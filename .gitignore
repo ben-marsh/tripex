@@ -1,4 +1,8 @@
 .vs/
+packages/
+Tripex/
+x64/
 *.dsp
+*.plg
 *.suo
 *.vcxproj.user
