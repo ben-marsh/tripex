@@ -149,21 +149,6 @@ bool CCfgItem::GetIntArray(int n, int *pn) const
 	CopyMemory(pn, &(*vn.begin()), n * sizeof(int));
 	return true;
 }
-bool CCfgItem::GetIntArray(int n, int *pn1, int *pn2, ...) const
-{
-	auto_ptr<int> pn(new int[n]);
-	bool bRes = GetIntArray(n, pn.get());
-
-	va_list pArg;
-	va_start(pArg, pn1);
-	for(int i = 0; i < n; i++)
-	{
-		*pn1 = pn.get()[i];
-		pn1 = va_arg(pArg, int*);
-	}
-	va_end(pArg);
-	return bRes;
-}
 bool CCfgItem::GetFloatArray(int n, float *pf) const
 {
 	int i;

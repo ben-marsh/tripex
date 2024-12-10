@@ -97,13 +97,3 @@ void _cdecl GetInfo( VIS_INFO *pInfo )
 	pInfo->bWantsFreq = TRUE;
 	pInfo->iSyncDelay = 0;
 }
-
-void get_module( struct VISUALISATION *pVis )
-{
-	pVis->Create = Create;
-	pVis->Start = Start;
-	pVis->AudioData = AudioData;
-	pVis->Render = Render;
-	pVis->Stop = Stop;
-	pVis->GetInfo = GetInfo;
-}

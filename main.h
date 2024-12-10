@@ -22,7 +22,7 @@ enum
 };
 
 extern ZAudio *g_pAudio;
-extern bitset<TXS_LAST> txs;
+//extern bitset<TXS_LAST> txs;
 
 //extern int active;
 //extern ZArray<EFFECT*> ppEffect;
@@ -30,7 +30,7 @@ extern int nEffect, nNextEffect;
 extern class ZTextureFont tef;
 
 // main-misc.cpp
-void ShowStatusMsg(const char *sFormat, ...);
+//void ShowStatusMsg(const char *sFormat, ...);
 
 // main-beat.cpp
 //void InitBeats();

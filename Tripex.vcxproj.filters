@@ -5,7 +5,6 @@
     <ClCompile Include="config.cpp" />
     <ClCompile Include="config-defaults.cpp" />
     <ClCompile Include="config-variables.cpp" />
-    <ClCompile Include="crt.cpp" />
     <ClCompile Include="CTextureItem.cpp" />
     <ClCompile Include="effect.cpp" />
     <ClCompile Include="effect-beziercube.cpp" />
@@ -55,15 +54,12 @@
     <ClCompile Include="ZTextureFont.cpp" />
     <ClCompile Include="ZTripex.cpp" />
     <ClCompile Include="ZVector.cpp" />
-    <ClCompile Include="zzz.cpp" />
-    <ClCompile Include="Main2.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CCfgItem.h" />
     <ClInclude Include="config.h" />
     <ClInclude Include="config-defaults.h" />
     <ClInclude Include="config-variables.h" />
-    <ClInclude Include="crt.h" />
     <ClInclude Include="CTextureItem.h" />
     <ClInclude Include="effect.h" />
     <ClInclude Include="error.h" />

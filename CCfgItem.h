@@ -68,7 +68,6 @@ public:
 	string GetString() const;
 	bool GetIntArray(vector<int> &vn) const;
 	bool GetIntArray(int n, int *pn) const;
-	bool GetIntArray(int n, int *pn1, int *pn2, ...) const;
 	bool GetFloatArray(int n, float *pf) const;
 
 	string GetKeyName();
