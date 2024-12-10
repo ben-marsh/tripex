@@ -108,7 +108,7 @@ public:
 	void ResetTextureState();
 	void ResetTextureStageState(DWORD dwStage);
 	void SetTexture(DWORD dwStage, ZTexture *pTexture, DWORD dwOp = D3DTOP_MODULATE, DWORD dwArg2 = D3DTA_CURRENT);
-	void SetTextureStageState(DWORD dwStage, DWORD dwKey, DWORD dwValue);
+	void SetTextureStageState(DWORD dwStage, D3DTEXTURESTAGESTATETYPE dwKey, DWORD dwValue);
 	HRESULT FlushTextureState();
 
 	static void BuildSprite(ZArray<ZVertexTL> &pVertex, ZArray<ZFace> &pFace, const ZPoint<int> &p, const ZRect<int> &spr, ZColour cDiffuse = ZColour::White(), ZColour cSpecular = ZColour::Black());
