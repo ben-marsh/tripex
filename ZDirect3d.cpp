@@ -408,10 +408,10 @@ HRESULT ZDirect3D::UploadTexture(ZTexture* pTexture)
 		}
 		else
 		{
-			//				hRes = D3DXLoadSurfaceFromMemory( pSurface, NULL, NULL, pTexture->m_pSrcData, 
-			//					pTexture->m_nSrcFmt, pTexture->m_nSrcSpan, pTexture->m_pSrcPalette, 
-			//					&rSrc, D3DX_FILTER_TRIANGLE | D3DX_FILTER_DITHER, 0 );
-			//				if( FAILED( hRes ) ) return TraceError( hRes );
+			hRes = D3DXLoadSurfaceFromMemory( pSurface, NULL, NULL, pTexture->m_pSrcData, 
+				pTexture->m_nSrcFmt, pTexture->m_nSrcSpan, pTexture->m_pSrcPalette, 
+				&rSrc, D3DX_FILTER_TRIANGLE | D3DX_FILTER_DITHER, 0 );
+			if( FAILED( hRes ) ) return TraceError( hRes );
 		}
 	}
 	return D3D_OK;
