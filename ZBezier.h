@@ -1,8 +1,6 @@
-#ifndef _ZBEZIER_H
-#define _ZBEZIER_H
+#pragma once
 
 #include "ZVector.h"
-//#include <H:\Microsoft Xbox SDK\xbox\include\d3d.h>
 
 class ZBezier
 {
@@ -82,5 +80,3 @@ template < int nBez > void ZContainedBezier<nBez>::GetNewPoints(ZBezier &b)
 	b[3].m_fY = vBound1.m_fY + ((float(rand()) / RAND_MAX) * (vBound2.m_fY - vBound1.m_fY));
 	b[3].m_fZ = vBound1.m_fZ + ((float(rand()) / RAND_MAX) * (vBound2.m_fZ - vBound1.m_fZ));
 }
-
-#endif

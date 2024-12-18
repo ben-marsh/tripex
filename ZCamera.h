@@ -1,5 +1,4 @@
-#ifndef _ZCAMERA_H
-#define _ZCAMERA_H
+#pragma once
 
 #include "ZVector.h"
 
@@ -35,5 +34,3 @@ public:
 	// GetTransform( ):
 	ZMatrix GetTransform( ) const;
 };
-
-#endif

@@ -1,5 +1,5 @@
-#ifndef _ZVECTOR_H
-#define _ZVECTOR_H
+#pragma once
+
 /*
 #include <d3d.h>
 #include <assert.h>
@@ -79,5 +79,3 @@ public:
 };
 
 #include "ZVector.inl"
-
-#endif

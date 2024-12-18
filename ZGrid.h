@@ -1,5 +1,4 @@
-#ifndef ENG_GRID
-#define ENG_GRID
+#pragma once
 
 #include "ZDirect3D.h"
 
@@ -19,5 +18,3 @@ public:
 	ZGrid( int nWidth, int nHeight );
 	HRESULT Render( );
 };
-
-#endif

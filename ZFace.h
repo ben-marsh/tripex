@@ -1,15 +1,13 @@
-#ifndef _ZFACE_H
-#define _ZFACE_H
+#pragma once
+
 #include "ZEdge.h"
 
-class ZFace
+struct ZFace
 {
-public:
 	WORD m_anVtx[ 3 ];
 
 	// Constructors:
-	inline ZFace( );
-	inline ZFace( const ZFace &f );
+	inline ZFace() = default;
 	inline ZFace( WORD nVtx1, WORD nVtx2, WORD nVtx3 );
 
 	// Set( ):
@@ -47,13 +45,6 @@ public:
 * Constructor:
 -----------------------------------*/
 
-ZFace::ZFace( )
-{
-}
-ZFace::ZFace( const ZFace &f )
-{
-	Set( f );
-}
 ZFace::ZFace( WORD nVtx1, WORD nVtx2, WORD nVtx3 )
 {
 	Set( nVtx1, nVtx2, nVtx3 );
@@ -165,6 +156,3 @@ const WORD &ZFace::operator[ ]( int nPos ) const
 {
 	return m_anVtx[ nPos ];
 }
-
-
-#endif

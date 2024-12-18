@@ -6,10 +6,6 @@
 * Constructor:
 -----------------------------------*/
 
-inline ZFft::Complex::Complex( )
-{
-}
-
 inline ZFft::Complex::Complex( float fReal, float fImag )
 {
 	m_fReal = fReal;

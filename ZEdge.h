@@ -1,5 +1,4 @@
-#ifndef _ZEDGE_H
-#define _ZEDGE_H
+#pragma once
 
 #include "Misc.h"
 
@@ -157,6 +156,3 @@ const WORD &ZEdge::operator[ ]( int nIdx ) const
 {
 	return m_anVtx[ nIdx ];
 }
-
-
-#endif

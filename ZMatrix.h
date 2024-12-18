@@ -1,5 +1,4 @@
-#ifndef _ZMATRIX_H
-#define _ZMATRIX_H
+#pragma once
 
 class ZMatrix
 {
@@ -49,5 +48,3 @@ public:
 };
 
 #include "ZMatrix.inl"
-
-#endif

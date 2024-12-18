@@ -1,8 +1,5 @@
 #pragma once
 
-#ifndef __ZPTR_H
-#define __ZPTR_H
-
 template < typename T > class ZPtr
 {
 protected:
@@ -46,5 +43,3 @@ public:
 		return *this;
 	}
 };
-
-#endif

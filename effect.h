@@ -1,11 +1,6 @@
 #pragma once
+
 #include "ZEffect.h"
-
-extern ZEffectPtr *pEffectBlank;
-extern vector< ZEffectPtr* > *pvpEffect;
-extern vector< ZEffectPtr* > *pvpEffectList;
-
-void CreateEffectList();
 
 #define EFFECT_MAX_TEXTURES 2
 

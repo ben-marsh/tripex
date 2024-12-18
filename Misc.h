@@ -1,5 +1,4 @@
-#ifndef __MISC_H
-#define __MISC_H
+#pragma once
 
 #pragma warning(disable: 4786)
 #pragma runtime_checks( "",off )
@@ -77,5 +76,3 @@ template< class T > inline T StepTo( T nValue, T nTarget, T nStep )
 		return max( nTarget, nValue - nStep );
 	}
 }
-
-#endif

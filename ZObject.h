@@ -1,5 +1,4 @@
-#ifndef _ZOBJECT_H
-#define _ZOBJECT_H
+#pragma once
 
 //#include "ZFlexibleVertexArray.h"
 #include "ZDirect3D.h"
@@ -314,5 +313,3 @@ public:
 	void CreateTorus(float fRadius, float fTubeRadius, int nPoints, int nTubePoints);
 	void CreateTetrahedron(float fRadius);
 };
-
-#endif

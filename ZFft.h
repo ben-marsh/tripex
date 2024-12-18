@@ -1,5 +1,4 @@
-#ifndef _ZFFT_H
-#define _ZFFT_H
+#pragma once
 
 /*---------------------------------------------
 * Includes
@@ -14,14 +13,14 @@
 class ZFft
 {
 protected:
-	class Complex
+	struct Complex
 	{
 	public:
 		float m_fReal;
 		float m_fImag;
 
 		// Constructor:
-		Complex( );
+		Complex() = default;
 		Complex( float fReal, float fImag );
 
 		// operator*( ):
@@ -65,5 +64,3 @@ public:
 };
 
 #include "ZFft.inl"
-
-#endif

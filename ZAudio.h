@@ -1,5 +1,4 @@
-#ifndef _ZAUDIO_H
-#define _ZAUDIO_H
+#pragma once
 
 #include "ZFft.h"
 #include "ZSpriteBuffer.h"
@@ -82,6 +81,3 @@ public:
 	// GetBand( ):
 	float GetBand( int nIdx );
 };
-
-
-#endif

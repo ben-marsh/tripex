@@ -1,5 +1,4 @@
-#ifndef _ZARRAY_H
-#define _ZARRAY_H
+#pragma once
 
 template < typename T > class ZArray
 {
@@ -220,5 +219,3 @@ template<typename T> void ZArray<T>::Fill(int nStart, int nEnd, T a)
 		memcpy(&pEntry[i], &a, sizeof(T)); 
 	}
 }
-
-#endif
