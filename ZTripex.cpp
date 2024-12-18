@@ -167,16 +167,12 @@ HRESULT ZTripex::Startup()
 	InitObjectArrays( );
 	InitObjectClipper( );
 
-	printf( "init arrays\n" );
-
 	txs.reset();
 
 	pBlankTexture = NULL;
 
 	pvpEffect = new std::vector< ZEffectPtr* >;
 	pvpEffect->push_back((*pvpEffectList)[0]);
-
-	printf( "tex\n" );
 
 	vpTexture.clear();
 	fEffectFrames = 0.0f;
@@ -193,16 +189,10 @@ HRESULT ZTripex::Startup()
 	LoadCfgItems();
 	UpdateCfgItems(true);
 
-	printf( "cfg items\n" );
-
 	pAudio = std::make_unique<ZAudio>( 512 );
 	g_pD3D = new ZDirect3D;
 
-	printf( "d3d\n" );
-
 	srand( timeGetTime( ) );
-
-	printf( "srand\n" );
 
 	PALETTEENTRY *ppe = new PALETTEENTRY[ 256 ];
 	{
@@ -231,8 +221,6 @@ HRESULT ZTripex::Startup()
 	g_pD3D->AddTexture( gui.get( ) );
 //	g_pD3D->vpTexture.push_back(gui.get());//auto_ptr< ZTexture >(gui);
 
-	printf( "gui tex\n" );
-
 	tef.Add( ( UINT8* )&g_anTexRawFont[ 1 ] );
 	tef.GetLetter(' ')->nEnd = 2;
 	g_pD3D->AddTexture( tef.GetTexture( ) );
@@ -248,9 +236,7 @@ HRESULT ZTripex::Startup()
 
 	srand( timeGetTime( ) );
 	
-	printf( "pre init thread\n" );
 	InitialiseThread( NULL );
-	printf( "post init thread\n" );
 
 	for( int i = 0; i < (int)vpTexture.size(); i++)
 	{
@@ -258,27 +244,20 @@ HRESULT ZTripex::Startup()
 //		g_pD3D->vpTexture.push_back(vpTexture[i].get());
 	}
 
-	printf( "added textures\n" );
-
 	id = (int)pvpEffect->size();
 
 	txs.set(TXS_CHANGE_EFFECT);
 
 	txs.set( TXS_RESET_TIMING );
 
-	printf( "d3d open\n" );
-
 	HRESULT hRes = g_pD3D->Open( );
 	if( FAILED( hRes ) ) return TraceError( hRes );
 
-	printf( "d3d opened\n" );
 //	hRes = pcHUD->Initialise(d3d.get());
 //	if(FAILED(hRes)) return TraceError(hRes);
 
 	return D3D_OK;
 }
-#include "ZTripex.h"
-extern ZTripex *g_pTripex;
 HRESULT ZTripex::Render()
 {
 	UpdateCfgItems();
@@ -297,8 +276,6 @@ HRESULT ZTripex::Render()
 	fFrames += min(4.0f, dwTimeChange / (1000.0f / 15.0f));
 	dwLastTime = dwTime;
 //	AddFrameTime(false, dwTimeChange);
-
-	printf( "Render Started\n" );
 
 	fEffectFrames += fFrames;
 	fFadePos += dwTimeChange; 
@@ -448,8 +425,6 @@ HRESULT ZTripex::Render()
 		return D3D_OK;
 	}
 
-	printf( "Audio Update\n" );
-
 	pAudio->Update( fFrames, (*pvpEffect)[nEffect]->fSensitivity );
 //	UpdateBeat(fFrames);
 
@@ -464,22 +439,14 @@ HRESULT ZTripex::Render()
 //	static unsigned int nc = 0x0000ffff;
 //	nc ^= 0x00005553;
 
-	printf( "Device Clear\n" );
-
 	HRESULT hRes = g_pD3D->g_pDevice->Clear( 0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x00000000, 1.0f, 0 );
 	if(FAILED(hRes)) return TraceError(hRes);
-
-	printf( "Begin scene\n" );
 
 	hRes = g_pD3D->g_pDevice->BeginScene( );
 	if( FAILED( hRes ) ) return TraceError( hRes );
 
-	printf( "Set Vertex Shader\n" );
-
 	hRes = g_pD3D->g_pDevice->SetFVF( D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_SPECULAR | D3DFVF_TEX1 );
 	if( FAILED( hRes ) ) return TraceError( hRes );
-
-	printf( "Set Texture\n" );
 
 	g_pD3D->SetTexture(0, gui.get());
 /*
@@ -492,8 +459,8 @@ HRESULT ZTripex::Render()
 	LuminanceOpacity = (1 << 6L),
 	InverseMultiply = (1 << 7L),
 */
-	printf( "SetRenderState\n" );
-	// D3DRS_CLIPPING is not supported in the XBox DX8 SDK ...
+
+// D3DRS_CLIPPING is not supported in the XBox DX8 SDK ...
 	//g_pD3D->SetRenderState(D3DRS_CLIPPING, false);
 	// ... Forza.
 
@@ -501,9 +468,7 @@ HRESULT ZTripex::Render()
 		{
 			DWORD dwStartTick = timeGetTime( );
 
-			printf( "Render Effect %d\n", i );
 			ppDrawEffect[i]->Render( );
-			printf( "Done\n" );
 			if(FAILED(hRes)) return TraceError(hRes);
 		}
 
@@ -512,8 +477,7 @@ HRESULT ZTripex::Render()
 //	int nX = d3d->GetWidth() * 0.06;
 //	int nY = d3d->GetHeight() - 63;
 
-	printf( "Set Texture\n" );
-	g_pD3D->SetTexture(0, g_pTripex->gui.get());
+	g_pD3D->SetTexture(0, gui.get());
 
 	std::string sMsg;
 	float fMsgBr = 0.0f;
@@ -532,13 +496,11 @@ HRESULT ZTripex::Render()
 	}
 	if(sMsg.size() > 0 && bShowMessages)
 	{
-//		printf( "Draw Message: %s\n", sMsg.c_str() );
 		DrawMessage(sb, &tef, 38, sMsg.c_str(), fMsgBr, 1 - fHUDTransparency);
 	}
 
 	if(txs.test(TXS_VISIBLE_BEATS))
 	{
-		printf( "Audio Render\n" );
 		pAudio->Render( sb );
 	}
 
@@ -546,21 +508,17 @@ HRESULT ZTripex::Render()
 //		sb.AddSprite(ZPoint<int>(10, 30), d3d->vpTexture[3], g_pD3D->Shade, ZRect<int>(0, 0, 600, 400), 1.0f );
 //		sb.Flush( d3d.get( ) );
 
-	printf( "Flush\n" );
 	hRes = sb.Flush( );
 	if(FAILED(hRes)) return TraceError(hRes);
 
-	printf( "End Scene\n" );
 	hRes = g_pD3D->g_pDevice->EndScene( );
 	if( FAILED( hRes ) ) return TraceError( hRes );
 
-	printf( "Present\n" );
 	hRes = g_pD3D->g_pDevice->Present(NULL, NULL, NULL, NULL);
 	if( FAILED( hRes ) ) return TraceError( hRes );
 
 //	AddFrameTime(true, clock() - dwRenderStartClock);
 
-	printf( "Finished Render\n" );
 	fFrames = 0;
 	return 0;
 }

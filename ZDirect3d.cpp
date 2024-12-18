@@ -57,44 +57,25 @@ HRESULT ZDirect3D::Open()
 
 	g_pDevice = ::g_pd3dDevice;
 
-	printf("GetBackBuffer\n");
 	IDirect3DSurface9* pd3dSurface = NULL;
 	HRESULT hRes = g_pDevice->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &pd3dSurface);
 	if (FAILED(hRes)) return TraceError(hRes);
-	printf("Done\n");
 
-	printf("Get Surface Desc\n");
 	D3DSURFACE_DESC d3dsd;
 	hRes = pd3dSurface->GetDesc(&d3dsd);
 	pd3dSurface->Release();
 	if (FAILED(hRes)) return TraceError(hRes);
-	printf("Done\n");
-
-	//printf( "surface desc\n" );
 
 	nWidth = d3dsd.Width;
 	nHeight = d3dsd.Height;
 
-	printf("Width: %d  Height: %d\n", nWidth, nHeight);
-
-	printf("Get Device Caps\n");
 	hRes = g_pDevice->GetDeviceCaps(&g_Caps);
 	if (FAILED(hRes)) return TraceError(hRes);
-	printf("Done\n");
-
-	//printf( "caps\n" );
 
 	for (std::set< ZTexture* >::iterator it = g_spTexture.begin(); it != g_spTexture.end(); it++)
 	{
-		printf("texture\n");
-
 		HRESULT hRes = CreateTexture(*it);
-
-		printf("returned\n");
-
 		if (FAILED(hRes)) return TraceError(hRes);
-
-		printf("after CreateTexture\n");
 	}
 	return D3D_OK;
 }
@@ -178,16 +159,11 @@ void ZDirect3D::SetState(int nFlags)
 }
 void ZDirect3D::ResetRenderState()
 {
-	//int ichk = 0;
 	mpNewRender.clear();
-	//printf( "ZDirect3d::ResetRenderState %d to %d\n", mpRender.begin(), mpRender.end() );
 	for (StateBuffer::iterator it = mpRender.begin(); it != mpRender.end(); it++)
 	{
-		//printf( "ZDirect3d::ResetRenderState loop #%d - %d - %d\n", ichk, it->first, it->second.first );
 		SetRenderState(it->first, it->second.second);
-		//ichk ++;
 	}
-	//printf( "Done\n" );
 }
 void ZDirect3D::SetRenderState(DWORD dwKey, DWORD dwValue)
 {
@@ -421,8 +397,6 @@ HRESULT ZDirect3D::CreateTexture(ZTexture* pTexture)
 {
 	_ASSERT(g_pd3dDevice != NULL);
 	_ASSERT(pTexture->m_pd3dTexture == NULL);
-
-	printf("%p\n", pTexture);
 
 	if (pTexture->m_nSrcFmt == D3DFMT_UNKNOWN)//pTexture->m_nFlags & ZTexture::F_SRC_FILE )
 	{

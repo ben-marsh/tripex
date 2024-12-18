@@ -21,24 +21,16 @@ void _cdecl Create( LPDIRECT3DDEVICE9 pd3dDevice, int iWidth, int iHeight, const
 //void _cdecl Start( int iChannels, int iSamplesPerSec, int iBitsPerSample )
 void _cdecl Start( int iChannels, int iSamplesPerSec, int iBitsPerSample, const char* szSongName)
 {
-	printf("start\n" );
-	//TODO:
 	g_pTripex = new ZTripex();
-
-	printf("constructed ZTripex\n" );
-
-	printf("calling Startup( )\n" );
 
 	HRESULT hRes = g_pTripex->Startup( );
 	if( FAILED( hRes ) ) 
 	{
-		printf("Startup( ) failed\n" );
 		g_pTripex->Shutdown( );
 		g_bInit = FALSE;
 	}
 	else
 	{
-		printf("Startup( ) succeeded\n" );
 		g_bInit = TRUE;
 	}
 }

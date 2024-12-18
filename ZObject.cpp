@@ -991,7 +991,6 @@ HRESULT ZObject::Render( )
 	HRESULT hRes;
 	if(!m_bsFlag.test(F_VALID_TRANSFORMED_DATA)) return D3D_OK;
 
-	printf( "ZObject::Render Start ...\n" );
 	ZDirect3D::TextureStage tsDefault;
 //	tsDisable.AddState(D3DTSS_COLOROP, D3DTOP_DISABLE);
 
@@ -1002,18 +1001,12 @@ HRESULT ZObject::Render( )
 	bool bStencilZ = m_bsFlag.test(F_DRAW_Z_BUFFER) && m_bsFlag.test(F_DRAW_TRANSPARENT);
 	for(int i = bStencilZ? -1 : 0; i < 1; i++)
 	{
-		//printf( "ResetRenderState\n" );
 		g_pD3D->ResetRenderState();
-		//int ichk = 0;
-		//printf( "SetRenderState %d to %d\n", mpState.begin(), mpState.end() );
 		for(std::map< D3DRENDERSTATETYPE, DWORD >::iterator it = mpState.begin(); it != mpState.end(); it++)
 		{
-			//printf( "SetRenderState loop #%d - %d - %d\n", ichk, it->first, it->second );
 			g_pD3D->SetRenderState(it->first, it->second);
-			//ichk ++;
 		}
 
-		//printf( "ResetTextureState\n" );
 		g_pD3D->ResetTextureState();
 		if(i == -1)
 		{
@@ -1066,12 +1059,10 @@ HRESULT ZObject::Render( )
 				pTransVertex[ i ].m_cSpecular.m_nB = rand( ) & 0xff;
 			}
 */
-			printf( "DrawIndexedPrimitive\n" );
 			hRes = g_pD3D->DrawIndexedPrimitive(pTransVertex, pClippedFace);
 			if(FAILED(hRes)) return TraceError(hRes);
 		}
 	}
 
-	printf( "ZObject::Render End ...\n" );
 	return D3D_OK;
 }

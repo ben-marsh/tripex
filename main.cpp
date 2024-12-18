@@ -180,44 +180,42 @@ LRESULT CALLBACK TxWndProc(HWND hWnd, UINT32 nMsg, WPARAM wParam, LPARAM lParam)
 	switch (nMsg)
 	{
 	case WM_CREATE:
-	{
-		MMRESULT mRes = CreateWaveIn(hWnd);
-		if (FAILED(mRes))
 		{
-			OutputWaveInError(mRes);
-			DestroyWaveIn();
+			MMRESULT mRes = CreateWaveIn(hWnd);
+			if (FAILED(mRes))
+			{
+				OutputWaveInError(mRes);
+				DestroyWaveIn();
+			}
+			else if (!CreateD3D(hWnd))
+			{
+				printf("couldn't create device\n");
+				DestroyWindow(hWnd);
+			}
+			else
+			{
+				void _cdecl Start(int iChannels, int iSamplesPerSec, int iBitsPerSample, const char* szSongName);
+				Start(2, 44100, 16, nullptr);
+				g_bStarted = TRUE;
+				SetTimer(hWnd, 0x1234, 10, NULL);
+			}
 		}
-		else if (!CreateD3D(hWnd))
-		{
-			printf("couldn't create device\n");
-			DestroyWindow(hWnd);
-		}
-		else
-		{
-			void _cdecl Start(int iChannels, int iSamplesPerSec, int iBitsPerSample, const char* szSongName);
-			Start(2, 44100, 16, nullptr);
-			g_bStarted = TRUE;
-			SetTimer(hWnd, 0x1234, 10, NULL);
-		}
-	}
-	return FALSE;
+		return FALSE;
 	case MM_WIM_OPEN:
-		printf("wave in opened\n");
 		return FALSE;
 	case MM_WIM_CLOSE:
-		printf("wave in closed\n");
 		return FALSE;
 	case MM_WIM_DATA:
-	{
-		int nIdx = (int)((WAVEHDR*)lParam - g_aWaveHdr);
-		RemoveWaveInBuffer(nIdx);
+		{
+			int nIdx = (int)((WAVEHDR*)lParam - g_aWaveHdr);
+			RemoveWaveInBuffer(nIdx);
 
-		void _cdecl AudioData(short* pAudioData, int iAudioDataLength, float* pFreqData, int iFreqDataLength);
-		AudioData((short*)g_aWaveHdr[nIdx].lpData, g_aWaveHdr[nIdx].dwBytesRecorded, NULL, 0);
+			void _cdecl AudioData(short* pAudioData, int iAudioDataLength, float* pFreqData, int iFreqDataLength);
+			AudioData((short*)g_aWaveHdr[nIdx].lpData, g_aWaveHdr[nIdx].dwBytesRecorded, NULL, 0);
 
-		AddWaveInBuffer(nIdx);
-	}
-	return FALSE;
+			AddWaveInBuffer(nIdx);
+		}
+		return FALSE;
 	case WM_TIMER:
 		if (wParam == 0x1234)
 		{
@@ -226,23 +224,23 @@ LRESULT CALLBACK TxWndProc(HWND hWnd, UINT32 nMsg, WPARAM wParam, LPARAM lParam)
 		}
 		break;
 	case WM_DESTROY:
-	{
-		MMRESULT mRes = DestroyWaveIn();
-		if (FAILED(mRes)) OutputWaveInError(mRes);
-	}
+		{
+			MMRESULT mRes = DestroyWaveIn();
+			if (FAILED(mRes)) OutputWaveInError(mRes);
+		}
 
-	KillTimer(hWnd, 1);
+		KillTimer(hWnd, 1);
 
-	if (g_bStarted)
-	{
-		void _cdecl Stop();
-		Stop();
+		if (g_bStarted)
+		{
+			void _cdecl Stop();
+			Stop();
 
-		g_bStarted = FALSE;
-	}
+			g_bStarted = FALSE;
+		}
 
-	DestroyD3D();
-	return FALSE;
+		DestroyD3D();
+		return FALSE;
 	case WM_KEYDOWN:
 		switch (wParam)
 		{
