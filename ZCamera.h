@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ZVector.h"
+#include <bitset>
 
 class ZCamera
 {

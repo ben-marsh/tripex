@@ -4,6 +4,7 @@
 #include "ZTexture.h"
 #include "ZColour.h"
 #include "ZSpriteBuffer.h"
+#include <memory>
 
 #define TF_ALIGNLEFT 0
 #define TF_ALIGNRIGHT 1

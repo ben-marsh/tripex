@@ -1,5 +1,6 @@
 #include "StdAfx.h"
 #include <crtdbg.h>
+#include <memory>
 #include "CCfgItem.h"
 #include "Misc.h"
 

@@ -3,6 +3,7 @@
 #include "main.h"
 #include "CCfgItem.h"
 #include "ZTextureFont.h"
+#include <bitset>
 
 class ZTripex
 {

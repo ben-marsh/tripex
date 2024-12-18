@@ -7,6 +7,8 @@
 #include "ZEdge.h"
 #include "ZPoint.h"
 #include "ZRect.h"
+#include <map>
+#include <set>
 
 #define MAX_TEXTURES 1
 

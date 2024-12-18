@@ -91,6 +91,7 @@
     <ClInclude Include="ZTextureFont.h" />
     <ClInclude Include="ZTripex.h" />
     <ClInclude Include="ZVector.h" />
+    <ClInclude Include="Platform.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ZFft.inl" />

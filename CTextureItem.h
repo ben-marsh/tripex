@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ZTexture.h"
+#include <string>
 
 class CTextureItem
 {

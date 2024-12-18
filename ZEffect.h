@@ -2,6 +2,7 @@
 
 #include <string>
 #include <set>
+#include <memory>
 
 class ZEffectBase
 {

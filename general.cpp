@@ -3,6 +3,7 @@
 #include "error.h"
 #include "ZColour.h"
 #include "ZTextureFont.h"
+#include <string>
 
 int GetClippedLineLength(ZTextureFont *pFont, const char *sText, int nClipWidth)
 {

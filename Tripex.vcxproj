@@ -251,6 +251,7 @@
     <ClInclude Include="general.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="Misc.h" />
+    <ClInclude Include="Platform.h" />
     <ClInclude Include="star.h" />
     <ClInclude Include="StdAfx.h" />
     <ClInclude Include="TextureData.h" />
