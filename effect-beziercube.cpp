@@ -48,6 +48,16 @@ public:
 
 	ZEffectBezierCube() : bcEdge(TWISTPLANES)
 	{
+		brt = 0.0;
+		pTexture = nullptr;
+		pTint = nullptr;
+
+		memset(pfRS, 0, sizeof(pfRS));
+		memset(pfPS, 0, sizeof(pfPS));
+		memset(pfYS, 0, sizeof(pfYS));
+		memset(pfPos, 0, sizeof(pfPos));
+		memset(pfSpeed, 0, sizeof(pfSpeed));
+
 		dAng = 0;
 		dAngX = 0;
 		dAngY = 0;

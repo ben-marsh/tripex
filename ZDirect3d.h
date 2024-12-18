@@ -80,18 +80,11 @@ public:
 	HRESULT DrawIndexedPrimitive(ZArray<ZVertexTL> &pVertex, ZArray<ZFace> &pfFace);
 
 	HRESULT AddTexture( ZTexture *pTexture );
-	HRESULT RemoveTexture( ZTexture *pTexture );
 	HRESULT UploadTexture( ZTexture *pTexture );
 	void GetStateChanges(NewStateBuffer &mp_new, StateBuffer &mp_current, vector< StateBufferChange > &vc);
 
 	HRESULT CreateTexture(ZTexture *pTexture);
-	HRESULT CopyTexture(ZTexture *pTexture);
-	HRESULT CopyTexture(ZTexture *pTexture, ZColour *pcData, int nSpan = 256);
-	HRESULT CopyTexture(ZTexture *pTexture, unsigned char *pnIndex, ZColour *pcPalette, int nSpan = 256);
 	void DestroyTexture(ZTexture *pTexture);
-
-	HRESULT CreatePalette( ZPalette *pPalette );
-	void DestroyPalette( ZPalette *pPalette );
 
 	ZTexture *Find(int nType);
 
@@ -113,7 +106,6 @@ public:
 
 	static void BuildSprite(ZArray<ZVertexTL> &pVertex, ZArray<ZFace> &pFace, const ZPoint<int> &p, const ZRect<int> &spr, ZColour cDiffuse = ZColour::White(), ZColour cSpecular = ZColour::Black());
 	HRESULT DrawSprite(const ZPoint<int> &p, const ZRect<int> &spr, ZColour cDiffuse = ZColour::White(), ZColour cSpecular = ZColour::Black());
-	HRESULT BlendSprites(const ZPoint<int> &p, float fBlend, const ZRect<int> &spr1, const ZRect<int> &spr2, ZColour cDiffuse = ZColour::White(), ZColour cSpecular = ZColour::Black());
 };
 
 extern ZDirect3D *g_pD3D;

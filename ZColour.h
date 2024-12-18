@@ -21,7 +21,7 @@ public:
 
 	// Constructors:
 	inline ZBaseColour( );
-	inline ZBaseColour( FLOAT32 fBr );
+	inline ZBaseColour( float fBr );
 	inline ZBaseColour( T nR, T nG, T nB );
 	template < class U > inline ZBaseColour( const ZBaseColour< U > &c )
 	{
@@ -74,7 +74,6 @@ public:
 	int GetMaxComponent(){ return max(m_nR, max(m_nG, m_nB)); }
 	int GetMinComponent(){ return min(m_nR, min(m_nG, m_nB)); }
 	static ZBaseColour<T> Blend(const ZBaseColour<T> &c1, const ZBaseColour<T> &c2, float fBlend){ return (ZBaseColour<T>)((c1 * (1.0f - fBlend)) + (c2 * fBlend)); }
-	class ZColourHSV ToHSV(float fDefH = 0.0, float fDefS = 0.0) const;
 };
 template < class T, class U > inline ZBaseColour<T> operator*(U n, const ZBaseColour<T> &c)
 {

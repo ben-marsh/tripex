@@ -17,7 +17,7 @@ public:
 class ZEffectPtr
 {
 protected:
-	ZEffectBase *pEffect;
+	std::unique_ptr<ZEffectBase> pEffect;
 
 public:
 	float fBr;
@@ -43,8 +43,8 @@ public:
 		};
 	};
 
-//	ZEffectPtr();
-//	~ZEffectPtr();
+	ZEffectPtr();
+	~ZEffectPtr();
 	virtual void Create() = 0;
 	virtual void Destroy();
 
@@ -64,7 +64,7 @@ public:
 	{
 //		_ASSERT(pEffect == NULL);
 //		Destroy();
-		pEffect = static_cast<ZEffectBase*>(new T);
+		pEffect = std::make_unique<T>();
 		pEffect->pEffectPtr = this;
 	}
 };

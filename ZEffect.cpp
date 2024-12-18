@@ -6,6 +6,7 @@
 /******** ZEffectBase ************************************/
 ZEffectBase::ZEffectBase()
 {
+	pEffectPtr = nullptr;
 }
 ZEffectBase::~ZEffectBase()
 {
@@ -14,28 +15,31 @@ HRESULT ZEffectBase::Reconfigure()
 {
 	return D3D_OK;
 }
-bool ZEffectBase::CanRender(float fElapsed)
+bool ZEffectBase::CanRender(FLOAT32 fElapsed)
 {
 	return true;
 }
 
 /******** ZEffectPtr **************************************/
-//	ZEffectPtr::ZEffectPtr()
-//	{
-//		pEffect = NULL;
-//	}
-//	ZEffectPtr::~ZEffectPtr()
-//	{
-//		_ASSERT(pEffect == NULL);
-//		Destroy();
-//	}
+ZEffectPtr::ZEffectPtr()
+{
+	bValid = false;
+	fBr = 0.0f;
+	fProb = 0.0f;
+	fStartupWeight = 0.0f;
+	nDrawOrder = 0;
+	nLastUsed = 0;
+
+
+
+	memset(pfSetting, 0, sizeof(pfSetting));
+}
+ZEffectPtr::~ZEffectPtr()
+{
+}
 void ZEffectPtr::Destroy()
 {
-	if(pEffect != NULL)
-	{
-		delete pEffect;
-		pEffect = NULL;
-	}
+	pEffect.reset();
 }
 HRESULT ZEffectPtr::Calculate(float fElapsed)
 {
