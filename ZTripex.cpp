@@ -31,8 +31,7 @@ void ZTripex::ShowStatusMsg(const char *sFormat, ...)
 	va_list pArg;
 	va_start( pArg, sFormat );
 
-	// TODO: FORZA: SORT THIS OUT
-	//vsnprintf( sStatusMsg, sizeof( sStatusMsg ), sFormat, pArg );
+	vsnprintf( sStatusMsg, sizeof( sStatusMsg ), sFormat, pArg );
 	dwStatusTime = timeGetTime( );
 }
 
@@ -515,19 +514,6 @@ HRESULT ZTripex::Render()
 	string sMsg;
 	float fMsgBr = 0.0f;
 
-	static int n = 0;
-	if(pvpEffect->size() <= 1 || TRUE )
-	{
-		n++;
-
-		// TODO
-		static char sBuf[ 200 ];
-		sprintf(sBuf, "%d\n", n );
-
-		sMsg = sBuf;//"No effects can be used" + sBuf;
-		fMsgBr = 1.0f;
-	}
-
 	DWORD dwTick = timeGetTime( );
 	if(dwTick >= dwStatusTime && dwTick <= dwStatusTime + (MSG_DISPLAY_TIME + MSG_FADEOUT_TIME) && sStatusMsg[ 0 ] != 0)
 	{
@@ -542,8 +528,8 @@ HRESULT ZTripex::Render()
 	}
 	if(sMsg.size() > 0 && bShowMessages)
 	{
-		printf( "Draw Message: %s\n", sMsg.c_str() );
-		//DrawMessage(sb, &tef, 38, sMsg.c_str(), fMsgBr, 1 - fHUDTransparency);
+//		printf( "Draw Message: %s\n", sMsg.c_str() );
+		DrawMessage(sb, &tef, 38, sMsg.c_str(), fMsgBr, 1 - fHUDTransparency);
 	}
 
 	if(txs.test(TXS_VISIBLE_BEATS))
