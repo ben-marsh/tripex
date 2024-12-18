@@ -153,7 +153,7 @@ void ZAudio::AddData( const void *pvSrc, int nSize )
 * Update( ):
 ---------------------------------------------*/
 
-void ZAudio::Update( float fElapsed )
+void ZAudio::Update( float fElapsed, float fSensitivity )
 {
 	for( int i = 0; i < m_nSamples; i++ )
 	{
@@ -209,7 +209,7 @@ void ZAudio::Update( float fElapsed )
 				fSize = max( fSize, fVal - m_afBeatHistory[ i ] );
 			}
 
-			float fLimit = 500.0f - 4.8f * (*pvpEffect)[ nEffect ]->fSensitivity;
+			float fLimit = 500.0f - 4.8f * fSensitivity;
 			if( fSize > fLimit )
 			{
 				m_bBeat = TRUE;

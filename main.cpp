@@ -254,10 +254,10 @@ LRESULT CALLBACK TxWndProc(HWND hWnd, UINT32 nMsg, WPARAM wParam, LPARAM lParam)
 			g_pTripex->txs.flip(TXS_VISIBLE_BEATS);
 			break;
 		case VK_LEFT:
-			if (nEffect > 1) g_pTripex->txs[TXS_EFFECT_LEFT] = true;
+			g_pTripex->txs[TXS_EFFECT_LEFT] = true;
 			break;
 		case VK_RIGHT:
-			if (nEffect + 1 < pvpEffect->size()) g_pTripex->txs[TXS_EFFECT_RIGHT] = true;
+			g_pTripex->txs[TXS_EFFECT_RIGHT] = true;
 			break;
 		case 'R':
 			g_pTripex->txs[TXS_RECONFIGURE] = true;

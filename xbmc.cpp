@@ -1,16 +1,11 @@
 #include "StdAfx.h"
 #include "effect.h"
-#include "config-variables.h"
 #include "ZTripex.h"
 #include "xbmc.h"
 
 //IDirect3DDevice9 *g_pd3dDevice;
 //unsigned char g_pcSpectrum[ 2 ][ 576 ];
 //unsigned char g_pcWaveform[ 2 ][ 576 ];
-
-HRESULT TxStartup( );
-HRESULT TxRender( );
-void TxShutdown( HRESULT );
 
 BOOL g_bInit = FALSE;
 
@@ -28,12 +23,9 @@ void _cdecl Start( int iChannels, int iSamplesPerSec, int iBitsPerSample, const 
 {
 	printf("start\n" );
 	//TODO:
-	g_pTripex = new ZTripex;
+	g_pTripex = new ZTripex();
 
 	printf("constructed ZTripex\n" );
-
-	CreateEffectList( );
-	CreateCfgItems( );
 
 	printf("calling Startup( )\n" );
 

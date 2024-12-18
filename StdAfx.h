@@ -18,6 +18,7 @@ static const FLOAT32 g_fRadToDeg = 57.295779513082320876798154814105f;//180.0f /
 
 #pragma warning(disable:4201)
 #pragma warning(disable:4275)
+
 //#pragma warning(disable:C4786)
 
 #define  _CRT_SECURE_NO_WARNINGS

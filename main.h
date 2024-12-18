@@ -26,7 +26,6 @@ extern ZAudio *g_pAudio;
 
 //extern int active;
 //extern ZArray<EFFECT*> ppEffect;
-extern int nEffect, nNextEffect;
 extern class ZTextureFont tef;
 
 // main-misc.cpp

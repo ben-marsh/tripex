@@ -7,7 +7,6 @@
 #include "ZTexture.h"
 #include "ZColourHSV.h"
 #include <time.h>
-#include "config-variables.h"
 //#include <mmsystem.h>
 
 //#pragma optimize("a", on)

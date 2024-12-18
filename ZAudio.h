@@ -52,7 +52,7 @@ public:
 	void AddData( const void *pvData, int nSize );
 
 	// Update( ):
-	void Update( float fElapsed );
+	void Update( float fElapsed, float fSensitivity);
 	
 	// Render( ):
 	void Render( ZSpriteBuffer &sb ) const;

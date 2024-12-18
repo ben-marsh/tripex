@@ -7,12 +7,12 @@
 #include "config.h"
 #include "ZSpriteBuffer.h"
 #include "CTextureItem.h"
-#include "config-variables.h"
 #include "config.h"
 #include "TextureData.h"
 #include "ZAudio.h"
 //#include "mmsystem.h"
 #include <algorithm>
+#include "config-defaults.h"
 #include "ZTripex.h"
 
 /****** constants *****/
@@ -21,10 +21,14 @@
 #define MSG_FADEOUT_TIME 1000
 
 ZTexture *pBlankTexture;
-int nEffect;
 void InitObjectArrays( );
 void InitObjectClipper( );
 
+ZTripex::ZTripex()
+{
+	CreateEffectList();
+	CreateCfgItems();
+}
 
 void ZTripex::ShowStatusMsg(const char *sFormat, ...)
 {
@@ -446,7 +450,7 @@ HRESULT ZTripex::Render()
 
 	printf( "Audio Update\n" );
 
-	g_pAudio->Update( fFrames );
+	g_pAudio->Update( fFrames, (*pvpEffect)[nEffect]->fSensitivity );
 //	UpdateBeat(fFrames);
 
 	for(int i = 0; i < 2; i++)
@@ -582,4 +586,258 @@ void ZTripex::Shutdown( )
 	}
 
 	SaveCfgItems();
+}
+
+ZEffectPtr* CreateEffect_Blank();
+ZEffectPtr* CreateEffect_BezierCube();
+ZEffectPtr* CreateEffect_CollapsingLightSphere();
+ZEffectPtr* CreateEffect_Distortion1();
+ZEffectPtr* CreateEffect_Distortion2();
+ZEffectPtr* CreateEffect_Distortion2Col();
+ZEffectPtr* CreateEffect_Flowmap();
+ZEffectPtr* CreateEffect_Tunnel();
+ZEffectPtr* CreateEffect_WaterGlobe();
+ZEffectPtr* CreateEffect_Tube();
+ZEffectPtr* CreateEffect_Sun();
+ZEffectPtr* CreateEffect_Bumpmapping();
+ZEffectPtr* CreateEffect_Spectrum();
+ZEffectPtr* CreateEffect_Rings();
+ZEffectPtr* CreateEffect_Phased();
+ZEffectPtr* CreateEffect_MotionBlur1();
+ZEffectPtr* CreateEffect_MotionBlur2();
+ZEffectPtr* CreateEffect_MotionBlur3();
+ZEffectPtr* CreateEffect_MotionBlur3Alt();
+ZEffectPtr* CreateEffect_MorphingSphere();
+ZEffectPtr* CreateEffect_Metaballs();
+ZEffectPtr* CreateEffect_LightTentacles();
+ZEffectPtr* CreateEffect_LightStar();
+ZEffectPtr* CreateEffect_LightSphere();
+ZEffectPtr* CreateEffect_LightRing();
+ZEffectPtr* CreateEffect_SuperSampling();
+/*
+extern ZEffectPtr *pEffectBezierCube;
+extern ZEffectPtr *pEffectCollapsingLightSphere;
+extern ZEffectPtr *pEffectDistortion1;
+extern ZEffectPtr *pEffectDistortion2;
+extern ZEffectPtr *pEffectDistortion2Col;
+extern ZEffectPtr *pEffectFlowmap;
+extern ZEffectPtr *pEffectTunnel;
+extern ZEffectPtr *pEffectWaterGlobe;
+extern ZEffectPtr *pEffectTube;
+extern ZEffectPtr *pEffectSun;
+extern ZEffectPtr *pEffectBumpmapping;
+extern ZEffectPtr *pEffectSpectrum;
+extern ZEffectPtr *pEffectRings;
+extern ZEffectPtr *pEffectPhased;
+extern ZEffectPtr *pEffectMotionBlur1;
+extern ZEffectPtr *pEffectMotionBlur2;
+extern ZEffectPtr *pEffectMotionBlur3;
+extern ZEffectPtr *pEffectMotionBlur3Alt;
+extern ZEffectPtr *pEffectMorphingSphere;
+extern ZEffectPtr *pEffectMetaballs;
+extern ZEffectPtr *pEffectLightTentacles;
+extern ZEffectPtr *pEffectLightStar;
+extern ZEffectPtr *pEffectLightSphere;
+extern ZEffectPtr *pEffectLightRing;
+extern ZEffectPtr *pEffectSuperSampling;
+*/
+void ZTripex::AddEffect(ZEffectPtr* (*fn)(), const char* sName, int nDrawOrder, float fStartupWeight, int nTex, ...)
+{
+	ZEffectPtr* pEffect = fn();
+	pEffect->sName = sName;
+	pEffect->nDrawOrder = nDrawOrder;
+	pEffect->fStartupWeight = fStartupWeight;
+
+	va_list pArg;
+	va_start(pArg, nTex);
+	while (nTex != 0)
+	{
+		pEffect->snTexture.insert(nTex);
+		nTex = va_arg(pArg, int);
+	}
+	va_end(pArg);
+
+	if (pvpEffectList->size() == 0) pvpEffectList->push_back(pEffect);
+	else
+	{
+		for (int i = 1;; i++)
+		{
+			if (i == pvpEffectList->size() || _stricmp(pEffect->sName.c_str(), (*pvpEffectList)[i]->sName.c_str()) < 0)
+			{
+				pvpEffectList->insert(pvpEffectList->begin() + i, pEffect);
+				break;
+			}
+		}
+	}
+}
+
+void ZTripex::CreateEffectList()
+{
+	_ASSERT(pvpEffectList == NULL);
+	pvpEffectList = new vector< ZEffectPtr* >;
+
+	AddEffect(&CreateEffect_Blank, "Blank", ZORDER_BLANK, 1.0f, 0);
+	AddEffect(&CreateEffect_Tunnel, "Tunnel", ZORDER_TUNNEL, 1.0f, TC_WTTUNNEL, 0);
+
+	pEffectBlank = (*pvpEffectList)[0];
+
+
+	AddEffect(&CreateEffect_WaterGlobe, "WaterGlobe", ZORDER_WATERGLOBE, 10.0f, TC_EMWATERGLOBE, 0);
+	AddEffect(&CreateEffect_Tube, "Tube", ZORDER_TUBE, 1.0f, TC_EMTUBE, 0);
+	AddEffect(&CreateEffect_Sun, "Sun", ZORDER_SUN, 1.0f, 0);
+	AddEffect(&CreateEffect_Bumpmapping, "Bumpmapping", ZORDER_BUMPMAPPING, 8.0f, TC_WTBUMPMAPBACK, TC_EMBUMPMAPTENTACLES, 0);
+	AddEffect(&CreateEffect_Spectrum, "Spectrum", ZORDER_ANALYSER, 1.0f, TC_EMANALYSER, 0);
+	AddEffect(&CreateEffect_Rings, "ConcentricRings", ZORDER_RINGS, 1.0f, TC_EMRINGS, 0);
+	AddEffect(&CreateEffect_Phased, "Phased", ZORDER_PHASED, 1.0f, TC_LBPHASED, 0);
+	AddEffect(&CreateEffect_MotionBlur1, "MotionBlur1", ZORDER_MOTIONBLUR, 1.0f, TC_EMMOTIONBLUR, 0);
+	AddEffect(&CreateEffect_MotionBlur2, "MotionBlur2", ZORDER_MOTIONBLUR2, 1.0f, TC_EMMOTIONBLUR2, 0);
+	AddEffect(&CreateEffect_MotionBlur3, "MotionBlur3", ZORDER_MOTIONBLUR3, 1.0f, TC_EMMOTIONBLUR3, 0);
+	AddEffect(&CreateEffect_MotionBlur3Alt, "MotionBlur3(Alt)", ZORDER_MOTIONBLUR3ALT, 1.0f, TC_EMMOTIONBLUR3ALT, 0);
+	AddEffect(&CreateEffect_MorphingSphere, "MorphingSphere", ZORDER_MORPHINGSPHERE, 1.0f, TC_EMMORPHINGSPHERE, 0);
+	AddEffect(&CreateEffect_LightTentacles, "LightTentacles", ZORDER_LIGHTTENTACLES, 1.0f, TC_LBLIGHTTENTACLES, 0);
+	AddEffect(&CreateEffect_LightStar, "LightStar", ZORDER_LIGHTSTAR, 1.0f, TC_LBLIGHTSTAR, TC_WTLIGHTSTAR, 0);
+	AddEffect(&CreateEffect_LightSphere, "LightSphere", ZORDER_LIGHTSPHERE, 1.0f, TC_LBLIGHTSPHERE, TC_WTLIGHTSPHERE, 0);
+	AddEffect(&CreateEffect_LightRing, "LightRing", ZORDER_LIGHTRING, 1.0f, TC_LBLIGHTRING, TC_WTLIGHTRING, 0);
+	AddEffect(&CreateEffect_Flowmap, "Flowmap", ZORDER_FLOWMAP, 10.0f, 0);
+	AddEffect(&CreateEffect_SuperSampling, "SuperSampling", ZORDER_DOTSTAR, 1.0f, TC_LBDOTSTAR, TC_WTDOTSTAR, 0);
+	AddEffect(&CreateEffect_Distortion2, "Distortion2", ZORDER_DISTORTION2, 1.0f, TC_WTDISTORTION2, 0);
+	AddEffect(&CreateEffect_Distortion2Col, "Distortion2(Lit)", ZORDER_DISTORTION2COL, 1.0f, TC_WTDISTORTION2COL, 0);
+	AddEffect(&CreateEffect_CollapsingLightSphere, "CollapsingLightSphere", ZORDER_COLLAPSINGSPHERE, 1.0f, TC_LBCOLLAPSINGSPHERE, TC_WTCOLLAPSINGSPHERE, 0);
+	AddEffect(&CreateEffect_BezierCube, "BezierCube", ZORDER_BEZIERCUBE, 1.0f, TC_LBBEZIERCUBE, TC_WTBEZIERCUBE, 0);
+	AddEffect(&CreateEffect_Distortion1, "Distortion1", ZORDER_DISTORTION, 1.0f, TC_WTDISTORTION, 0);
+}
+
+CCfgItem* ZTripex::AddCfgItem(CCfgItem* pItem)
+{
+	pppCfgItem->push_back(pItem);
+	(*pmpCfgItem)[pItem->GetKeyName()].push_back(pItem);
+	return pItem;
+}
+
+void ZTripex::CreateCfgItems()
+{
+	if (pppCfgItem == NULL)
+	{
+		pppCfgItem = new vector<CCfgItem*>;
+		pmpCfgItem = new map< string, vector< CCfgItem* >, CI_STR_CMP >();
+		psEffect = new string[pvpEffectList->size()];
+
+		AddCfgItem(CCfgItem::Bool("MeshHQ", &bMeshHQ, true));
+
+		// Display
+		AddCfgItem(CCfgItem::Bool("ShowProgress", &bShowProgress));
+		AddCfgItem(CCfgItem::Bool("ShowName", &bShowName));
+		AddCfgItem(CCfgItem::Bool("ShowNameStart", &bShowNameStart));
+		AddCfgItem(CCfgItem::Bool("ShowNameEnd", &bShowNameEnd));
+		AddCfgItem(CCfgItem::Bool("ShowTime", &bShowTime));
+		AddCfgItem(CCfgItem::Bool("ShowHUD", &bShowHUD));
+		AddCfgItem(CCfgItem::Bool("ShowHUDTitle", &bShowHUDTitle));
+		AddCfgItem(CCfgItem::Bool("ShowMessages", &bShowMessages));
+		AddCfgItem(CCfgItem::Float("HUDTransparency", &fHUDTransparency));
+
+		// General
+		AddCfgItem(CCfgItem::Float("Crossfading", &fCrossfading));
+		AddCfgItem(CCfgItem::Float("FadeIn", &fFadeIn));
+		AddCfgItem(CCfgItem::Float("FadeOut", &fFadeOut));
+		AddCfgItem(CCfgItem::Bool("AvoidBigReactions", &bAvoidBigReactions));
+
+		// Effects
+		AddCfgItem(CCfgItem::Float("SelectionFairness", &fFairness));
+		AddCfgItem(CCfgItem::Int("FlowmapW", &nFlowmapW, true));
+		AddCfgItem(CCfgItem::Int("FlowmapH", &nFlowmapH, true));
+		for (int i = 0; i < (int)pvpEffectList->size(); i++)
+		{
+			AddCfgItem(CCfgItem::String((*pvpEffectList)[i]->GetCfgItemName().c_str(), &psEffect[i]));
+		}
+	}
+}
+
+void ZTripex::UpdateCfgItems(bool bInit)
+{
+	for (unsigned int i = 0; i < pppCfgItem->size(); i++)
+	{
+		(*pppCfgItem)[i]->Update(bInit);
+	}
+	for (unsigned int i = 0; i < pvpEffectList->size(); i++)
+	{
+		for (int j = 0; j < 5; j++) (*pvpEffectList)[i]->pfSetting[j] = 0.0f;
+		CCfgItem* pItem = FindCfgItem((*pvpEffectList)[i]->GetCfgItemName().c_str());
+		pItem->GetFloatArray(5, (*pvpEffectList)[i]->pfSetting);
+	}
+	// filtering -> num
+}
+
+CCfgItem* ZTripex::FindCfgItem(const char* sName)
+{
+	for (unsigned int i = 0; i < pppCfgItem->size(); i++)
+	{
+		if (!_stricmp((*pppCfgItem)[i]->sName.c_str(), sName)) return (*pppCfgItem)[i];
+	}
+	//	assert(false);
+	return NULL;
+}
+
+static bool bLoadedCfg = false;
+void ZTripex::LoadCfgItems()
+{
+	if (bLoadedCfg) return;
+
+	UpdateCfgItems();
+
+	map< string, vector< CCfgItem* >, CI_STR_CMP >::iterator it;
+	for (it = pmpCfgItem->begin(); it != pmpCfgItem->end(); it++)
+	{
+		string sKey = it->first;
+		//			HKEY hKey = RegCreateKey(HKEY_CURRENT_USER, it->first.c_str(), KEY_READ);
+		for (int j = 0; j < (int)it->second.size(); j++)
+		{
+			CCfgItem* pItem = it->second[j];
+			//				if(!pItem->Load(hKey))
+			//				{
+			switch (pItem->nType)
+			{
+			case CCfgItem::CIT_INT:
+				pItem->SetInt(GetDefaultInt(pItem->sName.c_str()));
+				break;
+			case CCfgItem::CIT_BOOL:
+				pItem->SetBool(!!GetDefaultInt(pItem->sName.c_str()));
+				break;
+			case CCfgItem::CIT_FLOAT:
+				pItem->SetFloat(GetDefaultInt(pItem->sName.c_str()) / 1000.0f);
+				break;
+			case CCfgItem::CIT_STRING:
+				pItem->SetString(GetDefaultStr(pItem->sName.c_str()));
+				break;
+			default:
+				_ASSERT(false);
+				break;
+			}
+			pItem->bSave = false;
+			//				}
+		}
+		//			RegCloseKey(hKey);
+	}
+
+	bLoadedCfg = true;
+}
+
+void ZTripex::SaveCfgItems()
+{
+	if (!bLoadedCfg) return;
+	UpdateCfgItems(false);
+
+	//		for(map< string, vector< auto_ptr< CCfgItem > > >::iterator it = mpCfgItem.begin(); it != mpCfgItem.end(); it++)
+	//		{
+	//			string s = it->first;
+	//			HKEY hKey = NULL;
+	//			for(int j = 0; j < it->second.size(); j++)
+	//			{
+	//				if(it->second[j]->bSave && hKey == NULL)
+	//				{
+	//					hKey = RegCreateKey(HKEY_CURRENT_USER, it->first.c_str(), KEY_WRITE);
+	//				}
+	//				it->second[j]->Save(hKey);
+	//			}
+	//			RegCloseKey(hKey);
+	//		}
 }

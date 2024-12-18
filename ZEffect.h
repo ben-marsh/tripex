@@ -70,4 +70,5 @@ public:
 };
 
 //#define DECLARE_EFFECT_PTR(type, varname) static ZEffectPtrT<type> pTemp_##varname; ZEffectPtr *varname = &pTemp_##varname;
+#define IMPORT_EFFECT(name) extern ZEffectPtr *CreateEffect_##name( );
 #define EXPORT_EFFECT(name, type) ZEffectPtr *CreateEffect_##name( ){ return (ZEffectPtr*)new ZEffectPtrT< type >( ); }

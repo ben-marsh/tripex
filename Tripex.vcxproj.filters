@@ -4,9 +4,7 @@
     <ClCompile Include="CCfgItem.cpp" />
     <ClCompile Include="config.cpp" />
     <ClCompile Include="config-defaults.cpp" />
-    <ClCompile Include="config-variables.cpp" />
     <ClCompile Include="CTextureItem.cpp" />
-    <ClCompile Include="effect.cpp" />
     <ClCompile Include="effect-beziercube.cpp" />
     <ClCompile Include="effect-blank.cpp" />
     <ClCompile Include="effect-bumpmapping.cpp" />
@@ -59,7 +57,6 @@
     <ClInclude Include="CCfgItem.h" />
     <ClInclude Include="config.h" />
     <ClInclude Include="config-defaults.h" />
-    <ClInclude Include="config-variables.h" />
     <ClInclude Include="CTextureItem.h" />
     <ClInclude Include="effect.h" />
     <ClInclude Include="error.h" />

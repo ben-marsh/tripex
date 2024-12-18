@@ -188,7 +188,6 @@
   <ItemGroup>
     <ClCompile Include="CCfgItem.cpp" />
     <ClCompile Include="config-defaults.cpp" />
-    <ClCompile Include="config-variables.cpp" />
     <ClCompile Include="config.cpp" />
     <ClCompile Include="CTextureItem.cpp" />
     <ClCompile Include="effect-beziercube.cpp" />
@@ -214,7 +213,6 @@
     <ClCompile Include="effect-tube.cpp" />
     <ClCompile Include="effect-tunnel.cpp" />
     <ClCompile Include="effect-waterglobe.cpp" />
-    <ClCompile Include="effect.cpp" />
     <ClCompile Include="error.cpp" />
     <ClCompile Include="general.cpp" />
     <ClCompile Include="main.cpp" />
@@ -246,7 +244,6 @@
   <ItemGroup>
     <ClInclude Include="CCfgItem.h" />
     <ClInclude Include="config-defaults.h" />
-    <ClInclude Include="config-variables.h" />
     <ClInclude Include="config.h" />
     <ClInclude Include="CTextureItem.h" />
     <ClInclude Include="effect.h" />
