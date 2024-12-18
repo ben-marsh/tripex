@@ -7,19 +7,19 @@ class CTextureItem
 public:
 	bool bInternal;
 	int nInternalID;
-	string sFilename;
-	set<int> snClass;
+	std::string sFilename;
+	std::set<int> snClass;
 	ZTexture *pTexture;
 //	auto_ptr<ZTexture> pTexture;
 
 	static CTextureItem *Internal(int nID, const char *sUsage = "");
 	static CTextureItem *External(const char *sPath, const char *sUsage = "");
 
-	string GetPath();
-	string GetFile();
+	std::string GetPath();
+	std::string GetFile();
 
 	bool ParseUsageString(const char *sText);
-	string MakeUsageString();
+	std::string MakeUsageString();
 };
 
 extern const UINT32 *g_apnIntTexture[ ];

@@ -29,7 +29,7 @@ public:
 	const void *m_pSrcData;
 	const PALETTEENTRY *m_pSrcPalette;
 
-	set< int > m_snType;
+	std::set< int > m_snType;
 
 	// Constructor:
 	ZTexture( );

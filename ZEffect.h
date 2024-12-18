@@ -1,5 +1,8 @@
 #pragma once
 
+#include <string>
+#include <set>
+
 class ZEffectBase
 {
 public:
@@ -25,8 +28,8 @@ public:
 	int nLastUsed;
 	float fProb;
 
-	string sName;
-	set<int> snTexture;
+	std::string sName;
+	std::set<int> snTexture;
 	int nDrawOrder;
 	float fStartupWeight;
 
@@ -54,7 +57,7 @@ public:
 	bool CanRender(float fElapsed);
 
 	float GetElapsed(float fFrames);
-	string GetCfgItemName() const;
+	std::string GetCfgItemName() const;
 };
 
 template < class T > class ZEffectPtrT : public ZEffectPtr

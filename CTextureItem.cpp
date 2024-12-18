@@ -58,14 +58,14 @@ bool CTextureItem::ParseUsageString(const char *sText)
 {
 	snClass.clear();
 
-	vector<int> vn;
+	std::vector<int> vn;
 	if(!CCfgItem::ParseArrayString(sText, vn)) return false;
 	snClass.insert(vn.begin(), vn.end());
 	return true;
 }
-string CTextureItem::MakeUsageString()
+std::string CTextureItem::MakeUsageString()
 {
-	vector<int> vn;
+	std::vector<int> vn;
 	for (int value : snClass)
 	{
 		vn.push_back(value);
@@ -100,23 +100,23 @@ string CTextureItem::GetUsage()
 	return str;
 }
 */
-string CTextureItem::GetPath()
+std::string CTextureItem::GetPath()
 {
 	if(bInternal) return "[ Internal ]";
 	else
 	{
 		size_t nPos = sFilename.find_last_of("\\");
-		if(nPos != string::npos) nPos++;
+		if(nPos != std::string::npos) nPos++;
 		return sFilename.substr(0, nPos);
 	}
 }
-string CTextureItem::GetFile()
+std::string CTextureItem::GetFile()
 {
 	if(bInternal) return sFilename;
 	else
 	{
 		size_t nPos = sFilename.find_last_of("\\");
-		if(nPos != string::npos) nPos++;
-		return sFilename.substr(nPos, string::npos);
+		if(nPos != std::string::npos) nPos++;
+		return sFilename.substr(nPos, std::string::npos);
 	}
 }

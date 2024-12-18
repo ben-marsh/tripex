@@ -176,7 +176,7 @@ public:
 		nFlowmapW = Bound<int>(nFlowmapW, 1, 4);
 		nFlowmapH = Bound<int>(nFlowmapH, 1, 4);
 		
-		if(nFlowmapH > nFlowmapW) swap(nFlowmapW, nFlowmapH);
+		if(nFlowmapH > nFlowmapW) std::swap(nFlowmapW, nFlowmapH);
                                                          		
 		//	int i;
 		/*	nFlowmapW = nFlowmapH = 1;
@@ -270,8 +270,8 @@ public:
 		{
 			if(xd < 0)
 			{
-				swap( y1, y2 );
-				swap( x1, x2 );
+				std::swap( y1, y2 );
+				std::swap( x1, x2 );
 				yd = -yd;
 				xd = -xd;
 			}
@@ -295,8 +295,8 @@ public:
 		{
 			if(yd < 0)
 			{ 
-				swap( y1, y2 );
-				swap( x1, x2 );
+				std::swap( y1, y2 );
+				std::swap( x1, x2 );
 				yd = -yd;
 				xd = -xd;
 			}

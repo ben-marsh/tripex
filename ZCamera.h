@@ -11,7 +11,7 @@ public:
 		F_LAST,
 	};
 
-	bitset< F_LAST > m_bsFlag;
+	std::bitset< F_LAST > m_bsFlag;
 
 	FLOAT32 m_fScreenX, m_fScreenY;
 	FLOAT32 m_fScale;

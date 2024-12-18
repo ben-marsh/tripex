@@ -1006,7 +1006,7 @@ HRESULT ZObject::Render( )
 		g_pD3D->ResetRenderState();
 		//int ichk = 0;
 		//printf( "SetRenderState %d to %d\n", mpState.begin(), mpState.end() );
-		for(map< D3DRENDERSTATETYPE, DWORD >::iterator it = mpState.begin(); it != mpState.end(); it++)
+		for(std::map< D3DRENDERSTATETYPE, DWORD >::iterator it = mpState.begin(); it != mpState.end(); it++)
 		{
 			//printf( "SetRenderState loop #%d - %d - %d\n", ichk, it->first, it->second );
 			g_pD3D->SetRenderState(it->first, it->second);

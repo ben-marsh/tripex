@@ -35,9 +35,9 @@ class ZPalette;
 class ZDirect3D
 {
 public:
-	typedef map< DWORD, pair< DWORD, DWORD > > StateBuffer;
-	typedef map< DWORD, DWORD > NewStateBuffer;
-	typedef pair< StateBuffer::iterator, bool > StateBufferChange;
+	typedef std::map< DWORD, std::pair< DWORD, DWORD > > StateBuffer;
+	typedef std::map< DWORD, DWORD > NewStateBuffer;
+	typedef std::pair< StateBuffer::iterator, bool > StateBufferChange;
 
 	class TextureStage
 	{
@@ -71,8 +71,8 @@ public:
 	StateBuffer mpRender;
 	NewStateBuffer mpNewRender;
 	TextureStage pTextureStage[8];
-	set< pair< UINT16, UINT16 > > g_spnFreePalette;
-	set< ZTexture* > g_spTexture;
+	std::set< std::pair< UINT16, UINT16 > > g_spnFreePalette;
+	std::set< ZTexture* > g_spTexture;
 
 	ZDirect3D( );
 
@@ -82,7 +82,7 @@ public:
 
 	HRESULT AddTexture( ZTexture *pTexture );
 	HRESULT UploadTexture( ZTexture *pTexture );
-	void GetStateChanges(NewStateBuffer &mp_new, StateBuffer &mp_current, vector< StateBufferChange > &vc);
+	void GetStateChanges(NewStateBuffer &mp_new, StateBuffer &mp_current, std::vector< StateBufferChange > &vc);
 
 	HRESULT CreateTexture(ZTexture *pTexture);
 	void DestroyTexture(ZTexture *pTexture);

@@ -56,9 +56,6 @@ static const FLOAT32 g_fRadToDeg = 57.295779513082320876798154814105f;//180.0f /
 #include <map>
 #include <bitset>
 
-//#include <H:\Microsoft Xbox SDK\xbox\include\malloc.h>
-using namespace std;
-
 #include "ZAudio.h"
 
 extern ZAudio *g_pAudio;

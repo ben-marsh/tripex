@@ -12,7 +12,7 @@ CCfgItem::CCfgItem(const char *sName, int nType, void *pValue, bool bInitUpdate)
 	this->pValue = pValue;
 	bSave = false;
 	bChanged = false;
-	if(nType == CIT_STRING) psNewValue = new string;
+	if(nType == CIT_STRING) psNewValue = new std::string();
 }
 CCfgItem *CCfgItem::Int(const char *sName, int *pnValue, bool bInitUpdate)
 {
@@ -26,7 +26,7 @@ CCfgItem *CCfgItem::Float(const char *sName, float *pfValue, bool bInitUpdate)
 {
 	return new CCfgItem(sName, CIT_FLOAT, pfValue, bInitUpdate);
 }
-CCfgItem *CCfgItem::String(const char *sName, string *psValue, bool bInitUpdate)
+CCfgItem *CCfgItem::String(const char *sName, std::string *psValue, bool bInitUpdate)
 {
 	return new CCfgItem(sName, CIT_STRING, psValue, bInitUpdate);
 }
@@ -90,7 +90,7 @@ float CCfgItem::GetFloat() const
 	_ASSERT(nType == CIT_FLOAT);
 	return Get(this, &fNewValue, pfValue);
 }
-string CCfgItem::GetString() const
+std::string CCfgItem::GetString() const
 {
 	_ASSERT(nType == CIT_STRING);
 	return Get(this, psNewValue, psValue);
@@ -107,19 +107,19 @@ void CCfgItem::Update(bool bInit)
 
 	bChanged = false;
 }
-bool CCfgItem::SetIntArray(char c, vector<int> &vn)
+bool CCfgItem::SetIntArray(char c, std::vector<int> &vn)
 {
 	return SetString(MakeArrayString(c, vn).c_str());
 }
 bool CCfgItem::SetIntArray(char c, int n, int *pn)
 {
-	vector<int> vn(n);
+	std::vector<int> vn(n);
 	for(int i = 0; i < n; i++) vn[i] = pn[i];
 	return SetIntArray(c, vn);
 }
 bool CCfgItem::SetIntArray(char c, int n, int n1, ...)
 {
-	vector<int> vn;
+	std::vector<int> vn;
 
 	va_list pArg;
 	va_start(pArg, n1);
@@ -133,17 +133,17 @@ bool CCfgItem::SetIntArray(char c, int n, int n1, ...)
 }
 bool CCfgItem::SetFloatArray(char c, int n, float *pf)
 {
-	auto_ptr<int> pn(new int[n]);
+	std::auto_ptr<int> pn(new int[n]);
 	for(int i = 0; i < n; i++) pn.get()[i] = Bound<int>((int)(pf[i] * 1000.0f), 0, 1000);
 	return SetIntArray(c, n, pn.get());
 }
-bool CCfgItem::GetIntArray(vector<int> &vn) const
+bool CCfgItem::GetIntArray(std::vector<int> &vn) const
 {
 	return ParseArrayString(GetString().c_str(), vn);
 }
 bool CCfgItem::GetIntArray(int n, int *pn) const
 {
-	vector<int> vn;
+	std::vector<int> vn;
 	for(int i = 0; i < n; i++) pn[i] = 0;
 	if(!GetIntArray(vn) || (int)vn.size() != n) return false;
 	CopyMemory(pn, &(*vn.begin()), n * sizeof(int));
@@ -154,14 +154,14 @@ bool CCfgItem::GetFloatArray(int n, float *pf) const
 	int i;
 	for(i = 0; i < n; i++) pf[i] = 0.5f;
 
-	auto_ptr<int> pn(new int[n]);
+	std::auto_ptr<int> pn(new int[n]);
 	if(!GetIntArray(n, pn.get())) return false;
 	for(i = 0; i < n; i++) pf[i] = Bound<float>(pn.get()[i] / 1000.0f, 0.0f, 1.0f);
 	return true;
 }
-string CCfgItem::MakeArrayString(char c, vector<int> &vn)
+std::string CCfgItem::MakeArrayString(char c, std::vector<int> &vn)
 {
-	string str;
+	std::string str;
 	for(unsigned int i = 0; i < vn.size(); i++)
 	{
 		if(i > 0) str += c;
@@ -173,7 +173,7 @@ string CCfgItem::MakeArrayString(char c, vector<int> &vn)
 	}
 	return str;
 }
-bool CCfgItem::ParseArrayString(const char *str, vector<int> &vn)
+bool CCfgItem::ParseArrayString(const char *str, std::vector<int> &vn)
 {
 	while(isspace(*str)) str++;
 	for(;;)
@@ -240,14 +240,14 @@ bool CCfgItem::ParseArrayString(const char *str, vector<int> &vn)
 //			}
 //		}
 //	}
-string CCfgItem::GetKeyName()
+std::string CCfgItem::GetKeyName()
 {
-	string::size_type n = sName.find_last_of( "\\" );
-	if( n == string::npos) return "";
+	std::string::size_type n = sName.find_last_of( "\\" );
+	if( n == std::string::npos) return "";
 	return sName.substr(0, n);
 }
-string CCfgItem::GetValueName()
+std::string CCfgItem::GetValueName()
 {
 	size_t n = sName.find_last_of("\\");
-	return (n == string::npos)? sName : sName.substr(n + 1, string::npos);
+	return (n == std::string::npos)? sName : sName.substr(n + 1, std::string::npos);
 }

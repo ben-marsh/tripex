@@ -34,7 +34,7 @@ ZDirect3D::ZDirect3D()
 
 HRESULT ZDirect3D::Close()
 {
-	for (set< ZTexture* >::iterator it = g_spTexture.begin(); it != g_spTexture.end(); it++)
+	for (std::set< ZTexture* >::iterator it = g_spTexture.begin(); it != g_spTexture.end(); it++)
 	{
 		DestroyTexture(*it);
 	}
@@ -84,7 +84,7 @@ HRESULT ZDirect3D::Open()
 
 	//printf( "caps\n" );
 
-	for (set< ZTexture* >::iterator it = g_spTexture.begin(); it != g_spTexture.end(); it++)
+	for (std::set< ZTexture* >::iterator it = g_spTexture.begin(); it != g_spTexture.end(); it++)
 	{
 		printf("texture\n");
 
@@ -102,7 +102,7 @@ ZTexture* ZDirect3D::Find(int nType)
 {
 	int mt = 0;
 
-	set< ZTexture* >::iterator it;
+	std::set< ZTexture* >::iterator it;
 	for (it = g_spTexture.begin(); it != g_spTexture.end(); it++)
 	{
 		if ((*it)->m_snType.count(nType) > 0) mt++;
@@ -193,7 +193,7 @@ void ZDirect3D::SetRenderState(DWORD dwKey, DWORD dwValue)
 {
 	mpNewRender[dwKey] = dwValue;
 }
-void ZDirect3D::GetStateChanges(NewStateBuffer& mp_new, StateBuffer& mp_current, vector< StateBufferChange >& vc)
+void ZDirect3D::GetStateChanges(NewStateBuffer& mp_new, StateBuffer& mp_current, std::vector< StateBufferChange >& vc)
 {
 	// all those which have to be inserted
 	StateBuffer::iterator it_current = mp_current.begin();
@@ -205,7 +205,7 @@ void ZDirect3D::GetStateChanges(NewStateBuffer& mp_new, StateBuffer& mp_current,
 			if (it_current == mp_current.end() || it_current->first > it_new->first)
 			{
 				// don't know what the current state is, so need to get it all
-				pair<DWORD, DWORD> pn = pair< DWORD, DWORD >(it_new->second, 0);
+				std::pair<DWORD, DWORD> pn = std::pair< DWORD, DWORD >(it_new->second, 0);
 				it_current = mp_current.insert(it_current, StateBuffer::value_type(it_new->first, pn));
 				vc.push_back(StateBufferChange(it_current, true));
 				it_current++;
@@ -236,7 +236,7 @@ void ZDirect3D::GetStateChanges(NewStateBuffer& mp_new, StateBuffer& mp_current,
 HRESULT ZDirect3D::FlushRenderState()
 {
 	HRESULT hRes;
-	vector<StateBufferChange> vc;
+	std::vector<StateBufferChange> vc;
 	GetStateChanges(mpNewRender, mpRender, vc);
 
 	for (int i = 0; i < (int)vc.size(); i++)
@@ -320,7 +320,7 @@ HRESULT ZDirect3D::FlushTextureState()
 			}
 		}
 
-		vector< StateBufferChange > vc;
+		std::vector< StateBufferChange > vc;
 		GetStateChanges(pTextureStage[dwStage].mpNewState, pTextureStage[dwStage].mpState, vc);
 
 		for (int i = 0; i < (int)vc.size(); i++)
@@ -361,7 +361,7 @@ void ZDirect3D::SetTexture(DWORD dwStage, ZTexture* pTexture, DWORD dwOp, DWORD 
 
 HRESULT ZDirect3D::AddTexture(ZTexture* pTexture)
 {
-	pair< set< ZTexture* >::iterator, bool > itb = g_spTexture.insert(pTexture);
+	std::pair< std::set< ZTexture* >::iterator, bool > itb = g_spTexture.insert(pTexture);
 	if (itb.second && g_pDevice != NULL)
 	{
 		HRESULT hRes = CreateTexture(pTexture);

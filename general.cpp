@@ -15,7 +15,7 @@ int GetClippedLineLength(ZTextureFont *pFont, const char *sText, int nClipWidth)
 		{
 			if(bSpace) bFirstWord = false;
 
-			string sLine = string(sText, i); 
+			std::string sLine = std::string(sText, i);
 			if(pFont->GetWidth(sLine.c_str()) > nClipWidth) return nLastEnd;
 			else if(sText[i] == 0) return i;
 
@@ -39,7 +39,7 @@ void DrawMessage(ZSpriteBuffer &sb, ZTextureFont *pFont, int y, const char *sTex
 	const int nClipWidth = g_pD3D->GetWidth() - 40;
 	const int nLineHeight = 20;
 
-	vector<string> vsLine;
+	std::vector<std::string> vsLine;
 	int nWidth = 0;
 	for(;;)
 	{
@@ -48,7 +48,7 @@ void DrawMessage(ZSpriteBuffer &sb, ZTextureFont *pFont, int y, const char *sTex
 		int nLength = GetClippedLineLength(pFont, sText, nClipWidth);
 		if(nLength > 0)
 		{
-			string sLine(sText, nLength);
+			std::string sLine(sText, nLength);
 			vsLine.push_back(sLine);
 			nWidth = max(nWidth, pFont->GetWidth(sLine.c_str()));
 			sText += nLength;

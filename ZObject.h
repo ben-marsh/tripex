@@ -226,7 +226,7 @@ public:
 		F_LAST,
 	};
 
-	bitset< F_LAST > m_bsFlag;
+	std::bitset< F_LAST > m_bsFlag;
 /*		
 	enum
 	{
@@ -266,7 +266,7 @@ public:
 */
 	WORD wClipMask;
 
-	map< D3DRENDERSTATETYPE, DWORD > mpState;
+	std::map< D3DRENDERSTATETYPE, DWORD > mpState;
 
 	int nExposure;
 	float fDelayHistory, fFrameHistory, fRotationHistory, fFrameTime;

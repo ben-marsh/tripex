@@ -7,22 +7,22 @@
 class ZTripex
 {
 public:
-	bitset<TXS_LAST> txs;
+	std::bitset<TXS_LAST> txs;
 
 	ZTextureFont tef;
 	ZTexture *ptefTexture;
-	vector< auto_ptr< ZTexture > > vpTexture;
+	std::vector< std::unique_ptr< ZTexture > > vpTexture;
 	float fEffectFrames, fFadePos;
 	char sStatusMsg[ 256 ];
 	DWORD dwStatusTime;
 	unsigned int id;
 	int nEffect;
 	int nNextEffect;
-	auto_ptr< ZTexture > gui;
+	std::unique_ptr< ZTexture > gui;
 	DWORD dwLastTime;
 
-	vector< ZEffectPtr* >* pvpEffect;
-	vector< ZEffectPtr* >* pvpEffectList;
+	std::vector< ZEffectPtr* >* pvpEffect;
+	std::vector< ZEffectPtr* >* pvpEffectList;
 
 	ZTripex();
 	void ShowStatusMsg( const char *sFormat, ... );
@@ -34,21 +34,21 @@ public:
 private:
 	ZEffectPtr* pEffectBlank;
 
-	vector< CCfgItem* >* pppCfgItem = NULL;
+	std::vector< CCfgItem* >* pppCfgItem = NULL;
 
-	string* psEffect;
+	std::string* psEffect;
 
-	class CI_STR_CMP : public less<string>
+	class CI_STR_CMP : public std::less<std::string>
 	{
 	public:
-		bool operator()(const string& s1, const string& s2) const
+		bool operator()(const std::string& s1, const std::string& s2) const
 		{
 			return _stricmp(s1.c_str(), s2.c_str()) < 0;
 		}
 	};
 
 	// TODO: make sure these CfgItems are free'd
-	map< string, vector< CCfgItem* >, CI_STR_CMP >* pmpCfgItem = NULL;
+	std::map< std::string, std::vector< CCfgItem* >, CI_STR_CMP >* pmpCfgItem = NULL;
 
 	void AddEffect(ZEffectPtr* (*fn)(), const char* sName, int nDrawOrder, float fStartupWeight, int nTex, ...);
 	void CreateEffectList();

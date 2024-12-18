@@ -29,7 +29,7 @@ public:
 		BYTE *pbData;
 	};
 	ZArray<Letter> pLetter;
-	auto_ptr< ZTexture > pTexture;
+	std::unique_ptr< ZTexture > pTexture;
 	ZColour *m_pcData;
 
 	bool LineAboveThreshold(BYTE *pbData);

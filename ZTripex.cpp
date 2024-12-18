@@ -41,7 +41,7 @@ void ZTripex::ShowStatusMsg(const char *sFormat, ...)
 
 DWORD WINAPI ZTripex::InitialiseThread(void *pParam)
 {
-	vector< CTextureItem* > ppItem;
+	std::vector< CTextureItem* > ppItem;
 	LoadTextureSettings(ppItem);
 
 	for(int i = 1; i < (int)pvpEffectList->size(); i++)
@@ -146,7 +146,7 @@ DWORD WINAPI ZTripex::InitialiseThread(void *pParam)
 		{
 			pBlankTexture = ppItem[i]->pTexture;//.release();
 		}
-		for(set<int>::iterator it = ppItem[i]->snClass.begin(); it != ppItem[i]->snClass.end(); it++)
+		for(std::set<int>::iterator it = ppItem[i]->snClass.begin(); it != ppItem[i]->snClass.end(); it++)
 		{
 			ppItem[i]->pTexture->m_snType.insert(*it);
 		}
@@ -173,7 +173,7 @@ HRESULT ZTripex::Startup()
 
 	pBlankTexture = NULL;
 
-	pvpEffect = new vector< ZEffectPtr* >;
+	pvpEffect = new std::vector< ZEffectPtr* >;
 	pvpEffect->push_back((*pvpEffectList)[0]);
 
 	printf( "tex\n" );
@@ -221,7 +221,7 @@ HRESULT ZTripex::Startup()
 //	}
 //	}
 
-	gui = auto_ptr< ZTexture >( new ZTexture( ) );
+	gui = std::make_unique<ZTexture>();
 	gui->SetSource( ppe, &g_anTexRawGUI[ 1 ], 256 * 256, 256 );
 
 //	gui = auto_ptr< ZTexture >(new ZTexture(pc));//(ZColour*)g_anTexRawGUI ));//cGUI.GetPtr()));
@@ -441,7 +441,7 @@ HRESULT ZTripex::Render()
 
 	if(ppDrawEffect[1]->nDrawOrder < ppDrawEffect[0]->nDrawOrder)
 	{
-		swap( ppDrawEffect[1], ppDrawEffect[0] );
+		std::swap( ppDrawEffect[1], ppDrawEffect[0] );
 	}
 	if((!ppDrawEffect[0]->CanRender(fFrames) || ppDrawEffect[0] == pEffectBlank) && (!ppDrawEffect[1]->CanRender(fFrames) || ppDrawEffect[1] == pEffectBlank) && !(ppDrawEffect[0] == pEffectBlank && ppDrawEffect[1] == pEffectBlank && fFrames > 1.0f))
 	{
@@ -515,7 +515,7 @@ HRESULT ZTripex::Render()
 	printf( "Set Texture\n" );
 	g_pD3D->SetTexture(0, g_pTripex->gui.get());
 
-	string sMsg;
+	std::string sMsg;
 	float fMsgBr = 0.0f;
 
 	DWORD dwTick = timeGetTime( );
@@ -674,7 +674,7 @@ void ZTripex::AddEffect(ZEffectPtr* (*fn)(), const char* sName, int nDrawOrder, 
 void ZTripex::CreateEffectList()
 {
 	_ASSERT(pvpEffectList == NULL);
-	pvpEffectList = new vector< ZEffectPtr* >;
+	pvpEffectList = new std::vector< ZEffectPtr* >;
 
 	AddEffect(&CreateEffect_Blank, "Blank", ZORDER_BLANK, 1.0f, 0);
 	AddEffect(&CreateEffect_Tunnel, "Tunnel", ZORDER_TUNNEL, 1.0f, TC_WTTUNNEL, 0);
@@ -718,9 +718,9 @@ void ZTripex::CreateCfgItems()
 {
 	if (pppCfgItem == NULL)
 	{
-		pppCfgItem = new vector<CCfgItem*>;
-		pmpCfgItem = new map< string, vector< CCfgItem* >, CI_STR_CMP >();
-		psEffect = new string[pvpEffectList->size()];
+		pppCfgItem = new std::vector<CCfgItem*>;
+		pmpCfgItem = new std::map< std::string, std::vector< CCfgItem* >, CI_STR_CMP >();
+		psEffect = new std::string[pvpEffectList->size()];
 
 		AddCfgItem(CCfgItem::Bool("MeshHQ", &bMeshHQ, true));
 
@@ -784,10 +784,10 @@ void ZTripex::LoadCfgItems()
 
 	UpdateCfgItems();
 
-	map< string, vector< CCfgItem* >, CI_STR_CMP >::iterator it;
+	std::map< std::string, std::vector< CCfgItem* >, CI_STR_CMP >::iterator it;
 	for (it = pmpCfgItem->begin(); it != pmpCfgItem->end(); it++)
 	{
-		string sKey = it->first;
+		std::string sKey = it->first;
 		//			HKEY hKey = RegCreateKey(HKEY_CURRENT_USER, it->first.c_str(), KEY_READ);
 		for (int j = 0; j < (int)it->second.size(); j++)
 		{

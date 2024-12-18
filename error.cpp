@@ -12,7 +12,7 @@ public:
 	unsigned int m_nLine;
 };
 
-vector< ERROR_TRACE > *g_pvErrTrace = NULL;
+std::vector< ERROR_TRACE > *g_pvErrTrace = NULL;
 
 /*---------------------------------
 * AddToErrorTrace( )
@@ -24,7 +24,7 @@ HRESULT AddToErrorTrace(HRESULT hRes, const char *sFile, unsigned int nLine)
 	{
 		if( g_pvErrTrace == NULL )
 		{
-			g_pvErrTrace = new vector< ERROR_TRACE >;
+			g_pvErrTrace = new std::vector< ERROR_TRACE >;
 		}
 		ERROR_TRACE t = { sFile, nLine };
 		g_pvErrTrace->push_back( t );
@@ -49,7 +49,7 @@ void ClearErrorTrace()
 * GetErrorString( ):
 -----------------------------------*/
 
-BOOL GetErrorString( HRESULT hRes, string *ps )
+BOOL GetErrorString( HRESULT hRes, std::string *ps )
 {
 	if( hRes == D3D_OK ) return FALSE;
 

@@ -114,7 +114,7 @@ ZTexture *ZTextureFont::GetTexture()
 {
 	if(pTexture.get() == NULL)
 	{
-		pTexture = auto_ptr< ZTexture >( new ZTexture( ) );//(GetBitmap( ) ));
+		pTexture = std::make_unique<ZTexture>();
 		pTexture->SetSource( D3DFMT_X8R8G8B8, GetBitmap( ), 256 * 256 * 4, 256 * 4 );
 	}
 	return pTexture.get();

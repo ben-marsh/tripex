@@ -251,8 +251,8 @@ void ZObject::Clip(ZArray<ZFace> &pfSrc, ZArray<ZFace> &pfDst, WORD wClipMask)
 				if(nOut == 1)
 				{
 					// 0 = out, 1, 2 = in
-					if(pbOut[1]) swap( pwIndex[0], pwIndex[1] );
-					else if(pbOut[2]) swap( pwIndex[0], pwIndex[2] );
+					if(pbOut[1]) std::swap( pwIndex[0], pwIndex[1] );
+					else if(pbOut[2]) std::swap( pwIndex[0], pwIndex[2] );
 	
 					fNew = *pf;
 					fNew[pwIndex[0]] = GetClippedIndex(pf, pwIndex[1], pwIndex[0], wPlaneFlag, wClipRequired);
@@ -265,8 +265,8 @@ void ZObject::Clip(ZArray<ZFace> &pfSrc, ZArray<ZFace> &pfDst, WORD wClipMask)
 				else // if(nOut == 2)
 				{
 					// 0 = in, 1, 2 = out
-					if(!pbOut[1]) swap( pwIndex[0], pwIndex[1] );
-					else if(!pbOut[2]) swap( pwIndex[0], pwIndex[2] );
+					if(!pbOut[1]) std::swap( pwIndex[0], pwIndex[1] );
+					else if(!pbOut[2]) std::swap( pwIndex[0], pwIndex[2] );
 
 					fNew[pwIndex[0]] = (*pf)[pwIndex[0]];
 					fNew[pwIndex[1]] = GetClippedIndex(pf, pwIndex[0], pwIndex[1], wPlaneFlag, wClipRequired);

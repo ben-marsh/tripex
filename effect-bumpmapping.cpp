@@ -24,7 +24,7 @@
 #define YM 0.55f //0.2//5 //0.2
 
 extern bool bMeshHQ;
-extern vector< auto_ptr< ZTexture > > vpTexture;
+extern std::vector< std::unique_ptr< ZTexture > > vpTexture;
 extern ZTexture *pBlankTexture;
 extern bool fBigBeat;
 
@@ -110,7 +110,7 @@ public:
 //	ZPtrArray<BumpmapData*> pBump;
 //	ZArray<unsigned char> pBuf;
 
-	map< ZTexture*, auto_ptr< unsigned short > > mpBumpIndex;
+	std::map< ZTexture*, std::auto_ptr< unsigned short > > mpBumpIndex;
 
 	ZObject obj;
 	ZCamera camera;
@@ -229,7 +229,7 @@ public:
 //	grid = new Grid(GRIDW, GRIDH);//, doFDS);
 //	gridbm = new Grid(GRIDW, GRIDH);//, doFDSbm);
 
-		vector< ZTexture* > vpBumpmap;
+		std::vector< ZTexture* > vpBumpmap;
 //		for(unsigned int i = 0; i < vpTexture.size(); i++)
 		{
 //			if(vpTexture[i]->m_snType.count(TC_WTBUMPMAPBACK) > 0 && vpTexture[i]->m_vnData.size() == (256 * 256 * sizeof(ZColour)) && vpTexture[i].get() != pBlankTexture)
@@ -458,7 +458,7 @@ public:
 			texture = g_pD3D->Find(TC_WTBUMPMAPBACK);
 			if(texture != pBlankTexture)
 			{	
-				map< ZTexture*, auto_ptr< unsigned short > >::iterator it = mpBumpIndex.find(texture);
+				std::map< ZTexture*, std::auto_ptr< unsigned short > >::iterator it = mpBumpIndex.find(texture);
 				if(it != mpBumpIndex.end())
 				{
 					pnCurrentBump = it->second.get();
@@ -482,7 +482,7 @@ public:
 						d3dsd.Format == D3DFMT_X8R8G8B8 &&
 						SUCCEEDED(pSurface->LockRect(&d3dr, NULL, 0)))
 					{
-						auto_ptr< unsigned short > pb = auto_ptr< unsigned short >(new unsigned short[256 * 256]);
+						std::auto_ptr< unsigned short > pb = std::auto_ptr< unsigned short >(new unsigned short[256 * 256]);
 
 						unsigned char* pcSrc = (unsigned char*)d3dr.pBits;
 						unsigned char pbBump[256 * 256];

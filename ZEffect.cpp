@@ -71,9 +71,9 @@ float ZEffectPtr::GetElapsed(float fFrames)
 {
 	return fFrames * ((1.8f * fSpeed) + 0.1f);
 }
-string ZEffectPtr::GetCfgItemName() const
+std::string ZEffectPtr::GetCfgItemName() const
 {
-	string sCfgName = "Effects\\";
+	std::string sCfgName = "Effects\\";
 	for(int i = 0; sName[i] != 0; i++)
 	{
 		if(isalnum(sName[i])) sCfgName += sName[i];

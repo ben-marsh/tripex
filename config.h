@@ -3,6 +3,7 @@
 #include "ZArray.h"
 #include "ZPtr.h"
 #include "ZDirect3D.h"
+#include <vector>
 
 #define HKEY_ROOT (HKEY_LOCAL_MACHINE)
 #define KEY_MAIN "Software\\-\\Tripex"
@@ -10,8 +11,8 @@
 
 class CTextureItem;
 
-bool LoadTextureSettings(vector< CTextureItem* > &ppItem);
-bool SaveTextureSettings(vector< CTextureItem* > &ppItem);
+bool LoadTextureSettings(std::vector< CTextureItem* > &ppItem);
+bool SaveTextureSettings(std::vector< CTextureItem* > &ppItem);
 
 // config-directx.cpp
 //extern string sDevice;

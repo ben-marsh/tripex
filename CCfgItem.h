@@ -1,6 +1,6 @@
 #pragma once
 
-extern const string sKeyBase;
+extern const std::string sKeyBase;
 
 class CCfgItem
 {
@@ -14,7 +14,7 @@ public:
 	};
 
 	bool bInitUpdate;
-	string sName;
+	std::string sName;
 	int nType;
 	bool bChanged, bSave;
 
@@ -24,14 +24,14 @@ public:
 		int *pnValue;
 		bool *pbValue;
 		float *pfValue;
-		string *psValue;
+		std::string *psValue;
 	};
 	union
 	{
 		bool bNewValue;
 		float fNewValue;
 		int nNewValue;
-		string *psNewValue;
+		std::string *psNewValue;
 	};
 
 	CCfgItem(const char *sName, int nType, void *pValue, bool bInitUpdate = false);
@@ -41,22 +41,22 @@ public:
 	static CCfgItem *Int(const char *sName, int *pnValue, bool bInitUpdate = false);
 	static CCfgItem *Bool(const char *sName, bool *pbValue, bool bInitUpdate = false);
 	static CCfgItem *Float(const char *sName, float *pfValue, bool bInitUpdate = false);
-	static CCfgItem *String(const char *sName, string *psValue, bool bInitUpdate = false);
+	static CCfgItem *String(const char *sName, std::string *psValue, bool bInitUpdate = false);
 	~CCfgItem();
 
 	void OnChange();
 	void OnChangeTarget();
 
 	// arrays
-	static string MakeArrayString(char c, vector<int> &vn);
-	static bool ParseArrayString(const char *str, vector<int> &vn);
+	static std::string MakeArrayString(char c, std::vector<int> &vn);
+	static bool ParseArrayString(const char *str, std::vector<int> &vn);
 
 	// setting variables
 	bool SetInt(int nValue);
 	bool SetBool(bool bValue);
 	bool SetFloat(float fValue);
 	bool SetString(const char *sValue);
-	bool SetIntArray(char c, vector<int> &vn);
+	bool SetIntArray(char c, std::vector<int> &vn);
 	bool SetIntArray(char c, int n, int n1, ...);
 	bool SetIntArray(char c, int n, int *pn);
 	bool SetFloatArray(char c, int n, float *pf);
@@ -65,13 +65,13 @@ public:
 	int GetInt() const;
 	bool GetBool() const;
 	float GetFloat() const;
-	string GetString() const;
-	bool GetIntArray(vector<int> &vn) const;
+	std::string GetString() const;
+	bool GetIntArray(std::vector<int> &vn) const;
 	bool GetIntArray(int n, int *pn) const;
 	bool GetFloatArray(int n, float *pf) const;
 
-	string GetKeyName();
-	string GetValueName();
+	std::string GetKeyName();
+	std::string GetValueName();
 
 //		bool Load(HKEY hKey);
 //		void Save(HKEY hKey);

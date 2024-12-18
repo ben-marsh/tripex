@@ -6,7 +6,7 @@ bool bMeshHQ;
 
 // config-effects.cpp
 float fFairness;
-string *psFlowmapSize;
+std::string *psFlowmapSize;
 int nFlowmapSize;
 
 // config-display.cpp
@@ -33,7 +33,7 @@ int nFlowmapH;
 #define KEY_MAIN "Software\\-\\Tripex"
 #define KEY_TEXTURES "Software\\-\\Tripex\\Textures"
 
-bool LoadTextureSettings(vector< CTextureItem* > &ppItem)
+bool LoadTextureSettings(std::vector< CTextureItem* > &ppItem)
 {
 //		HKEY hKey = RegCreateKey(HKEY_ROOT, KEY_TEXTURES, KEY_READ);
 //		if(hKey == NULL) return false;
@@ -41,7 +41,7 @@ bool LoadTextureSettings(vector< CTextureItem* > &ppItem)
 	static char sName[100];
 	static char sValue[1024];
 
-	map< int, string > mpIntUse, mpExtFile, mpExtUse;
+	std::map< int, std::string > mpIntUse, mpExtFile, mpExtUse;
 
 	int i;
 	for(i = 1; i < nIntTextures; i++)
@@ -102,10 +102,10 @@ bool LoadTextureSettings(vector< CTextureItem* > &ppItem)
 	ppItem.clear();
 	for(i = 1; i < nIntTextures; i++)
 	{
-		string s = mpIntUse[i];
+		std::string s = mpIntUse[i];
 		ppItem.push_back(CTextureItem::Internal(i, s.c_str()));
 	}
-	for(map< int, string >::iterator it = mpExtFile.begin(); it != mpExtFile.end(); it++)
+	for(std::map< int, std::string >::iterator it = mpExtFile.begin(); it != mpExtFile.end(); it++)
 	{
 		ppItem.push_back(CTextureItem::External(it->second.c_str(), mpExtUse[it->first].c_str()));
 	}

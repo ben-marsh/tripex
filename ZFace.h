@@ -72,7 +72,7 @@ void ZFace::Set( WORD nVtx1, WORD nVtx2, WORD nVtx3 )
 
 void ZFace::SwapCull( )
 {
-	swap( m_anVtx[0], m_anVtx[1] );
+	std::swap( m_anVtx[0], m_anVtx[1] );
 }
 
 /*---------------------------------
