@@ -3,6 +3,7 @@
 #include "main.h"
 #include "CCfgItem.h"
 #include "ZTextureFont.h"
+#include "ZAudio.h"
 #include <bitset>
 
 class ZTripex
@@ -21,6 +22,7 @@ public:
 	int nNextEffect;
 	std::unique_ptr< ZTexture > gui;
 	DWORD dwLastTime;
+	std::unique_ptr<ZAudio> pAudio;
 
 	std::vector< ZEffectPtr* >* pvpEffect;
 	std::vector< ZEffectPtr* >* pvpEffectList;

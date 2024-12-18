@@ -1,7 +1,6 @@
 #include "StdAfx.h"
 #include "ZAudio.h"
 
-ZAudio *g_pAudio = NULL;
 #include "stdafx.h"
 #include <mmeapi.h>
 #include "Vis.h"

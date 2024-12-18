@@ -149,7 +149,7 @@ public:
 
 		camera.m_vPosition = ZVector(0, 0, -320);
 	}
-	HRESULT Calculate(float brightness, float elapsed)
+	HRESULT Calculate(float brightness, float elapsed, ZAudio* pAudio)
 	{
 		static int done = 0;
 
@@ -161,7 +161,7 @@ public:
 //			angle += 20;
 			obj.fDamping = 0.98f;//95
 
-			obj.fAverage = g_pAudio->GetIntensity( );
+			obj.fAverage = pAudio->GetIntensity( );
 /*			float fDamping = 0.9 - (average * average);
 			float fAverage = pObj->AverageHeight();
 			float fHeight = 0.1 * average * average;
@@ -171,11 +171,11 @@ public:
 */
 // 			float fHeight = average * pObj->AverageHeight();
 
-			double bh = g_pAudio->GetIntensity( );// * 50;
+			double bh = pAudio->GetIntensity( );// * 50;
 
 //			float fAverage = pObj->AverageHeight();
 //			pObj->pfPos[0] = bh * sin(angle * 3.14159 / 128.0);
-			float fMult = min(1, g_pAudio->GetIntensity( ) * 2) - min(1, g_pAudio->GetIntensity( ) * 3) - (obj.AverageHeight() / 0.5f); //0.95 - average; //9; //0.95;
+			float fMult = min(1, pAudio->GetIntensity( ) * 2) - min(1, pAudio->GetIntensity( ) * 3) - (obj.AverageHeight() / 0.5f); //0.95 - average; //9; //0.95;
 			obj.Update();
 //			pObj->fDamping = average / pObj->;//min(0.96, average * 2.0) * Bound<float>(1 - avHeight, 0, 1); /**/ //(AVSZ / avHeight); //0.95 - average; //9; //0.95;
 
@@ -203,7 +203,7 @@ public:
 		obj.Calculate(&camera, elapsed);
 		return S_OK;
 	}
-	HRESULT Reconfigure()
+	virtual HRESULT Reconfigure(ZAudio* pAudio) override
 	{
 		obj.pTexture[0].Set(ZObject::Texture::T_ENVMAP, g_pD3D->Find(TC_EMWATERGLOBE));
 		return S_OK;

@@ -195,7 +195,7 @@ HRESULT ZTripex::Startup()
 
 	printf( "cfg items\n" );
 
-	g_pAudio = new ZAudio( 512 );
+	pAudio = std::make_unique<ZAudio>( 512 );
 	g_pD3D = new ZDirect3D;
 
 	printf( "d3d\n" );
@@ -331,7 +331,7 @@ HRESULT ZTripex::Render()
 //				bInFade = false;
 			fEffectFrames = 0;
 
-			HRESULT hRes = (*pvpEffect)[nEffect]->Reconfigure( );
+			HRESULT hRes = (*pvpEffect)[nEffect]->Reconfigure(pAudio.get());
 			if(FAILED(hRes)) return TraceError(hRes); 
 		}
 	}
@@ -375,7 +375,7 @@ HRESULT ZTripex::Render()
 				(*pvpEffect)[i]->fProb = 1.0f / (1.0f + expf(-weight / temperature));
 			}
 
-			(*pvpEffect)[i]->fProb *= (*pvpEffect)[i]->fPreference * max(0.1f, 1.0f - fabs(g_pAudio->GetIntensity( ) - (*pvpEffect)[i]->fActivity));
+			(*pvpEffect)[i]->fProb *= (*pvpEffect)[i]->fPreference * max(0.1f, 1.0f - fabs(pAudio->GetIntensity( ) - (*pvpEffect)[i]->fActivity));
 
 			pt += (*pvpEffect)[i]->fProb;//vpEffect[i]->preference * p[i];
 		}
@@ -400,7 +400,7 @@ HRESULT ZTripex::Render()
 	}
 	if(txs[TXS_RECONFIGURE])//bReconfigure)
 	{
-		HRESULT hRes = (*pvpEffect)[nEffect]->Reconfigure( );
+		HRESULT hRes = (*pvpEffect)[nEffect]->Reconfigure(pAudio.get());
 		if(FAILED(hRes)) return TraceError(hRes);
 
 		txs.reset(TXS_IN_FADE);
@@ -426,7 +426,7 @@ HRESULT ZTripex::Render()
 
 	if(ppDrawEffect[1]->fBr > FLOAT_ZERO && !txs[TXS_RESET_TARGET])
 	{
-		HRESULT hRes = ppDrawEffect[1]->Reconfigure( );
+		HRESULT hRes = ppDrawEffect[1]->Reconfigure(pAudio.get());
 		if(FAILED(hRes)) return TraceError(hRes);
 
 		txs[TXS_RESET_TARGET] = true;
@@ -450,12 +450,12 @@ HRESULT ZTripex::Render()
 
 	printf( "Audio Update\n" );
 
-	g_pAudio->Update( fFrames, (*pvpEffect)[nEffect]->fSensitivity );
+	pAudio->Update( fFrames, (*pvpEffect)[nEffect]->fSensitivity );
 //	UpdateBeat(fFrames);
 
 	for(int i = 0; i < 2; i++)
 	{
-		HRESULT hRes = ppDrawEffect[i]->Calculate( fFrames );
+		HRESULT hRes = ppDrawEffect[i]->Calculate( fFrames, pAudio.get() );
 		if(FAILED(hRes)) return TraceError(hRes);
 	}
 
@@ -539,7 +539,7 @@ HRESULT ZTripex::Render()
 	if(txs.test(TXS_VISIBLE_BEATS))
 	{
 		printf( "Audio Render\n" );
-		g_pAudio->Render( sb );
+		pAudio->Render( sb );
 	}
 
 //		ZSpriteBuffer sb;
@@ -571,11 +571,7 @@ void ZTripex::Shutdown( )
 
 	g_pD3D->Close( );
 
-	if( g_pAudio != NULL )
-	{
-		delete g_pAudio;
-		g_pAudio = NULL;
-	}
+	pAudio.reset();
 
 //	gui = auto_ptr<ZTexture>(NULL);
 //	pcHUD = NULL;

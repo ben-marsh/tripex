@@ -66,7 +66,7 @@ public:
 		obj.nMaxHistoryLength = 25;
 		obj.wcExposureLightChange = ZWideColour(-2, -2, -2);
 	}
-	HRESULT Calculate(float brightness, float elapsed)
+	HRESULT Calculate(float brightness, float elapsed, ZAudio* pAudio)
 	{
 		brt = brightness;
 		accum += elapsed * 2.0f;
@@ -77,8 +77,8 @@ public:
 			br = brightness;
 			for(int i = 0; i < nSources; i++)
 			{
-				position[i] += speed[i] * g_pAudio->GetIntensity( ) * 0.3 * elapsed;
-				double linearity = max(0, 1 - g_pAudio->GetBeat( ) );//);//(bigbeat / 2.0));
+				position[i] += speed[i] * pAudio->GetIntensity( ) * 0.3 * elapsed;
+				double linearity = max(0, 1 - pAudio->GetBeat( ) );//);//(bigbeat / 2.0));
 			
 				while(position[i] > 1.0 || position[i] < 0.0)
 				{
@@ -89,7 +89,7 @@ public:
 					pvPosition[3][i].m_fY = (rand() * 70.0 / RAND_MAX) - 35.0;
 					pvPosition[3][i].m_fZ = (rand() * 70.0 / RAND_MAX) - 35.0;
 
-					float c = g_pAudio->GetRandomSample( );
+					float c = pAudio->GetRandomSample( );
 					pvPosition[2][i].m_fX = (pvPosition[3][i].m_fX * (1 - c)) + ((c * rand() * 70.0 / RAND_MAX) - 35.0);
 					pvPosition[2][i].m_fY = (pvPosition[3][i].m_fY * (1 - c)) + ((c * rand() * 70.0 / RAND_MAX) - 35.0);
 					pvPosition[2][i].m_fZ = (pvPosition[3][i].m_fZ * (1 - c)) + ((c * rand() * 70.0 / RAND_MAX) - 35.0);
@@ -99,7 +99,7 @@ public:
 
 					if(position[i] > 1.0) position[i] -= 1.0;
 					if(position[i] < 0.0) position[i] += 1.0;
-					speed[i] = (g_pAudio->GetRandomSample( ) * 0.15) + 0.01;
+					speed[i] = (pAudio->GetRandomSample( ) * 0.15) + 0.01;
 				}
 
 				for(int j = 0; j < 4; j++)
@@ -109,15 +109,15 @@ public:
 				obj.pVertex[i].m_vPos = b.Calculate(position[i]);
 			}
 
-			obj.fRoll += elapsed * g_pAudio->GetIntensity( ) * 4.0 * 3.14159 / 180.0;
-			obj.fPitch += elapsed * g_pAudio->GetIntensity( ) * 3.0 * 3.14159 / 180.0;
+			obj.fRoll += elapsed * pAudio->GetIntensity( ) * 4.0 * 3.14159 / 180.0;
+			obj.fPitch += elapsed * pAudio->GetIntensity( ) * 3.0 * 3.14159 / 180.0;
 			obj.fYaw += elapsed * 2.0 * 3.14159 / 180.0;
 			obj.Calculate(&camera, 1.0);
 			obj.wcAmbientLight = ZColour::Grey(64.0 * brightness);
 		}
 		return S_OK;
 	}
-	HRESULT Reconfigure( )
+	virtual HRESULT Reconfigure(ZAudio* pAudio) override
 	{
 		dBrBack = 1;
 		if(fNotRendered)// || (rand() <= (RAND_MAX * 0.3)))

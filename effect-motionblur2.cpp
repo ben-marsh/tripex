@@ -82,11 +82,11 @@ public:
 		}
 		camera.m_vPosition.m_fZ = -130;
 	}
-	HRESULT Calculate(float brightness, float elapsed)
+	HRESULT Calculate(float brightness, float elapsed, ZAudio* pAudio)
 	{
 		camera.m_vPosition = b.Calculate(fBezPos);
 		camera.SetTarget(ZVector::Origin());
-		fBezPos += 0.02 * g_pAudio->GetIntensity( ) * elapsed;
+		fBezPos += 0.02 * pAudio->GetIntensity( ) * elapsed;
 
 		fTime += elapsed;
 		fChange = min(1.0f, fChange + (elapsed / 3.0));
@@ -109,14 +109,14 @@ public:
 		for(int i = 0; i < 3; i++)
 		{
 			pObj[i].wcAmbientLight = ZColour::Grey(60.0 * brightness);
-			pObj[i].fRoll += pfa[0] * elapsed * (g_pAudio->GetIntensity( ) + 0.1);
-			pObj[i].fPitch += pfa[1] * elapsed * g_pAudio->GetIntensity( ) ;
-			pObj[i].fYaw += pfa[2] * elapsed * (g_pAudio->GetIntensity( ) + 0.2);
+			pObj[i].fRoll += pfa[0] * elapsed * (pAudio->GetIntensity( ) + 0.1);
+			pObj[i].fPitch += pfa[1] * elapsed * pAudio->GetIntensity( ) ;
+			pObj[i].fYaw += pfa[2] * elapsed * (pAudio->GetIntensity( ) + 0.2);
 			pObj[i].Calculate(&camera, elapsed);
 		}
 		return S_OK;
 	}
-	HRESULT Reconfigure()
+	virtual HRESULT Reconfigure(ZAudio* pAudio) override
 	{
 		ZTexture *pTexture = g_pD3D->Find(TC_EMMOTIONBLUR2);//2);
 		for(int i = 0; i < PIPES; i++)

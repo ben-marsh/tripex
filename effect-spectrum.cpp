@@ -114,7 +114,7 @@ public:
 	* Calculate( ):
 	---------------------------------------------*/
 
-	HRESULT Calculate( FLOAT32 fBrightness, FLOAT32 fElapsed )
+	HRESULT Calculate( FLOAT32 fBrightness, FLOAT32 fElapsed, ZAudio* pAudio)
 	{
 		int i, j;
 		m_fRotAng += fElapsed * ( 2.0f * g_fDegToRad );
@@ -145,7 +145,7 @@ public:
 			for( i = 0; i < 256; i++ )
 			{
 				int nTarget = i * TRAIL_W / 256;
-				m_pfHeight[ 0 ][ nTarget ] = max( m_pfHeight[ 0 ][ nTarget ], g_pAudio->GetBand( i ) );
+				m_pfHeight[ 0 ][ nTarget ] = max( m_pfHeight[ 0 ][ nTarget ], pAudio->GetBand( i ) );
 			}
 			for( i = 0; i < TRAIL_W; i++ )
 			{
@@ -242,7 +242,7 @@ public:
 	* Reconfigure( ):
 	---------------------------------------------*/
 
-	HRESULT Reconfigure()
+	virtual HRESULT Reconfigure(ZAudio* pAudio) override
 	{
 		static ZTexture *pTexture;
 		pTexture = g_pD3D->Find(TC_EMANALYSER);

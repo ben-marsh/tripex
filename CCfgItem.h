@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 extern const std::string sKeyBase;
 

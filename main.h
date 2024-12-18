@@ -21,7 +21,6 @@ enum
 	TXS_LAST,
 };
 
-extern ZAudio *g_pAudio;
 //extern bitset<TXS_LAST> txs;
 
 //extern int active;

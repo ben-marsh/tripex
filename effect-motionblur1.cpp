@@ -51,13 +51,13 @@ public:
 	{
 		return (fElapsed > 0.5);
 	}
-	HRESULT Calculate(float brightness, float elapsed)
+	HRESULT Calculate(float brightness, float elapsed, ZAudio* pAudio)
 	{
 		for(int i = 0; i < RINGS; i++)
 		{
-			pObj[i].fRoll += rs[i] * g_pAudio->GetIntensity( )* elapsed;
-			pObj[i].fPitch += ps[i] * g_pAudio->GetIntensity( )* elapsed;
-			pObj[i].fYaw += ys[i] * max(0.1, g_pAudio->GetIntensity( )) * elapsed;
+			pObj[i].fRoll += rs[i] * pAudio->GetIntensity( )* elapsed;
+			pObj[i].fPitch += ps[i] * pAudio->GetIntensity( )* elapsed;
+			pObj[i].fYaw += ys[i] * max(0.1, pAudio->GetIntensity( )) * elapsed;
 			pObj[i].wcAmbientLight = ZColour::Grey(brightness * 20.0f);// / pObj[i].nExposure);
 			pObj[i].Calculate(&camera, elapsed);
 		}
@@ -73,7 +73,7 @@ public:
 		}
 		return S_OK;
 	}
-	HRESULT Reconfigure( )
+	virtual HRESULT Reconfigure(ZAudio* pAudio) override
 	{
 		ZTexture *t = g_pD3D->Find(TC_EMMOTIONBLUR);
 		for(int i = 0; i < RINGS; i++) pObj[i].pTexture[0].m_pTexture = t;

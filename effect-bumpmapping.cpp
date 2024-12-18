@@ -270,7 +270,7 @@ public:
 			mpBumpIndex[vpBumpmap[i]] = pb;
 		}
 */	}
-	HRESULT Calculate( float brightness, float elapsed )
+	HRESULT Calculate( float brightness, float elapsed, ZAudio* pAudio )
 	{
 		HRESULT hRes;
 		br = brightness;
@@ -297,7 +297,7 @@ public:
 					grid.pVertex[i].m_aTex[0].x = gridbm.pVertex[i].m_aTex[0].x = precalc_u[x][y] + (tx / 256.0f);
 					grid.pVertex[i].m_aTex[0].y = gridbm.pVertex[i].m_aTex[0].y = precalc_v[x][y] + (ty / 256.0f);
 
-					float brav = precalc_c[x][y] * br * g_pAudio->GetIntensity( );//min(average, 1);
+					float brav = precalc_c[x][y] * br * pAudio->GetIntensity( );//min(average, 1);
 					brav *= 1.6f;
 					gridbm.pVertex[i].m_cDiffuse = ZColour::Grey((int)(255.0f * br));//max(0.2, min(brav, 1)) * 255.0);//gridbm->vertex[i].color = D3DRGB(brav, brav, brav);
 					grid.pVertex[i].m_cDiffuse = ZColour::Grey((int)(br * precalc_c[(int)(x + tx) % GRIDW][y % GRIDH] * 255.0f));
@@ -370,17 +370,17 @@ public:
 
 		/** TENTACLES **********/
 		obj.wcAmbientLight = ZColour::Grey((int)(brightness * 205.0f));
-		if( g_pAudio->IsBeat( ) && g_pAudio->GetBeat( ) > 0.9f) fTentacleDir = -fTentacleDir;
+		if( pAudio->IsBeat( ) && pAudio->GetBeat( ) > 0.9f) fTentacleDir = -fTentacleDir;
 		for(float fPos = 0;;)
 		{
 			float fNext = fPos + MIN_FRAME_TIME;
 			bool bLast = fNext > elapsed;
 
 			float fThis = min(MIN_FRAME_TIME, elapsed - fPos);
-			obj.fRoll += fThis * fTentacleDir * g_fDegToRad * 5.0f * (g_pAudio->GetIntensity( ) + 0.1f);
-			obj.fPitch += fThis * fTentacleDir * g_fDegToRad * 20.0f * g_pAudio->GetIntensity( );
-			obj.fYaw += fThis * fTentacleDir * g_fDegToRad * 10.0f * (g_pAudio->GetIntensity( ) + 0.1f);
-			angle += g_pAudio->GetIntensity( ) * fMoveSpeed * fThis * g_fDegToRad;
+			obj.fRoll += fThis * fTentacleDir * g_fDegToRad * 5.0f * (pAudio->GetIntensity( ) + 0.1f);
+			obj.fPitch += fThis * fTentacleDir * g_fDegToRad * 20.0f * pAudio->GetIntensity( );
+			obj.fYaw += fThis * fTentacleDir * g_fDegToRad * 10.0f * (pAudio->GetIntensity( ) + 0.1f);
+			angle += pAudio->GetIntensity( ) * fMoveSpeed * fThis * g_fDegToRad;
 			obj.vPosition.m_fX = 200.0f * cosf(angle) * sinf(angle * 1.3f) * cosf(angle * 2.3f) * sinf(angle * 0.6f);
 			obj.vPosition.m_fY = 100.0f * cosf(angle * 0.2f) * sinf(angle * 1.1f) * cosf(angle * 1.6f) * sinf(angle * 1.2f);
 			obj.vPosition.m_fZ = 150.0f * cosf(angle * 1.6f) * sinf(angle * 0.5f) * cosf(angle * 1.1f) * sinf(angle * 1.2f);
@@ -446,7 +446,7 @@ public:
 
 		return hRes;
 	}
-	HRESULT Reconfigure( )
+	virtual HRESULT Reconfigure(ZAudio* pAudio) override
 	{
 		obj.pTexture[0].m_nType = ZObject::Texture::T_ENVMAP;
 		obj.pTexture[0].m_pTexture = g_pD3D->Find(TC_EMBUMPMAPTENTACLES);//ENVIRONMENTMAP));

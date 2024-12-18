@@ -106,10 +106,10 @@ public:
 			}
 		}
 	}
-	HRESULT Calculate(float brightness, float elapsed)
+	HRESULT Calculate(float brightness, float elapsed, ZAudio* pAudio)
 	{
-		fBezPos += elapsed * g_pAudio->GetIntensity( ) * 0.01f;
-		fBezPos2 += elapsed * g_pAudio->GetIntensity( ) * 0.02f;
+		fBezPos += elapsed * pAudio->GetIntensity( ) * 0.01f;
+		fBezPos2 += elapsed * pAudio->GetIntensity( ) * 0.02f;
 		cCamera.m_vPosition = ZVector(0, 0, -70);//bez.Calculate(fBezPos);
 		cCamera.SetTarget(bez2.Calculate(fBezPos2));
 
@@ -143,21 +143,21 @@ public:
 				if((i % 3) == 0)
 				{
 					pObj[i].fRoll += 0.1f * as[i][0][0];
-					pObj[i].fPitch += g_pAudio->GetDampenedBand( pEffectPtr->fSensitivity, 3.0f/16.0f, 4.0f/16.0f) * as[i][1][0];
-					pObj[i].fYaw += g_pAudio->GetDampenedBand( pEffectPtr->fSensitivity, 4.0f/16.0f, 5.0f/16.0f) * as[i][2][0];
+					pObj[i].fPitch += pAudio->GetDampenedBand( pEffectPtr->fSensitivity, 3.0f/16.0f, 4.0f/16.0f) * as[i][1][0];
+					pObj[i].fYaw += pAudio->GetDampenedBand( pEffectPtr->fSensitivity, 4.0f/16.0f, 5.0f/16.0f) * as[i][2][0];
 					pObj[i].fPitch = Bound<float>(pObj[i].fPitch, -ANGSZ, ANGSZ);
 					pObj[i].fYaw = Bound<float>(pObj[i].fYaw, -ANGSZ, ANGSZ);
 				}
 				if((i % 3) == 1)
 				{
-					pObj[i].fRoll += g_pAudio->GetDampenedBand(pEffectPtr->fSensitivity, 2.0f/16.0f, 3.0f/16.0f) * as[i][0][0];
+					pObj[i].fRoll += pAudio->GetDampenedBand(pEffectPtr->fSensitivity, 2.0f/16.0f, 3.0f/16.0f) * as[i][0][0];
 					pObj[i].fPitch += 0.1f * as[i][1][0];
-					pObj[i].fYaw += 1.5f * g_pAudio->GetDampenedBand(pEffectPtr->fSensitivity, 2.0f/16.0f, 4.0f/16.0f) * as[i][2][0];
+					pObj[i].fYaw += 1.5f * pAudio->GetDampenedBand(pEffectPtr->fSensitivity, 2.0f/16.0f, 4.0f/16.0f) * as[i][2][0];
 				}
 				if((i % 3) == 2) 
 				{
-					pObj[i].fRoll += g_pAudio->GetDampenedBand(pEffectPtr->fSensitivity, 1/16.0f, 2/16.0f) * as[i][0][0];
-					pObj[i].fPitch += g_pAudio->GetIntensity( ) * as[i][1][0];
+					pObj[i].fRoll += pAudio->GetDampenedBand(pEffectPtr->fSensitivity, 1/16.0f, 2/16.0f) * as[i][0][0];
+					pObj[i].fPitch += pAudio->GetIntensity( ) * as[i][1][0];
 					pObj[i].fYaw += 0.1f * as[i][2][0];
 				}
 	//for(int o = 0; o < RINGS; o++)

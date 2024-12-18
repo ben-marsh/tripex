@@ -3,6 +3,7 @@
 //#include <assert.h>
 #include "effect.h"
 #include "error.h"
+#include "ZAudio.h"
 #include "ZPaletteCanvas.h"
 #include "ZTexture.h"
 #include "ZColourHSV.h"
@@ -523,7 +524,7 @@ public:
 			}
 		}
 	}
-	void DrawOscilloscope(double dElapsed, int nOsc, double dBr, ZArray<unsigned char> &dst)
+	void DrawOscilloscope(double dElapsed, int nOsc, double dBr, ZAudio* pAudio, ZArray<unsigned char> &dst)
 	{
 		double xsprev, ysprev;
 		dOscSpin += dElapsed * 1 * 3.14159 / 180.0;
@@ -541,12 +542,12 @@ public:
 					int n = (i + 1) % 128;	
 					
 					double na = 2.0 * 3.14159 * n / 127.0;
-					double nr = 70 + (g_pAudio->GetSample( j, n * 4 ) * 128.0f * 4.0f / 20.0f);
+					double nr = 70 + (pAudio->GetSample( j, n * 4 ) * 128.0f * 4.0f / 20.0f);
 					double nx = (nr * cos(na)) + (90 * cos(dOscSpin + (j * 3.14159)));
 					double ny = (nr * sin(na)) + (90 * sin(dOscSpin + (j * 3.14159)));
 					
 					double ta = 2.0 * 3.14159 * i / 127.0;
-					double tr = 70 + (g_pAudio->GetSample( j, i * 4) * 4.0f * 128.0f / 20.0);
+					double tr = 70 + (pAudio->GetSample( j, i * 4) * 4.0f * 128.0f / 20.0);
 					double tx = (tr * cos(ta)) + (90 * cos(dOscSpin + (j * 3.14159)));
 					double ty = (tr * sin(ta)) + (90 * sin(dOscSpin + (j * 3.14159)));	
 					
@@ -560,8 +561,8 @@ public:
 				for(i = 0; i < 128; i++)
 				{
 					double dAng = dSpin + (j * 3.14159 / 2.0);
-					double xs = xc + (((cos(dAng) * 2.3 * (i - 64)) + (g_pAudio->GetSample( j, i * 4 ) * 128.0f * 4.0f * -sin(dAng) / 25.0)) * fMagnify); 
-					double ys = yc + (((sin(dAng) * 2.3 * (i - 64)) + (g_pAudio->GetSample( j, i * 4 ) * 128.0f * 4.0f * cos(dAng) / 25.0)) * fMagnify);
+					double xs = xc + (((cos(dAng) * 2.3 * (i - 64)) + (pAudio->GetSample( j, i * 4 ) * 128.0f * 4.0f * -sin(dAng) / 25.0)) * fMagnify); 
+					double ys = yc + (((sin(dAng) * 2.3 * (i - 64)) + (pAudio->GetSample( j, i * 4 ) * 128.0f * 4.0f * cos(dAng) / 25.0)) * fMagnify);
 					
 					if(i > 0) DrawAALine(dst, xsprev, ysprev, xs, ys, width, height, dBr);
 					
@@ -574,7 +575,7 @@ public:
 			for(i = 0; i < 128; i++)
 			{
 				double xs = xc + ((i - 64) * 3 * fMagnify); //(i / xc + (cos(dAng) * 1.3 * (i - 64)) + (waveformStereo[j][i] * -sin(dAng) / 10.0); 
-				double ys = yc + fMagnify * g_pAudio->GetSample( i * 4 ) * 4.0f * 128.0f / 10.0;
+				double ys = yc + fMagnify * pAudio->GetSample( i * 4 ) * 4.0f * 128.0f / 10.0;
 				
 				if(i > 0) DrawAALine(dst, xsprev, ysprev, xs, ys, width, height, dBr);
 				
@@ -597,7 +598,7 @@ public:
 					//				double ny = (nr * sin(na));
 					
 					double ta = 2.0 * 3.14159 * n / 128.0;
-					double tr = 90 + ((g_pAudio->GetSample( n * 4) * 128.0f * 4.0f) / 40.0);
+					double tr = 90 + ((pAudio->GetSample( n * 4) * 128.0f * 4.0f) / 40.0);
 					double tx = (tr * cos(ta));
 					double ty = (tr * sin(ta));
 					
@@ -617,7 +618,7 @@ public:
 			break;
 		}
 	}
-	HRESULT Calculate(float brightness, float elapsed)
+	HRESULT Calculate(float brightness, float elapsed, ZAudio* pAudio)
 	{
 		HRESULT hRes;
 		int i, j;
@@ -759,15 +760,15 @@ public:
 		ZArray<unsigned char> &dst = fOddFrame? bf2 : bf1;
 		
 		//	int index[128];
-		double r = g_pAudio->GetIntensity( );
+		double r = pAudio->GetIntensity( );
 		ang += elapsed * min(r / 200.0, 2) * 4.0 * 3.14159 / 180.0;
 		
-		int brt = g_pAudio->GetIntensity( ) * 30.0; //min(max(average * 10.0, 8), 50);
+		int brt = pAudio->GetIntensity( ) * 30.0; //min(max(average * 10.0, 8), 50);
 		
 		r = (r / 20) + 10;
 		
 		j = 0;
-		double mlt = min(0.85, (g_pAudio->GetIntensity( ) * 1.6)) / 4.0;
+		double mlt = min(0.85, (pAudio->GetIntensity( ) * 1.6)) / 4.0;
 		//(0.7 + (average * 0.5))) / 4.0;
 		
 		//	ZeroMemory(dst, sizeof(char) * 256 * 512);
@@ -782,16 +783,16 @@ public:
 		//ml * ((50 - brt) / 9.0) * 3.14159 / 180.0, ml * ((50 - brt) / 8.0) * 3.14159 / 180.0, ((50 - brt) / 7.0) * 3.14159 / 180.0); //2 * 3.14159 / 180.0, 3 * 3.14159 / 180.0);
 		//	obj->Rotate();
 		
-		static double amplitude = g_pAudio->GetIntensity( ); 
-		double target = max(20, (1 - g_pAudio->GetIntensity( )) * 70.0); //average * 70.0;
+		static double amplitude = pAudio->GetIntensity( ); 
+		double target = max(20, (1 - pAudio->GetIntensity( )) * 70.0); //average * 70.0;
 		
 		amplitude = target;
 		
 		static double angle = 0;
-		angle += elapsed * g_pAudio->GetIntensity( )* 2.0 * 3.14159 / 180.0;
+		angle += elapsed * pAudio->GetIntensity( )* 2.0 * 3.14159 / 180.0;
 		
 		static double fa = 0;
-		fa += elapsed * g_pAudio->GetIntensity( )* 3.14159 / 180.0;
+		fa += elapsed * pAudio->GetIntensity( )* 3.14159 / 180.0;
 		//	double brm = average((1 - cos(average * 3.14159))  / 2) + 0.5;
 		
 		if(fabs(target - amplitude) < 4 * elapsed) amplitude = target;
@@ -823,7 +824,7 @@ public:
 				dOscFade = 0;
 			}
 		}
-		double dBr = min(1.0, g_pAudio->GetIntensity( )* 3.0);
+		double dBr = min(1.0, pAudio->GetIntensity( )* 3.0);
 		if(nOsc2 != -1 && dOscFade >= 1.0)
 		{
 			nOsc1 = nOsc2;
@@ -832,10 +833,10 @@ public:
 		
 		if(nOsc2 != -1)
 		{
-			DrawOscilloscope(elapsed, nOsc1, dBr * (1 - dOscFade), dst);
-			DrawOscilloscope(elapsed, nOsc2, dBr * dOscFade, dst);
+			DrawOscilloscope(elapsed, nOsc1, dBr * (1 - dOscFade), pAudio, dst);
+			DrawOscilloscope(elapsed, nOsc2, dBr * dOscFade, pAudio, dst);
 		}
-		else DrawOscilloscope(elapsed, nOsc1, dBr, dst);
+		else DrawOscilloscope(elapsed, nOsc1, dBr, pAudio, dst);
 
 		pCanvas->m_cColour = ZColour::Grey(255.0 * brightness);//D3DRGB(brightness, brightness, brightness);
 

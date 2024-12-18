@@ -118,9 +118,9 @@ public:
 		}
 		return ZVector(0, 0, 0);
 	}
-	HRESULT Calculate(float brightness, float elapsed)
+	HRESULT Calculate(float brightness, float elapsed, ZAudio* pAudio)
 	{
-		fAvTotal += elapsed * g_pAudio->GetIntensity( );
+		fAvTotal += elapsed * pAudio->GetIntensity( );
 		fAvTime += elapsed;
 
 		cam.m_vPosition.m_fZ = -80;
@@ -145,7 +145,7 @@ public:
 
 		camera.m_vPosition.m_fZ = StepTo<float>(camera.m_vPosition.m_fZ, fCamTarget, fSpeed * elapsed);// * 2.0 * (-camera.vPosition.k / 250.0));//2);
 
-		fCamPos += g_pAudio->GetIntensity( ) * elapsed * 0.02;
+		fCamPos += pAudio->GetIntensity( ) * elapsed * 0.02;
 		camera.SetTarget(bz.Calculate(fCamPos));
 
 		if(nNewEffect != -1)
@@ -168,7 +168,7 @@ public:
 			}
 		}
 
-		camera.m_fRoll += g_pAudio->GetIntensity( ) * 3.14159 * 2.0 * elapsed / 180.0;
+		camera.m_fRoll += pAudio->GetIntensity( ) * 3.14159 * 2.0 * elapsed / 180.0;
 
 		for(int i = 0; i < 9; i++)
 		{
@@ -181,10 +181,10 @@ public:
 				pObj[i].vPosition = GetPos(nEffect, i);
 			}	
 
-			float fSpeed = g_pAudio->GetDampenedBand( pEffectPtr->fSensitivity, i / 10.0, (i + 1) / 10.0);
+			float fSpeed = pAudio->GetDampenedBand( pEffectPtr->fSensitivity, i / 10.0, (i + 1) / 10.0);
 			pObj[i].fRoll += elapsed * 4.0 * 3.14159 / 180.0;
-			pObj[i].fPitch += g_pAudio->GetIntensity( ) * elapsed * 10.0 * 3.14159 / 180.0;
-			pObj[i].fYaw += (g_pAudio->GetIntensity( ) + g_pAudio->GetBeat( ) ) * elapsed * 7 * 3.14159 / 180.0;
+			pObj[i].fPitch += pAudio->GetIntensity( ) * elapsed * 10.0 * 3.14159 / 180.0;
+			pObj[i].fYaw += (pAudio->GetIntensity( ) + pAudio->GetBeat( ) ) * elapsed * 7 * 3.14159 / 180.0;
 			pObj[i].wcAmbientLight = ZColour::Grey(brightness * 48.0f);// / pObj[i].nExposure);
 			pObj[i].Calculate(&camera, elapsed);
 		}
@@ -201,10 +201,10 @@ public:
 		}
 		return S_OK;
 	}
-	HRESULT Reconfigure()
+	virtual HRESULT Reconfigure(ZAudio* pAudio) override
 	{
 		fAvTime = 16;
-		fAvTotal = g_pAudio->GetIntensity( ) * fAvTime;
+		fAvTotal = pAudio->GetIntensity( ) * fAvTime;
 		bReset = true;
 		ZTexture *t = g_pD3D->Find(bAltBlur? TC_EMMOTIONBLUR3ALT : TC_EMMOTIONBLUR3);
 		for(int i = 0; i < 9; i++) pObj[i].pTexture[0].m_pTexture = t;

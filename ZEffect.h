@@ -3,6 +3,7 @@
 #include <string>
 #include <set>
 #include <memory>
+#include "ZAudio.h"
 
 class ZEffectBase
 {
@@ -12,8 +13,8 @@ public:
 	ZEffectBase();
 	virtual ~ZEffectBase();
 
-	virtual HRESULT Calculate( FLOAT32 fBr, FLOAT32 fElapsed ) = 0;
-	virtual HRESULT Reconfigure( );
+	virtual HRESULT Calculate( FLOAT32 fBr, FLOAT32 fElapsed, ZAudio* pAudio ) = 0;
+	virtual HRESULT Reconfigure(ZAudio* pAudio);
 	virtual HRESULT Render( ) = 0;
 	virtual bool CanRender( FLOAT32 fElapsed );
 };
@@ -52,8 +53,8 @@ public:
 	virtual void Create() = 0;
 	virtual void Destroy();
 
-	HRESULT Calculate(float fElapsed);
-	HRESULT Reconfigure( );
+	HRESULT Calculate(float fElapsed, ZAudio* pAudio);
+	HRESULT Reconfigure(ZAudio* pAudio);
 	HRESULT Render( );
 	bool CanRender(float fElapsed);
 

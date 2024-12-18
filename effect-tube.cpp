@@ -127,12 +127,12 @@ public:
 //	scene->vpObject.Add(coil);
 		cCamera.m_vPosition.m_fZ = -120;//120;
 	}
-	HRESULT Calculate(float brightness, float elapsed)
+	HRESULT Calculate(float brightness, float elapsed, ZAudio* pAudio)
 	{
 		int i, j;
 		for(i = 0; i < 128; i++)
 		{
-			accwf[i * PTCIRCUM / 128] += g_pAudio->GetSample(i*4) * 128.0f * 4.0f * elapsed * (PTCIRCUM / 128.0f);
+			accwf[i * PTCIRCUM / 128] += pAudio->GetSample(i*4) * 128.0f * 4.0f * elapsed * (PTCIRCUM / 128.0f);
 		}
 
 		static double accum = 1;
@@ -224,7 +224,7 @@ public:
 
 		return S_OK;
 	}
-	HRESULT Reconfigure()
+	virtual HRESULT Reconfigure(ZAudio* pAudio) override
 	{
 		ZTexture *tx = g_pD3D->Find(TC_EMTUBE);
 		coil.pTexture[0].Set(ZObject::Texture::T_ENVMAP, tx);

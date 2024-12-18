@@ -23,17 +23,14 @@ static const FLOAT32 g_fRadToDeg = 57.295779513082320876798154814105f;//180.0f /
 #pragma warning(disable:4244)
 
 #include <crtdbg.h>
-#include <windows.h>
 #include <math.h>
 #include <float.h>
 #include <stdio.h>
 #include <conio.h>
-#include <d3d9.h>
-#include <crtdbg.h>
-#include <string.h>
 
 #define timeGetTime() ((DWORD)GetTickCount64())
 
-#include "ZAudio.h"
-
-extern ZAudio* g_pAudio;
+#include "ZColour.h"
+#include "ZPoint.h"
+#include "ZRect.h"
+#include <vector>

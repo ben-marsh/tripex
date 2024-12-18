@@ -59,9 +59,9 @@ public:
 
 		camera.m_vPosition.m_fZ = -320;
 	}
-	HRESULT Calculate(float br, float elapsed)
+	HRESULT Calculate(float br, float elapsed, ZAudio* pAudio)
 	{
-		fBezPos += elapsed * g_pAudio->GetIntensity( ) * 0.04;
+		fBezPos += elapsed * pAudio->GetIntensity( ) * 0.04;
 		camera.m_vPosition = b.Calculate(fBezPos);
 //	float fPos = 0;
 //	fPos += elapsed * 3.14159 / 180.0;
@@ -70,7 +70,7 @@ public:
 
 		for(int i = 0; i < pObj[NOBJ].pVertex.GetLength(); i++)
 		{
-			pfAng[i] += g_pAudio->GetIntensity( ) * elapsed * 8.0 * 3.14159 / 180.0;
+			pfAng[i] += pAudio->GetIntensity( ) * elapsed * 8.0 * 3.14159 / 180.0;
 		}
 		for(int i = 0; i < NOBJ; i++)
 		{
@@ -84,13 +84,13 @@ public:
 			pObj[i].fYaw += elapsed * 2.0 * PI / 180.0;
 			pObj[i].m_bsFlag.set( ZObject::F_VALID_VERTEX_NORMALS, false );
 			float fBlend = float(i) / NOBJ;
-			float fMult2 = (i == 0)? 1.0f : min(1.0, g_pAudio->GetIntensity( ) * 1.5);//(averagefloat(i) / NOBJ);
+			float fMult2 = (i == 0)? 1.0f : min(1.0, pAudio->GetIntensity( ) * 1.5);//(averagefloat(i) / NOBJ);
 			pObj[i].wcAmbientLight = br * (ZColour::Grey(96 * fMult2 * (1 - (0.4 * float(i) / NOBJ))) - ZColour(fBlend * 40.0, fBlend * 40.0, fBlend * 5.0));
 			pObj[i].Calculate(&camera, elapsed);
 		}
 		return S_OK;
 	}
-	HRESULT Reconfigure( )
+	virtual HRESULT Reconfigure(ZAudio* pAudio) override
 	{
 		ZTexture *tx = g_pD3D->Find(TC_EMMORPHINGSPHERE);
 		for(int i = 0; i < NOBJ; i++)

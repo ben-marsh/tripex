@@ -56,22 +56,22 @@ public:
 		obj.FindDelayValues();
 		camera.m_vPosition.m_fZ = -120;
 	}
-	HRESULT Calculate(float brightness, float elapsed)
+	HRESULT Calculate(float brightness, float elapsed, ZAudio* pAudio)
 	{
 		brt = brightness;
 
 		static double pos = 2;
-		pos += 0.02 * g_pAudio->GetIntensity( );
+		pos += 0.02 * pAudio->GetIntensity( );
 
-		if(g_pAudio->GetIntensity( ) > 0.5)
+		if(pAudio->GetIntensity( ) > 0.5)
 		{
-			obj.fRoll += ((g_pAudio->GetIntensity( ) - 0.5) / 0.5) * elapsed * 2.0 * 3 * 3.14159 / 180.0;
+			obj.fRoll += ((pAudio->GetIntensity( ) - 0.5) / 0.5) * elapsed * 2.0 * 3 * 3.14159 / 180.0;
 		}
-		if(g_pAudio->GetIntensity( ) > 0.3)
+		if(pAudio->GetIntensity( ) > 0.3)
 		{
-			obj.fPitch += ((g_pAudio->GetIntensity( ) - 0.3) / 0.7) * elapsed * 1.7 * 1.5 * 6.0 * 3.14159 / 180.0;
+			obj.fPitch += ((pAudio->GetIntensity( ) - 0.3) / 0.7) * elapsed * 1.7 * 1.5 * 6.0 * 3.14159 / 180.0;
 		}
-		obj.fYaw += g_pAudio->GetIntensity( ) * elapsed * 4.0 * 3.14159 / 180.0;
+		obj.fYaw += pAudio->GetIntensity( ) * elapsed * 4.0 * 3.14159 / 180.0;
 		obj.wcAmbientLight = ZColour::Grey(brightness * 255.0);
 //		obj.cAmbientLight = ZWideColour(255, 255, 255);
 		obj.Calculate(&camera, elapsed);
@@ -111,7 +111,7 @@ public:
 
 		return S_OK;
 	}
-	HRESULT Reconfigure( )
+	virtual HRESULT Reconfigure(ZAudio* pAudio) override
 	{
 		obj.pTexture[0].m_nType = ZObject::Texture::T_SPRITE;
 		obj.pTexture[0].m_pTexture = g_pD3D->Find(TC_LBLIGHTTENTACLES);

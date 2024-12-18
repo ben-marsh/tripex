@@ -46,17 +46,17 @@ public:
 			pdHeight[i] = -10.0 + (rand() * 20.0 / RAND_MAX);
 		}
 	}
-	HRESULT Calculate(float brightness, float elapsed)
+	HRESULT Calculate(float brightness, float elapsed, ZAudio* pAudio)
 	{
 		brt = brightness;
-		dRadAng += (1.0 + (elapsed * (6.0 * g_pAudio->GetIntensity( )))) * 3.14159 / 128.0;
+		dRadAng += (1.0 + (elapsed * (6.0 * pAudio->GetIntensity( )))) * 3.14159 / 128.0;
 		if(dRadAng > 3.14159 * 2.0)
 		{
-			if(g_pAudio->GetIntensity( ) < 0.2) nSpikes = 0;
-			else if(g_pAudio->GetIntensity( ) < 0.45) nSpikes = 1;
-			else if(g_pAudio->GetIntensity( ) < 0.6) nSpikes = 2;
-			else if(g_pAudio->GetIntensity( ) < 0.75) nSpikes = 3;
-			else if(g_pAudio->GetIntensity( ) < 0.9) nSpikes = 4;
+			if(pAudio->GetIntensity( ) < 0.2) nSpikes = 0;
+			else if(pAudio->GetIntensity( ) < 0.45) nSpikes = 1;
+			else if(pAudio->GetIntensity( ) < 0.6) nSpikes = 2;
+			else if(pAudio->GetIntensity( ) < 0.75) nSpikes = 3;
+			else if(pAudio->GetIntensity( ) < 0.9) nSpikes = 4;
 			else nSpikes = 5;
 
 			while(dRadAng > 3.14159 * 2.0) dRadAng -= 3.14159 * 2.0;
@@ -103,7 +103,7 @@ public:
 		}
 		return S_OK;
 	}
-	HRESULT Reconfigure( )
+	virtual HRESULT Reconfigure(ZAudio* pAudio) override
 	{
 		obj.pTexture[0].m_pTexture = g_pD3D->Find(TC_LBLIGHTSTAR);
 		pTint = g_pD3D->Find(TC_WTLIGHTSTAR);

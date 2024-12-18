@@ -105,15 +105,15 @@ public:
 			}
 		}
 	}
-	HRESULT Calculate(float fBr, float fElapsed)
+	HRESULT Calculate(float fBr, float fElapsed, ZAudio* pAudio)
 	{
 		ZVector pvPos[4];
-		float fPosChange = 0.015f * g_pAudio->GetIntensity( ) * fElapsed;
+		float fPosChange = 0.015f * pAudio->GetIntensity( ) * fElapsed;
 		static float fTexVOfs = 3;//0.99;1.5;//0.99;
 		fTexVOfs += 0.003f * fTBr * fElapsed;
 		while(fTexVOfs > 0) fTexVOfs--;
-		if(g_pAudio->GetIntensity( ) > fTBr) fTBr += min(g_pAudio->GetIntensity( ) - fTBr, 0.05f) * fElapsed;
-		if(g_pAudio->GetIntensity( ) < fTBr) fTBr += max(g_pAudio->GetIntensity( ) - fTBr, -0.05f) * fElapsed;
+		if(pAudio->GetIntensity( ) > fTBr) fTBr += min(pAudio->GetIntensity( ) - fTBr, 0.05f) * fElapsed;
+		if(pAudio->GetIntensity( ) < fTBr) fTBr += max(pAudio->GetIntensity( ) - fTBr, -0.05f) * fElapsed;
 
 		int nOldStart = (int)(fPos * nTunnelL);
 		bool fReset = false;
@@ -126,8 +126,8 @@ public:
 
 		for(; fPos >= 1.0; fPos -= 1)
 		{
-			float fAng1 = fPrevAng + GetRand(RANDCH_A1 * g_pAudio->GetIntensity( ));
-			float fAng2 = fAng1 + GetRand(RANDCH_A2 * g_pAudio->GetIntensity( ));
+			float fAng1 = fPrevAng + GetRand(RANDCH_A1 * pAudio->GetIntensity( ));
+			float fAng2 = fAng1 + GetRand(RANDCH_A2 * pAudio->GetIntensity( ));
 			fPrevAng = fAng2;// + 3.14159;
 			for(int j = 0; j < 2; j++)
 			{
@@ -259,7 +259,7 @@ public:
 		}
 		return S_OK;
 	}
-	HRESULT Reconfigure()
+	virtual HRESULT Reconfigure(ZAudio* pAudio) override
 	{
 		tx = g_pD3D->Find(TC_WTTUNNEL);
 		pObj[0].pTexture[0].Set(ZObject::Texture::T_USER, tx);//SetTexture(tx);

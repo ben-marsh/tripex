@@ -45,10 +45,10 @@ void _cdecl Start( int iChannels, int iSamplesPerSec, int iBitsPerSample, const 
 
 void _cdecl AudioData( short* pAudioData, int iAudioDataLength, float *pFreqData, int iFreqDataLength )
 {
-	if( g_pAudio != NULL )
+	if( g_pTripex->pAudio != NULL )
 	{
-		g_pAudio->SetDataFormat( 2, 44100, 16 );
-		g_pAudio->AddData( pAudioData, iAudioDataLength );
+		g_pTripex->pAudio->SetDataFormat( 2, 44100, 16 );
+		g_pTripex->pAudio->AddData( pAudioData, iAudioDataLength );
 	}
 
 //	for( int i = 0; i < 2; i++ )

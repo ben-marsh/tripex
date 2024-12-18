@@ -2,6 +2,7 @@
 #include "StdAfx.h"
 #include "ZObject.h"
 #include "ZBezier.h"
+#include "ZAudio.h"
 #include "effect.h"
 #include <conio.h>
 #include "error.h"
@@ -132,9 +133,9 @@ public:
 			pObj[i].pTexture[0].m_nType = ZObject::Texture::T_SPRITE;
 		}
 	}
-	HRESULT Calculate(float brightness, float elapsed)
+	HRESULT Calculate(float brightness, float elapsed, ZAudio* pAudio)
 	{
-		double dMultDest = 1 - g_pAudio->GetDampenedBand(pEffectPtr->fSensitivity, 0.0f, 1.0f);//average;
+		double dMultDest = 1 - pAudio->GetDampenedBand(pEffectPtr->fSensitivity, 0.0f, 1.0f);//average;
 		camera.m_vPosition.m_fZ = -110;//pScene->camera.z = -110;//60;
 		double sm = 1.3 * elapsed;
 
@@ -144,7 +145,7 @@ public:
 		if(dMultDest > dMult) dMult = min(dMultDest, dMult + 0.01);
 
 		double dTwistAng = PI * sin(dAng) / 2.0;
-		dAng += sm * g_pAudio->GetDampenedBand(pEffectPtr->fSensitivity, 0, 0.5f) * 0.25 * 4 * g_fDegToRad;
+		dAng += sm * pAudio->GetDampenedBand(pEffectPtr->fSensitivity, 0, 0.5f) * 0.25 * 4 * g_fDegToRad;
 
 		double dCentre = (TWISTPLANES - 1.0) / 2.0;
 		for(int i = 0; i < TWISTPLANES; i++)
@@ -158,9 +159,9 @@ public:
 				pfPos[i] = pfPos[i] - (int)pfPos[i];
 			}
 
-			pObjPlane[i].fRoll += pfRS[i] * (g_pAudio->GetIntensity( ) + 0.1);
-			pObjPlane[i].fYaw += pfYS[i] * (g_pAudio->GetIntensity( ) + 0.1);
-			pObjPlane[i].fPitch += pfPS[i] * g_pAudio->GetIntensity( );
+			pObjPlane[i].fRoll += pfRS[i] * (pAudio->GetIntensity( ) + 0.1);
+			pObjPlane[i].fYaw += pfYS[i] * (pAudio->GetIntensity( ) + 0.1);
+			pObjPlane[i].fPitch += pfPS[i] * pAudio->GetIntensity( );
 
 			pObjPlane[i].vPosition.m_fX = -(BEZIERHEIGHT / 2) + (i * BEZIERHEIGHT / (TWISTPLANES - 1.0));
 			pObjPlane[i].vPosition.m_fZ = -60;
@@ -199,16 +200,16 @@ public:
 		}
 		obj.Calculate(&camera, elapsed);
 
-		dMult = g_pAudio->GetDampenedBand(pEffectPtr->fSensitivity, 0, 1.0f);//average;
+		dMult = pAudio->GetDampenedBand(pEffectPtr->fSensitivity, 0, 1.0f);//average;
 		dAngX += sm * dMult * 9 * g_fDegToRad;
 
-		dAngY += sm * g_pAudio->GetDampenedBand(pEffectPtr->fSensitivity, 0/16.0f, 3/16.0f) * 3.4 * g_fDegToRad;
-		dAngZ += sm * g_pAudio->GetDampenedBand(pEffectPtr->fSensitivity, 3/16.0f, 9/16.0f) * 4.2 * g_fDegToRad;
+		dAngY += sm * pAudio->GetDampenedBand(pEffectPtr->fSensitivity, 0/16.0f, 3/16.0f) * 3.4 * g_fDegToRad;
+		dAngZ += sm * pAudio->GetDampenedBand(pEffectPtr->fSensitivity, 3/16.0f, 9/16.0f) * 4.2 * g_fDegToRad;
 		while(dAngX > PI2) dAngX -= PI2;
 		while(dAngY > PI2) dAngY -= PI2;
 		while(dAngZ > PI2) dAngZ -= PI2;
 
-		camera.m_fRoll += sm * g_pAudio->GetIntensity( ) * 4 * g_fDegToRad;
+		camera.m_fRoll += sm * pAudio->GetIntensity( ) * 4 * g_fDegToRad;
 	//	pScene->camera.turn(sm * average * 4 * 3.14159 / 180.0, 0, 0);
 		return D3D_OK;
 	}
@@ -250,7 +251,7 @@ public:
 		}
 		return D3D_OK;
 	}
-	HRESULT Reconfigure( )
+	virtual HRESULT Reconfigure(ZAudio* pAudio) override
 	{
 		pTexture = g_pD3D->Find(TC_LBBEZIERCUBE);
 		testobj.pTexture[0].m_pTexture = pTexture;

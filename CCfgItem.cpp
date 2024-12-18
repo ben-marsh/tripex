@@ -3,6 +3,7 @@
 #include <memory>
 #include "CCfgItem.h"
 #include "Misc.h"
+#include <varargs.h>
 
 /************* CCfgItem ****************************************/
 CCfgItem::CCfgItem(const char *sName, int nType, void *pValue, bool bInitUpdate)

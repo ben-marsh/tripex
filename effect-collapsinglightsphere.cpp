@@ -68,15 +68,15 @@ public:
 			pdYPos[i] = (SPREAD / 2.0) - (double(rand()) * SPREAD / RAND_MAX);
 		}
 	}
-	HRESULT Calculate(float brightness, float elapsed)
+	HRESULT Calculate(float brightness, float elapsed, ZAudio* pAudio)
 	{
 		brt = brightness;
-		if(nStage == 0) dWaitTime += elapsed * g_pAudio->GetDampenedBand( pEffectPtr->fSensitivity, 0.0f, 1.0f);
+		if(nStage == 0) dWaitTime += elapsed * pAudio->GetDampenedBand( pEffectPtr->fSensitivity, 0.0f, 1.0f);
 		else if(nStage == 1) dTilt += elapsed * 1.5 * g_fDegToRad;
-		else if(nStage == 2) dWaitTime += elapsed * g_pAudio->GetDampenedBand(pEffectPtr->fSensitivity, 0.0f, 1.0f);
+		else if(nStage == 2) dWaitTime += elapsed * pAudio->GetDampenedBand(pEffectPtr->fSensitivity, 0.0f, 1.0f);
 		else if(nStage == 3) dTilt -= elapsed * 1.5 * g_fDegToRad;
 
-		if((dTilt < 0) || (dTilt > 3.141592 / 2.0) || (dWaitTime > 40.0 && g_pAudio->GetIntensity( ) > 0.6))
+		if((dTilt < 0) || (dTilt > 3.141592 / 2.0) || (dWaitTime > 40.0 && pAudio->GetIntensity( ) > 0.6))
 		{
 			nStage = (nStage + 1) & 3;
 			dWaitTime = 0.0;
@@ -84,7 +84,7 @@ public:
 		}
 
 		float fTwistMult = sin(dTilt);// * 3.14159 / 128.0);
-		float multp = (/*fac*/dTilt * g_pAudio->GetIntensity( )) + (1 - dTilt/*fac*/) + 0.1;
+		float multp = (/*fac*/dTilt * pAudio->GetIntensity( )) + (1 - dTilt/*fac*/) + 0.1;
 
 		obj.pVertex.SetLength(SOURCES);
 		for(int i = 0; i < SOURCES; i++)
@@ -100,8 +100,8 @@ public:
 			obj.pVertex[i].m_vPos.m_fY = (y * sin_t) + (x * cos_t);
 			obj.pVertex[i].m_vPos.m_fZ = z;
 
-			pdAng[i] += elapsed * multp * (g_pAudio->GetIntensity( ) + 0.1) * pdSpeed[i] * 3.14159 / 180.0;
-			pdTilt[i] += (g_pAudio->GetIntensity( ) + 0.1) * elapsed * multp * 1 * 3.14159 / 180.0;
+			pdAng[i] += elapsed * multp * (pAudio->GetIntensity( ) + 0.1) * pdSpeed[i] * 3.14159 / 180.0;
+			pdTilt[i] += (pAudio->GetIntensity( ) + 0.1) * elapsed * multp * 1 * 3.14159 / 180.0;
 
 			float fTransMult = FOREGROUNDBR + ((z / -100.0) * (1 - FOREGROUNDBR));
 			float fBr = brightness * fTransMult / 2.0;
@@ -114,7 +114,7 @@ public:
 		obj.Calculate(&camera, elapsed);
 		return D3D_OK;
 	}
-	HRESULT Render( )
+	HRESULT Render( ) override
 	{
 		HRESULT hRes;
 		hRes = obj.Render( );
@@ -133,7 +133,7 @@ public:
 		}
 		return S_OK;
 	}
-	HRESULT Reconfigure( )
+	virtual HRESULT Reconfigure(ZAudio* pAudio) override
 	{
 		obj.pTexture[0].Set(ZObject::Texture::T_SPRITE, g_pD3D->Find(TC_LBCOLLAPSINGSPHERE));
 		pTint = g_pD3D->Find(TC_WTCOLLAPSINGSPHERE);

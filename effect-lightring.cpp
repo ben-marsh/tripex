@@ -73,7 +73,7 @@ public:
 	
 		obj.pVertex.SetLength(SOURCES);
 	}
-	HRESULT Calculate(float brightness, float elapsed)
+	HRESULT Calculate(float brightness, float elapsed, ZAudio* pAudio)
 	{
 		brt = brightness;
 		accum += elapsed * 3.0;
@@ -83,8 +83,8 @@ public:
 			float elapsed = 1.0f;
 			for(int i = 0; i < SOURCES; i++)
 			{
-				position[i] += 0.25 * speed[i] * g_pAudio->GetIntensity( ) * elapsed;
-				ehp[i] += 0.25 * ehps[i] * (0.4 + 2 * (g_pAudio->GetIntensity( )+ g_pAudio->GetBeat( ))) * elapsed;
+				position[i] += 0.25 * speed[i] * pAudio->GetIntensity( ) * elapsed;
+				ehp[i] += 0.25 * ehps[i] * (0.4 + 2 * (pAudio->GetIntensity( )+ pAudio->GetBeat( ))) * elapsed;
 
 				double r = 2.0 * er[i] * cos(ehp[i]);
 
@@ -94,10 +94,10 @@ public:
 			}
 	
 			static double a2 = 0;
-			a2 += elapsed * (g_pAudio->GetIntensity( ) + g_pAudio->GetBeat( )) * 3.14159 / 180.0;
+			a2 += elapsed * (pAudio->GetIntensity( ) + pAudio->GetBeat( )) * 3.14159 / 180.0;
 
-			obj.fRoll += elapsed * 0.25 * g_pAudio->GetIntensity( ) * 4.0 * 3.14159 / 180.0;
-			obj.fPitch += elapsed * 0.25 * g_pAudio->GetIntensity( ) * 3.0 * 3.14159 / 180.0;
+			obj.fRoll += elapsed * 0.25 * pAudio->GetIntensity( ) * 4.0 * 3.14159 / 180.0;
+			obj.fPitch += elapsed * 0.25 * pAudio->GetIntensity( ) * 3.0 * 3.14159 / 180.0;
 			obj.fYaw += elapsed * 0.25 * 2.0 * 3.14159 / 180.0;
 
 			obj.pTexture[0].Set(ZObject::Texture::T_SPRITE, tx);
@@ -105,7 +105,7 @@ public:
 		}
 		return S_OK;
 	}
-	HRESULT Reconfigure( )
+	virtual HRESULT Reconfigure(ZAudio* pAudio) override
 	{
 		tx = g_pD3D->Find(TC_LBLIGHTRING);
 		ptTint = g_pD3D->Find(TC_WTLIGHTRING);

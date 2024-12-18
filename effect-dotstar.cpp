@@ -144,7 +144,7 @@ public:
 		}
 	}
 //Object *makeTentacles(int segs, float l, float r);
-	HRESULT Calculate(float brightness, float elapsed)
+	HRESULT Calculate(float brightness, float elapsed, ZAudio* pAudio)
 	{
 		camera.m_vPosition = b.Calculate(fBezPos);
 		camera.SetTarget(b2.Calculate(fBezPos2));//ZVector::Origin());
@@ -152,7 +152,7 @@ public:
 		fBezPos2 += 0.02 * fSpeed * elapsed;
 
 		fChange += elapsed;
-		fTotal += g_pAudio->GetIntensity( ) * elapsed;
+		fTotal += pAudio->GetIntensity( ) * elapsed;
 		if(fChange > 20)
 		{
 			fTarget = fTotal / fChange;
@@ -170,9 +170,9 @@ public:
 		dPos += elapsed;
 		while(dPos > 60)
 		{
-			rs = ((g_pAudio->GetIntensity( ) * 2.0) + 1.0 + (rand() * 5.0 / RAND_MAX)) * 3.14159 / 180.0;
-			ps = ((g_pAudio->GetIntensity( ) * 2.0) + 1.0 + (rand() * 5.0 / RAND_MAX)) * 3.14159 / 180.0;
-			ys = ((g_pAudio->GetIntensity( ) * 2.0) + 1.0 + (rand() * 5.0 / RAND_MAX)) * 3.14159 / 180.0;
+			rs = ((pAudio->GetIntensity( ) * 2.0) + 1.0 + (rand() * 5.0 / RAND_MAX)) * 3.14159 / 180.0;
+			ps = ((pAudio->GetIntensity( ) * 2.0) + 1.0 + (rand() * 5.0 / RAND_MAX)) * 3.14159 / 180.0;
+			ys = ((pAudio->GetIntensity( ) * 2.0) + 1.0 + (rand() * 5.0 / RAND_MAX)) * 3.14159 / 180.0;
 //		if(rand() > (RAND_MAX * 0.7)) rs = -rs;
 //		if(rand() > (RAND_MAX * 0.8)) ps = -ps;
 //		if(rand() > (RAND_MAX * 0.6)) ys = -ys;
@@ -199,9 +199,9 @@ public:
 	//	pTarget.Fill(0);
 //	ZeroMemory(pBuffer, 256 * 256 * sizeof(unsigned char));
 //	ZeroMemory(pTarget, 64 * 64 * sizeof(unsigned char));
-		obj.fRoll += g_pAudio->GetIntensity( ) * elapsed * 4.0 * 3.14159 / 180.0;//(average + 0.05) * elapsed;// * rs;
-		obj.fPitch += g_pAudio->GetIntensity( ) * elapsed * 5.0 * 3.14159 / 180.0;//(average + 0.05) * elapsed;// * rs;
-		obj.fYaw += g_pAudio->GetIntensity( ) * elapsed * 6.0 * 3.14159 / 180.0;//(average + 0.05) * elapsed;// * rs;
+		obj.fRoll += pAudio->GetIntensity( ) * elapsed * 4.0 * 3.14159 / 180.0;//(average + 0.05) * elapsed;// * rs;
+		obj.fPitch += pAudio->GetIntensity( ) * elapsed * 5.0 * 3.14159 / 180.0;//(average + 0.05) * elapsed;// * rs;
+		obj.fYaw += pAudio->GetIntensity( ) * elapsed * 6.0 * 3.14159 / 180.0;//(average + 0.05) * elapsed;// * rs;
 //	obj.fPitch += average * elapsed * ps;
 //	obj.fYaw += 0.5 * elapsed * ys * 3.14159 / 180.0;
 
@@ -248,9 +248,9 @@ public:
 		}
 		return S_OK;
 	}
-	HRESULT Reconfigure( )
+	virtual HRESULT Reconfigure(ZAudio* pAudio) override
 	{
-		fSpeed = g_pAudio->GetIntensity( );
+		fSpeed = pAudio->GetIntensity( );
 		pTexture = g_pD3D->Find(TC_LBDOTSTAR);
 		pTint = g_pD3D->Find(TC_WTDOTSTAR);
 		return S_OK;

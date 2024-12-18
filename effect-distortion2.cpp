@@ -50,7 +50,7 @@ public:
 			else pc[i] = ZColour(0, 255, 255);
 		}
 	}
-	HRESULT Calculate(float brightness, float elapsed)
+	HRESULT Calculate(float brightness, float elapsed, ZAudio* g_pAudio)
 	{
 		elapsed *= 1.5;
 
@@ -155,7 +155,7 @@ public:
 
 		return S_OK;
 	}
-	HRESULT Reconfigure( )
+	virtual HRESULT Reconfigure(ZAudio* pAudio) override
 	{
 		tx = g_pD3D->Find(bLight? TC_WTDISTORTION2COL : TC_WTDISTORTION2);
 		return S_OK;
