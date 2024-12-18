@@ -11,9 +11,9 @@ ZEffectBase::ZEffectBase()
 ZEffectBase::~ZEffectBase()
 {
 }
-HRESULT ZEffectBase::Reconfigure(ZAudio*)
+ZError* ZEffectBase::Reconfigure(ZAudio*)
 {
-	return D3D_OK;
+	return nullptr;
 }
 bool ZEffectBase::CanRender(FLOAT32 fElapsed)
 {
@@ -41,21 +41,21 @@ void ZEffectPtr::Destroy()
 {
 	pEffect.reset();
 }
-HRESULT ZEffectPtr::Calculate(float fElapsed, ZAudio* pAudio)
+ZError* ZEffectPtr::Calculate(float fElapsed, ZAudio* pAudio)
 {
 	_ASSERT(pEffect != NULL);
 
 	pAudio->SetIntensityBeatScale( fSensitivity * 3.0f );
-	HRESULT hRes = pEffect->Calculate(fBr, GetElapsed(fElapsed), pAudio);
+	ZError* error = pEffect->Calculate(fBr, GetElapsed(fElapsed), pAudio);
 	pAudio->SetIntensityBeatScale( 0.0f );
-	return hRes;
+	return error;
 }
-HRESULT ZEffectPtr::Reconfigure(ZAudio* pAudio)
+ZError* ZEffectPtr::Reconfigure(ZAudio* pAudio)
 {
 	_ASSERT(pEffect != NULL);
 	return pEffect->Reconfigure(pAudio);
 }
-HRESULT ZEffectPtr::Render()
+ZError* ZEffectPtr::Render()
 {
 	_ASSERT(pEffect != NULL);
 	return pEffect->Render();

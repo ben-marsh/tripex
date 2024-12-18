@@ -3,6 +3,7 @@
 #include <string>
 #include <set>
 #include <memory>
+#include "error.h"
 #include "ZAudio.h"
 
 class ZEffectBase
@@ -13,9 +14,9 @@ public:
 	ZEffectBase();
 	virtual ~ZEffectBase();
 
-	virtual HRESULT Calculate( FLOAT32 fBr, FLOAT32 fElapsed, ZAudio* pAudio ) = 0;
-	virtual HRESULT Reconfigure(ZAudio* pAudio);
-	virtual HRESULT Render( ) = 0;
+	virtual ZError* Calculate( FLOAT32 fBr, FLOAT32 fElapsed, ZAudio* pAudio ) = 0;
+	virtual ZError* Reconfigure(ZAudio* pAudio);
+	virtual ZError* Render( ) = 0;
 	virtual bool CanRender( FLOAT32 fElapsed );
 };
 
@@ -53,9 +54,9 @@ public:
 	virtual void Create() = 0;
 	virtual void Destroy();
 
-	HRESULT Calculate(float fElapsed, ZAudio* pAudio);
-	HRESULT Reconfigure(ZAudio* pAudio);
-	HRESULT Render( );
+	ZError* Calculate(float fElapsed, ZAudio* pAudio);
+	ZError* Reconfigure(ZAudio* pAudio);
+	ZError* Render( );
 	bool CanRender(float fElapsed);
 
 	float GetElapsed(float fFrames);

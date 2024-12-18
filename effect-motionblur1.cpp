@@ -51,7 +51,7 @@ public:
 	{
 		return (fElapsed > 0.5);
 	}
-	HRESULT Calculate(float brightness, float elapsed, ZAudio* pAudio)
+	ZError* Calculate(float brightness, float elapsed, ZAudio* pAudio) override
 	{
 		for(int i = 0; i < RINGS; i++)
 		{
@@ -61,24 +61,27 @@ public:
 			pObj[i].wcAmbientLight = ZColour::Grey(brightness * 20.0f);// / pObj[i].nExposure);
 			pObj[i].Calculate(&camera, elapsed);
 		}
-		return S_OK;
+		return nullptr;
 	}
-	HRESULT Render( )
+	ZError* Render( ) override
 	{
-		HRESULT hRes;
+		ZError* error;
 		for(int i = 0; i < RINGS; i++)
 		{
-			hRes = pObj[i].Render( );
-			if(FAILED(hRes)) return TraceError(hRes);
+			error = pObj[i].Render( );
+			if(error) return TraceError(error);
 		}
-		return S_OK;
+		return nullptr;
 	}
-	virtual HRESULT Reconfigure(ZAudio* pAudio) override
+	ZError* Reconfigure(ZAudio* pAudio) override
 	{
 		ZTexture *t = g_pD3D->Find(TC_EMMOTIONBLUR);
-		for(int i = 0; i < RINGS; i++) pObj[i].pTexture[0].m_pTexture = t;
+		for (int i = 0; i < RINGS; i++)
+		{
+			pObj[i].pTexture[0].m_pTexture = t;
+		}
 		fFirstCalc = true;
-		return S_OK;
+		return nullptr;
 	}
 };
 

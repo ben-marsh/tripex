@@ -59,7 +59,7 @@ public:
 
 		camera.m_vPosition.m_fZ = -320;
 	}
-	HRESULT Calculate(float br, float elapsed, ZAudio* pAudio)
+	ZError* Calculate(float br, float elapsed, ZAudio* pAudio) override
 	{
 		fBezPos += elapsed * pAudio->GetIntensity( ) * 0.04;
 		camera.m_vPosition = b.Calculate(fBezPos);
@@ -88,27 +88,26 @@ public:
 			pObj[i].wcAmbientLight = br * (ZColour::Grey(96 * fMult2 * (1 - (0.4 * float(i) / NOBJ))) - ZColour(fBlend * 40.0, fBlend * 40.0, fBlend * 5.0));
 			pObj[i].Calculate(&camera, elapsed);
 		}
-		return S_OK;
+		return nullptr;
 	}
-	virtual HRESULT Reconfigure(ZAudio* pAudio) override
+	ZError* Reconfigure(ZAudio* pAudio) override
 	{
 		ZTexture *tx = g_pD3D->Find(TC_EMMORPHINGSPHERE);
 		for(int i = 0; i < NOBJ; i++)
 		{
 			pObj[i].pTexture[0].Set(ZObject::Texture::T_ENVMAP, tx);
 		}
-		return S_OK;
+		return nullptr;
 	}
-	HRESULT Render( )
+	ZError* Render( ) override
 	{
-		HRESULT hRes;
-
 		for(int i = 0; i < NOBJ; i++)
 		{
-			hRes = pObj[i].Render( ); 
-			if(FAILED(hRes)) return TraceError(hRes);
+			ZError* error = pObj[i].Render( ); 
+			if(error) return TraceError(error);
 		}
-		return S_OK;
+
+		return nullptr;
 	}
 };
 EXPORT_EFFECT(MorphingSphere, ZEffectMorphingSphere)

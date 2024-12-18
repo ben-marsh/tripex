@@ -304,7 +304,7 @@ public:
 
 	// pipeline functions
 	void Calculate(ZCamera *pCamera, float fElapsed = 1.0f);
-	HRESULT Render( );
+	ZError* Render( );
 
 	// stock objects
 	void CreateCube(float fSize);

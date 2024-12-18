@@ -3,6 +3,7 @@
 #include "ZColour.h"
 #include "ZPoint.h"
 #include "ZRect.h"
+#include "error.h"
 #include <vector>
 
 class ZSpriteBuffer
@@ -30,7 +31,7 @@ public:
 
 	ZSpriteBuffer();
 	void Clear();
-	HRESULT Flush( );
+	ZError* Flush( );
 
 	void SetState(int nState);
 	void SetTexture(ZTexture *pTexture);

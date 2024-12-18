@@ -144,7 +144,7 @@ public:
 		}
 	}
 //Object *makeTentacles(int segs, float l, float r);
-	HRESULT Calculate(float brightness, float elapsed, ZAudio* pAudio)
+	ZError* Calculate(float brightness, float elapsed, ZAudio* pAudio) override
 	{
 		camera.m_vPosition = b.Calculate(fBezPos);
 		camera.SetTarget(b2.Calculate(fBezPos2));//ZVector::Origin());
@@ -161,7 +161,7 @@ public:
 		}
 
 		fTotalElapsed += elapsed * 2;
-		if(fTotalElapsed < 1) return S_OK;
+		if(fTotalElapsed < 1) return nullptr;
 
 //	fSpeed = 0;
 		fSpeed = StepTo<float>(fSpeed, fTarget, 0.02 * elapsed);
@@ -246,18 +246,18 @@ public:
 				nIndex++;
 			}
 		}
-		return S_OK;
+		return nullptr;
 	}
-	virtual HRESULT Reconfigure(ZAudio* pAudio) override
+	ZError* Reconfigure(ZAudio* pAudio) override
 	{
 		fSpeed = pAudio->GetIntensity( );
 		pTexture = g_pD3D->Find(TC_LBDOTSTAR);
 		pTint = g_pD3D->Find(TC_WTDOTSTAR);
-		return S_OK;
+		return nullptr;
 	}
-	HRESULT Render( )
+	ZError* Render( ) override
 	{
-		HRESULT hRes;
+		ZError* error;
 
 		double dSize = /*1.2 **/ (min(g_pD3D->GetWidth(), g_pD3D->GetHeight()) - 1) / 64.0f;//min(d3d->GetWidth(), d3d->GetHeight()) / 64.0;
 
@@ -337,8 +337,9 @@ public:
 			}
 			dY += dSize;
 		}
-		hRes = g_pD3D->DrawIndexedPrimitive(pTargetVertex, pTargetFace);
-		if(FAILED(hRes)) return S_OK;
+		error = g_pD3D->DrawIndexedPrimitive(pTargetVertex, pTargetFace);
+		if (error) return TraceError(error);
+
 		//lpd3dDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, D3DFVF_TLVERTEX, pVertex, 4, pwFace, 6, 0);
 
 		if(pTint != pBlankTexture)
@@ -352,7 +353,7 @@ public:
 			g_pD3D->DrawSprite(ZPoint<int>(0, 0), ZRect<int>(0, 0, g_pD3D->GetWidth(), g_pD3D->GetHeight()), ZColour::Grey(brt * 255.0));
 		}
 
-		return S_OK;
+		return nullptr;
 	}
 };
 

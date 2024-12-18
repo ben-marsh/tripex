@@ -149,7 +149,7 @@ public:
 
 		camera.m_vPosition = ZVector(0, 0, -320);
 	}
-	HRESULT Calculate(float brightness, float elapsed, ZAudio* pAudio)
+	ZError* Calculate(float brightness, float elapsed, ZAudio* pAudio) override
 	{
 		static int done = 0;
 
@@ -201,22 +201,22 @@ public:
 
 		obj.Create();
 		obj.Calculate(&camera, elapsed);
-		return S_OK;
+		return nullptr;
 	}
-	virtual HRESULT Reconfigure(ZAudio* pAudio) override
+	ZError* Reconfigure(ZAudio* pAudio) override
 	{
 		obj.pTexture[0].Set(ZObject::Texture::T_ENVMAP, g_pD3D->Find(TC_EMWATERGLOBE));
-		return S_OK;
+		return nullptr;
 	}
-	HRESULT Render()
+	ZError* Render()
 	{
-		HRESULT hRes;
+		ZError* error;
 		obj.m_bsFlag.set(ZObject::F_DRAW_TRANSPARENT);
 
-		hRes = obj.Render();//scene->render(d3d);
-		if(FAILED(hRes)) return TraceError(hRes);
+		error = obj.Render();//scene->render(d3d);
+		if(error) return TraceError(error);
 
-		return S_OK;
+		return nullptr;
 	}
 };
 

@@ -43,9 +43,9 @@ int ZSpriteBuffer::GetPosition(const Item &item)
 	}
 	return nBestIndex;*/
 }
-HRESULT ZSpriteBuffer::Flush( )
+ZError* ZSpriteBuffer::Flush( )
 {
-	HRESULT hRes;
+	ZError* error;
 
 	for(int i = 0; i < (int)vi.size(); i++)
 	{
@@ -57,11 +57,12 @@ HRESULT ZSpriteBuffer::Flush( )
 		{
 			g_pD3D->SetState(vi[i].nState);
 		}
-		hRes = g_pD3D->DrawSprite(vi[i].p, vi[i].r, vi[i].cDiffuse);
-		if(FAILED(hRes)) return TraceError(hRes);
+
+		error = g_pD3D->DrawSprite(vi[i].p, vi[i].r, vi[i].cDiffuse);
+		if(error) return TraceError(error);
 	}
 	Clear();
-	return D3D_OK;
+	return nullptr;
 }
 void ZSpriteBuffer::AddItem(const Item &item)
 {

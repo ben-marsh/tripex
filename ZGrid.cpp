@@ -94,7 +94,7 @@ HRESULT ZGrid::Calculate()
 //{
 //	callback = fn;
 //}
-HRESULT ZGrid::Render( )
+ZError* ZGrid::Render( )
 {
 	if(nScrWidth != g_pD3D->GetWidth() || nScrHeight != g_pD3D->GetHeight() )
 	{
@@ -199,9 +199,9 @@ HRESULT ZGrid::Render( )
 		bUpdateEdges = false;
 	}
 
-	HRESULT hRes = g_pD3D->DrawIndexedPrimitive(pVertex, pFace);
-	if(FAILED(hRes)) return TraceError(hRes);
+	ZError* error = g_pD3D->DrawIndexedPrimitive(pVertex, pFace);
+	if(error) return TraceError(error);
 
-	return D3D_OK;
+	return nullptr;
 }
  

@@ -53,7 +53,7 @@ public:
 			}
 		}
 	}
-	HRESULT Calculate(float brightness, float elapsed, ZAudio* pAudio)
+	ZError* Calculate(float brightness, float elapsed, ZAudio* pAudio) override
 	{
 		elapsed *= 1.5;
 
@@ -74,20 +74,20 @@ public:
 		obj.Calculate(&camera, elapsed);
 
 		camera.m_vPosition = ZVector(40 * sin(a) * cos(a * 1.2), 40 * cos(a * 0.7) * sin(a * 0.9), 40 * cos(a * 1.4) * sin(0.7));
-		return S_OK;
+		return nullptr;
 	}
-	virtual HRESULT Reconfigure(ZAudio* pAudio) override
+	ZError* Reconfigure(ZAudio* pAudio) override
 	{
 		ZTexture *tx = g_pD3D->Find(TC_LBPHASED);
 		obj.pTexture[0].Set(ZObject::Texture::T_SPRITE, tx);
-		return S_OK;
+		return nullptr;
 	}
-	HRESULT Render()
+	ZError* Render() override
 	{
-		HRESULT hRes;
-		hRes = obj.Render();
-		if(FAILED(hRes)) return TraceError(hRes);
-		return S_OK;
+		ZError* error = obj.Render();
+		if(error) return TraceError(error);
+
+		return nullptr;
 	}
 	bool CanRender(float fElapsed)
 	{

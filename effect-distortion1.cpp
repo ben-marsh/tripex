@@ -40,7 +40,7 @@ public:
 			}
 		}
 	}
-	HRESULT Calculate(float brightness, float elapsed, ZAudio* pAudio)
+	ZError* Calculate(float brightness, float elapsed, ZAudio* pAudio) override
 	{
 		br = brightness;
 		xp += 0.015/*08*/ * pAudio->GetDampenedBand(pEffectPtr->fSensitivity, 0, 0.25f) * elapsed;
@@ -75,23 +75,24 @@ public:
 		}
 
 		grid.bUpdateEdges = true;
-		return S_OK;
+		return nullptr;
 	}
-	HRESULT Render()
+	ZError* Render() override
 	{
-		HRESULT hRes;
+		ZError* error;
 		g_pD3D->SetTexture(0, tx);
 		g_pD3D->SetState(g_pD3D->Transparent);//D3DRS_TRANSPARENT);
 
-		hRes = grid.Render( );
-		if(FAILED(hRes)) return TraceError(hRes);
-		return S_OK;
+		error = grid.Render( );
+		if(error) return TraceError(error);
+
+		return nullptr;
 	}
-	virtual HRESULT Reconfigure(ZAudio* pAudio) override
+	ZError* Reconfigure(ZAudio* pAudio) override
 	{
 		tx = g_pD3D->Find(TC_WTDISTORTION);
 //	grid->SetTexture(d3d->Select(TC_WRAPTEXTURE));//TC_ENVIRONMENTMAP));
-		return S_OK;
+		return nullptr;
 	}
 };
 

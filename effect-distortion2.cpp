@@ -50,7 +50,7 @@ public:
 			else pc[i] = ZColour(0, 255, 255);
 		}
 	}
-	HRESULT Calculate(float brightness, float elapsed, ZAudio* g_pAudio)
+	ZError* Calculate(float brightness, float elapsed, ZAudio* g_pAudio) override
 	{
 		elapsed *= 1.5;
 
@@ -139,26 +139,26 @@ public:
 			}
 		}
 		
-		return S_OK;
+		return nullptr;
 	}
-	HRESULT Render( )
+	ZError* Render( )
 	{
-		HRESULT hRes;
+		ZError* error;
 
 		g_pD3D->SetState(g_pD3D->Transparent | g_pD3D->Shade);
 		g_pD3D->SetRenderState(D3DRS_SPECULARENABLE, true);
 
 		g_pD3D->SetTexture(0, tx);
 
-		hRes = grid.Render( );
-		if(FAILED(hRes)) return TraceError(hRes);
+		error = grid.Render( );
+		if(error) return TraceError(error);
 
-		return S_OK;
+		return nullptr;
 	}
-	virtual HRESULT Reconfigure(ZAudio* pAudio) override
+	ZError* Reconfigure(ZAudio* pAudio) override
 	{
 		tx = g_pD3D->Find(bLight? TC_WTDISTORTION2COL : TC_WTDISTORTION2);
-		return S_OK;
+		return nullptr;
 	}
 };
 

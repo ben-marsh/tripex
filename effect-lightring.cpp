@@ -73,7 +73,7 @@ public:
 	
 		obj.pVertex.SetLength(SOURCES);
 	}
-	HRESULT Calculate(float brightness, float elapsed, ZAudio* pAudio)
+	ZError* Calculate(float brightness, float elapsed, ZAudio* pAudio) override
 	{
 		brt = brightness;
 		accum += elapsed * 3.0;
@@ -103,20 +103,20 @@ public:
 			obj.pTexture[0].Set(ZObject::Texture::T_SPRITE, tx);
 			obj.Calculate(&camera, elapsed);
 		}
-		return S_OK;
+		return nullptr;
 	}
-	virtual HRESULT Reconfigure(ZAudio* pAudio) override
+	ZError* Reconfigure(ZAudio* pAudio) override
 	{
 		tx = g_pD3D->Find(TC_LBLIGHTRING);
 		ptTint = g_pD3D->Find(TC_WTLIGHTRING);
-		return S_OK;
+		return nullptr;
 	}
-	HRESULT Render( )
+	ZError* Render( ) override
 	{
-		HRESULT hRes;
+		ZError* error;
 
-		hRes = obj.Render( );
-		if(FAILED(hRes)) return hRes;	
+		error = obj.Render( );
+		if(error) return TraceError(error);	
 
 		if(ptTint != pBlankTexture)
 		{
@@ -129,7 +129,7 @@ public:
 			g_pD3D->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
 			g_pD3D->DrawSprite(ZPoint<int>(0, 0), ZRect<int>(0, 0, g_pD3D->GetWidth(), g_pD3D->GetHeight()), ZColour::Grey(brt * 255.0));
 		}
-		return S_OK;
+		return nullptr;
 	}
 	bool CanRender(double dElapsed)
 	{

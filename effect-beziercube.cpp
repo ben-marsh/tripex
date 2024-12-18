@@ -133,7 +133,7 @@ public:
 			pObj[i].pTexture[0].m_nType = ZObject::Texture::T_SPRITE;
 		}
 	}
-	HRESULT Calculate(float brightness, float elapsed, ZAudio* pAudio)
+	ZError* Calculate(float brightness, float elapsed, ZAudio* pAudio) override
 	{
 		double dMultDest = 1 - pAudio->GetDampenedBand(pEffectPtr->fSensitivity, 0.0f, 1.0f);//average;
 		camera.m_vPosition.m_fZ = -110;//pScene->camera.z = -110;//60;
@@ -211,18 +211,18 @@ public:
 
 		camera.m_fRoll += sm * pAudio->GetIntensity( ) * 4 * g_fDegToRad;
 	//	pScene->camera.turn(sm * average * 4 * 3.14159 / 180.0, 0, 0);
-		return D3D_OK;
+		return nullptr;
 	}
-	HRESULT Render( )
+	ZError* Render( )
 	{
-		HRESULT hRes;
+		ZError* error;
 	//	hRes = obj.Render(d3d);
 	//	if(FAILED(hRes)) return TraceError(hRes);
 
-		hRes = pObjPlane[0].Render();
-		if(FAILED(hRes)) return TraceError(hRes);
-		hRes = pObjPlane[TWISTPLANES-1].Render();
-		if(FAILED(hRes)) return TraceError(hRes);
+		error = pObjPlane[0].Render();
+		if(error) return TraceError(error);
+		error = pObjPlane[TWISTPLANES-1].Render();
+		if(error) return TraceError(error);
 	//	for(int i = 0; i < TWISTPLANES; i++)
 	//	{
 	//		hRes = pObjPlane[i].Render(d3d);
@@ -230,8 +230,8 @@ public:
 	//	}
 		for(int i = 0; i < BEZIERS; i++)
 		{
-			hRes = pObj[i].Render();
-			if(FAILED(hRes)) return TraceError(hRes);
+			error = pObj[i].Render();
+			if(error) return TraceError(error);
 		}
 
 	//	hRes = pScene->render(d3d);
@@ -246,12 +246,12 @@ public:
 			g_pD3D->SetRenderState(D3DRS_ZENABLE, FALSE);
 			g_pD3D->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
 
-			hRes = g_pD3D->DrawSprite(ZPoint<int>(0, 0), ZRect<int>(0, 0, g_pD3D->GetWidth(), g_pD3D->GetHeight()), ZColour::Grey(brt * 255.0));
-			if(FAILED(hRes)) return D3D_OK;
+			error = g_pD3D->DrawSprite(ZPoint<int>(0, 0), ZRect<int>(0, 0, g_pD3D->GetWidth(), g_pD3D->GetHeight()), ZColour::Grey(brt * 255.0));
+			if(error) return TraceError(error);
 		}
-		return D3D_OK;
+		return nullptr;
 	}
-	virtual HRESULT Reconfigure(ZAudio* pAudio) override
+	ZError* Reconfigure(ZAudio* pAudio) override
 	{
 		pTexture = g_pD3D->Find(TC_LBBEZIERCUBE);
 		testobj.pTexture[0].m_pTexture = pTexture;
@@ -265,7 +265,7 @@ public:
 			pObj[i].pTexture[0].m_pTexture = pTexture;
 		}
 		pTint = g_pD3D->Find(TC_WTBEZIERCUBE);
-		return D3D_OK;
+		return nullptr;
 	}
 };
 

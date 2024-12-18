@@ -5,13 +5,13 @@
 class ZEffectBlank : public ZEffectBase
 {
 public:
-	HRESULT Calculate( FLOAT32, FLOAT32, ZAudio* )
+	ZError* Calculate( FLOAT32, FLOAT32, ZAudio* )
 	{
-		return D3D_OK;
+		return nullptr;
 	};
-	HRESULT Render( )
+	ZError* Render( )
 	{
-		return D3D_OK;
+		return nullptr;
 	}
 };
 

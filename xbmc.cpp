@@ -23,8 +23,8 @@ void _cdecl Start( int iChannels, int iSamplesPerSec, int iBitsPerSample, const 
 {
 	g_pTripex = new ZTripex();
 
-	HRESULT hRes = g_pTripex->Startup( );
-	if( FAILED( hRes ) ) 
+	ZError* error = g_pTripex->Startup( );
+	if( error ) 
 	{
 		g_pTripex->Shutdown( );
 		g_bInit = FALSE;
@@ -58,8 +58,8 @@ void _cdecl Render( )
 {
 	if( g_bInit )
 	{
-		HRESULT hRes = g_pTripex->Render( );
-		if( FAILED( hRes ) )
+		ZError* hRes = g_pTripex->Render( );
+		if( hRes )
 		{
 			g_pTripex->Shutdown( );
 			g_bInit = FALSE;

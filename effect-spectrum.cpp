@@ -114,7 +114,7 @@ public:
 	* Calculate( ):
 	---------------------------------------------*/
 
-	HRESULT Calculate( FLOAT32 fBrightness, FLOAT32 fElapsed, ZAudio* pAudio)
+	ZError* Calculate( FLOAT32 fBrightness, FLOAT32 fElapsed, ZAudio* pAudio) override
 	{
 		int i, j;
 		m_fRotAng += fElapsed * ( 2.0f * g_fDegToRad );
@@ -234,7 +234,7 @@ public:
 			m_pLimit[ i ].Calculate( &m_cCamera, fElapsed );
 		}
 
-		return S_OK;
+		return nullptr;
 	}
 
 
@@ -242,7 +242,7 @@ public:
 	* Reconfigure( ):
 	---------------------------------------------*/
 
-	virtual HRESULT Reconfigure(ZAudio* pAudio) override
+	ZError* Reconfigure(ZAudio* pAudio) override
 	{
 		static ZTexture *pTexture;
 		pTexture = g_pD3D->Find(TC_EMANALYSER);
@@ -254,27 +254,27 @@ public:
 		{
 			m_pLimit[i].pTexture[0].Set(ZObject::Texture::T_SPRITE, pTexture);
 		}
-		return S_OK;
+		return nullptr;
 	}
 
 	/*---------------------------------------------
 	* Render( ):
 	---------------------------------------------*/
 
-	HRESULT Render( )
+	ZError* Render( ) override
 	{
-		HRESULT hRes;
+		ZError* error;
 		for( int i = 0; i < TRAIL_H; i++ )
 		{
-			hRes = m_pObj[ i ].Render( );
-			if( FAILED( hRes ) ) return TraceError( hRes );
+			error = m_pObj[ i ].Render( );
+			if( error ) return TraceError( error );
 		}
 		for( int i = 0; i < LIMITER_H; i++ )
 		{
-			hRes = m_pLimit[ i ].Render( );
-			if( FAILED( hRes ) ) return TraceError( hRes );
+			error = m_pLimit[ i ].Render( );
+			if( error ) return TraceError( error );
 		}
-		return S_OK;
+		return nullptr;
 	}
 };
 

@@ -270,9 +270,9 @@ public:
 			mpBumpIndex[vpBumpmap[i]] = pb;
 		}
 */	}
-	HRESULT Calculate( float brightness, float elapsed, ZAudio* pAudio )
+	ZError* Calculate( float brightness, float elapsed, ZAudio* pAudio ) override
 	{
-		HRESULT hRes;
+		ZError* error;
 		br = brightness;
 
 		tx += /*4*/1 * elapsed;//average * 20.0;
@@ -284,8 +284,8 @@ public:
 		{
 			if(!fStarted)
 			{
-				hRes = pc.Create( );//.Initialise( );
-				if(FAILED(hRes)) return TraceError(hRes);
+				error = pc.Create( );//.Initialise( );
+				if(error) return TraceError(error);
 				fStarted = true;
 			}
 
@@ -359,8 +359,8 @@ public:
 			}
 #endif
 
-			hRes = pc.UploadTextures( );
-			if( FAILED( hRes ) ) return TraceError( hRes );
+			error = pc.UploadTextures( );
+			if( error ) return TraceError( error );
 //			hRes = pc.Calculate(pnBuf);
 //			if(FAILED(hRes)) return TraceError(hRes);
 		}
@@ -391,11 +391,11 @@ public:
 			if(bLast) break;
 			fPos = fNext;
 		}
-		return D3D_OK;
+		return nullptr;
 	}
-	HRESULT Render( )
+	ZError* Render( ) override
 	{
-		HRESULT hRes;
+		ZError* error;
 		static double angle = 0;
 
 		if(texture == pBlankTexture)
@@ -408,13 +408,13 @@ public:
 
 			g_pD3D->SetTexture(0, texture);
 			g_pD3D->SetState(g_pD3D->Shade);
-			hRes = grid.Render( );
-			if(FAILED(hRes)) return TraceError(hRes);
+			error = grid.Render( );
+			if(error) return TraceError(error);
 
 			g_pD3D->SetTexture(0, pc.GetTexture(0, 0));
 			g_pD3D->SetState(g_pD3D->Transparent | g_pD3D->Shade);// | D3DRS_SHADE);
-			hRes = gridbm.Render( );
-			if(FAILED(hRes)) return TraceError(hRes);
+			error = gridbm.Render( );
+			if(error) return TraceError(error);
 		}
 //	d3d->lpd3dDevice->SetTexture(0, texture->GetSurface());
 //	d3d->lpd3dDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
@@ -441,12 +441,12 @@ public:
 	hRes = gridbm->Render(d3d);
 	if(FAILED(hRes)) return hRes;
 */	
-		hRes = obj.Render( );//scene->render(d3d);
-		if(FAILED(hRes)) return TraceError(hRes);
+		error = obj.Render( );//scene->render(d3d);
+		if(error) return TraceError(error);
 
-		return hRes;
+		return nullptr;
 	}
-	virtual HRESULT Reconfigure(ZAudio* pAudio) override
+	ZError* Reconfigure(ZAudio* pAudio) override
 	{
 		obj.pTexture[0].m_nType = ZObject::Texture::T_ENVMAP;
 		obj.pTexture[0].m_pTexture = g_pD3D->Find(TC_EMBUMPMAPTENTACLES);//ENVIRONMENTMAP));
@@ -540,7 +540,7 @@ public:
 				}
 *///			}
 		}
-		return D3D_OK;
+		return nullptr;
 	}
 };
 

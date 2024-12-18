@@ -5,76 +5,68 @@
 #include "error.h"
 #include "CCfgItem.h"
 
-class ERROR_TRACE
+ZError::ZError(HRESULT hRes)
 {
-public:
-	const char *m_sFile;
-	unsigned int m_nLine;
-};
-
-std::vector< ERROR_TRACE > *g_pvErrTrace = NULL;
-
-/*---------------------------------
-* AddToErrorTrace( )
------------------------------------*/
-
-HRESULT AddToErrorTrace(HRESULT hRes, const char *sFile, unsigned int nLine)
-{
-	if( hRes != D3D_OK )
-	{
-		if( g_pvErrTrace == NULL )
-		{
-			g_pvErrTrace = new std::vector< ERROR_TRACE >;
-		}
-		ERROR_TRACE t = { sFile, nLine };
-		g_pvErrTrace->push_back( t );
-	}
-	return hRes;
+	char sBuf[100];
+	sprintf(sBuf, "Error %08x\n", hRes);
+	Message = sBuf;
 }
 
-/*---------------------------------
-* ClearErrorTrace( ):
------------------------------------*/
-
-void ClearErrorTrace()
+ZError::~ZError()
 {
-	if( g_pvErrTrace != NULL )
-	{
-		delete g_pvErrTrace;
-		g_pvErrTrace = NULL;
-	}
 }
 
-/*---------------------------------
-* GetErrorString( ):
------------------------------------*/
-
-BOOL GetErrorString( HRESULT hRes, std::string *ps )
+ZError* ZError::AddTrace(const char* file, uint32_t line)
 {
-	if( hRes == D3D_OK ) return FALSE;
+	Trace.push_back(std::make_pair(file, line));
+	return this;
+}
 
-	char sBuf[ 100 ];
-	sprintf( sBuf, "Error %08x\n", hRes );
-
-	*ps = sBuf;
-	*ps += "Trace: ";
-	if( g_pvErrTrace != NULL )
+std::string ZError::GetDescription() const
+{
+	std::string description = Message;
+	description += "Trace: ";
+	if (Trace.size() > 0)
 	{
-		for( unsigned int i = 0; i < g_pvErrTrace->size( ); i++ )
+		for (unsigned int i = 0; i < Trace.size(); i++)
 		{
-			if( i > 0 ) *ps += ", ";
+			if (i > 0) description += ", ";
 
-			const char *sPos = strrchr( (*g_pvErrTrace)[ i ].m_sFile, '\\' );
-			if( sPos == NULL ) sPos = (*g_pvErrTrace)[ i ].m_sFile;
+			const char* sPos = strrchr(Trace[i].first, '\\');
+			if (sPos == NULL) sPos = Trace[i].first;
 			else sPos++;
 
-			sprintf( sBuf, "%s(%d)", sPos, (*g_pvErrTrace)[ i ].m_nLine );
-			*ps += sBuf;
+			char sBuf[256];
+			sprintf(sBuf, "%s(%d)", sPos, Trace[i].second);
+			description += sBuf;
 		}
 	}
 	else
 	{
-		*ps += "(none)";
+		description += "(none)";
 	}
-	return TRUE;
+	return description;
+}
+
+// ---------------------------------------------------------
+
+ZError* TraceErrorImpl(ZError* error, const char* file, uint32_t line)
+{
+	if (error != nullptr)
+	{
+		error->AddTrace(file, line);
+	}
+	return error;
+}
+
+ZError* TraceErrorImpl(HRESULT hRes, const char* file, uint32_t line)
+{
+	if (FAILED(hRes))
+	{
+		return TraceErrorImpl(new ZError(hRes), file, line);
+	}
+	else
+	{
+		return nullptr;
+	}
 }

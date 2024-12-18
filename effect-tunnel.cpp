@@ -105,7 +105,7 @@ public:
 			}
 		}
 	}
-	HRESULT Calculate(float fBr, float fElapsed, ZAudio* pAudio)
+	ZError* Calculate(float fBr, float fElapsed, ZAudio* pAudio) override
 	{
 		ZVector pvPos[4];
 		float fPosChange = 0.015f * pAudio->GetIntensity( ) * fElapsed;
@@ -257,23 +257,23 @@ public:
 		{
 			pObj[i].Calculate(&camera, fElapsed);
 		}
-		return S_OK;
+		return nullptr;
 	}
-	virtual HRESULT Reconfigure(ZAudio* pAudio) override
+	ZError* Reconfigure(ZAudio* pAudio) override
 	{
 		tx = g_pD3D->Find(TC_WTTUNNEL);
 		pObj[0].pTexture[0].Set(ZObject::Texture::T_USER, tx);//SetTexture(tx);
 		pObj[1].pTexture[0].Set(ZObject::Texture::T_USER, tx);///.pTexture = tx;//SetTexture(tx);
-		return S_OK;
+		return nullptr;
 	}
-	HRESULT Render()
+	ZError* Render() override
 	{
 		for(int i = 0; i < 2; i++)
 		{
-			HRESULT hRes = pObj[i].Render();
-			if(FAILED(hRes)) return TraceError(hRes);
+			ZError* error = pObj[i].Render();
+			if(error) return TraceError(error);
 		}
-		return S_OK;
+		return nullptr;
 	}
 };
 

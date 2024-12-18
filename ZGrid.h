@@ -16,5 +16,5 @@ public:
 	bool bUpdateEdges;
 
 	ZGrid( int nWidth, int nHeight );
-	HRESULT Render( );
+	ZError* Render( );
 };

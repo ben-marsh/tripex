@@ -38,14 +38,14 @@ ZPaletteCanvas::ZPaletteCanvas( SINT32 nWidth, SINT32 nHeight )
 * Create( ):
 -----------------------------------*/
 
-HRESULT ZPaletteCanvas::Create( )
+ZError* ZPaletteCanvas::Create( )
 {
 	for( SINT32 i = 0; i < m_nWidth * m_nHeight; i++ )
 	{
-		HRESULT hRes = g_pD3D->AddTexture( &m_aTexture[ i ] );
-		if( FAILED( hRes ) ) return TraceError( hRes );
+		ZError* error = g_pD3D->AddTexture( &m_aTexture[ i ] );
+		if( error ) return TraceError( error );
 	}
-	return D3D_OK;
+	return nullptr;
 }
 
 
@@ -62,14 +62,14 @@ UINT8 *ZPaletteCanvas::GetDataPtr( )
 * UploadTextures( ):
 -----------------------------------*/
 
-HRESULT ZPaletteCanvas::UploadTextures( )
+ZError* ZPaletteCanvas::UploadTextures( )
 {
 	for( SINT32 i = 0; i < m_nWidth * m_nHeight; i++ )
 	{
-		HRESULT hRes = g_pD3D->UploadTexture( &m_aTexture[ i ] );
-		if( FAILED( hRes ) ) return TraceError( hRes );
+		ZError* error = g_pD3D->UploadTexture( &m_aTexture[ i ] );
+		if( error ) return TraceError( error );
 	}
-	return D3D_OK;
+	return nullptr;
 }
 
 /*---------------------------------
@@ -85,9 +85,9 @@ ZTexture *ZPaletteCanvas::GetTexture( SINT32 nX, SINT32 nY )
 * Render( ):
 -----------------------------------*/
 
-HRESULT ZPaletteCanvas::Render( )
+ZError* ZPaletteCanvas::Render( )
 {
-	HRESULT hRes;
+	ZError* error;
 	ZArray<ZFace> pFace;
 	pFace.Add(ZFace(0, 1, 3));
 	pFace.Add(ZFace(1, 2, 3));
@@ -174,16 +174,16 @@ HRESULT ZPaletteCanvas::Render( )
 
 			g_pD3D->SetTexture(0, GetTexture(hi,vi));// ppTexture[i++]);
 
-			hRes = g_pD3D->DrawIndexedPrimitive(v, pFace);//pVertex, pFace);
+			error = g_pD3D->DrawIndexedPrimitive(v, pFace);//pVertex, pFace);
 //				->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, D3DFVF_TLVERTEX, v, 4, face, 6, 0);
-			if(FAILED(hRes)) return TraceError(hRes);
+			if(error) return TraceError(error);
 		}
 	}
 //	d3d->SetTexture(0, ppTexture[0]);
 //	CopySprite(d3d, ZColour::White(), 0, 0, 1, 1, 254, 254);
 //	d3d->SetTexture(0, ppTexture[1]);
 //	CopySprite(d3d, ZColour::White(), 258, 0, 1, 1, 254, 254);
-	return S_OK;
+	return nullptr;
 }
 
 //	

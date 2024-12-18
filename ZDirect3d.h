@@ -10,6 +10,7 @@
 #include "ZRect.h"
 #include <map>
 #include <set>
+#include "error.h"
 
 #define MAX_TEXTURES 1
 
@@ -79,15 +80,15 @@ public:
 
 	ZDirect3D( );
 
-	HRESULT Open( );
-	HRESULT Close( );
-	HRESULT DrawIndexedPrimitive(ZArray<ZVertexTL> &pVertex, ZArray<ZFace> &pfFace);
+	ZError* Open( );
+	ZError* Close( );
+	ZError* DrawIndexedPrimitive(ZArray<ZVertexTL> &pVertex, ZArray<ZFace> &pfFace);
 
-	HRESULT AddTexture( ZTexture *pTexture );
-	HRESULT UploadTexture( ZTexture *pTexture );
+	ZError* AddTexture( ZTexture *pTexture );
+	ZError* UploadTexture( ZTexture *pTexture );
 	void GetStateChanges(NewStateBuffer &mp_new, StateBuffer &mp_current, std::vector< StateBufferChange > &vc);
 
-	HRESULT CreateTexture(ZTexture *pTexture);
+	ZError* CreateTexture(ZTexture *pTexture);
 	void DestroyTexture(ZTexture *pTexture);
 
 	ZTexture *Find(int nType);
@@ -99,17 +100,17 @@ public:
 	void SetState(int nFlags);
 	void ResetRenderState();
 	void SetRenderState(DWORD dwKey, DWORD dwValue);
-	HRESULT FlushRenderState();
+	ZError* FlushRenderState();
 
 	// texture state
 	void ResetTextureState();
 	void ResetTextureStageState(DWORD dwStage);
 	void SetTexture(DWORD dwStage, ZTexture *pTexture, DWORD dwOp = D3DTOP_MODULATE, DWORD dwArg2 = D3DTA_CURRENT);
 	void SetTextureStageState(DWORD dwStage, D3DTEXTURESTAGESTATETYPE dwKey, DWORD dwValue);
-	HRESULT FlushTextureState();
+	ZError* FlushTextureState();
 
 	static void BuildSprite(ZArray<ZVertexTL> &pVertex, ZArray<ZFace> &pFace, const ZPoint<int> &p, const ZRect<int> &spr, ZColour cDiffuse = ZColour::White(), ZColour cSpecular = ZColour::Black());
-	HRESULT DrawSprite(const ZPoint<int> &p, const ZRect<int> &spr, ZColour cDiffuse = ZColour::White(), ZColour cSpecular = ZColour::Black());
+	ZError* DrawSprite(const ZPoint<int> &p, const ZRect<int> &spr, ZColour cDiffuse = ZColour::White(), ZColour cSpecular = ZColour::Black());
 };
 
 extern ZDirect3D *g_pD3D;

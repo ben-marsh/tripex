@@ -66,7 +66,7 @@ public:
 		obj.nMaxHistoryLength = 25;
 		obj.wcExposureLightChange = ZWideColour(-2, -2, -2);
 	}
-	HRESULT Calculate(float brightness, float elapsed, ZAudio* pAudio)
+	ZError* Calculate(float brightness, float elapsed, ZAudio* pAudio) override
 	{
 		brt = brightness;
 		accum += elapsed * 2.0f;
@@ -115,9 +115,9 @@ public:
 			obj.Calculate(&camera, 1.0);
 			obj.wcAmbientLight = ZColour::Grey(64.0 * brightness);
 		}
-		return S_OK;
+		return nullptr;
 	}
-	virtual HRESULT Reconfigure(ZAudio* pAudio) override
+	virtual ZError* Reconfigure(ZAudio* pAudio) override
 	{
 		dBrBack = 1;
 		if(fNotRendered)// || (rand() <= (RAND_MAX * 0.3)))
@@ -141,12 +141,12 @@ public:
 		obj.pTexture[0].Set(ZObject::Texture::T_SPRITE, g_pD3D->Find(TC_LBLIGHTSPHERE));
 
 		pTint = g_pD3D->Find(TC_WTLIGHTSPHERE);
-		return S_OK;
+		return nullptr;
 	}
-	HRESULT Render( )
+	ZError* Render( ) override
 	{
-		HRESULT hRes = obj.Render( );
-		if(FAILED(hRes)) return hRes;
+		ZError* error = obj.Render( );
+		if(error) return TraceError(error);
 
 		if(pTint != pBlankTexture)
 		{
@@ -158,7 +158,7 @@ public:
 			g_pD3D->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
 			g_pD3D->DrawSprite(ZPoint<int>(0, 0), ZRect<int>(0, 0, g_pD3D->GetWidth(), g_pD3D->GetHeight()), ZColour::Grey(brt * 255.0));
 		}
-		return S_OK;
+		return nullptr;
 	}
 	bool CanRender(double dElapsed)
 	{

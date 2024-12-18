@@ -56,7 +56,7 @@ public:
 
 		camera.m_vPosition.m_fZ = -120;
 	}
-	HRESULT Calculate(float br, float elapsed, ZAudio* pAudio)
+	ZError* Calculate(float br, float elapsed, ZAudio* pAudio) override
 	{
 		accum += elapsed * 1.3;
 		bool bChanged = false;
@@ -109,23 +109,26 @@ public:
 				pObj[i].Calculate(&camera, elapsed);
 			}
 		}
-		return S_OK;
+		return nullptr;
 	}
-	virtual HRESULT Reconfigure(ZAudio* pAudio) override
+	ZError* Reconfigure(ZAudio* pAudio) override
 	{
 		ZTexture *tx = g_pD3D->Find(TC_EMRINGS);
-		for(int i = 0; i < RINGS; i++) pObj[i].pTexture[0].Set(ZObject::Texture::T_ENVMAP, tx);
-		return S_OK;
+		for (int i = 0; i < RINGS; i++)
+		{
+			pObj[i].pTexture[0].Set(ZObject::Texture::T_ENVMAP, tx);
+		}
+		return nullptr;
 	}
-	HRESULT Render()
+	ZError* Render() override
 	{
-		HRESULT hRes;
+		ZError* error;
 		for(int i = 0; i < RINGS; i++)
 		{
-			hRes = pObj[i].Render(); 
-			if(FAILED(hRes)) return TraceError(hRes);
+			error = pObj[i].Render(); 
+			if(error) return TraceError(error);
 		}
-		return S_OK;
+		return nullptr;
 	}
 	bool CanRender(double dElapsed)
 	{

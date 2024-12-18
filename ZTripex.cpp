@@ -162,7 +162,7 @@ DWORD WINAPI ZTripex::InitialiseThread(void *pParam)
 	return 0;
 }
 
-HRESULT ZTripex::Startup()
+ZError* ZTripex::Startup()
 {
 	InitObjectArrays( );
 	InitObjectClipper( );
@@ -250,15 +250,15 @@ HRESULT ZTripex::Startup()
 
 	txs.set( TXS_RESET_TIMING );
 
-	HRESULT hRes = g_pD3D->Open( );
-	if( FAILED( hRes ) ) return TraceError( hRes );
+	ZError* error = g_pD3D->Open( );
+	if( error ) return TraceError( error );
 
 //	hRes = pcHUD->Initialise(d3d.get());
 //	if(FAILED(hRes)) return TraceError(hRes);
 
-	return D3D_OK;
+	return nullptr;
 }
-HRESULT ZTripex::Render()
+ZError* ZTripex::Render()
 {
 	UpdateCfgItems();
 
@@ -308,8 +308,8 @@ HRESULT ZTripex::Render()
 //				bInFade = false;
 			fEffectFrames = 0;
 
-			HRESULT hRes = (*pvpEffect)[nEffect]->Reconfigure(pAudio.get());
-			if(FAILED(hRes)) return TraceError(hRes); 
+			ZError* error = (*pvpEffect)[nEffect]->Reconfigure(pAudio.get());
+			if(error) return TraceError(error); 
 		}
 	}
 	if(!txs.test(TXS_IN_FADE) && (!txs.test(TXS_HOLD) || txs.test(TXS_CHANGE_EFFECT)) && 
@@ -377,8 +377,8 @@ HRESULT ZTripex::Render()
 	}
 	if(txs[TXS_RECONFIGURE])//bReconfigure)
 	{
-		HRESULT hRes = (*pvpEffect)[nEffect]->Reconfigure(pAudio.get());
-		if(FAILED(hRes)) return TraceError(hRes);
+		ZError* error = (*pvpEffect)[nEffect]->Reconfigure(pAudio.get());
+		if(error) return TraceError(error);
 
 		txs.reset(TXS_IN_FADE);
 		txs.reset(TXS_RECONFIGURE);
@@ -403,8 +403,8 @@ HRESULT ZTripex::Render()
 
 	if(ppDrawEffect[1]->fBr > FLOAT_ZERO && !txs[TXS_RESET_TARGET])
 	{
-		HRESULT hRes = ppDrawEffect[1]->Reconfigure(pAudio.get());
-		if(FAILED(hRes)) return TraceError(hRes);
+		ZError* error = ppDrawEffect[1]->Reconfigure(pAudio.get());
+		if(error) return TraceError(error);
 
 		txs[TXS_RESET_TARGET] = true;
 	}
@@ -422,7 +422,7 @@ HRESULT ZTripex::Render()
 	}
 	if((!ppDrawEffect[0]->CanRender(fFrames) || ppDrawEffect[0] == pEffectBlank) && (!ppDrawEffect[1]->CanRender(fFrames) || ppDrawEffect[1] == pEffectBlank) && !(ppDrawEffect[0] == pEffectBlank && ppDrawEffect[1] == pEffectBlank && fFrames > 1.0f))
 	{
-		return D3D_OK;
+		return nullptr;
 	}
 
 	pAudio->Update( fFrames, (*pvpEffect)[nEffect]->fSensitivity );
@@ -430,8 +430,8 @@ HRESULT ZTripex::Render()
 
 	for(int i = 0; i < 2; i++)
 	{
-		HRESULT hRes = ppDrawEffect[i]->Calculate( fFrames, pAudio.get() );
-		if(FAILED(hRes)) return TraceError(hRes);
+		ZError* error = ppDrawEffect[i]->Calculate( fFrames, pAudio.get() );
+		if(error) return TraceError(error);
 	}
 
 	// lock the back
@@ -508,8 +508,8 @@ HRESULT ZTripex::Render()
 //		sb.AddSprite(ZPoint<int>(10, 30), d3d->vpTexture[3], g_pD3D->Shade, ZRect<int>(0, 0, 600, 400), 1.0f );
 //		sb.Flush( d3d.get( ) );
 
-	hRes = sb.Flush( );
-	if(FAILED(hRes)) return TraceError(hRes);
+	ZError* error = sb.Flush( );
+	if(error) return TraceError(error);
 
 	hRes = g_pD3D->g_pDevice->EndScene( );
 	if( FAILED( hRes ) ) return TraceError( hRes );

@@ -68,7 +68,7 @@ public:
 			pdYPos[i] = (SPREAD / 2.0) - (double(rand()) * SPREAD / RAND_MAX);
 		}
 	}
-	HRESULT Calculate(float brightness, float elapsed, ZAudio* pAudio)
+	ZError* Calculate(float brightness, float elapsed, ZAudio* pAudio) override
 	{
 		brt = brightness;
 		if(nStage == 0) dWaitTime += elapsed * pAudio->GetDampenedBand( pEffectPtr->fSensitivity, 0.0f, 1.0f);
@@ -112,13 +112,14 @@ public:
 		}
 		obj.m_bsFlag.set( ZObject::F_VALID_VERTEX_DIFFUSE );
 		obj.Calculate(&camera, elapsed);
-		return D3D_OK;
+		return nullptr;
 	}
-	HRESULT Render( ) override
+	ZError* Render( ) override
 	{
-		HRESULT hRes;
-		hRes = obj.Render( );
-		if(FAILED(hRes)) return hRes;
+		ZError* error;
+
+		error = obj.Render( );
+		if (error) return TraceError(error);
 
 		if(pTint != pBlankTexture)
 		{
@@ -131,13 +132,13 @@ public:
 			g_pD3D->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
 			g_pD3D->DrawSprite(ZPoint<int>(0, 0), ZRect<int>(0, 0, g_pD3D->GetWidth(), g_pD3D->GetHeight()), ZColour::Grey(brt * 255.0));
 		}
-		return S_OK;
+		return nullptr;
 	}
-	virtual HRESULT Reconfigure(ZAudio* pAudio) override
+	ZError* Reconfigure(ZAudio* pAudio) override
 	{
 		obj.pTexture[0].Set(ZObject::Texture::T_SPRITE, g_pD3D->Find(TC_LBCOLLAPSINGSPHERE));
 		pTint = g_pD3D->Find(TC_WTCOLLAPSINGSPHERE);
-		return D3D_OK;
+		return nullptr;
 	}
 };
 EXPORT_EFFECT( CollapsingLightSphere, ZEffectCollapsingLightSphere )

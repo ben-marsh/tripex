@@ -30,8 +30,8 @@ public:
 	ZTripex();
 	void ShowStatusMsg( const char *sFormat, ... );
 	DWORD WINAPI InitialiseThread(void *pParam);
-	HRESULT Startup( );
-	HRESULT Render( );
+	ZError* Startup( );
+	ZError* Render( );
 	void Shutdown( );
 
 private:

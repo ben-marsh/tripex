@@ -618,9 +618,9 @@ public:
 			break;
 		}
 	}
-	HRESULT Calculate(float brightness, float elapsed, ZAudio* pAudio)
+	ZError* Calculate(float brightness, float elapsed, ZAudio* pAudio) override
 	{
-		HRESULT hRes;
+		ZError* error;
 		int i, j;
 	
 		dFrames += elapsed;
@@ -632,8 +632,8 @@ public:
 	
 		if(fFirstRender)
 		{
-			hRes = pCanvas->Create( );//pc.Initialise( );
-			if(FAILED(hRes)) return TraceError(hRes);
+			error = pCanvas->Create( );//pc.Initialise( );
+			if(error) return TraceError(error);
 
 			fFirstRender = false;
 			accum = 1.1;
@@ -841,9 +841,9 @@ public:
 		pCanvas->m_cColour = ZColour::Grey(255.0 * brightness);//D3DRGB(brightness, brightness, brightness);
 
 		memcpy( pCanvas->GetDataPtr( ), (fOddFrame? bf2 : bf1).GetBuffer( ), bf1.GetSize());
-		hRes = pCanvas->UploadTextures( );
+		error = pCanvas->UploadTextures( );
 //		hRes = pc.Calculate((fOddFrame? bf2 : bf1).GetBuffer());
-		if(FAILED(hRes)) return TraceError(hRes);
+		if(error) return TraceError(error);
 		
 		DWORD dwTime = timeGetTime( ) - dwStartTime;
 		if(dwTimeTotal < 1000000 && dwTime < 1000000)
@@ -851,16 +851,16 @@ public:
 			dwTimeTotal += dwTime;
 			nSamples++;
 		}
-		return S_OK;
+		return nullptr;
 	}
-	HRESULT Render( )
+	ZError* Render( ) override
 	{
 		g_pD3D->SetState(g_pD3D->Transparent);
 		
-		HRESULT hRes = pCanvas->Render( );
-		if(FAILED(hRes)) return TraceError(hRes);
+		ZError* error = pCanvas->Render( );
+		if(error) return TraceError(error);
 
-		return S_OK;
+		return nullptr;
 	}
 	bool CanRender(float dElapsed)
 	{

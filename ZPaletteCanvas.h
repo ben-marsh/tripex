@@ -19,17 +19,17 @@ public:
 	ZPaletteCanvas( SINT32 nWidth, SINT32 nHeight );
 
 	// Create( ):
-	HRESULT Create( );
+	ZError* Create( );
 
 	// GetDataPtr( ):
 	UINT8 *GetDataPtr( );
 
 	// UploadTextures( ):
-	HRESULT UploadTextures( );
+	ZError* UploadTextures( );
 
 	// GetTexture( ):
 	ZTexture *GetTexture( SINT32 nX, SINT32 nY );
 
 	// Render( ):
-	HRESULT Render( );
+	ZError* Render( );
 };

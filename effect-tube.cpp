@@ -127,7 +127,7 @@ public:
 //	scene->vpObject.Add(coil);
 		cCamera.m_vPosition.m_fZ = -120;//120;
 	}
-	HRESULT Calculate(float brightness, float elapsed, ZAudio* pAudio)
+	ZError* Calculate(float brightness, float elapsed, ZAudio* pAudio) override
 	{
 		int i, j;
 		for(i = 0; i < 128; i++)
@@ -205,26 +205,26 @@ public:
 
 		obj.Calculate(&cCamera, elapsed);
 		coil.Calculate(&cCamera, elapsed);
-		return S_OK;
+		return nullptr;
 	}
-	HRESULT Render()
+	ZError* Render() override
 	{
-		HRESULT hRes;
+		ZError* error;
 
 //	obj->property(objTransparent, true);//fDrawn);
 //	obj->property(objZBuffer, false);//fDrawn);
 //	coil->property(objTransparent, true);
 //	coil->property(objZBuffer, false);
 
-		hRes = obj.Render();
-		if(FAILED(hRes)) return hRes;
+		error = obj.Render();
+		if(error) return TraceError(error);
 
-		hRes = coil.Render();
-		if(FAILED(hRes)) return hRes;
+		error = coil.Render();
+		if(error) return TraceError(error);
 
-		return S_OK;
+		return nullptr;
 	}
-	virtual HRESULT Reconfigure(ZAudio* pAudio) override
+	ZError* Reconfigure(ZAudio* pAudio) override
 	{
 		ZTexture *tx = g_pD3D->Find(TC_EMTUBE);
 		coil.pTexture[0].Set(ZObject::Texture::T_ENVMAP, tx);
@@ -235,9 +235,12 @@ public:
 
 		for(int i = 0; i < PTLENGTH; i++)
 		{
-			for(int j = 0; j < PTCIRCUM; j++) height[i][j] = 0;
+			for (int j = 0; j < PTCIRCUM; j++)
+			{
+				height[i][j] = 0;
+			}
 		}
-		return S_OK;
+		return nullptr;
 	}
 };
 

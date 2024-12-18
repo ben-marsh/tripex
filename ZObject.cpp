@@ -986,10 +986,12 @@ static const ZTexturePosition pSpriteTex[4] = { { 0.0, 0.0 }, { 1.0f, 0.0f }, { 
 
 	m_bsFlag.set(F_VALID_TRANSFORMED_DATA);
 }
-HRESULT ZObject::Render( )
+ZError* ZObject::Render( )
 {
-	HRESULT hRes;
-	if(!m_bsFlag.test(F_VALID_TRANSFORMED_DATA)) return D3D_OK;
+	if (!m_bsFlag.test(F_VALID_TRANSFORMED_DATA))
+	{
+		return nullptr;
+	}
 
 	ZDirect3D::TextureStage tsDefault;
 //	tsDisable.AddState(D3DTSS_COLOROP, D3DTOP_DISABLE);
@@ -1059,10 +1061,10 @@ HRESULT ZObject::Render( )
 				pTransVertex[ i ].m_cSpecular.m_nB = rand( ) & 0xff;
 			}
 */
-			hRes = g_pD3D->DrawIndexedPrimitive(pTransVertex, pClippedFace);
-			if(FAILED(hRes)) return TraceError(hRes);
+			ZError* error = g_pD3D->DrawIndexedPrimitive(pTransVertex, pClippedFace);
+			if(error) return TraceError(error);
 		}
 	}
 
-	return D3D_OK;
+	return nullptr;
 }

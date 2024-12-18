@@ -106,7 +106,7 @@ public:
 			}
 		}
 	}
-	HRESULT Calculate(float brightness, float elapsed, ZAudio* pAudio)
+	ZError* Calculate(float brightness, float elapsed, ZAudio* pAudio) override
 	{
 		fBezPos += elapsed * pAudio->GetIntensity( ) * 0.01f;
 		fBezPos2 += elapsed * pAudio->GetIntensity( ) * 0.02f;
@@ -179,17 +179,17 @@ public:
 			}
 			accum--;
 		}
-		return S_OK;
+		return nullptr;
 	}
-	HRESULT Render()
+	ZError* Render()
 	{
-		HRESULT hRes;
+		ZError* error;
 		for(int i = 0; i < RINGS; i++)
 		{
-			hRes = pObj[i].Render();
-			if(FAILED(hRes)) return hRes;
+			error = pObj[i].Render();
+			if(error) return TraceError(error);
 		}
-		return S_OK;
+		return nullptr;
 	//	return scene->render(d3d);
 	}
 };

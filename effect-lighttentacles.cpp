@@ -56,7 +56,7 @@ public:
 		obj.FindDelayValues();
 		camera.m_vPosition.m_fZ = -120;
 	}
-	HRESULT Calculate(float brightness, float elapsed, ZAudio* pAudio)
+	ZError* Calculate(float brightness, float elapsed, ZAudio* pAudio) override
 	{
 		brt = brightness;
 
@@ -102,21 +102,21 @@ public:
 		ZVector v = b.Calculate(pos);//, &x, &y, &z);
 		camera.m_fPitch = (v - camera.m_vPosition).GetPitch();
 		camera.m_fYaw = (v - camera.m_vPosition).GetYaw();
-		return S_OK;
+		return nullptr;
 	}
-	HRESULT Render( )
+	ZError* Render( ) override
 	{
-		HRESULT hRes = obj.Render( );
-		if(FAILED(hRes)) return hRes;
+		ZError* error = obj.Render( );
+		if(error) return TraceError(error);
 
-		return S_OK;
+		return nullptr;
 	}
-	virtual HRESULT Reconfigure(ZAudio* pAudio) override
+	ZError* Reconfigure(ZAudio* pAudio) override
 	{
 		obj.pTexture[0].m_nType = ZObject::Texture::T_SPRITE;
 		obj.pTexture[0].m_pTexture = g_pD3D->Find(TC_LBLIGHTTENTACLES);
 		ptTint = g_pD3D->Find(TC_WTLIGHTTENTACLES);
-		return S_OK;
+		return nullptr;
 	}
 };
 
