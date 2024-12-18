@@ -18,6 +18,7 @@ ZPaletteCanvas::ZPaletteCanvas( SINT32 nWidth, SINT32 nHeight )
 	m_nHeight = nHeight;
 	m_anData = new UINT8[ nSpan * nHeight * 256 ];
 	m_aTexture = new ZTexture[ nTextures ];
+	memset(m_aPalette, 0, sizeof(m_aPalette));
 
 	SINT32 nTexture = 0;
 	for( SINT32 nY = 0; nY < nHeight; nY++ )

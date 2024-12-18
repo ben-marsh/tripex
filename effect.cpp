@@ -106,7 +106,7 @@ void CreateEffectList()
 	AddEffect(&CreateEffect_WaterGlobe, "WaterGlobe", ZORDER_WATERGLOBE, 10.0f, TC_EMWATERGLOBE, 0);
 	AddEffect(&CreateEffect_Tube, "Tube", ZORDER_TUBE, 1.0f, TC_EMTUBE, 0);
 	AddEffect(&CreateEffect_Sun, "Sun", ZORDER_SUN, 1.0f, 0);
-//	//	AddEffect(pEffectBumpmapping, "Bumpmapping", ZORDER_BUMPMAPPING, 8.0f, TC_WTBUMPMAPBACK, TC_EMBUMPMAPTENTACLES, 0);
+	AddEffect(&CreateEffect_Bumpmapping, "Bumpmapping", ZORDER_BUMPMAPPING, 8.0f, TC_WTBUMPMAPBACK, TC_EMBUMPMAPTENTACLES, 0);
 	AddEffect(&CreateEffect_Spectrum, "Spectrum", ZORDER_ANALYSER, 1.0f, TC_EMANALYSER, 0);
 	AddEffect(&CreateEffect_Rings, "ConcentricRings", ZORDER_RINGS, 1.0f, TC_EMRINGS, 0);
 	AddEffect(&CreateEffect_Phased, "Phased", ZORDER_PHASED, 1.0f, TC_LBPHASED, 0);

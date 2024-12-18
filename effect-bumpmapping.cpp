@@ -344,11 +344,18 @@ public:
 				pop esi
 			}
 #else
-			_ASSERT(false);
-			unsigned char lx = (unsigned char)tx;
-			for(i = 0; i < 256*256; i++)
+			UINT8* data = pc.GetDataPtr();
+			if (pnCurrentBump == nullptr)
 			{
-//				pBuf[i] = envmap[(unsigned short)(pnCurrentBump[i] + lx)];//tx)];//) + nOfs];//(pBumpY[i] << 8) | pBumpX[i]];
+				memset(data, 0, 256 * 256);
+			}
+			else
+			{
+				unsigned char lx = (unsigned char)tx;
+				for(i = 0; i < 256*256; i++)
+				{
+					data[i] = pnLightMap[(unsigned short)(pnCurrentBump[i] + lx)];
+				}
 			}
 #endif
 
@@ -456,6 +463,57 @@ public:
 				{
 					pnCurrentBump = it->second.get();
 				}
+				else
+				{
+					IDirect3DSurface9* pSurface;
+
+					HRESULT hRes = texture->m_pd3dTexture->GetSurfaceLevel(0, &pSurface);
+					if (FAILED(hRes)) return TraceError(hRes);
+
+					RECT Rect = { 0, 0, 256, 256 };
+
+					D3DSURFACE_DESC d3dsd;
+					hRes = pSurface->GetDesc(&d3dsd);
+					if (FAILED(hRes)) return TraceError(hRes);
+
+					D3DLOCKED_RECT d3dr;
+					if (d3dsd.Width == 256 &&
+						d3dsd.Height == 256 &&
+						d3dsd.Format == D3DFMT_X8R8G8B8 &&
+						SUCCEEDED(pSurface->LockRect(&d3dr, NULL, 0)))
+					{
+						auto_ptr< unsigned short > pb = auto_ptr< unsigned short >(new unsigned short[256 * 256]);
+
+						unsigned char* pcSrc = (unsigned char*)d3dr.pBits;
+						unsigned char pbBump[256 * 256];
+						unsigned char* pbDst = pbBump;
+						for (int nY = 0; nY < 256; nY++)
+						{
+							for (int nX = 0; nX < 256; nX++)
+							{
+								*(pbDst++) = ((unsigned)pcSrc[0] + (unsigned)pcSrc[1] + (unsigned)pcSrc[2]) / 3;// unsigned int(pcSrc->m_nR) + unsigned int(pcSrc->m_nG) + unsigned int(pcSrc->m_nB)) / 3;
+								pcSrc += 4;
+							}
+						}
+
+						int nIndex = 0;
+						for (int nY = 0; nY < 256; nY++)
+						{
+							for (int nX = 0; nX < 256; nX++)
+							{
+								int nBumpX = (int)pbBump[(nIndex + 1) & 0xffff] - (int)pbBump[(nIndex - 1) & 0xffff] + 128 - nX;
+								int nBumpY = (int)pbBump[(nIndex + 256) & 0xffff] - (int)pbBump[(nIndex - 256) & 0xffff] + 128 - nY;
+								pb.get()[nIndex] = (((unsigned char)nBumpY) << 8) | ((unsigned char)nBumpX);
+								nIndex++;
+							}
+						}
+						pnCurrentBump = pb.get(); 
+						mpBumpIndex[texture] = std::move(pb);
+
+						pSurface->UnlockRect();
+					}
+				}
+
 /*				for(int i = 0;;i++)
 				{
 					if(pBump[i]->pTexture == NULL) return TraceError(E_BUMPMAPNOTFOUND);
