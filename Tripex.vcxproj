@@ -131,8 +131,9 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <ForcedIncludeFiles>StdAfx.h</ForcedIncludeFiles>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -216,7 +217,6 @@
     <ClCompile Include="EffectTunnel.cpp" />
     <ClCompile Include="EffectWaterGlobe.cpp" />
     <ClCompile Include="Error.cpp" />
-    <ClCompile Include="general.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Misc.cpp" />
     <ClCompile Include="StdAfx.cpp">
@@ -231,7 +231,7 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="ZDirect3d.cpp" />
     <ClCompile Include="Effect.cpp" />
-    <ClCompile Include="AudioFft.cpp" />
+    <ClCompile Include="Fourier.cpp" />
     <ClCompile Include="TexturedGrid.cpp" />
     <ClCompile Include="Matrix44.cpp" />
     <ClCompile Include="Actor-Clip.cpp" />
@@ -250,7 +250,6 @@
     <ClInclude Include="TextureSource.h" />
     <ClInclude Include="Effect.h" />
     <ClInclude Include="Error.h" />
-    <ClInclude Include="general.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="Misc.h" />
     <ClInclude Include="Platform.h" />
@@ -268,7 +267,7 @@
     <ClInclude Include="ZDirect3d.h" />
     <ClInclude Include="Edge.h" />
     <ClInclude Include="Face.h" />
-    <ClInclude Include="AudioFft.h" />
+    <ClInclude Include="Fourier.h" />
     <ClInclude Include="TexturedGrid.h" />
     <ClInclude Include="Matrix44.h" />
     <ClInclude Include="Actor.h" />
@@ -286,7 +285,7 @@
     <None Include=".gitignore" />
     <None Include="packages.config" />
     <None Include="Vector3.inl" />
-    <None Include="AudioFft.inl" />
+    <None Include="Fourier.inl" />
     <None Include="Matrix44.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

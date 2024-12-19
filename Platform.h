@@ -22,10 +22,4 @@ static const float g_fRadToDeg = 57.295779513082320876798154814105f;//180.0f / P
 
 #pragma warning(disable:4244)
 
-#include <crtdbg.h>
-#include <math.h>
-#include <float.h>
-#include <stdio.h>
-#include <conio.h>
-
 #define timeGetTime() ((DWORD)GetTickCount64())

@@ -2,7 +2,6 @@
 //#include "tripex2.h"
 #include "effect.h"
 #include "error.h"
-#include "general.h"
 #include "StarModel.h"
 #include "Actor.h"
 #include "BezierCurve.h"

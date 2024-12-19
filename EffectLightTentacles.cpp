@@ -3,7 +3,6 @@
 #include "BezierCurve.h"
 #include "effect.h"
 #include "error.h"
-#include "general.h"
 
 #define NMPOINTS 30//50//30
 #define LENGTH 50//40

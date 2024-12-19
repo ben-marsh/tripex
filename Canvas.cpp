@@ -1,7 +1,6 @@
 #include "Platform.h"
 #include "Canvas.h"
 #include "error.h"
-#include "general.h"
 #include "Texture.h"
 #include "ZDirect3D.h"
 

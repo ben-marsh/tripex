@@ -1,5 +1,5 @@
 #include "Platform.h"
-#include "AudioFft.h"
+#include "Fourier.h"
 #include "Misc.h"
 
 /*---------------------------------
@@ -10,7 +10,7 @@
 * Constructor:
 ---------------------------------------------*/
 
-AudioFft::AudioFft( int nSamples ) : m_nSamples( nSamples ), m_nLogSamples( IntegerLog2( nSamples ) )
+Fourier::Fourier( int nSamples ) : m_nSamples( nSamples ), m_nLogSamples( IntegerLog2( nSamples ) )
 {
 	_ASSERT( nSamples == ( 1 << m_nLogSamples ) );
 
@@ -49,7 +49,7 @@ AudioFft::AudioFft( int nSamples ) : m_nSamples( nSamples ), m_nLogSamples( Inte
 * Destructor:
 ---------------------------------------------*/
 
-AudioFft::~AudioFft( )
+Fourier::~Fourier( )
 {
 	if( m_afScale != NULL )
 	{
@@ -61,7 +61,7 @@ AudioFft::~AudioFft( )
 * SetDecay( ):
 ---------------------------------------------*/
 
-void AudioFft::SetDecay( float fDecay )
+void Fourier::SetDecay( float fDecay )
 {
 	m_fDecay = fDecay;
 }
@@ -70,7 +70,7 @@ void AudioFft::SetDecay( float fDecay )
 * Update( ):
 ---------------------------------------------*/
 
-void AudioFft::Update( const short int *anSample )
+void Fourier::Update( const short int *anSample )
 {
 	for (int i = 0; i < m_nSamples; i++)
 	{
@@ -116,7 +116,7 @@ void AudioFft::Update( const short int *anSample )
 * GetAmplitude( ):
 ---------------------------------------------*/
 
-float AudioFft::GetAmplitude( int nIdx ) const
+float Fourier::GetAmplitude( int nIdx ) const
 {
 	_ASSERT( nIdx >= 0 && nIdx < m_nSamples );
 	return m_afAmplitude[ nIdx ];

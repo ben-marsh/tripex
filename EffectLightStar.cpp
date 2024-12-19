@@ -2,7 +2,6 @@
 #include "effect.h"
 #include "Actor.h"
 #include "error.h"
-#include "general.h"
 
 #define SOURCES 512
 

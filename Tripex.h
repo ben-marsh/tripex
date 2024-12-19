@@ -53,6 +53,9 @@ private:
 	// TODO: make sure these CfgItems are free'd
 	std::map< std::string, std::vector< ConfigItem* >, CI_STR_CMP >* pmpCfgItem = NULL;
 
+	void DrawMessage(SpriteBuffer& sb, TextureFont* pFont, int y, const char* sText, float fBr, float fBackBr);
+	int GetClippedLineLength(TextureFont* pFont, const char* sText, int nClipWidth);
+
 	void AddEffect(EffectHandler* (*fn)(), const char* sName, int nDrawOrder, float fStartupWeight, int nTex, ...);
 	void CreateEffectList();
 

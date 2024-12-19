@@ -1,10 +1,8 @@
 #include "Platform.h"
 #include "Actor.h"
-#include "effect.h"
+#include "Effect.h"
 #include "BezierCurve.h"
 #include "TexturedGrid.h"
-#include "general.h"
-#include "effect.h"
 
 #define SOURCES 40//40//35//50
 #define FRAMES 12

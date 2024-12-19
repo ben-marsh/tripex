@@ -3,7 +3,6 @@
 #include "Actor.h"
 #include "error.h"
 #include "effect.h"
-#include "general.h"
 
 //#define SOURCES 65//180//65//80
 #define FRAMES 10

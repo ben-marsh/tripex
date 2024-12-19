@@ -10,7 +10,7 @@
 * ZFft
 ---------------------------------------------*/
 
-class AudioFft
+class Fourier
 {
 protected:
 	struct Complex
@@ -48,10 +48,10 @@ public:
 	float *m_afAmplitude;
 
 	// Constructor:
-	AudioFft( int nSamples );
+	Fourier( int nSamples );
 
 	// Destructor:
-	~AudioFft( );
+	~Fourier( );
 
 	// SetDecay( ):
 	void SetDecay( float fDecay );
@@ -63,4 +63,4 @@ public:
 	float GetAmplitude( int nIdx ) const;
 };
 
-#include "AudioFft.inl"
+#include "Fourier.inl"

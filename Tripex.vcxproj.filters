@@ -4,7 +4,6 @@
     <ClCompile Include="config.cpp" />
     <ClCompile Include="config-defaults.cpp" />
     <ClCompile Include="error.cpp" />
-    <ClCompile Include="general.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Misc.cpp" />
     <ClCompile Include="StdAfx.cpp" />
@@ -12,7 +11,7 @@
     <ClCompile Include="AudioData.cpp" />
     <ClCompile Include="ZDirect3d.cpp" />
     <ClCompile Include="Effect.cpp" />
-    <ClCompile Include="AudioFft.cpp" />
+    <ClCompile Include="Fourier.cpp" />
     <ClCompile Include="TexturedGrid.cpp" />
     <ClCompile Include="ConfigItem.cpp" />
     <ClCompile Include="TextureSource.cpp" />
@@ -63,7 +62,6 @@
     <ClInclude Include="config-defaults.h" />
     <ClInclude Include="Effect.h" />
     <ClInclude Include="Error.h" />
-    <ClInclude Include="general.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="Misc.h" />
     <ClInclude Include="StdAfx.h" />
@@ -71,7 +69,7 @@
     <ClInclude Include="ZArray.h" />
     <ClInclude Include="AudioData.h" />
     <ClInclude Include="ZDirect3d.h" />
-    <ClInclude Include="AudioFft.h" />
+    <ClInclude Include="Fourier.h" />
     <ClInclude Include="TexturedGrid.h" />
     <ClInclude Include="Platform.h" />
     <ClInclude Include="ConfigItem.h" />
@@ -101,7 +99,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="AudioFft.inl" />
+    <None Include="Fourier.inl" />
     <None Include="packages.config" />
     <None Include=".editorconfig" />
     <None Include=".gitignore" />

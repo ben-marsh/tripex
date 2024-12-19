@@ -6,7 +6,6 @@
 #include "effect.h"
 #include <conio.h>
 #include "error.h"
-#include "general.h"
 
 #define BEZIERS 5
 #define BEZIERPOINTS 50

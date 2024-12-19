@@ -1,3 +1,6 @@
+#include "Fourier.h"
+#include <math.h>
+
 /*---------------------------------
 * ZFft::Complex
 -----------------------------------*/
@@ -6,7 +9,7 @@
 * Constructor:
 -----------------------------------*/
 
-inline AudioFft::Complex::Complex( float fReal, float fImag )
+inline Fourier::Complex::Complex( float fReal, float fImag )
 {
 	m_fReal = fReal;
 	m_fImag = fImag;
@@ -16,7 +19,7 @@ inline AudioFft::Complex::Complex( float fReal, float fImag )
 * operator*( ):
 -----------------------------------*/
 
-inline AudioFft::Complex AudioFft::Complex::operator*( const Complex &c ) const
+inline Fourier::Complex Fourier::Complex::operator*( const Complex &c ) const
 {
 	Complex cRes;
 	cRes.m_fReal = m_fReal * c.m_fReal - m_fImag * c.m_fImag;
@@ -28,7 +31,7 @@ inline AudioFft::Complex AudioFft::Complex::operator*( const Complex &c ) const
 * operator+( ):
 -----------------------------------*/
 
-inline AudioFft::Complex AudioFft::Complex::operator+( const Complex &c ) const
+inline Fourier::Complex Fourier::Complex::operator+( const Complex &c ) const
 {
 	return Complex( m_fReal + c.m_fReal, m_fImag + c.m_fImag );
 }
@@ -37,7 +40,7 @@ inline AudioFft::Complex AudioFft::Complex::operator+( const Complex &c ) const
 * operator-( ):
 -----------------------------------*/
 
-inline AudioFft::Complex AudioFft::Complex::operator-( const Complex &c ) const
+inline Fourier::Complex Fourier::Complex::operator-( const Complex &c ) const
 {
 	return Complex( m_fReal - c.m_fReal, m_fImag - c.m_fImag );
 }
@@ -46,7 +49,7 @@ inline AudioFft::Complex AudioFft::Complex::operator-( const Complex &c ) const
 * Length( ):
 -----------------------------------*/
 
-inline float AudioFft::Complex::Length( ) const
+inline float Fourier::Complex::Length( ) const
 {
 	return sqrtf( m_fReal * m_fReal + m_fImag * m_fImag );
 }

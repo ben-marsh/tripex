@@ -3,7 +3,6 @@
 #include <conio.h>
 #include "Actor.h"
 #include "error.h"
-#include "general.h"
 #include <algorithm>
 
 #define SOURCES 512

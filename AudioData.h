@@ -1,6 +1,6 @@
 #pragma once
 
-#include "AudioFft.h"
+#include "Fourier.h"
 #include "SpriteBuffer.h"
 
 #define FREQ_HISTORY_SIZE 20
@@ -14,7 +14,7 @@ protected:
 	short int *m_anMono;
 	short int *m_aanStereo[ 2 ];
 	float m_aafFreqHistory[ FREQ_HISTORY_SIZE ][ 16 ];
-	AudioFft m_Fft;
+	Fourier m_Fft;
 
 	int m_anBandIdx[ FREQ_BANDS ];
 	float m_afBandMul[ FREQ_BANDS ];
