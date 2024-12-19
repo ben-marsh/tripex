@@ -5,7 +5,7 @@
 #include "error.h"
 #include "Texture.h"
 
-const int pnStateOrder[] = { g_pD3D->Multiply, g_pD3D->InverseMultiply, g_pD3D->Transparent, g_pD3D->LuminanceOpacity };
+const int pnStateOrder[] = { ZDirect3D::Multiply, ZDirect3D::InverseMultiply, ZDirect3D::Transparent, ZDirect3D::LuminanceOpacity };
 
 int SpriteBuffer::GetOrder(const SpriteBuffer::Item &item)
 {
@@ -71,13 +71,13 @@ void SpriteBuffer::AddItem(const Item &item)
 
 	if(item.cDiffuse == ColorRgb::Black())
 	{
-		if(item.nState == g_pD3D->InverseMultiply) return;
-		if(item.nState == g_pD3D->LuminanceOpacity) return;
-		if(item.nState == g_pD3D->Transparent) return;
+		if(item.nState == ZDirect3D::InverseMultiply) return;
+		if(item.nState == ZDirect3D::LuminanceOpacity) return;
+		if(item.nState == ZDirect3D::Transparent) return;
 	}
 	else if(item.cDiffuse == ColorRgb::White() && item.pTexture == NULL)
 	{
-		if(item.nState == g_pD3D->Multiply) return;
+		if(item.nState == ZDirect3D::Multiply) return;
 	}
 
 	vi.insert(vi.begin() + GetPosition(item), item);

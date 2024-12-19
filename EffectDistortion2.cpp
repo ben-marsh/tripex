@@ -145,7 +145,7 @@ public:
 	{
 		Error* error;
 
-		g_pD3D->SetState(g_pD3D->Transparent | g_pD3D->Shade);
+		g_pD3D->SetState(ZDirect3D::Transparent | ZDirect3D::Shade);
 		g_pD3D->SetRenderState(D3DRS_SPECULARENABLE, true);
 
 		g_pD3D->SetTexture(0, tx);

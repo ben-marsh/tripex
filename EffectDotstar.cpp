@@ -267,7 +267,7 @@ public:
 		pTargetFace.nStep = 100;
 
 		g_pD3D->SetTexture(0, pTexture);
-		g_pD3D->SetState(g_pD3D->Transparent);
+		g_pD3D->SetState(ZDirect3D::Transparent);
 
 		ColorRgb pcColour[5];
 		for(int k = 0; k < 5; k++)

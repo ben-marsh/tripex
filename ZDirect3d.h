@@ -11,27 +11,7 @@
 #include <map>
 #include <set>
 #include "error.h"
-
-#define MAX_TEXTURES 1
-
-class ZVertex
-{
-public:
-	Vector3 m_vPos;
-	Vector3 m_vNormal;
-	ColorRgb m_cDiffuse;
-	ColorRgb m_cSpecular;
-	ZPoint< float > m_aTex[MAX_TEXTURES];
-};
-class ZVertexTL
-{
-public:
-	Vector3 m_vPos;
-	float m_fRHW;
-	ColorRgb m_cDiffuse;
-	ColorRgb m_cSpecular;
-	ZPoint< float > m_aTex[MAX_TEXTURES];
-};
+#include "Vertex.h"
 
 class Texture;
 class ZPalette;

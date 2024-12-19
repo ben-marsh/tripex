@@ -403,16 +403,16 @@ public:
 		}
 		else
 		{
-			//			hRes = d3d->SetState(g_pD3D->Shade);//D3DRS_SHADE);
+			//			hRes = d3d->SetState(ZDirect3D::Shade);//D3DRS_SHADE);
 //			if(FAILED(hRes)) return TraceError(hRes);
 
 			g_pD3D->SetTexture(0, texture);
-			g_pD3D->SetState(g_pD3D->Shade);
+			g_pD3D->SetState(ZDirect3D::Shade);
 			error = grid.Render( );
 			if(error) return TraceError(error);
 
 			g_pD3D->SetTexture(0, pc.GetTexture(0, 0));
-			g_pD3D->SetState(g_pD3D->Transparent | g_pD3D->Shade);// | D3DRS_SHADE);
+			g_pD3D->SetState(ZDirect3D::Transparent | ZDirect3D::Shade);// | D3DRS_SHADE);
 			error = gridbm.Render( );
 			if(error) return TraceError(error);
 		}

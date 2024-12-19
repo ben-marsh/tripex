@@ -855,7 +855,7 @@ public:
 	}
 	Error* Render( ) override
 	{
-		g_pD3D->SetState(g_pD3D->Transparent);
+		g_pD3D->SetState(ZDirect3D::Transparent);
 		
 		Error* error = pCanvas->Render( );
 		if(error) return TraceError(error);

@@ -254,6 +254,7 @@
     <ClInclude Include="StdAfx.h" />
     <ClInclude Include="TextureData.h" />
     <ClInclude Include="Vector3.h" />
+    <ClInclude Include="Vertex.h" />
     <ClInclude Include="ZArray.h" />
     <ClInclude Include="AudioData.h" />
     <ClInclude Include="BezierCurve.h" />

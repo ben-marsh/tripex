@@ -81,7 +81,7 @@ public:
 	{
 		Error* error;
 		g_pD3D->SetTexture(0, tx);
-		g_pD3D->SetState(g_pD3D->Transparent);//D3DRS_TRANSPARENT);
+		g_pD3D->SetState(ZDirect3D::Transparent);//D3DRS_TRANSPARENT);
 
 		error = grid.Render( );
 		if(error) return TraceError(error);
