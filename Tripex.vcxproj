@@ -131,9 +131,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <ForcedIncludeFiles>
-      </ForcedIncludeFiles>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <ForcedIncludeFiles>StdAfx.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -225,7 +224,6 @@
     </ClCompile>
     <ClCompile Include="TextureData.cpp" />
     <ClCompile Include="Vector3.cpp" />
-    <ClCompile Include="xbmc.cpp" />
     <ClCompile Include="AudioData.cpp" />
     <ClCompile Include="BezierCurve.cpp" />
     <ClCompile Include="Camera.cpp" />
@@ -235,7 +233,6 @@
     <ClCompile Include="TexturedGrid.cpp" />
     <ClCompile Include="Matrix44.cpp" />
     <ClCompile Include="Actor-Clip.cpp" />
-    <ClCompile Include="Actor-Primitives.cpp" />
     <ClCompile Include="Actor.cpp" />
     <ClCompile Include="Canvas.cpp" />
     <ClCompile Include="SpriteBuffer.cpp" />
@@ -257,7 +254,6 @@
     <ClInclude Include="StdAfx.h" />
     <ClInclude Include="TextureData.h" />
     <ClInclude Include="Vector3.h" />
-    <ClInclude Include="xbmc.h" />
     <ClInclude Include="ZArray.h" />
     <ClInclude Include="AudioData.h" />
     <ClInclude Include="BezierCurve.h" />
@@ -271,7 +267,6 @@
     <ClInclude Include="TexturedGrid.h" />
     <ClInclude Include="Matrix44.h" />
     <ClInclude Include="Actor.h" />
-    <ClInclude Include="Palette.h" />
     <ClInclude Include="Canvas.h" />
     <ClInclude Include="Point.h" />
     <ClInclude Include="Rect.h" />

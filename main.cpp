@@ -6,15 +6,34 @@
 #include "Tripex.h"
 #include "effect.h"
 
-extern Tripex* g_pTripex;
-
 IDirect3D9* g_pd3d = NULL;
 IDirect3DDevice9* g_pd3dDevice = NULL;
-bool g_bStarted = FALSE;
+
 HWAVEIN g_hWaveIn = NULL;
 WAVEHDR g_aWaveHdr[2];
 UINT8* g_apnWaveBuf[2] = { NULL, };
 WAVEFORMATEX g_wfex;
+
+Tripex* g_pTripex;
+
+void AudioData(short* pAudioData, int iAudioDataLength, float* pFreqData, int iFreqDataLength)
+{
+	if (g_pTripex->pAudio != NULL)
+	{
+		g_pTripex->pAudio->SetDataFormat(2, 44100, 16);
+		g_pTripex->pAudio->AddData(pAudioData, iAudioDataLength);
+	}
+
+	//	for( int i = 0; i < 2; i++ )
+	//	{
+	//		for( int j = 0; j < 576; j++ )
+	//		{
+	//			g_pcSpectrum[ i ][ j ] = 0.6f * rand( ) / powf(j, 1.4f);
+	//			//	powf( rand( ), 1.0f + ( 4.0f * -j / 576.0f ) );
+	//			g_pcWaveform[ i ][ j ] = rand( );
+	//		}
+	//	}
+}
 
 /*---------------------------------
 * CreateD3D( )
@@ -174,6 +193,12 @@ MMRESULT DestroyWaveIn()
 * TxWndProc( )
 -----------------------------------*/
 
+void HandleError(HWND hWnd, Error* error)
+{
+	MessageBoxA(hWnd, error->GetDescription().c_str(), NULL, MB_OK);
+	CloseWindow(hWnd);
+}
+
 LRESULT CALLBACK TxWndProc(HWND hWnd, UINT32 nMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (nMsg)
@@ -193,9 +218,13 @@ LRESULT CALLBACK TxWndProc(HWND hWnd, UINT32 nMsg, WPARAM wParam, LPARAM lParam)
 			}
 			else
 			{
-				void _cdecl Start(int iChannels, int iSamplesPerSec, int iBitsPerSample, const char* szSongName);
-				Start(2, 44100, 16, nullptr);
-				g_bStarted = TRUE;
+				g_pTripex = new Tripex();
+
+				Error* error = g_pTripex->Startup();
+				if (error)
+				{
+					HandleError(hWnd, error);
+				}
 				SetTimer(hWnd, 0x1234, 10, NULL);
 			}
 		}
@@ -218,8 +247,12 @@ LRESULT CALLBACK TxWndProc(HWND hWnd, UINT32 nMsg, WPARAM wParam, LPARAM lParam)
 	case WM_TIMER:
 		if (wParam == 0x1234)
 		{
-			void _cdecl Render();
-			Render();
+			Error* error = g_pTripex->Render();
+			if (error)
+			{
+				MessageBoxA(hWnd, error->GetDescription().c_str(), NULL, MB_OK);
+				CloseWindow(hWnd);
+			}
 		}
 		break;
 	case WM_DESTROY:
@@ -230,12 +263,12 @@ LRESULT CALLBACK TxWndProc(HWND hWnd, UINT32 nMsg, WPARAM wParam, LPARAM lParam)
 
 		KillTimer(hWnd, 1);
 
-		if (g_bStarted)
+		if (g_pTripex != nullptr)
 		{
-			void _cdecl Stop();
-			Stop();
+			g_pTripex->Shutdown();
 
-			g_bStarted = FALSE;
+			delete g_pTripex;
+			g_pTripex = nullptr;
 		}
 
 		DestroyD3D();

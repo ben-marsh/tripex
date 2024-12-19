@@ -7,7 +7,6 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Misc.cpp" />
     <ClCompile Include="StdAfx.cpp" />
-    <ClCompile Include="xbmc.cpp" />
     <ClCompile Include="AudioData.cpp" />
     <ClCompile Include="ZDirect3d.cpp" />
     <ClCompile Include="Effect.cpp" />
@@ -43,7 +42,6 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Matrix44.cpp" />
     <ClCompile Include="Actor-Clip.cpp" />
-    <ClCompile Include="Actor-Primitives.cpp" />
     <ClCompile Include="Actor.cpp" />
     <ClCompile Include="Canvas.cpp" />
     <ClCompile Include="SpriteBuffer.cpp" />
@@ -65,7 +63,6 @@
     <ClInclude Include="main.h" />
     <ClInclude Include="Misc.h" />
     <ClInclude Include="StdAfx.h" />
-    <ClInclude Include="xbmc.h" />
     <ClInclude Include="ZArray.h" />
     <ClInclude Include="AudioData.h" />
     <ClInclude Include="ZDirect3d.h" />
@@ -83,7 +80,6 @@
     <ClInclude Include="Face.h" />
     <ClInclude Include="Matrix44.h" />
     <ClInclude Include="Actor.h" />
-    <ClInclude Include="Palette.h" />
     <ClInclude Include="Canvas.h" />
     <ClInclude Include="Point.h" />
     <ClInclude Include="Rect.h" />
