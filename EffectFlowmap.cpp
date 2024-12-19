@@ -723,7 +723,7 @@ public:
 		{
 			if(fadecolour >= 1)
 			{
-				for( SINT32 i = 0; i < 256; i++ )
+				for( int32 i = 0; i < 256; i++ )
 				{
 					PALETTEENTRY *pEntry = &pCanvas->m_aPalette[ i ];
 					pEntry->peRed = dstcolour[ i ].m_nR;

@@ -75,7 +75,7 @@ public:
 	StateBuffer mpRender;
 	NewStateBuffer mpNewRender;
 	TextureStage pTextureStage[8];
-	std::set< std::pair< UINT16, UINT16 > > g_spnFreePalette;
+	std::set< std::pair< uint16, uint16 > > g_spnFreePalette;
 	std::set< Texture* > g_spTexture;
 
 	ZDirect3D( );

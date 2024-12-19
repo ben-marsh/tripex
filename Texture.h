@@ -9,7 +9,7 @@ class Texture
 //	friend HRESULT g_pD3D->FlushTextureState( );
 //	friend void g_pD3D->SetTexture(DWORD dwStage, ZTexture *pTexture, DWORD dwOp, DWORD dwArg2);
 public:
-	UINT32 m_nFlags;
+	uint32 m_nFlags;
 	IDirect3DTexture9 *m_pd3dTexture;
 
 	enum
@@ -24,8 +24,8 @@ public:
 	// if palette is set in dynamic texture?
 
 	D3DFORMAT m_nSrcFmt;
-	UINT32 m_nSrcSize;
-	UINT32 m_nSrcSpan;
+	uint32 m_nSrcSize;
+	uint32 m_nSrcSpan;
 	const void *m_pSrcData;
 	const PALETTEENTRY *m_pSrcPalette;
 
@@ -38,12 +38,12 @@ public:
 	~Texture( );
 
 	// SetFlags( ):
-	void SetFlags( UINT32 nFlag );
+	void SetFlags( uint32 nFlag );
 
 	// SetSource( ):
-	void SetSource( const void *pSrcData, UINT32 nSrcSize );
-	void SetSource( D3DFORMAT nSrcFmt, const void *pSrcData, UINT32 nSrcSize, UINT32 nSrcSpan );
-	void SetSource( const PALETTEENTRY *pPalette, const void *pSrcData, UINT32 nSrcSize, UINT32 nSrcSpan );
+	void SetSource( const void *pSrcData, uint32 nSrcSize );
+	void SetSource( D3DFORMAT nSrcFmt, const void *pSrcData, uint32 nSrcSize, uint32 nSrcSpan );
+	void SetSource( const PALETTEENTRY *pPalette, const void *pSrcData, uint32 nSrcSize, uint32 nSrcSpan );
 
 	// SetSpan( ):
 
@@ -83,7 +83,7 @@ public:
 //	
 //		const BYTE *m_pnData;
 //		const PALETTEENTRY *m_pnPalette;
-//		UINT32 m_nDataSize;
+//		uint32 m_nDataSize;
 //	
 //		// texture types
 //	

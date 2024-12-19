@@ -34,7 +34,7 @@ Texture::~Texture( )
 * SetFlags( ):
 -----------------------------------*/
 
-void Texture::SetFlags( UINT32 nFlags )
+void Texture::SetFlags( uint32 nFlags )
 {
 	_ASSERT( m_pd3dTexture == NULL );
 	m_nFlags = nFlags;
@@ -44,7 +44,7 @@ void Texture::SetFlags( UINT32 nFlags )
 * SetSource( )
 -----------------------------------*/
 
-void Texture::SetSource( const void *pSrcData, UINT32 nSrcSize )
+void Texture::SetSource( const void *pSrcData, uint32 nSrcSize )
 {
 	m_nSrcFmt = D3DFMT_UNKNOWN;
 	m_pSrcData = pSrcData;
@@ -52,7 +52,7 @@ void Texture::SetSource( const void *pSrcData, UINT32 nSrcSize )
 	m_pSrcPalette = NULL;
 }
 
-void Texture::SetSource( const PALETTEENTRY *pSrcPalette, const void *pSrcData, UINT32 nSrcSize, UINT32 nSrcSpan )
+void Texture::SetSource( const PALETTEENTRY *pSrcPalette, const void *pSrcData, uint32 nSrcSize, uint32 nSrcSpan )
 {
 	m_nSrcFmt = D3DFMT_P8;
 	m_pSrcData = pSrcData;
@@ -61,7 +61,7 @@ void Texture::SetSource( const PALETTEENTRY *pSrcPalette, const void *pSrcData, 
 	m_pSrcPalette = pSrcPalette;
 }
 
-void Texture::SetSource( D3DFORMAT nSrcFmt, const void *pSrcData, UINT32 nSrcSize, UINT32 nSrcSpan )
+void Texture::SetSource( D3DFORMAT nSrcFmt, const void *pSrcData, uint32 nSrcSize, uint32 nSrcSpan )
 {
 	_ASSERT( nSrcFmt != D3DFMT_P8 );
 
@@ -72,7 +72,7 @@ void Texture::SetSource( D3DFORMAT nSrcFmt, const void *pSrcData, UINT32 nSrcSiz
 	m_pSrcPalette = NULL;
 }
 /*
-void ZTexture::SetSource( const void *pSrcData, UINT32 nSrcSize, const PALETTEENTRY *pPalette )
+void ZTexture::SetSource( const void *pSrcData, uint32 nSrcSize, const PALETTEENTRY *pPalette )
 {
 	m_pSrcData = pSrcData;
 	m_nSrcSize = nSrcSize;
@@ -83,7 +83,7 @@ void ZTexture::SetSource( const void *pSrcData, UINT32 nSrcSize, const PALETTEEN
 class ZTexture
 {
 protected:
-	UINT32 m_nFlags;
+	uint32 m_nFlags;
 	IDirect3DTexture8 *m_pd3dTexture;
 
 public:
@@ -99,19 +99,19 @@ public:
 	// if palette is set in dynamic texture?
 
 	D3DFORMAT m_nSrcFmt;
-	UINT32 m_nSrcSize;
+	uint32 m_nSrcSize;
 	const void *m_pSrc;
 	const PALETTEENTRY *m_pSrcPalette;
 
 	// Constructor:
-	ZTexture( UINT32 nFlags );
+	ZTexture( uint32 nFlags );
 
 	// Destructor:
 	~ZTexture( );
 
 	// SetSource( ):
-	void SetSource( const UINT8 *pnIdx, UINT32 nSize, const PALETTEENTRY *pPalette );
-	void SetSource( D3DFORMAT nFmt, void *pSrc, UINT32 nSize );
+	void SetSource( const uint8 *pnIdx, uint32 nSize, const PALETTEENTRY *pPalette );
+	void SetSource( D3DFORMAT nFmt, void *pSrc, uint32 nSize );
 };
 
 

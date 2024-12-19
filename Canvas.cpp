@@ -8,23 +8,23 @@
 * Constructor:
 -----------------------------------*/
 
-Canvas::Canvas( SINT32 nWidth, SINT32 nHeight )
+Canvas::Canvas( int32 nWidth, int32 nHeight )
 {
-	SINT32 nTextures = nWidth * nHeight;
-	UINT32 nSpan = nWidth * 256;
+	int32 nTextures = nWidth * nHeight;
+	uint32 nSpan = nWidth * 256;
 
 	m_nWidth = nWidth;
 	m_nHeight = nHeight;
-	m_anData = new UINT8[ nSpan * nHeight * 256 ];
+	m_anData = new uint8[ nSpan * nHeight * 256 ];
 	m_aTexture = new Texture[ nTextures ];
 	memset(m_aPalette, 0, sizeof(m_aPalette));
 
-	SINT32 nTexture = 0;
-	for( SINT32 nY = 0; nY < nHeight; nY++ )
+	int32 nTexture = 0;
+	for( int32 nY = 0; nY < nHeight; nY++ )
 	{
-		for( SINT32 nX = 0; nX < nWidth; nX++ )
+		for( int32 nX = 0; nX < nWidth; nX++ )
 		{
-			UINT8 *pnData = &m_anData[ ( nX * 256 ) + ( nY * 256 * nSpan ) ];
+			uint8 *pnData = &m_anData[ ( nX * 256 ) + ( nY * 256 * nSpan ) ];
 
 			Texture *pTexture = &m_aTexture[ nTexture++ ];
 			pTexture->SetFlags( Texture::F_DYNAMIC );
@@ -39,7 +39,7 @@ Canvas::Canvas( SINT32 nWidth, SINT32 nHeight )
 
 Error* Canvas::Create( )
 {
-	for( SINT32 i = 0; i < m_nWidth * m_nHeight; i++ )
+	for( int32 i = 0; i < m_nWidth * m_nHeight; i++ )
 	{
 		Error* error = g_pD3D->AddTexture( &m_aTexture[ i ] );
 		if( error ) return TraceError( error );
@@ -52,7 +52,7 @@ Error* Canvas::Create( )
 * GetDataPtr( ):
 -----------------------------------*/
 
-UINT8 *Canvas::GetDataPtr( )
+uint8 *Canvas::GetDataPtr( )
 {
 	return m_anData;
 }
@@ -63,7 +63,7 @@ UINT8 *Canvas::GetDataPtr( )
 
 Error* Canvas::UploadTextures( )
 {
-	for( SINT32 i = 0; i < m_nWidth * m_nHeight; i++ )
+	for( int32 i = 0; i < m_nWidth * m_nHeight; i++ )
 	{
 		Error* error = g_pD3D->UploadTexture( &m_aTexture[ i ] );
 		if( error ) return TraceError( error );
@@ -75,7 +75,7 @@ Error* Canvas::UploadTextures( )
 * GetTexture( ):
 -----------------------------------*/
 
-Texture *Canvas::GetTexture( SINT32 nX, SINT32 nY )
+Texture *Canvas::GetTexture( int32 nX, int32 nY )
 {
 	return &m_aTexture[ ( nY * m_nWidth ) + nX ];
 }
@@ -193,10 +193,10 @@ Error* Canvas::Render( )
 //	
 //	
 //		// Create( ):
-//		void Create( SINT32 nWidth, UINT32 nHeight );
+//		void Create( int32 nWidth, uint32 nHeight );
 //	
 //		// GetDataPtr( ):
-//		UINT8 *GetDataPtr( );
+//		uint8 *GetDataPtr( );
 //	
 //		// UploadTextures( ):
 //		HRESULT UploadTextures( );

@@ -100,7 +100,7 @@ inline WideColorRgb ColorHsv::GetRGB( ) const
 	float fR = fMin + Bound< float >( -1 + fabsf( fPos - 3.0f ), 0.0f, 1.0f ) * fSpread;
 	float fG = fMin + Bound< float >( +2 - fabsf( fPos - 2.0f ), 0.0f, 1.0f ) * fSpread;
 	float fB = fMin + Bound< float >( +2 - fabsf( fPos - 4.0f ), 0.0f, 1.0f ) * fSpread;
-	return WideColorRgb( ( SINT32 )fR, ( SINT32 )fG, ( SINT32 )fB );
+	return WideColorRgb( ( int32 )fR, ( int32 )fG, ( int32 )fB );
 }
 
 /*---------------------------------

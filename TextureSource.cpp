@@ -3,7 +3,7 @@
 #include "ConfigItem.h"
 #include "TextureData.h"
 
-extern const UINT32 *g_apnIntTexture[ ] =
+extern const uint32 *g_apnIntTexture[ ] =
 {
 	g_anTexRawGUI,
 	g_anTexBlank,

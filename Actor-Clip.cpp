@@ -5,8 +5,8 @@
 
 typedef struct
 {
-	UINT16 wClip;
-	UINT16 wIndex;
+	uint16 wClip;
+	uint16 wIndex;
 } ClipInfo;
 
 ZArray<ClipInfo> *ppClip;
@@ -27,7 +27,7 @@ void InitObjectClipper( )
 
 
 
-bool IsClipRequired(Face &f, UINT16 wPlaneMask)
+bool IsClipRequired(Face &f, uint16 wPlaneMask)
 {
 	for(int j = 0;;j++)
 	{
@@ -35,9 +35,9 @@ bool IsClipRequired(Face &f, UINT16 wPlaneMask)
 		else if((*ppClip)[f[j]].wClip & wPlaneMask) return true;
 	}
 }
-UINT16 Actor::GetClipFlag(UINT16 wClipMask, Vector3 &v)
+uint16 Actor::GetClipFlag(uint16 wClipMask, Vector3 &v)
 {
-	UINT16 wClip = 0;
+	uint16 wClip = 0;
 	if(wClipMask & CLIP_FLAG_MIN_X && v.m_fX < m_fClipMinX) wClip |= CLIP_FLAG_MIN_X;
 	if(wClipMask & CLIP_FLAG_MAX_X && v.m_fX > m_fClipMaxX) wClip |= CLIP_FLAG_MAX_X;
 
@@ -49,7 +49,7 @@ UINT16 Actor::GetClipFlag(UINT16 wClipMask, Vector3 &v)
 	return wClip;
 }
 //WORD wClipRequired;
-int Actor::GetClippedIndex(Face *pf, int nIn, int nOut, UINT16 wPlaneFlag, UINT16 wClipRequired)
+int Actor::GetClippedIndex(Face *pf, int nIn, int nOut, uint16 wPlaneFlag, uint16 wClipRequired)
 {
 	ClipInfo *pci = &(*ppClip)[(*pf)[nIn]];
 	ZVertexTL &vIn = (pci->wClip != 0)? (*ppvOut)[pci->wIndex] : pTransVertex[pci->wIndex];
@@ -88,7 +88,7 @@ int Actor::GetClippedIndex(Face *pf, int nIn, int nOut, UINT16 wPlaneFlag, UINT1
 	int nVertex;
 	ZVertexTL *pNewVertex;
 
-	UINT16 wClip = GetClipFlag(wClipRequired & (wPlaneFlag - 1), vPos);
+	uint16 wClip = GetClipFlag(wClipRequired & (wPlaneFlag - 1), vPos);
 	if(wClip == 0)
 	{
 		int nLength = (*ppnEmptyVertex).GetLength();
@@ -131,7 +131,7 @@ int Actor::GetClippedIndex(Face *pf, int nIn, int nOut, UINT16 wPlaneFlag, UINT1
 	}
 	return nIndex;
 }
-void Actor::AddClippedFace(Face &fNew, UINT16 wPlaneMask, ZArray<Face> &pfDst)
+void Actor::AddClippedFace(Face &fNew, uint16 wPlaneMask, ZArray<Face> &pfDst)
 {
 	if(IsClipRequired(fNew, wPlaneMask))
 	{
@@ -152,7 +152,7 @@ void Actor::AddClippedFace(Face &fNew, UINT16 wPlaneMask, ZArray<Face> &pfDst)
 		pfDst.Add(fNew);
 	}
 }
-void Actor::Clip(ZArray<Face> &pfSrc, ZArray<Face> &pfDst, UINT16 wClipMask)
+void Actor::Clip(ZArray<Face> &pfSrc, ZArray<Face> &pfDst, uint16 wClipMask)
 {
 	pfDst.Empty();
 	(*ppvOut).Empty();
@@ -161,7 +161,7 @@ void Actor::Clip(ZArray<Face> &pfSrc, ZArray<Face> &pfDst, UINT16 wClipMask)
 	(*ppnEmptyFace).Empty();
 
 	(*ppClip).SetLength(pTransVertex.GetLength());
-	UINT16 wClipRequired = 0;
+	uint16 wClipRequired = 0;
 
 	// -0.25
 	// pD3D->dwWidth - 0.25
@@ -187,7 +187,7 @@ void Actor::Clip(ZArray<Face> &pfSrc, ZArray<Face> &pfDst, UINT16 wClipMask)
 		(*ppClip)[i].wClip = GetClipFlag(wClipMask, pTransVertex[i].m_vPos);
 		if((*ppClip)[i].wClip != 0)
 		{
-			(*ppClip)[i].wIndex = (UINT16)(*ppvOut).Add(pTransVertex[i]);
+			(*ppClip)[i].wIndex = (uint16)(*ppvOut).Add(pTransVertex[i]);
 			(*ppnEmptyVertex).Add(i);
 		}
 		else
@@ -217,11 +217,11 @@ void Actor::Clip(ZArray<Face> &pfSrc, ZArray<Face> &pfDst, UINT16 wClipMask)
 	int nFirstClip = pfDst.GetLength();
 
 	Face fNew;
-	UINT16 pwIndex[3];
+	uint16 pwIndex[3];
 	bool pbOut[3];
 	for(int nPlane = CLIP_PLANES - 1; nPlane >= 0; nPlane--)
 	{
-		UINT16 wPlaneFlag = (UINT16)CLIP_FLAG(nPlane);
+		uint16 wPlaneFlag = (uint16)CLIP_FLAG(nPlane);
 		if(!(wClipRequired & wPlaneFlag)) continue;
 
 		for(int nFace = (*ppfOut).GetLength() - 1; nFace >= 0; nFace--)

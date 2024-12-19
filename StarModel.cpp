@@ -133,7 +133,7 @@ float pfStarVertex[] =
 	-36.394753f, -15.075200f, 10.606603f
 };
 
-extern UINT16 pwStarFace[] =
+extern uint16 pwStarFace[] =
 {
 	0, 1, 2,
 	2, 3, 0,
@@ -395,4 +395,4 @@ extern UINT16 pwStarFace[] =
 };
 
 extern const int nStarVertices = sizeof(pfStarVertex) / (sizeof(float) * 3);
-extern const int nStarFaces = sizeof(pwStarFace) / (sizeof(UINT16) * 3);
+extern const int nStarFaces = sizeof(pwStarFace) / (sizeof(uint16) * 3);

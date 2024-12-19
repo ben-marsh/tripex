@@ -352,8 +352,8 @@ Error* ZDirect3D::UploadTexture(Texture* pTexture)
 
 	const ZRect< int > rSrc(0, 0, 256, 256);
 
-	SINT32 nMipLevels = pTexture->m_pd3dTexture->GetLevelCount();
-	for (SINT32 i = 0; i < nMipLevels; i++)
+	int32 nMipLevels = pTexture->m_pd3dTexture->GetLevelCount();
+	for (int32 i = 0; i < nMipLevels; i++)
 	{
 		IDirect3DSurface9* pSurface;
 
@@ -370,12 +370,12 @@ Error* ZDirect3D::UploadTexture(Texture* pTexture)
 			d3dsd.Format == pTexture->m_nSrcFmt &&
 			SUCCEEDED(pSurface->LockRect(&d3dr, NULL, 0)))
 		{
-			const UINT8* pnSrc = (const UINT8*)pTexture->m_pSrcData;
-			for (SINT32 i = 0; i < 256; i++)
+			const uint8* pnSrc = (const uint8*)pTexture->m_pSrcData;
+			for (int32 i = 0; i < 256; i++)
 			{
-				//					( ( UINT8* )d3dr.pBits )[ i ] = rand( );
+				//					( ( uint8* )d3dr.pBits )[ i ] = rand( );
 				memcpy(d3dr.pBits, pnSrc, 256);
-				d3dr.pBits = (UINT8*)(d3dr.pBits) + d3dr.Pitch;
+				d3dr.pBits = (uint8*)(d3dr.pBits) + d3dr.Pitch;
 				pnSrc += pTexture->m_nSrcSpan;
 			}
 
@@ -405,12 +405,12 @@ Error* ZDirect3D::CreateTexture(Texture* pTexture)
 	}
 	else
 	{
-		UINT32 nMipLevels = (pTexture->m_nFlags & Texture::F_MIP_CHAIN) ? 0 : 1;
-		//			UINT32 nUsage = 0;//( pTexture->m_nFlags & ZTexture::F_DYNAMIC )? D3DUSAGE_DYNAMIC : 0;
+		uint32 nMipLevels = (pTexture->m_nFlags & Texture::F_MIP_CHAIN) ? 0 : 1;
+		//			uint32 nUsage = 0;//( pTexture->m_nFlags & ZTexture::F_DYNAMIC )? D3DUSAGE_DYNAMIC : 0;
 		//			D3DPOOL nPool = ( pTexture->m_nFlags & ZTexture::F_DYNAMIC )? D3DPOOL_DEFAULT : D3DPOOL_MANAGED;
 		//			D3DPOOL nPool = ( pTexture->m_nFlags & ZTexture::F_DYNAMIC )? D3DPOOL_SYSMEMORY : D3DPOOL_MANAGED;
 
-		UINT32 nUsage = 0;//( pTexture->m_nFlags & ZTexture::F_DYNAMIC )? D3DUSAGE_DYNAMIC : 0;
+		uint32 nUsage = 0;//( pTexture->m_nFlags & ZTexture::F_DYNAMIC )? D3DUSAGE_DYNAMIC : 0;
 		D3DPOOL nPool = D3DPOOL_MANAGED;
 		/*
 			hRes = pd3dDevice->CreateTexture(
@@ -468,7 +468,7 @@ Error* ZDirect3D::CreateTexture(Texture* pTexture)
 			else
 			{
 				ZColour *pcSrc = (ZColour*)&pTexture->m_vnData[ 0 ];
-				UINT32 an[ 256 * 256 ];
+				uint32 an[ 256 * 256 ];
 				for( int i = 0; i < 256 * 256; i++ ) an[ i ] = pcSrc[ i ].dw;//.Reverse( ).GetCOLORREF( );
 				D3DXLoadSurfaceFromMemory( pSurface, NULL, NULL, an, D3DFMT_X8R8G8B8, 256 * 4, NULL, &r, D3DX_FILTER_TRIANGLE | D3DX_FILTER_DITHER, 0 );
 			}

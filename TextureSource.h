@@ -23,7 +23,7 @@ public:
 	std::string MakeUsageString();
 };
 
-extern const UINT32 *g_apnIntTexture[ ];
+extern const uint32 *g_apnIntTexture[ ];
 //const char *psIntTexture[];
 extern const int nIntTextures;
 //extern CTextureItem pInternalTexture[];

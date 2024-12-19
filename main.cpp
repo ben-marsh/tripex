@@ -11,7 +11,7 @@ IDirect3DDevice9* g_pd3dDevice = NULL;
 
 HWAVEIN g_hWaveIn = NULL;
 WAVEHDR g_aWaveHdr[2];
-UINT8* g_apnWaveBuf[2] = { NULL, };
+uint8* g_apnWaveBuf[2] = { NULL, };
 WAVEFORMATEX g_wfex;
 
 Tripex* g_pTripex;
@@ -199,7 +199,7 @@ void HandleError(HWND hWnd, Error* error)
 	CloseWindow(hWnd);
 }
 
-LRESULT CALLBACK TxWndProc(HWND hWnd, UINT32 nMsg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK TxWndProc(HWND hWnd, uint32 nMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (nMsg)
 	{

@@ -8,7 +8,7 @@
 #include "ZArray.h"
 #include "ColorRgb.h"
 
-#define WORD_INVALID_INDEX ((UINT16)0x0ffff)
+#define WORD_INVALID_INDEX ((uint16)0x0ffff)
 #define FRAME_TTL 1000
 
 #define CLIP_FLAG(x) (1L << x)
@@ -30,7 +30,7 @@ public:
 	{
 		Matrix44 mTransform;
 		float m_fTime;
-		SINT32 m_nFrame;
+		int32 m_nFrame;
 		float m_fPos;
 	};
 
@@ -152,7 +152,7 @@ public:
 
 	std::bitset< F_LAST > m_bsFlag;
 
-	UINT16 wClipMask;
+	uint16 wClipMask;
 
 	std::map< D3DRENDERSTATETYPE, DWORD > mpState;
 
@@ -178,7 +178,7 @@ public:
 	ZArray<Edge> pEdge, pClippedEdge;//, peClipped;//Edge;
 //	ZArray<int> pnClipped;
 
-	ZArray<UINT16*> ppwVertexFaceList;
+	ZArray<uint16*> ppwVertexFaceList;
 	ZArray<float> pfDelay;
 
 	void FindFaceOrder(const Vector3 &vIntPoint);

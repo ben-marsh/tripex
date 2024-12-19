@@ -148,13 +148,13 @@ void Actor::FindVertexFaceList()
 	{
 		for(int j = 0; j < 3; j++)
 		{
-			UINT16*&pwFace = ppwVertexFaceList[pFace[i][j]];
+			uint16*&pwFace = ppwVertexFaceList[pFace[i][j]];
 			int k = 0; 
-			if(pwFace == NULL) pwFace = (UINT16*)malloc(4 * sizeof(UINT16));
+			if(pwFace == NULL) pwFace = (uint16*)malloc(4 * sizeof(uint16));
 			else
 			{
 				while(pwFace[k] != WORD_INVALID_INDEX) k++;
-				if(k >= 3) pwFace = (UINT16*)realloc(pwFace, (k + 2) * sizeof(UINT16));
+				if(k >= 3) pwFace = (uint16*)realloc(pwFace, (k + 2) * sizeof(uint16));
 			}
 			pwFace[k] = i;
 			pwFace[k+1] = WORD_INVALID_INDEX;
@@ -176,7 +176,7 @@ void Actor::FindVertexNormals()
 	for(int i = 0; i < pVertex.GetLength(); i++)
 	{
 		Vector3 vNormal = Vector3(0, 0, 0);
-		UINT16 *pwFace = ppwVertexFaceList[i];
+		uint16 *pwFace = ppwVertexFaceList[i];
 		for(int j = 0; pwFace[j] != WORD_INVALID_INDEX; j++)
 		{
 			vNormal += pvFaceNormal[pwFace[j]];
@@ -504,9 +504,9 @@ void Actor::Calculate(Camera *pCamera, float fElapsed)
 	{
 		for(i = 0; i < pVertex.GetLength(); i++)
 		{
-			pTransVertex[i].m_cDiffuse.m_nR = (UINT8)(pTransVertex[i].m_cDiffuse.m_nR * pVertex[i].m_cDiffuse.m_nR / 255.0f);
-			pTransVertex[i].m_cDiffuse.m_nG = (UINT8)(pTransVertex[i].m_cDiffuse.m_nG * pVertex[i].m_cDiffuse.m_nG / 255.0f);
-			pTransVertex[i].m_cDiffuse.m_nB = (UINT8)(pTransVertex[i].m_cDiffuse.m_nB * pVertex[i].m_cDiffuse.m_nB / 255.0f);
+			pTransVertex[i].m_cDiffuse.m_nR = (uint8)(pTransVertex[i].m_cDiffuse.m_nR * pVertex[i].m_cDiffuse.m_nR / 255.0f);
+			pTransVertex[i].m_cDiffuse.m_nG = (uint8)(pTransVertex[i].m_cDiffuse.m_nG * pVertex[i].m_cDiffuse.m_nG / 255.0f);
+			pTransVertex[i].m_cDiffuse.m_nB = (uint8)(pTransVertex[i].m_cDiffuse.m_nB * pVertex[i].m_cDiffuse.m_nB / 255.0f);
 		}
 	}
 	if(m_bsFlag.test( F_VALID_VERTEX_SPECULAR ) )
@@ -705,8 +705,8 @@ void Actor::Calculate(Camera *pCamera, float fElapsed)
 				pnLookup.SetLength(pTransVertex.GetLength());
 				for(int i = 0; i < pTransVertex.GetLength(); i++)
 				{
-					UINT16 wVertex = i % pVertex.GetLength();
-					UINT16 wExposure = i / pVertex.GetLength();
+					uint16 wVertex = i % pVertex.GetLength();
+					uint16 wExposure = i / pVertex.GetLength();
 					int nOldIndex = (wVertex * pfExpBase.GetLength()) + wExposure;
 					pnLookup[nOldIndex] = i;
 				}
@@ -715,7 +715,7 @@ void Actor::Calculate(Camera *pCamera, float fElapsed)
 				{
 					for(int j = 0; j < 3; j++)
 					{
-						UINT16 &wv = (*ppfExposureBuffer)[i][j];
+						uint16 &wv = (*ppfExposureBuffer)[i][j];
 						wv = pnLookup[wv];
 					}
 				}
@@ -874,7 +874,7 @@ void Actor::CreateGeosphere(float fRadius, int nVertices)
 	struct GeoEdge : public Edge
 	{
 		float fLength;
-		UINT16 pwFace[2];
+		uint16 pwFace[2];
 
 		void FindLength(Actor* pObj) { fLength = (pObj->pVertex[(*this)[0]].m_vPos - pObj->pVertex[(*this)[1]].m_vPos).Length(); }
 	};

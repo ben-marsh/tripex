@@ -344,7 +344,7 @@ public:
 				pop esi
 			}
 #else
-			UINT8* data = pc.GetDataPtr();
+			uint8* data = pc.GetDataPtr();
 			if (pnCurrentBump == nullptr)
 			{
 				memset(data, 0, 256 * 256);

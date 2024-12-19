@@ -167,8 +167,8 @@ public:
 				{
 					for(int j = 0; j < TRI; j++)
 					{
-						pObj[i].pVertex[base + j].m_cDiffuse = ColorRgb((UINT8)(brightness * 128.0f / EXPDIV), (UINT8)(brightness * 77.0f / EXPDIV), (UINT8)(brightness * 243.0f / EXPDIV)); //0.6 / 25, 0.5 / 25);
-						pObj[i].pVertex[base + j + TRI].m_cDiffuse = ColorRgb(0, (UINT8)(brightness * 64.0f / EXPDIV), 0);
+						pObj[i].pVertex[base + j].m_cDiffuse = ColorRgb((uint8)(brightness * 128.0f / EXPDIV), (uint8)(brightness * 77.0f / EXPDIV), (uint8)(brightness * 243.0f / EXPDIV)); //0.6 / 25, 0.5 / 25);
+						pObj[i].pVertex[base + j + TRI].m_cDiffuse = ColorRgb(0, (uint8)(brightness * 64.0f / EXPDIV), 0);
 					}
 					base += 2 * TRI;
 				}

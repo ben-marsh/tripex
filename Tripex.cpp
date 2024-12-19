@@ -60,7 +60,7 @@ DWORD WINAPI Tripex::InitialiseThread(void *pParam)
 	int nTexture = 0;
 	for(int i = 0; i < (int)ppItem.size(); i++ )//nIntTextures + nDiskTextures; i++)
 	{
-		const UINT32 *pnTexData = g_apnIntTexture[ ppItem[ i ]->nInternalID ];
+		const uint32 *pnTexData = g_apnIntTexture[ ppItem[ i ]->nInternalID ];
 
 		Texture *pTexture = new Texture( );
 		pTexture->SetFlags( Texture::F_FILTERING | Texture::F_MIP_CHAIN );
@@ -75,7 +75,7 @@ DWORD WINAPI Tripex::InitialiseThread(void *pParam)
 		ppItem[ i ]->pTexture = pTexture;
 
 /*
-		UINT32 *pnTex = UnpackJpeg( ( const UINT8* )( pnTexData + 1 ), pnTexData[ 0 ] );
+		uint32 *pnTex = UnpackJpeg( ( const uint8* )( pnTexData + 1 ), pnTexData[ 0 ] );
 		if( pnTex == NULL )
 		{
 			ppItem.erase(ppItem.begin() + i);
@@ -205,7 +205,7 @@ Error* Tripex::Startup()
 
 //	{for( int i = 0; i < 256 * 256; i++ )
 //	{
-//		unsigned char c = ((UINT8*)&g_anTexRawGUI[ 1 ])[ i ];
+//		unsigned char c = ((uint8*)&g_anTexRawGUI[ 1 ])[ i ];
 //		pc[ i ] = ZColour( c,c,c);
 //	}
 //	}
@@ -220,7 +220,7 @@ Error* Tripex::Startup()
 	g_pD3D->AddTexture( gui.get( ) );
 //	g_pD3D->vpTexture.push_back(gui.get());//auto_ptr< ZTexture >(gui);
 
-	tef.Add( ( UINT8* )&g_anTexRawFont[ 1 ] );
+	tef.Add( ( uint8* )&g_anTexRawFont[ 1 ] );
 	tef.GetLetter(' ')->nEnd = 2;
 	g_pD3D->AddTexture( tef.GetTexture( ) );
 //	g_pD3D->vpTexture.push_back(tef.GetTexture());

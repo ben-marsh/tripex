@@ -5,16 +5,16 @@
 class Edge
 {
 public:
-	UINT16 m_anVtx[ 2 ];
+	uint16 m_anVtx[ 2 ];
 
 	// Constructor:
 	inline Edge();
 	inline Edge( const Edge &e );
-	inline Edge( UINT16 nVtx1, UINT16 nVtx2 );
+	inline Edge( uint16 nVtx1, uint16 nVtx2 );
 
 	// Set( ):
 	inline void Set( const Edge &e );
-	inline void Set(UINT16 nVtx1, UINT16 nVtx2 );
+	inline void Set(uint16 nVtx1, uint16 nVtx2 );
 
 	// Flipped( ):
 	inline Edge Flipped( ) const;
@@ -23,10 +23,10 @@ public:
 	inline Edge Ordered( ) const;
 
 	// Contains( ):
-	inline bool Contains(UINT16 nVtx) const;
+	inline bool Contains(uint16 nVtx) const;
 
 	// CommonIndex( ):
-	inline UINT16 CommonIndex( const Edge &e ) const;
+	inline uint16 CommonIndex( const Edge &e ) const;
 
 	// operator=( ):
 	inline Edge &operator=( const Edge &e );
@@ -35,8 +35,8 @@ public:
 	inline bool operator==( const Edge &e ) const;
 
 	// operator[ ]( ):
-	inline UINT16 &operator[ ]( int nIdx );
-	inline const UINT16 &operator[ ]( int nIdx ) const;
+	inline uint16 &operator[ ]( int nIdx );
+	inline const uint16 &operator[ ]( int nIdx ) const;
 };
 
 /*---------------------------------
@@ -52,7 +52,7 @@ Edge::Edge( const Edge &e )
 	Set(e);
 }
 
-Edge::Edge(UINT16 nVtx1, UINT16 nVtx2 )
+Edge::Edge(uint16 nVtx1, uint16 nVtx2 )
 {
 	Set( nVtx1, nVtx2 );
 }
@@ -66,7 +66,7 @@ void Edge::Set( const Edge &e )
 	Set( e.m_anVtx[ 0 ], e.m_anVtx[ 1 ] );
 }
 
-void Edge::Set(UINT16 nVtx1, UINT16 nVtx2 )
+void Edge::Set(uint16 nVtx1, uint16 nVtx2 )
 {
 	m_anVtx[ 0 ] = nVtx1;
 	m_anVtx[ 1 ] = nVtx2;
@@ -101,7 +101,7 @@ Edge Edge::Ordered( ) const
 * Contains( ):
 -----------------------------------*/
 
-bool Edge::Contains(UINT16 nVtx ) const
+bool Edge::Contains(uint16 nVtx ) const
 {
 	return m_anVtx[ 0 ] == nVtx || m_anVtx[ 1 ] == nVtx;
 }
@@ -110,7 +110,7 @@ bool Edge::Contains(UINT16 nVtx ) const
 * CommonIndex( ):
 -----------------------------------*/
 
-UINT16 Edge::CommonIndex( const Edge &e ) const
+uint16 Edge::CommonIndex( const Edge &e ) const
 {
 	if( e.Contains( m_anVtx[ 0 ] ) )
 	{
@@ -120,7 +120,7 @@ UINT16 Edge::CommonIndex( const Edge &e ) const
 	{
 		return m_anVtx[ 1 ];
 	}
-	return (UINT16)-1;
+	return (uint16)-1;
 }
 
 
@@ -147,12 +147,12 @@ bool Edge::operator==( const Edge &e ) const
 * operator[ ]( ):
 -----------------------------------*/
 
-UINT16&Edge::operator[ ]( int nIdx )
+uint16&Edge::operator[ ]( int nIdx )
 {
 	return m_anVtx[ nIdx ];
 }
 
-const UINT16&Edge::operator[ ]( int nIdx ) const
+const uint16&Edge::operator[ ]( int nIdx ) const
 {
 	return m_anVtx[ nIdx ];
 }
