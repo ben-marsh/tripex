@@ -1,7 +1,6 @@
 #pragma once
 
 #include "ZArray.h"
-#include "ZPtr.h"
 #include "ZDirect3D.h"
 #include <vector>
 
@@ -12,7 +11,6 @@
 class CTextureItem;
 
 bool LoadTextureSettings(std::vector< CTextureItem* > &ppItem);
-bool SaveTextureSettings(std::vector< CTextureItem* > &ppItem);
 
 // config-directx.cpp
 //extern string sDevice;

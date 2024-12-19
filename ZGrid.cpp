@@ -1,7 +1,7 @@
 #include "StdAfx.h"
 #include "zgrid.h"
 #include "error.h"
-#include "ZPtr.h"
+#include <memory>
 
 ZGrid::ZGrid(int nWidth, int nHeight)//, DWORD dwVertexFormat)//, GridCoordCallbackFunction callback)
 {
@@ -111,7 +111,7 @@ ZError* ZGrid::Render( )
 		nStartX = -1;
 		nStartY = -1;
 
-		ZPtr<float> pfY = new float[nHeight + 1];
+		std::unique_ptr<float[]> pfY = std::make_unique<float[]>(nHeight + 1);
 		for(int y = 0; y <= nHeight; y++)
 		{
 			pfY[y] = (y * 479 * fScale / nHeight) + ((nScrHeight - (480 * fScale)) / 2);
@@ -121,7 +121,7 @@ ZError* ZGrid::Render( )
 				fPosY = pfY[y] / (pfY[y] - pfY[y - 1]);
 			}
 		}
-		ZPtr<float> pfX = new float[nWidth + 1];
+		std::unique_ptr<float[]> pfX = std::make_unique<float[]>(nWidth + 1);
 		for(int x = 0; x <= nWidth; x++)
 		{
 			pfX[x] = (x * 639 * fScale / nWidth) + ((nScrWidth - (640 * fScale)) / 2);
@@ -204,4 +204,3 @@ ZError* ZGrid::Render( )
 
 	return nullptr;
 }
- 

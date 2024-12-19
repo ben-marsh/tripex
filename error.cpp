@@ -1,6 +1,5 @@
 #include "StdAfx.h"
 #include "main.h"
-#include "ZPtr.h"
 #include "config.h"
 #include "error.h"
 #include "CCfgItem.h"

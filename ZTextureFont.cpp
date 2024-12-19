@@ -2,7 +2,6 @@
 #include "ZTextureFont.h"
 #include "general.h"
 #include "error.h"
-#include "ZPtr.h"
 	
 #define LETTER_APPEAR_FRAMES 200 //120
 #define LETTER_DIFF_FRAMES 10

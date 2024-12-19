@@ -273,7 +273,6 @@
     <ClInclude Include="ZPalette.h" />
     <ClInclude Include="ZPaletteCanvas.h" />
     <ClInclude Include="ZPoint.h" />
-    <ClInclude Include="ZPtr.h" />
     <ClInclude Include="ZRect.h" />
     <ClInclude Include="ZSpriteBuffer.h" />
     <ClInclude Include="ZTexture.h" />
