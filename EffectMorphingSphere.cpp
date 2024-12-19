@@ -9,7 +9,7 @@
 
 #define NOBJ 4
 
-class ZEffectMorphingSphere : public ZEffectBase
+class EffectMorphingSphere : public EffectBase
 {
 public:
 	Actor pObj[NOBJ + 1];
@@ -18,7 +18,7 @@ public:
 	ContainedBezierCurve<1> b;
 	float fBezPos;
 	
-	ZEffectMorphingSphere() : b(Vector3(-100, -100, -600), Vector3(100, 100, -200))
+	EffectMorphingSphere() : b(Vector3(-100, -100, -600), Vector3(100, 100, -200))
 	{
 		fBezPos = 0;
 		pObj[NOBJ].CreateTetrahedronGeosphere(1.0, 4);
@@ -110,4 +110,4 @@ public:
 		return nullptr;
 	}
 };
-EXPORT_EFFECT(MorphingSphere, ZEffectMorphingSphere)
+EXPORT_EFFECT(MorphingSphere, EffectMorphingSphere)

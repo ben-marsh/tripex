@@ -19,7 +19,7 @@
 #define BAR_SIZE 5.0f
 #define LIMITER_H 15//10
 
-class ZEffectSpectrum : public ZEffectBase
+class EffectSpectrum : public EffectBase
 {
 public:
 	FLOAT32 m_fBrAng;
@@ -38,7 +38,7 @@ public:
 	* Constructor:
 	---------------------------------------------*/
 
-	ZEffectSpectrum( )
+	EffectSpectrum( )
 	{
 		m_fAng = 0.0f;
 		m_fr = true;
@@ -278,4 +278,4 @@ public:
 	}
 };
 
-EXPORT_EFFECT(Spectrum, ZEffectSpectrum)
+EXPORT_EFFECT(Spectrum, EffectSpectrum)

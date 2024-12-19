@@ -27,7 +27,7 @@ const float RANDCH_R2 = 100.0f;
 
 //static double dPos = 0.9; // start position in the first bezier
 
-class ZEffectTunnel : public ZEffectBase
+class EffectTunnel : public EffectBase
 {
 public:
 	float fPos;
@@ -56,7 +56,7 @@ public:
 	}
 
 	
-	ZEffectTunnel()
+	EffectTunnel()
 	{
 		fPos = 0.9f;
 		fPrevAng = 0;
@@ -277,4 +277,4 @@ public:
 	}
 };
 
-EXPORT_EFFECT( Tunnel, ZEffectTunnel )
+EXPORT_EFFECT( Tunnel, EffectTunnel )

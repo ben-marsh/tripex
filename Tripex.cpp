@@ -171,7 +171,7 @@ Error* Tripex::Startup()
 
 	pBlankTexture = NULL;
 
-	pvpEffect = new std::vector< ZEffectPtr* >;
+	pvpEffect = new std::vector< EffectHandler* >;
 	pvpEffect->push_back((*pvpEffectList)[0]);
 
 	vpTexture.clear();
@@ -280,7 +280,7 @@ Error* Tripex::Render()
 	fEffectFrames += fFrames;
 	fFadePos += dwTimeChange; 
 
-	ZEffectPtr *ppDrawEffect[2];
+	EffectHandler *ppDrawEffect[2];
 	if(txs.test(TXS_EFFECT_LEFT) || txs.test(TXS_EFFECT_RIGHT))//bEffectLeft || bEffectRight))
 	{
 		int nNewEffect = nEffect;
@@ -595,9 +595,9 @@ extern ZEffectPtr *pEffectLightSphere;
 extern ZEffectPtr *pEffectLightRing;
 extern ZEffectPtr *pEffectSuperSampling;
 */
-void Tripex::AddEffect(ZEffectPtr* (*fn)(), const char* sName, int nDrawOrder, float fStartupWeight, int nTex, ...)
+void Tripex::AddEffect(EffectHandler* (*fn)(), const char* sName, int nDrawOrder, float fStartupWeight, int nTex, ...)
 {
-	ZEffectPtr* pEffect = fn();
+	EffectHandler* pEffect = fn();
 	pEffect->sName = sName;
 	pEffect->nDrawOrder = nDrawOrder;
 	pEffect->fStartupWeight = fStartupWeight;
@@ -628,7 +628,7 @@ void Tripex::AddEffect(ZEffectPtr* (*fn)(), const char* sName, int nDrawOrder, f
 void Tripex::CreateEffectList()
 {
 	_ASSERT(pvpEffectList == NULL);
-	pvpEffectList = new std::vector< ZEffectPtr* >;
+	pvpEffectList = new std::vector< EffectHandler* >;
 
 	AddEffect(&CreateEffect_Blank, "Blank", ZORDER_BLANK, 1.0f, 0);
 	AddEffect(&CreateEffect_Tunnel, "Tunnel", ZORDER_TUNNEL, 1.0f, TC_WTTUNNEL, 0);

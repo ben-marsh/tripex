@@ -12,7 +12,7 @@
 
 extern Texture *pBlankTexture;
 
-class ZEffectLightTentacles : public ZEffectBase
+class EffectLightTentacles : public EffectBase
 {
 public:
 	Actor obj;
@@ -23,7 +23,7 @@ public:
 	double brt;
 	Texture *ptTint;
 
-	ZEffectLightTentacles() : b(4)
+	EffectLightTentacles() : b(4)
 	{
 		Actor sphere;
 		sphere.CreateGeosphere(1.0, NMPOINTS);
@@ -120,4 +120,4 @@ public:
 	}
 };
 
-EXPORT_EFFECT(LightTentacles, ZEffectLightTentacles)
+EXPORT_EFFECT(LightTentacles, EffectLightTentacles)

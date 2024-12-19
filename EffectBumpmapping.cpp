@@ -82,7 +82,7 @@ void MakeTentacles(Actor &obj, int segs, float l, float r)
 	obj.FindVertexNormals();
 }
 
-class ZEffectBumpmapping : public ZEffectBase
+class EffectBumpmapping : public EffectBase
 {
 public:
 	class BumpmapData
@@ -132,7 +132,7 @@ public:
 	float fMoveSpeed;
 	float accum;
 
-	ZEffectBumpmapping() : grid(GRIDW, GRIDH), gridbm(GRIDW, GRIDH), pc( 1, 1 )
+	EffectBumpmapping() : grid(GRIDW, GRIDH), gridbm(GRIDW, GRIDH), pc( 1, 1 )
 	{
 		fTentacleAng = 0.0f;
 		fTentacleDir = 1.0f;
@@ -544,4 +544,4 @@ public:
 	}
 };
 
-EXPORT_EFFECT( Bumpmapping, ZEffectBumpmapping )
+EXPORT_EFFECT( Bumpmapping, EffectBumpmapping )

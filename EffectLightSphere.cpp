@@ -15,7 +15,7 @@ extern bool bMeshHQ;
 extern Texture *pBlankTexture;
 //extern EFFECT lightsphere;
 
-class ZEffectLightSphere : public ZEffectBase
+class EffectLightSphere : public EffectBase
 {
 public:
 	Actor obj;
@@ -42,7 +42,7 @@ public:
 	double dBrBack;
 	Texture *pTint;
 
-	ZEffectLightSphere() : b(4)
+	EffectLightSphere() : b(4)
 	{
 		accum = 1.1;
 		r = p = y = 0;
@@ -165,5 +165,5 @@ public:
 		return (dElapsed > 0.2);
 	}
 };
-EXPORT_EFFECT( LightSphere, ZEffectLightSphere )
+EXPORT_EFFECT( LightSphere, EffectLightSphere )
 

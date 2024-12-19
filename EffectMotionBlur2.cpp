@@ -17,7 +17,7 @@ static const int nVertices = PIPE_LENGTH * PIPE_CIRCUMPOINTS;
 #define UPDATETIME 60
 #define ANG (5.0 * 3.14159 / 180.0)
 
-class ZEffectMotionBlur2 : public ZEffectBase
+class EffectMotionBlur2 : public EffectBase
 {
 public:
 	Actor pObj[PIPES];
@@ -28,7 +28,7 @@ public:
 	float pf[2][3], pfa[3];
 	float fChange;
 
-	ZEffectMotionBlur2() : b(Vector3(-100, -100, -20), Vector3(100, 100, 100))
+	EffectMotionBlur2() : b(Vector3(-100, -100, -20), Vector3(100, 100, 100))
 	{
 		for(int i = 0; i < 3; i++) pf[1][i] = 0.0f;
 
@@ -137,4 +137,4 @@ public:
 	}
 };
 
-EXPORT_EFFECT(MotionBlur2, ZEffectMotionBlur2)
+EXPORT_EFFECT(MotionBlur2, EffectMotionBlur2)

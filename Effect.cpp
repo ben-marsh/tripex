@@ -1,27 +1,26 @@
 #include "StdAfx.h"
-#include "effect.h"
 #include "ZDirect3D.h"
-#include "ZEffect.h"
+#include "Effect.h"
 
 /******** ZEffectBase ************************************/
-ZEffectBase::ZEffectBase()
+EffectBase::EffectBase()
 {
 	pEffectPtr = nullptr;
 }
-ZEffectBase::~ZEffectBase()
+EffectBase::~EffectBase()
 {
 }
-Error* ZEffectBase::Reconfigure(AudioData*)
+Error* EffectBase::Reconfigure(AudioData*)
 {
 	return nullptr;
 }
-bool ZEffectBase::CanRender(FLOAT32 fElapsed)
+bool EffectBase::CanRender(FLOAT32 fElapsed)
 {
 	return true;
 }
 
 /******** ZEffectPtr **************************************/
-ZEffectPtr::ZEffectPtr()
+EffectHandler::EffectHandler()
 {
 	bValid = false;
 	fBr = 0.0f;
@@ -34,14 +33,14 @@ ZEffectPtr::ZEffectPtr()
 
 	memset(pfSetting, 0, sizeof(pfSetting));
 }
-ZEffectPtr::~ZEffectPtr()
+EffectHandler::~EffectHandler()
 {
 }
-void ZEffectPtr::Destroy()
+void EffectHandler::Destroy()
 {
 	pEffect.reset();
 }
-Error* ZEffectPtr::Calculate(float fElapsed, AudioData* pAudio)
+Error* EffectHandler::Calculate(float fElapsed, AudioData* pAudio)
 {
 	_ASSERT(pEffect != NULL);
 
@@ -50,28 +49,28 @@ Error* ZEffectPtr::Calculate(float fElapsed, AudioData* pAudio)
 	pAudio->SetIntensityBeatScale( 0.0f );
 	return error;
 }
-Error* ZEffectPtr::Reconfigure(AudioData* pAudio)
+Error* EffectHandler::Reconfigure(AudioData* pAudio)
 {
 	_ASSERT(pEffect != NULL);
 	return pEffect->Reconfigure(pAudio);
 }
-Error* ZEffectPtr::Render()
+Error* EffectHandler::Render()
 {
 	_ASSERT(pEffect != NULL);
 	return pEffect->Render();
 }
-bool ZEffectPtr::CanRender(float fFrames)
+bool EffectHandler::CanRender(float fFrames)
 {
 	_ASSERT(pEffect != NULL);
 
 	if(fFrames > 3.8) return true;
 	else return pEffect->CanRender(GetElapsed(fFrames));
 }
-float ZEffectPtr::GetElapsed(float fFrames)
+float EffectHandler::GetElapsed(float fFrames)
 {
 	return fFrames * ((1.8f * fSpeed) + 0.1f);
 }
-std::string ZEffectPtr::GetCfgItemName() const
+std::string EffectHandler::GetCfgItemName() const
 {
 	std::string sCfgName = "Effects\\";
 	for(int i = 0; sName[i] != 0; i++)

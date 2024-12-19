@@ -12,7 +12,7 @@
 #define NSPIKES 8//15
 #define NCENTRES 5
 
-template < bool bLight > class ZEffectDistortion2T : public ZEffectBase
+template < bool bLight > class EffectDistortion2T : public EffectBase
 {
 public:
 	BezierCurve pb[NCENTRES];
@@ -32,7 +32,7 @@ public:
 	double br;
 	Texture *tx;
 
-	ZEffectDistortion2T() : grid(GRW, GRH)
+	EffectDistortion2T() : grid(GRW, GRH)
 	{
 		xp = yp = 0;
 		t = 0;
@@ -162,8 +162,8 @@ public:
 	}
 };
 
-EXPORT_EFFECT( Distortion2, ZEffectDistortion2T< false > )
-EXPORT_EFFECT( Distortion2Col, ZEffectDistortion2T< true > )
+EXPORT_EFFECT( Distortion2, EffectDistortion2T< false > )
+EXPORT_EFFECT( Distortion2Col, EffectDistortion2T< true > )
 
 //	typedef ZEffectDistortion2T<true> ZEffectDistortion2Col;
 //	DECLARE_EFFECT_PTR(ZEffectDistortion2Col, pEffectDistortion2Col)

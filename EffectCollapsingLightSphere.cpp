@@ -23,7 +23,7 @@
 
 extern Texture *pBlankTexture;
 
-class ZEffectCollapsingLightSphere : public ZEffectBase
+class EffectCollapsingLightSphere : public EffectBase
 {
 public:
 	double pdAng[SOURCES];
@@ -44,7 +44,7 @@ public:
 	int nStage;
 	double brt;
 
-	ZEffectCollapsingLightSphere()
+	EffectCollapsingLightSphere()
 	{
 		dWaitTime = 0;
 		dTilt = 0;
@@ -142,5 +142,5 @@ public:
 		return nullptr;
 	}
 };
-EXPORT_EFFECT( CollapsingLightSphere, ZEffectCollapsingLightSphere )
+EXPORT_EFFECT( CollapsingLightSphere, EffectCollapsingLightSphere )
 

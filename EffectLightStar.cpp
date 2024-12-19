@@ -8,7 +8,7 @@
 
 extern Texture *pBlankTexture;
 
-class ZEffectLightStar : public ZEffectBase
+class EffectLightStar : public EffectBase
 {
 public:
 	Actor obj;
@@ -23,7 +23,7 @@ public:
 	double dViewAng;
 	int nSpikes;
 
-	ZEffectLightStar()
+	EffectLightStar()
 	{
 		dRadAng = 2 * 3.14159 * 2.0;
 		dViewAng = 0;
@@ -111,4 +111,4 @@ public:
 		return nullptr;
 	}
 };
-EXPORT_EFFECT( LightStar, ZEffectLightStar )
+EXPORT_EFFECT( LightStar, EffectLightStar )

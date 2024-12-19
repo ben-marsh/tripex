@@ -1,5 +1,5 @@
 #include "StdAfx.h"
-#include "ZEffect.h"
+#include "Effect.h"
 #include "error.h"
 #include "Actor.h"
 #include "BezierCurve.h"
@@ -18,7 +18,7 @@
 #define OUTER (INNER + 30)
 #define ANGSZ (20.0f * g_fDegToRad)
 
-class ZEffectSun : public ZEffectBase
+class EffectSun : public EffectBase
 {
 public:
 	Actor pObj[RINGS];
@@ -29,7 +29,7 @@ public:
 	float fBezPos;
 	float fBezPos2;
 
-	ZEffectSun() : 
+	EffectSun() : 
 		bez(Vector3(4 * 20, 4 * 20, 70), Vector3(4 * -20,4 * -20,-60)), 
 		bez2(Vector3(10, 10, 10), Vector3(-10,-10,-20))
 	{
@@ -193,4 +193,4 @@ public:
 	//	return scene->render(d3d);
 	}
 };
-EXPORT_EFFECT(Sun, ZEffectSun)
+EXPORT_EFFECT(Sun, EffectSun)

@@ -11,7 +11,7 @@
     <ClCompile Include="xbmc.cpp" />
     <ClCompile Include="AudioData.cpp" />
     <ClCompile Include="ZDirect3d.cpp" />
-    <ClCompile Include="ZEffect.cpp" />
+    <ClCompile Include="Effect.cpp" />
     <ClCompile Include="AudioFft.cpp" />
     <ClCompile Include="TexturedGrid.cpp" />
     <ClCompile Include="ConfigItem.cpp" />
@@ -71,7 +71,6 @@
     <ClInclude Include="ZArray.h" />
     <ClInclude Include="AudioData.h" />
     <ClInclude Include="ZDirect3d.h" />
-    <ClInclude Include="ZEffect.h" />
     <ClInclude Include="AudioFft.h" />
     <ClInclude Include="TexturedGrid.h" />
     <ClInclude Include="Platform.h" />

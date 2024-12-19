@@ -229,7 +229,7 @@
     <ClCompile Include="BezierCurve.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="ZDirect3d.cpp" />
-    <ClCompile Include="ZEffect.cpp" />
+    <ClCompile Include="Effect.cpp" />
     <ClCompile Include="AudioFft.cpp" />
     <ClCompile Include="TexturedGrid.cpp" />
     <ClCompile Include="Matrix44.cpp" />
@@ -266,7 +266,6 @@
     <ClInclude Include="ColorHsv.h" />
     <ClInclude Include="ZDirect3d.h" />
     <ClInclude Include="Edge.h" />
-    <ClInclude Include="ZEffect.h" />
     <ClInclude Include="Face.h" />
     <ClInclude Include="AudioFft.h" />
     <ClInclude Include="TexturedGrid.h" />

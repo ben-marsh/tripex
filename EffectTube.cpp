@@ -15,7 +15,7 @@
 #define CLENGTH 100
 #define CDIFF (PTLENGTH * PTDIST / CLENGTH)
 
-class ZEffectTube : public ZEffectBase
+class EffectTube : public EffectBase
 {
 public:
 	float height[PTLENGTH][PTCIRCUM];
@@ -25,7 +25,7 @@ public:
 	Actor obj, coil;
 	Camera cCamera;
 
-	ZEffectTube()
+	EffectTube()
 	{
 		int i, j;
 		coil.pVertex.SetLength(CLENGTH * 4);
@@ -244,4 +244,4 @@ public:
 	}
 };
 
-EXPORT_EFFECT(Tube, ZEffectTube)
+EXPORT_EFFECT(Tube, EffectTube)

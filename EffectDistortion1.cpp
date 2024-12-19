@@ -9,7 +9,7 @@
 #define GRH 50
 #define SPIKES 15
 
-class ZEffectDistortion1 : public ZEffectBase
+class EffectDistortion1 : public EffectBase
 {
 public:
 	bool fSetTexture;
@@ -23,7 +23,7 @@ public:
 	double average;
 	Texture *tx;
 
-	ZEffectDistortion1() : grid(GRW, GRH)
+	EffectDistortion1() : grid(GRW, GRH)
 	{
 		xp = yp = 0;
 		t = 0;
@@ -96,4 +96,4 @@ public:
 	}
 };
 
-EXPORT_EFFECT( Distortion1, ZEffectDistortion1 )
+EXPORT_EFFECT( Distortion1, EffectDistortion1 )

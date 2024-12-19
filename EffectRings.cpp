@@ -10,7 +10,7 @@
 
 extern bool bMeshHQ;
 
-class ZEffectRings : public ZEffectBase
+class EffectRings : public EffectBase
 {
 public:
 	bool fSetTexture;
@@ -30,7 +30,7 @@ public:
 	double accum;
 	double pos;
 
-	ZEffectRings()
+	EffectRings()
 	{
 		fFirstCalc = true;
 		accum = 1.5;
@@ -136,4 +136,4 @@ public:
 	}
 };
 
-EXPORT_EFFECT(Rings, ZEffectRings)
+EXPORT_EFFECT(Rings, EffectRings)

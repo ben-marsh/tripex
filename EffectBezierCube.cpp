@@ -26,7 +26,7 @@
 
 extern Texture *pBlankTexture;
 
-class ZEffectBezierCube : public ZEffectBase
+class EffectBezierCube : public EffectBase
 {
 public:
 	int nCornerIndex[BEZIERS];
@@ -47,7 +47,7 @@ public:
 	double dAng, dAngX, dAngY, dAngZ;
 	double dMult;
 
-	ZEffectBezierCube() : bcEdge(TWISTPLANES)
+	EffectBezierCube() : bcEdge(TWISTPLANES)
 	{
 		brt = 0.0;
 		pTexture = nullptr;
@@ -269,4 +269,4 @@ public:
 	}
 };
 
-EXPORT_EFFECT( BezierCube, ZEffectBezierCube )
+EXPORT_EFFECT( BezierCube, EffectBezierCube )

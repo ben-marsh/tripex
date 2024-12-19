@@ -10,7 +10,7 @@
 
 #define AVERAGES 10
 
-class ZEffectPhased : public ZEffectBase
+class EffectPhased : public EffectBase
 {
 public:
 	Actor obj;
@@ -21,7 +21,7 @@ public:
 	int lastbeat;
 	double a;
 
-	ZEffectPhased()
+	EffectPhased()
 	{
 		a = 0;
 		lastbeat = 0;
@@ -95,4 +95,4 @@ public:
 	}
 };
 
-EXPORT_EFFECT(Phased, ZEffectPhased)
+EXPORT_EFFECT(Phased, EffectPhased)

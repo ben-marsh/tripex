@@ -18,7 +18,7 @@
 
 extern Texture *pBlankTexture;
 
-class ZEffectSuperSampling : public ZEffectBase
+class EffectSuperSampling : public EffectBase
 {
 public:
 	// 256x256
@@ -55,7 +55,7 @@ public:
 	float fTotalElapsed;
 	double brt;
 
-	ZEffectSuperSampling() : //: camera(0),
+	EffectSuperSampling() : //: camera(0),
 		b(Vector3(-100, -100, 120), Vector3(100, 100, 140)),
 		b2(Vector3(-20, -20, -20), Vector3(20, 20, 20))
 	{
@@ -358,4 +358,4 @@ public:
 	}
 };
 
-EXPORT_EFFECT( SuperSampling, ZEffectSuperSampling )
+EXPORT_EFFECT( SuperSampling, EffectSuperSampling )

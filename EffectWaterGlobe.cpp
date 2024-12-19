@@ -17,7 +17,7 @@
 
 #define DAMPCHANGE 0.001
 
-class ZEffectWaterGlobe : public ZEffectBase
+class EffectWaterGlobe : public EffectBase
 {
 	class ZGeoEdge : public Edge
 	{
@@ -140,7 +140,7 @@ public:
 	bool bSetTexture;
 	Camera camera;
 
-	ZEffectWaterGlobe()
+	EffectWaterGlobe()
 	{
 		nPos = 0;
 
@@ -221,4 +221,4 @@ public:
 	}
 };
 
-EXPORT_EFFECT(WaterGlobe, ZEffectWaterGlobe)
+EXPORT_EFFECT(WaterGlobe, EffectWaterGlobe)

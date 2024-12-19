@@ -1,8 +1,8 @@
 #include "StdAfx.h"
-#include "ZEffect.h"
+#include "Effect.h"
 #include <d3d9.h>
 
-class ZEffectBlank : public ZEffectBase
+class EffectBlank : public EffectBase
 {
 public:
 	Error* Calculate( FLOAT32, FLOAT32, AudioData* )
@@ -15,4 +15,4 @@ public:
 	}
 };
 
-EXPORT_EFFECT( Blank, ZEffectBlank )
+EXPORT_EFFECT( Blank, EffectBlank )

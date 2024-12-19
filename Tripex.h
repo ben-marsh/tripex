@@ -24,8 +24,8 @@ public:
 	DWORD dwLastTime;
 	std::unique_ptr<AudioData> pAudio;
 
-	std::vector< ZEffectPtr* >* pvpEffect;
-	std::vector< ZEffectPtr* >* pvpEffectList;
+	std::vector< EffectHandler* >* pvpEffect;
+	std::vector< EffectHandler* >* pvpEffectList;
 
 	Tripex();
 	void ShowStatusMsg( const char *sFormat, ... );
@@ -35,7 +35,7 @@ public:
 	void Shutdown( );
 
 private:
-	ZEffectPtr* pEffectBlank;
+	EffectHandler* pEffectBlank;
 
 	std::vector< ConfigItem* >* pppCfgItem = NULL;
 
@@ -53,7 +53,7 @@ private:
 	// TODO: make sure these CfgItems are free'd
 	std::map< std::string, std::vector< ConfigItem* >, CI_STR_CMP >* pmpCfgItem = NULL;
 
-	void AddEffect(ZEffectPtr* (*fn)(), const char* sName, int nDrawOrder, float fStartupWeight, int nTex, ...);
+	void AddEffect(EffectHandler* (*fn)(), const char* sName, int nDrawOrder, float fStartupWeight, int nTex, ...);
 	void CreateEffectList();
 
 	ConfigItem* AddCfgItem(ConfigItem* pItem);

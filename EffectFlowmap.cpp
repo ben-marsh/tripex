@@ -75,7 +75,7 @@ public:
 	}
 };
 */
-class ZEffectFlowmap : public ZEffectBase
+class EffectFlowmap : public EffectBase
 {
 public:
 	typedef struct
@@ -147,7 +147,7 @@ public:
 
 	double ang;
 
-	ZEffectFlowmap()
+	EffectFlowmap()
 	{
 		dwTimeTotal = 0;
 		nSamples = 0;
@@ -867,4 +867,4 @@ public:
 		return (dElapsed >= fStep);//(dElapsed >= 1.0);//(dElapsed >= 0.8);//1);
 	}
 };
-EXPORT_EFFECT( Flowmap, ZEffectFlowmap )
+EXPORT_EFFECT( Flowmap, EffectFlowmap )

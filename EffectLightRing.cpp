@@ -20,7 +20,7 @@ extern Texture *pBlankTexture;
 //static unsigned int buffersize = 0;
 //static D3DTLVERTEX *vb = NULL;
 
-class ZEffectLightRing : public ZEffectBase
+class EffectLightRing : public EffectBase
 {
 public:
 	BezierCurve b;
@@ -43,7 +43,7 @@ public:
 	Texture *tx;
 	double br;
 
-	ZEffectLightRing()
+	EffectLightRing()
 	{
 		fSetTexture = true;
 		fNotRendered = true;
@@ -136,4 +136,4 @@ public:
 		return (dElapsed > 0.1);//1.0);
 	}
 };
-EXPORT_EFFECT( LightRing, ZEffectLightRing )
+EXPORT_EFFECT( LightRing, EffectLightRing )

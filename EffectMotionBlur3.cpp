@@ -11,7 +11,7 @@
 //static int nEffect, nNewEffect = -1;
 
 
-template < bool bAltBlur > class ZEffectMotionBlur3T : public ZEffectBase
+template < bool bAltBlur > class EffectMotionBlur3T : public EffectBase
 {
 public:
 	Camera camera;
@@ -34,7 +34,7 @@ public:
 	ContainedBezierCurve<2> bz;
 	Camera cam;
 
-	ZEffectMotionBlur3T() : bz(Vector3(20, 20, 20), -Vector3(20, 20, 20))//, cam(0)
+	EffectMotionBlur3T() : bz(Vector3(20, 20, 20), -Vector3(20, 20, 20))//, cam(0)
 	{
 		cam.m_bsFlag.set( Camera::F_SCREEN_TRANSFORM, false );
 
@@ -212,8 +212,8 @@ public:
 	}
 };
 
-EXPORT_EFFECT(MotionBlur3, ZEffectMotionBlur3T<false>)
-EXPORT_EFFECT(MotionBlur3Alt, ZEffectMotionBlur3T<true>)
+EXPORT_EFFECT(MotionBlur3, EffectMotionBlur3T<false>)
+EXPORT_EFFECT(MotionBlur3Alt, EffectMotionBlur3T<true>)
 
 //typedef ZEffectMotionBlur3T<false> ZEffectMotionBlur3;
 //DECLARE_EFFECT_PTR(ZEffectMotionBlur3, pEffectMotionBlur3)

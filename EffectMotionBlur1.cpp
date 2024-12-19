@@ -8,7 +8,7 @@
 
 #define NFR 50
 
-class ZEffectMotionBlur1 : public ZEffectBase
+class EffectMotionBlur1 : public EffectBase
 {
 public:
 	bool fSetTexture;
@@ -20,7 +20,7 @@ public:
 	bool fFirstCalc;
 	double accum;
 
-	ZEffectMotionBlur1()
+	EffectMotionBlur1()
 	{
 		accum = 1.5;
 		fFirstCalc = false;
@@ -86,4 +86,4 @@ public:
 	}
 };
 
-EXPORT_EFFECT(MotionBlur1, ZEffectMotionBlur1)
+EXPORT_EFFECT(MotionBlur1, EffectMotionBlur1)
