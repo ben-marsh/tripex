@@ -1,11 +1,11 @@
 #include "StdAfx.h"
 #include "general.h"
 #include "error.h"
-#include "ZColour.h"
-#include "ZTextureFont.h"
+#include "ColorRgb.h"
+#include "TextureFont.h"
 #include <string>
 
-int GetClippedLineLength(ZTextureFont *pFont, const char *sText, int nClipWidth)
+int GetClippedLineLength(TextureFont *pFont, const char *sText, int nClipWidth)
 {
 	bool bFirstWord = true;
 	int nLastEnd = 0;
@@ -32,7 +32,7 @@ int GetClippedLineLength(ZTextureFont *pFont, const char *sText, int nClipWidth)
 	}
 }
 
-void DrawMessage(ZSpriteBuffer &sb, ZTextureFont *pFont, int y, const char *sText, float fBr, float fBackBr)
+void DrawMessage(SpriteBuffer &sb, TextureFont *pFont, int y, const char *sText, float fBr, float fBackBr)
 {
 //	static ZArray<ZVertexTL> pVertex;
 //	static ZArray<ZFace> face;
@@ -69,6 +69,6 @@ void DrawMessage(ZSpriteBuffer &sb, ZTextureFont *pFont, int y, const char *sTex
 	for(int i = 0; i < (int)vsLine.size(); i++)
 	{
 		int nLineWidth = pFont->GetWidth(vsLine[i].c_str());
-		pFont->Draw(&sb, vsLine[i].c_str(), ZPoint<int>(nCentreX - (nLineWidth / 2), y + 5 + (i * nLineHeight)), ZColour::Grey((int)(fBr * 255.0f)));
+		pFont->Draw(&sb, vsLine[i].c_str(), ZPoint<int>(nCentreX - (nLineWidth / 2), y + 5 + (i * nLineHeight)), ColorRgb::Grey((int)(fBr * 255.0f)));
 	}
 }

@@ -31,7 +31,7 @@ static const FLOAT32 g_fRadToDeg = 57.295779513082320876798154814105f;//180.0f /
 
 #define timeGetTime() ((DWORD)GetTickCount64())
 
-#include "ZColour.h"
-#include "ZPoint.h"
-#include "ZRect.h"
+#include "ColorRgb.h"
+#include "Point.h"
+#include "Rect.h"
 #include <vector>

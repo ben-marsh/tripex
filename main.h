@@ -1,9 +1,9 @@
 #pragma once
 
 #include "ZArray.h"
-#include "ZSpriteBuffer.h"
+#include "SpriteBuffer.h"
 #include "EFFECT.h"
-#include "ZAudio.h"
+#include "AudioData.h"
 
 enum
 {
@@ -25,7 +25,7 @@ enum
 
 //extern int active;
 //extern ZArray<EFFECT*> ppEffect;
-extern class ZTextureFont tef;
+extern class TextureFont tef;
 
 // main-misc.cpp
 //void ShowStatusMsg(const char *sFormat, ...);

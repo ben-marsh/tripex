@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 #include "effect.h"
-#include "ZTripex.h"
+#include "Tripex.h"
 #include "xbmc.h"
 
 //IDirect3DDevice9 *g_pd3dDevice;
@@ -9,7 +9,7 @@
 
 BOOL g_bInit = FALSE;
 
-ZTripex *g_pTripex;
+Tripex *g_pTripex;
 
 //void _cdecl Create( IDirect3DDevice8 *pd3dDevice )
 void _cdecl Create( LPDIRECT3DDEVICE9 pd3dDevice, int iWidth, int iHeight, const char* szVisualisationName)
@@ -21,9 +21,9 @@ void _cdecl Create( LPDIRECT3DDEVICE9 pd3dDevice, int iWidth, int iHeight, const
 //void _cdecl Start( int iChannels, int iSamplesPerSec, int iBitsPerSample )
 void _cdecl Start( int iChannels, int iSamplesPerSec, int iBitsPerSample, const char* szSongName)
 {
-	g_pTripex = new ZTripex();
+	g_pTripex = new Tripex();
 
-	ZError* error = g_pTripex->Startup( );
+	Error* error = g_pTripex->Startup( );
 	if( error ) 
 	{
 		g_pTripex->Shutdown( );
@@ -58,7 +58,7 @@ void _cdecl Render( )
 {
 	if( g_bInit )
 	{
-		ZError* hRes = g_pTripex->Render( );
+		Error* hRes = g_pTripex->Render( );
 		if( hRes )
 		{
 			g_pTripex->Shutdown( );

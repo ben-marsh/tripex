@@ -1,7 +1,7 @@
 #include "StdAfx.h"
 #include "ZDirect3d.h"
 #include <d3dx9.h>
-#include "ZTexture.h"
+#include "Texture.h"
 #include "error.h"
 
 /*
@@ -23,8 +23,8 @@ ZDirect3D* g_pD3D = NULL;
 
 ZDirect3D::TextureStage::TextureStage()
 {
-	pTexture = (ZTexture*)-1;
-	pNewTexture = (ZTexture*)-1;
+	pTexture = (Texture*)-1;
+	pNewTexture = (Texture*)-1;
 }
 
 ZDirect3D::ZDirect3D()
@@ -32,9 +32,9 @@ ZDirect3D::ZDirect3D()
 	g_pDevice = NULL;
 }
 
-ZError* ZDirect3D::Close()
+Error* ZDirect3D::Close()
 {
-	for (std::set< ZTexture* >::iterator it = g_spTexture.begin(); it != g_spTexture.end(); it++)
+	for (std::set< Texture* >::iterator it = g_spTexture.begin(); it != g_spTexture.end(); it++)
 	{
 		DestroyTexture(*it);
 	}
@@ -51,7 +51,7 @@ int ZDirect3D::GetHeight()
 {
 	return nHeight;
 }
-ZError* ZDirect3D::Open()
+Error* ZDirect3D::Open()
 {
 	_ASSERT(g_pDevice == NULL);
 
@@ -72,18 +72,18 @@ ZError* ZDirect3D::Open()
 	hRes = g_pDevice->GetDeviceCaps(&g_Caps);
 	if (FAILED(hRes)) return TraceError(hRes);
 
-	for (std::set< ZTexture* >::iterator it = g_spTexture.begin(); it != g_spTexture.end(); it++)
+	for (std::set< Texture* >::iterator it = g_spTexture.begin(); it != g_spTexture.end(); it++)
 	{
-		ZError* error = CreateTexture(*it);
+		Error* error = CreateTexture(*it);
 		if (error) return TraceError(error);
 	}
 	return nullptr;
 }
-ZTexture* ZDirect3D::Find(int nType)
+Texture* ZDirect3D::Find(int nType)
 {
 	int mt = 0;
 
-	std::set< ZTexture* >::iterator it;
+	std::set< Texture* >::iterator it;
 	for (it = g_spTexture.begin(); it != g_spTexture.end(); it++)
 	{
 		if ((*it)->m_snType.count(nType) > 0) mt++;
@@ -102,9 +102,9 @@ ZTexture* ZDirect3D::Find(int nType)
 	}
 	return NULL;
 }
-ZError* ZDirect3D::DrawIndexedPrimitive(ZArray<ZVertexTL>& pVertex, ZArray<ZFace>& pFace)
+Error* ZDirect3D::DrawIndexedPrimitive(ZArray<ZVertexTL>& pVertex, ZArray<Face>& pFace)
 {
-	ZError* error;
+	Error* error;
 
 	error = FlushRenderState();
 	if (error) return TraceError(error);
@@ -209,7 +209,7 @@ void ZDirect3D::GetStateChanges(NewStateBuffer& mp_new, StateBuffer& mp_current,
 		}
 	}
 }
-ZError* ZDirect3D::FlushRenderState()
+Error* ZDirect3D::FlushRenderState()
 {
 	HRESULT hRes;
 	std::vector<StateBufferChange> vc;
@@ -234,12 +234,12 @@ ZError* ZDirect3D::FlushRenderState()
 	return nullptr;
 }
 
-ZError* ZDirect3D::FlushTextureState()
+Error* ZDirect3D::FlushTextureState()
 {
 	HRESULT hRes;
 	for (DWORD dwStage = 0; dwStage < 8; dwStage++)
 	{
-		if (pTextureStage[dwStage].pTexture != pTextureStage[dwStage].pNewTexture && pTextureStage[dwStage].pNewTexture != (ZTexture*)-1)
+		if (pTextureStage[dwStage].pTexture != pTextureStage[dwStage].pNewTexture && pTextureStage[dwStage].pNewTexture != (Texture*)-1)
 		{
 			IDirect3DTexture9* pTex = NULL;
 			if (pTextureStage[dwStage].pNewTexture != NULL)
@@ -252,10 +252,10 @@ ZError* ZDirect3D::FlushTextureState()
 
 			pTextureStage[dwStage].pTexture = pTextureStage[dwStage].pNewTexture;
 
-			ZTexture* pTexture = pTextureStage[dwStage].pTexture;
+			Texture* pTexture = pTextureStage[dwStage].pTexture;
 			if (pTexture != NULL)
 			{
-				if (pTexture->m_nFlags & ZTexture::F_MIP_CHAIN)
+				if (pTexture->m_nFlags & Texture::F_MIP_CHAIN)
 				{
 					if (g_Caps.TextureFilterCaps & D3DPTFILTERCAPS_MIPFPOINT)
 					{
@@ -271,7 +271,7 @@ ZError* ZDirect3D::FlushTextureState()
 					g_pDevice->SetSamplerState(dwStage, D3DSAMP_MIPFILTER, D3DTEXF_NONE);
 				}
 
-				if (pTexture->m_nFlags & ZTexture::F_FILTERING)
+				if (pTexture->m_nFlags & Texture::F_FILTERING)
 				{
 					if (g_Caps.TextureFilterCaps & D3DPTFILTERCAPS_MINFLINEAR)
 					{
@@ -317,7 +317,7 @@ ZError* ZDirect3D::FlushTextureState()
 	}
 	return nullptr;
 }
-void ZDirect3D::SetTexture(DWORD dwStage, ZTexture* pTexture, DWORD dwOp, DWORD dwArg2)
+void ZDirect3D::SetTexture(DWORD dwStage, Texture* pTexture, DWORD dwOp, DWORD dwArg2)
 {
 	ResetTextureStageState(dwStage);
 
@@ -335,18 +335,18 @@ void ZDirect3D::SetTexture(DWORD dwStage, ZTexture* pTexture, DWORD dwOp, DWORD 
 	SetTextureStageState(dwStage, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
 }
 
-ZError* ZDirect3D::AddTexture(ZTexture* pTexture)
+Error* ZDirect3D::AddTexture(Texture* pTexture)
 {
-	std::pair< std::set< ZTexture* >::iterator, bool > itb = g_spTexture.insert(pTexture);
+	std::pair< std::set< Texture* >::iterator, bool > itb = g_spTexture.insert(pTexture);
 	if (itb.second && g_pDevice != NULL)
 	{
-		ZError* error = CreateTexture(pTexture);
+		Error* error = CreateTexture(pTexture);
 		if (error) return TraceError(error);
 	}
 	return nullptr;
 }
 
-ZError* ZDirect3D::UploadTexture(ZTexture* pTexture)
+Error* ZDirect3D::UploadTexture(Texture* pTexture)
 {
 	if (pTexture->m_pSrcData == NULL) return nullptr;
 
@@ -393,7 +393,7 @@ ZError* ZDirect3D::UploadTexture(ZTexture* pTexture)
 	return nullptr;
 }
 
-ZError* ZDirect3D::CreateTexture(ZTexture* pTexture)
+Error* ZDirect3D::CreateTexture(Texture* pTexture)
 {
 	_ASSERT(g_pd3dDevice != NULL);
 	_ASSERT(pTexture->m_pd3dTexture == NULL);
@@ -405,7 +405,7 @@ ZError* ZDirect3D::CreateTexture(ZTexture* pTexture)
 	}
 	else
 	{
-		UINT32 nMipLevels = (pTexture->m_nFlags & ZTexture::F_MIP_CHAIN) ? 0 : 1;
+		UINT32 nMipLevels = (pTexture->m_nFlags & Texture::F_MIP_CHAIN) ? 0 : 1;
 		//			UINT32 nUsage = 0;//( pTexture->m_nFlags & ZTexture::F_DYNAMIC )? D3DUSAGE_DYNAMIC : 0;
 		//			D3DPOOL nPool = ( pTexture->m_nFlags & ZTexture::F_DYNAMIC )? D3DPOOL_DEFAULT : D3DPOOL_MANAGED;
 		//			D3DPOOL nPool = ( pTexture->m_nFlags & ZTexture::F_DYNAMIC )? D3DPOOL_SYSMEMORY : D3DPOOL_MANAGED;
@@ -479,7 +479,7 @@ ZError* ZDirect3D::CreateTexture(ZTexture* pTexture)
 
 	return nullptr;
 }
-void ZDirect3D::DestroyTexture(ZTexture* pTexture)
+void ZDirect3D::DestroyTexture(Texture* pTexture)
 {
 	//		assert(HasTexture(pTexture));
 
@@ -495,7 +495,7 @@ void ZDirect3D::SetTextureStageState(DWORD dwStage, D3DTEXTURESTAGESTATETYPE dwK
 }
 void ZDirect3D::ResetTextureStageState(DWORD dwStage)
 {
-	if (pTextureStage[dwStage].pNewTexture != (ZTexture*)-1)
+	if (pTextureStage[dwStage].pNewTexture != (Texture*)-1)
 	{
 		pTextureStage[dwStage].pNewTexture = NULL;
 	}
@@ -509,7 +509,7 @@ void ZDirect3D::ResetTextureStageState(DWORD dwStage)
 		}
 	}
 }
-void ZDirect3D::BuildSprite(ZArray<ZVertexTL>& pVertex, ZArray<ZFace>& pFace, const ZPoint<int>& p, const ZRect<int>& spr, ZColour cDiffuse, ZColour cSpecular)
+void ZDirect3D::BuildSprite(ZArray<ZVertexTL>& pVertex, ZArray<Face>& pFace, const ZPoint<int>& p, const ZRect<int>& spr, ColorRgb cDiffuse, ColorRgb cSpecular)
 {
 	pVertex.SetLength(4);
 
@@ -523,7 +523,7 @@ void ZDirect3D::BuildSprite(ZArray<ZVertexTL>& pVertex, ZArray<ZFace>& pFace, co
 	float fTexH = fH * fMult;
 	for (int i = 0; i < 4; i++)
 	{
-		pVertex[i].m_vPos = ZVector(p.x - 0.5f, p.y - 0.5f, 0.1f);
+		pVertex[i].m_vPos = Vector3(p.x - 0.5f, p.y - 0.5f, 0.1f);
 		pVertex[i].m_aTex[0] = p2;
 		if (i == 1 || i == 2)
 		{
@@ -541,13 +541,13 @@ void ZDirect3D::BuildSprite(ZArray<ZVertexTL>& pVertex, ZArray<ZFace>& pFace, co
 	}
 
 	pFace.SetLength(2);
-	pFace[0] = ZFace(0, 1, 3);
-	pFace[1] = ZFace(1, 2, 3);
+	pFace[0] = Face(0, 1, 3);
+	pFace[1] = Face(1, 2, 3);
 }
-ZError* ZDirect3D::DrawSprite(const ZPoint<int>& p, const ZRect<int>& spr, ZColour cDiffuse, ZColour cSpecular)
+Error* ZDirect3D::DrawSprite(const ZPoint<int>& p, const ZRect<int>& spr, ColorRgb cDiffuse, ColorRgb cSpecular)
 {
 	ZArray<ZVertexTL> pv;
-	ZArray<ZFace> pf;
+	ZArray<Face> pf;
 	BuildSprite(pv, pf, p, spr, cDiffuse, cSpecular);
 	return DrawIndexedPrimitive(pv, pf);
 }

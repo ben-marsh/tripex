@@ -1,13 +1,12 @@
 #include "StdAfx.h"
-#include "ZAudio.h"
+#include "AudioData.h"
 
 #include "stdafx.h"
 #include <mmeapi.h>
-#include "Vis.h"
-#include "ZTripex.h"
+#include "Tripex.h"
 #include "effect.h"
 
-extern ZTripex* g_pTripex;
+extern Tripex* g_pTripex;
 
 IDirect3D9* g_pd3d = NULL;
 IDirect3DDevice9* g_pd3dDevice = NULL;

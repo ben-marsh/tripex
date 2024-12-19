@@ -2,12 +2,12 @@
 
 #include <d3d9.h>
 #include "ZArray.h"
-#include "ZColour.h"
-#include "ZVector.h"
-#include "ZFace.h"
-#include "ZEdge.h"
-#include "ZPoint.h"
-#include "ZRect.h"
+#include "ColorRgb.h"
+#include "Vector3.h"
+#include "Face.h"
+#include "Edge.h"
+#include "Point.h"
+#include "Rect.h"
 #include <map>
 #include <set>
 #include "error.h"
@@ -17,23 +17,23 @@
 class ZVertex
 {
 public:
-	ZVector m_vPos;
-	ZVector m_vNormal;
-	ZColour m_cDiffuse;
-	ZColour m_cSpecular;
+	Vector3 m_vPos;
+	Vector3 m_vNormal;
+	ColorRgb m_cDiffuse;
+	ColorRgb m_cSpecular;
 	ZPoint< FLOAT32 > m_aTex[MAX_TEXTURES];
 };
 class ZVertexTL
 {
 public:
-	ZVector m_vPos;
+	Vector3 m_vPos;
 	FLOAT32 m_fRHW;
-	ZColour m_cDiffuse;
-	ZColour m_cSpecular;
+	ColorRgb m_cDiffuse;
+	ColorRgb m_cSpecular;
 	ZPoint< FLOAT32 > m_aTex[MAX_TEXTURES];
 };
 
-class ZTexture;
+class Texture;
 class ZPalette;
 
 class ZDirect3D
@@ -50,8 +50,8 @@ public:
 	protected:
 		StateBuffer mpState;
 		NewStateBuffer mpNewState;
-		ZTexture *pTexture;
-		ZTexture *pNewTexture;
+		Texture *pTexture;
+		Texture *pNewTexture;
 
 	public:
 		TextureStage();
@@ -76,22 +76,22 @@ public:
 	NewStateBuffer mpNewRender;
 	TextureStage pTextureStage[8];
 	std::set< std::pair< UINT16, UINT16 > > g_spnFreePalette;
-	std::set< ZTexture* > g_spTexture;
+	std::set< Texture* > g_spTexture;
 
 	ZDirect3D( );
 
-	ZError* Open( );
-	ZError* Close( );
-	ZError* DrawIndexedPrimitive(ZArray<ZVertexTL> &pVertex, ZArray<ZFace> &pfFace);
+	Error* Open( );
+	Error* Close( );
+	Error* DrawIndexedPrimitive(ZArray<ZVertexTL> &pVertex, ZArray<Face> &pfFace);
 
-	ZError* AddTexture( ZTexture *pTexture );
-	ZError* UploadTexture( ZTexture *pTexture );
+	Error* AddTexture( Texture *pTexture );
+	Error* UploadTexture( Texture *pTexture );
 	void GetStateChanges(NewStateBuffer &mp_new, StateBuffer &mp_current, std::vector< StateBufferChange > &vc);
 
-	ZError* CreateTexture(ZTexture *pTexture);
-	void DestroyTexture(ZTexture *pTexture);
+	Error* CreateTexture(Texture *pTexture);
+	void DestroyTexture(Texture *pTexture);
 
-	ZTexture *Find(int nType);
+	Texture *Find(int nType);
 
 	int GetWidth( );
 	int GetHeight( );
@@ -100,17 +100,17 @@ public:
 	void SetState(int nFlags);
 	void ResetRenderState();
 	void SetRenderState(DWORD dwKey, DWORD dwValue);
-	ZError* FlushRenderState();
+	Error* FlushRenderState();
 
 	// texture state
 	void ResetTextureState();
 	void ResetTextureStageState(DWORD dwStage);
-	void SetTexture(DWORD dwStage, ZTexture *pTexture, DWORD dwOp = D3DTOP_MODULATE, DWORD dwArg2 = D3DTA_CURRENT);
+	void SetTexture(DWORD dwStage, Texture *pTexture, DWORD dwOp = D3DTOP_MODULATE, DWORD dwArg2 = D3DTA_CURRENT);
 	void SetTextureStageState(DWORD dwStage, D3DTEXTURESTAGESTATETYPE dwKey, DWORD dwValue);
-	ZError* FlushTextureState();
+	Error* FlushTextureState();
 
-	static void BuildSprite(ZArray<ZVertexTL> &pVertex, ZArray<ZFace> &pFace, const ZPoint<int> &p, const ZRect<int> &spr, ZColour cDiffuse = ZColour::White(), ZColour cSpecular = ZColour::Black());
-	ZError* DrawSprite(const ZPoint<int> &p, const ZRect<int> &spr, ZColour cDiffuse = ZColour::White(), ZColour cSpecular = ZColour::Black());
+	static void BuildSprite(ZArray<ZVertexTL> &pVertex, ZArray<Face> &pFace, const ZPoint<int> &p, const ZRect<int> &spr, ColorRgb cDiffuse = ColorRgb::White(), ColorRgb cSpecular = ColorRgb::Black());
+	Error* DrawSprite(const ZPoint<int> &p, const ZRect<int> &spr, ColorRgb cDiffuse = ColorRgb::White(), ColorRgb cSpecular = ColorRgb::Black());
 };
 
 extern ZDirect3D *g_pD3D;

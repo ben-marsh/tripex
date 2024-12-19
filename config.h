@@ -8,9 +8,9 @@
 #define KEY_MAIN "Software\\-\\Tripex"
 #define KEY_TEXTURES "Software\\-\\Tripex\\Textures"
 
-class CTextureItem;
+class TextureSource;
 
-bool LoadTextureSettings(std::vector< CTextureItem* > &ppItem);
+bool LoadTextureSettings(std::vector< TextureSource* > &ppItem);
 
 // config-directx.cpp
 //extern string sDevice;
