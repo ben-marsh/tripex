@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "Platform.h"
 #include "Misc.h"
 #include <float.h>
 #include "Actor.h"
@@ -8,7 +8,7 @@ class ZGeoEdge : public Edge
 {
 public:
 	float fLength;
-	WORD pwFace[2];
+	UINT16 pwFace[2];
 
 	void FindLength(Actor *pObj){ fLength = (pObj->pVertex[(*this)[0]].m_vPos - pObj->pVertex[(*this)[1]].m_vPos).Length(); }
 };

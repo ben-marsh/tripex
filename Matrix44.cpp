@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "Platform.h"
 #include "Vector3.h"
 #include "Matrix44.h"
 

@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "Platform.h"
 #include "StarModel.h"
 
 float pfStarVertex[] =
@@ -133,7 +133,7 @@ float pfStarVertex[] =
 	-36.394753f, -15.075200f, 10.606603f
 };
 
-extern WORD pwStarFace[] =
+extern UINT16 pwStarFace[] =
 {
 	0, 1, 2,
 	2, 3, 0,
@@ -395,4 +395,4 @@ extern WORD pwStarFace[] =
 };
 
 extern const int nStarVertices = sizeof(pfStarVertex) / (sizeof(float) * 3);
-extern const int nStarFaces = sizeof(pwStarFace) / (sizeof(WORD) * 3);
+extern const int nStarFaces = sizeof(pwStarFace) / (sizeof(UINT16) * 3);

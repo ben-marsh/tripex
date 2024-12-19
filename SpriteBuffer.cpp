@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "Platform.h"
 #include "ZDirect3D.h"
 #include "ColorRgb.h"
 #include "SpriteBuffer.h"

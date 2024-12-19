@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "Platform.h"
 #include "Actor.h"
 #include "error.h"
 #include "effect.h"
@@ -31,7 +31,7 @@ class EffectWaterGlobe : public EffectBase
 		float fDamping;
 		ZArray<Vector3> pvDir;
 		ZArray<float> pfPos, pfVel;
-		ZArray<WORD*> ppwAdjacent;
+		ZArray<UINT16*> ppwAdjacent;
 		float fSize;
 		float fAngle;
 		float fAverage;
@@ -52,7 +52,7 @@ class EffectWaterGlobe : public EffectBase
 			ppwAdjacent.SetLength(pVertex.GetLength());
 			for(int i = 0; i < pVertex.GetLength(); i++)
 			{
-				ZArray<WORD> pwIndex;
+				ZArray<UINT16> pwIndex;
 				for(int j = 0; ppwVertexFaceList[i][j] != WORD_INVALID_INDEX; j++)
 				{
 					Face &f = pFace[ppwVertexFaceList[i][j]];

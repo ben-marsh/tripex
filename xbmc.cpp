@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "Platform.h"
 #include "effect.h"
 #include "Tripex.h"
 #include "xbmc.h"
@@ -7,7 +7,7 @@
 //unsigned char g_pcSpectrum[ 2 ][ 576 ];
 //unsigned char g_pcWaveform[ 2 ][ 576 ];
 
-BOOL g_bInit = FALSE;
+bool g_bInit = FALSE;
 
 Tripex *g_pTripex;
 

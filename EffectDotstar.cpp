@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "Platform.h"
 //#include "tripex2.h"
 #include "effect.h"
 #include "error.h"

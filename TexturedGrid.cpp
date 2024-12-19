@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "Platform.h"
 #include "TexturedGrid.h"
 #include "error.h"
 #include <memory>

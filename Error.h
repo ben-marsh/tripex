@@ -1,6 +1,9 @@
 #pragma once
 
+#include "Platform.h"
 #include <string>
+#include <vector>
+#include <Windows.h>
 
 struct Error
 {

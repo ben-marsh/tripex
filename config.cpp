@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "Platform.h"
 #include "TextureSource.h"
 #include "config-defaults.h"
 

@@ -1,5 +1,6 @@
-#include "StdAfx.h"
+#include "Platform.h"
 #include <memory.h>
+#include <string.h>
 #include "config-defaults.h"
 
 int GetDefaultInt( const char *sName )

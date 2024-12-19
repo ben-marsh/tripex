@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "Platform.h"
 
 extern const UINT32 g_anTexRawGUI[ ] =
 {
@@ -437,8 +437,6 @@ extern const UINT32 g_anTexRawGUI[ ] =
 	0x0240651e, 0xf65c3708, 0x01201f07, 0x3fe881c3, 0x88edaee7, 0x7eefb3f6, 0x03e03bff, 0xebbcca1f, 
 	0x2ceede9d, 0xaf13e23c, 0xbe33c5f8, 0x3c7f8ef1, 0xf92f23e4, 0xf2be53c9, 0x406a4f96, 0xcd3b0000, 
 };
-
-#include "StdAfx.h"
 
 extern const UINT32 g_anTexRawFont[ ] =
 {
@@ -1290,8 +1288,6 @@ extern const UINT32 g_anTexRawFont[ ] =
 	0x00000000, 
 };
 
-#include "StdAfx.h"
-
 extern const UINT32 g_anTexBlank[ ] =
 {
 	668,
@@ -1317,8 +1313,6 @@ extern const UINT32 g_anTexBlank[ ] =
 	0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 
 	0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0xd9ff1f00, 
 };
-
-#include "StdAfx.h"
 
 extern const UINT32 g_anTexAlienEgg[ ] =
 {
@@ -1478,8 +1472,6 @@ extern const UINT32 g_anTexAlienEgg[ ] =
 	0x92469ea6, 0xba59fc46, 0x2a0efb95, 0x61de54ef, 0xeb1c4208, 0x42801042, 0xff7f8010, 0xcdcdcdd9, 
 };
 
-#include "StdAfx.h"
-
 extern const UINT32 g_anTexBrightLight[ ] =
 {
 	3626,
@@ -1598,8 +1590,6 @@ extern const UINT32 g_anTexBrightLight[ ] =
 	0x77aba03d, 0x3ae0d64c, 0xb8b503dc, 0xa99cb50e, 0x1e502a66, 0x514a66a9, 0xf733aaf7, 0xd3f73ed0, 
 	0xf73e7d8f, 0x3f909fd3, 0xcdcdd9ff, 
 };
-
-#include "StdAfx.h"
 
 extern const UINT32 g_anTexEyes[ ] =
 {
@@ -2056,8 +2046,6 @@ extern const UINT32 g_anTexEyes[ ] =
 	0x75347b69, 0xff4bb011, 0xcdcdcdd9, 
 };
 
-#include "StdAfx.h"
-
 extern const UINT32 g_anTexFlesh[ ] =
 {
 	13297,
@@ -2478,8 +2466,6 @@ extern const UINT32 g_anTexFlesh[ ] =
 	0x1c0b660c, 0x8527cfea, 0xa77bf5ab, 0xb88f7a9b, 0x2b55cd68, 0x2db9386a, 0x7546bfb1, 0x9cd5d75d, 
 	0x32cb5c1a, 0x24933e98, 0x3a488428, 0xffd548f4, 0xcdcdcdd9, 
 };
-
-#include "StdAfx.h"
 
 extern const UINT32 g_anTexForest[ ] =
 {
@@ -2912,8 +2898,6 @@ extern const UINT32 g_anTexForest[ ] =
 	0x649470aa, 0x8605bf44, 0xff218832, 0xcdcdcdd9, 
 };
 
-#include "StdAfx.h"
-
 extern const UINT32 g_anTexLight[ ] =
 {
 	2766,
@@ -3005,8 +2989,6 @@ extern const UINT32 g_anTexLight[ ] =
 	0x3da13db5, 0x3301ec89, 0x1be6e4b5, 0x3790afd8, 0xc6ced99c, 0x03f94a5e, 0xc959c949, 0x0279929f, 
 	0x41c52379, 0x11015165, 0x01111110, 0xcdcdd9ff, 
 };
-
-#include "StdAfx.h"
 
 extern const UINT32 g_anTexShinySand[ ] =
 {

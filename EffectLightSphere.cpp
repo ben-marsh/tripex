@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "Platform.h"
 #include "BezierCurve.h"
 #include "Actor.h"
 #include "error.h"

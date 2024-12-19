@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "Platform.h"
 #include "AudioFft.h"
 #include "Misc.h"
 

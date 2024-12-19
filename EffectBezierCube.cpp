@@ -1,5 +1,5 @@
 // average = (sensitivity * average)
-#include "StdAfx.h"
+#include "Platform.h"
 #include "Actor.h"
 #include "BezierCurve.h"
 #include "AudioData.h"

@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "Platform.h"
 //#include <mmsystem.h>
 #include "Actor.h"
 #include "error.h"
@@ -156,13 +156,13 @@ void Actor::FindVertexFaceList()
 	{
 		for(int j = 0; j < 3; j++)
 		{
-			WORD *&pwFace = ppwVertexFaceList[pFace[i][j]];
+			UINT16*&pwFace = ppwVertexFaceList[pFace[i][j]];
 			int k = 0; 
-			if(pwFace == NULL) pwFace = (WORD*)malloc(4 * sizeof(WORD));
+			if(pwFace == NULL) pwFace = (UINT16*)malloc(4 * sizeof(UINT16));
 			else
 			{
 				while(pwFace[k] != WORD_INVALID_INDEX) k++;
-				if(k >= 3) pwFace = (WORD*)realloc(pwFace, (k + 2) * sizeof(WORD));
+				if(k >= 3) pwFace = (UINT16*)realloc(pwFace, (k + 2) * sizeof(UINT16));
 			}
 			pwFace[k] = i;
 			pwFace[k+1] = WORD_INVALID_INDEX;
@@ -184,7 +184,7 @@ void Actor::FindVertexNormals()
 	for(int i = 0; i < pVertex.GetLength(); i++)
 	{
 		Vector3 vNormal = Vector3(0, 0, 0);
-		WORD *pwFace = ppwVertexFaceList[i];
+		UINT16 *pwFace = ppwVertexFaceList[i];
 		for(int j = 0; pwFace[j] != WORD_INVALID_INDEX; j++)
 		{
 			vNormal += pvFaceNormal[pwFace[j]];
@@ -750,8 +750,8 @@ void Actor::Calculate(Camera *pCamera, float fElapsed)
 				pnLookup.SetLength(pTransVertex.GetLength());
 				for(int i = 0; i < pTransVertex.GetLength(); i++)
 				{
-					WORD wVertex = i % pVertex.GetLength();
-					WORD wExposure = i / pVertex.GetLength();
+					UINT16 wVertex = i % pVertex.GetLength();
+					UINT16 wExposure = i / pVertex.GetLength();
 					int nOldIndex = (wVertex * pfExpBase.GetLength()) + wExposure;
 					pnLookup[nOldIndex] = i;
 				}
@@ -760,7 +760,7 @@ void Actor::Calculate(Camera *pCamera, float fElapsed)
 				{
 					for(int j = 0; j < 3; j++)
 					{
-						WORD &wv = (*ppfExposureBuffer)[i][j];
+						UINT16 &wv = (*ppfExposureBuffer)[i][j];
 						wv = pnLookup[wv];
 					}
 				}
@@ -885,7 +885,7 @@ static const ZTexturePosition pSpriteTex[4] = { { 0.0, 0.0 }, { 1.0f, 0.0f }, { 
 				{
 					if(pEdge.GetLength() > 0)
 					{
-						WORD pwIndex[2];
+						UINT16 pwIndex[2];
 						bool pfOut[2];
 						ZEdge eNew;
 						for(int j = 0; j < pEdge.GetLength(); j++)
@@ -926,7 +926,7 @@ static const ZTexturePosition pSpriteTex[4] = { { 0.0, 0.0 }, { 1.0f, 0.0f }, { 
 					if(pFace.GetLength() > 0)
 					{
 						ZFace fNew;
-						WORD pwIndex[3];
+						UINT16 pwIndex[3];
 						bool pfOut[3];
 						for(int j = 0; j < pFace.GetLength(); j++)
 						{

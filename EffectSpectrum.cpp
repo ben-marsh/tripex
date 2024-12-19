@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "Platform.h"
 #include "effect.h"
 #include "Actor.h"
 #include "Camera.h"
@@ -52,7 +52,7 @@ public:
 			m_pObj[i].pFace.SetLength((TRAIL_W - 1) * 8);
 			m_pObj[i].m_bsFlag.set(Actor::F_DRAW_TRANSPARENT);
 			m_pObj[i].m_bsFlag.set( Actor::F_DRAW_Z_BUFFER, false );
-			WORD v = 0, f = 0;
+			UINT16 v = 0, f = 0;
 			for(int j = 0; j < TRAIL_W; j++)
 			{
 				int n = j * 4;
@@ -65,17 +65,17 @@ public:
 				if(j < TRAIL_W - 1)
 				{
 					Face *pFace;
-					for( WORD k = 0; k < 4; k++ )
+					for(UINT16 k = 0; k < 4; k++ )
 					{
 						pFace = &m_pObj[ i ].pFace[ f + k * 2 ];
-						( *pFace )[ 0 ] = ( WORD )( v + k );
-						( *pFace )[ 1 ] = ( WORD )( v + k + 4 );
-						( *pFace )[ 2 ] = ( WORD )( v + ( ( k + 1 ) % 4 ) );
+						( *pFace )[ 0 ] = (UINT16)( v + k );
+						( *pFace )[ 1 ] = (UINT16)( v + k + 4 );
+						( *pFace )[ 2 ] = (UINT16)( v + ( ( k + 1 ) % 4 ) );
 
 						pFace = &m_pObj[ i ].pFace[ f + k * 2 + 1 ];
-						( *pFace )[ 0 ] = ( WORD )( v + ( ( k + 1 ) % 4 ) );
-						( *pFace )[ 1 ] = ( WORD )( v + k + 4 );
-						( *pFace )[ 2 ] = ( WORD )( v + 4 + ( ( k + 1 ) % 4 ) );
+						( *pFace )[ 0 ] = (UINT16)( v + ( ( k + 1 ) % 4 ) );
+						( *pFace )[ 1 ] = (UINT16)( v + k + 4 );
+						( *pFace )[ 2 ] = (UINT16)( v + 4 + ( ( k + 1 ) % 4 ) );
 					}
 					f += 8;
 				}

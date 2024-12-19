@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "Platform.h"
 #include "ZDirect3d.h"
 #include <d3dx9.h>
 #include "Texture.h"

@@ -1,9 +1,9 @@
-#include "StdAfx.h"
+#include "Platform.h"
 #include <crtdbg.h>
 #include <memory>
 #include "ConfigItem.h"
 #include "Misc.h"
-#include <varargs.h>
+#include <cstdarg>
 
 /************* CCfgItem ****************************************/
 ConfigItem::ConfigItem(const char *sName, int nType, void *pValue, bool bInitUpdate)
@@ -148,7 +148,7 @@ bool ConfigItem::GetIntArray(int n, int *pn) const
 	std::vector<int> vn;
 	for(int i = 0; i < n; i++) pn[i] = 0;
 	if(!GetIntArray(vn) || (int)vn.size() != n) return false;
-	CopyMemory(pn, &(*vn.begin()), n * sizeof(int));
+	memcpy(pn, &(*vn.begin()), n * sizeof(int));
 	return true;
 }
 bool ConfigItem::GetFloatArray(int n, float *pf) const

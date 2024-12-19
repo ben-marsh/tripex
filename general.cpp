@@ -1,5 +1,4 @@
-#include "StdAfx.h"
-#include "general.h"
+#include "Platform.h"
 #include "error.h"
 #include "ColorRgb.h"
 #include "TextureFont.h"

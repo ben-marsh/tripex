@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "Platform.h"
 #include "Effect.h"
 #include <d3d9.h>
 

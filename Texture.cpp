@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "Platform.h"
 //#include <d3dx8.h>
 #include "Texture.h"
 #include "error.h"

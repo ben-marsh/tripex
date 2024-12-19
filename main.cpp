@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "Platform.h"
 #include "AudioData.h"
 
 #include "stdafx.h"
@@ -10,7 +10,7 @@ extern Tripex* g_pTripex;
 
 IDirect3D9* g_pd3d = NULL;
 IDirect3DDevice9* g_pd3dDevice = NULL;
-BOOL g_bStarted = FALSE;
+bool g_bStarted = FALSE;
 HWAVEIN g_hWaveIn = NULL;
 WAVEHDR g_aWaveHdr[2];
 UINT8* g_apnWaveBuf[2] = { NULL, };
@@ -20,7 +20,7 @@ WAVEFORMATEX g_wfex;
 * CreateD3D( )
 -----------------------------------*/
 
-BOOL CreateD3D(HWND hWnd)
+bool CreateD3D(HWND hWnd)
 {
 	g_pd3d = Direct3DCreate9(D3D_SDK_VERSION);
 	if (g_pd3d == NULL) return FALSE;

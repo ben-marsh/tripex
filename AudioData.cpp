@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "Platform.h"
 #include "AudioData.h"
 #include "Misc.h"
 
@@ -351,7 +351,7 @@ float AudioData::GetBand( int nIdx )
 
 
 /*
-#include "StdAfx.h"
+#include "Platform.h"
 #include "effect.h"
 //#include "winamp.h"
 #include "main.h"

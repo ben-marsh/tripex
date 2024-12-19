@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "Platform.h"
 #include "Canvas.h"
 #include "error.h"
 #include "general.h"

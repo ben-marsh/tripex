@@ -9,7 +9,7 @@
 #include "ZArray.h"
 #include "ColorRgb.h"
 
-#define WORD_INVALID_INDEX ((WORD)0x0ffff)
+#define WORD_INVALID_INDEX ((UINT16)0x0ffff)
 #define FRAME_TTL 1000
 
 #define CLIP_FLAG(x) (1L << x)
@@ -264,7 +264,7 @@ public:
 		// (so can't use same index into pVertex)
 	};
 */
-	WORD wClipMask;
+	UINT16 wClipMask;
 
 	std::map< D3DRENDERSTATETYPE, DWORD > mpState;
 
@@ -290,7 +290,7 @@ public:
 	ZArray<Edge> pEdge, pClippedEdge;//, peClipped;//Edge;
 //	ZArray<int> pnClipped;
 
-	ZArray<WORD*> ppwVertexFaceList;
+	ZArray<UINT16*> ppwVertexFaceList;
 	ZArray<float> pfDelay;
 
 	void FindFaceOrder(const Vector3 &vIntPoint);

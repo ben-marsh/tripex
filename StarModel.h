@@ -3,7 +3,7 @@
 #include "Platform.h"
 
 extern float pfStarVertex[];
-extern WORD pwStarFace[];
+extern UINT16 pwStarFace[];
 
 extern const int nStarVertices;
 extern const int nStarFaces;

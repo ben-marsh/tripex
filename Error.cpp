@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "Platform.h"
 #include "main.h"
 #include "config.h"
 #include "error.h"

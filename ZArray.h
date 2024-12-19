@@ -1,5 +1,8 @@
 #pragma once
 
+#include "Platform.h"
+#include <algorithm>
+
 template < typename T > class ZArray
 {
 protected:
@@ -81,17 +84,9 @@ template<typename T> T *ZArray<T>::Detach()
 }
 template<typename T> void ZArray<T>::SwapBuffer(ZArray<T> &pOther)
 {
-	nLength ^= pOther.nLength;
-	pOther.nLength ^= nLength;
-	nLength ^= pOther.nLength;
-
-	nSize ^= pOther.nSize;
-	pOther.nSize ^= nSize;
-	nSize ^= pOther.nSize;
-
-	(DWORD&)pEntry ^= (DWORD&)pOther.pEntry;
-	(DWORD&)pOther.pEntry ^= (DWORD&)pEntry;
-	(DWORD&)pEntry ^= (DWORD&)pOther.pEntry;
+	std::swap(nLength, pOther.nLength);
+	std::swap(nSize, pOther.nSize);
+	std::swap(pEntry, pOther.pEntry);
 }
 template<typename T> ZArray<T>::ZArray(int nNewLength, int nNewStep)
 {

@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "Platform.h"
 #include "Misc.h"
 
 const unsigned char g_anBitReverse[ 256 ] =

@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "Platform.h"
 #include "effect.h"
 #include "Actor.h"
 #include "error.h"

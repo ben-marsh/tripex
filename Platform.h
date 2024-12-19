@@ -30,8 +30,3 @@ static const FLOAT32 g_fRadToDeg = 57.295779513082320876798154814105f;//180.0f /
 #include <conio.h>
 
 #define timeGetTime() ((DWORD)GetTickCount64())
-
-#include "ColorRgb.h"
-#include "Point.h"
-#include "Rect.h"
-#include <vector>
