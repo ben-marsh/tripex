@@ -1,6 +1,7 @@
 #pragma once
 
 #define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
 
 typedef unsigned char UINT8;
 typedef unsigned short UINT16;

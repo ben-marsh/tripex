@@ -174,10 +174,10 @@ void ZObject::Clip(ZArray<ZFace> &pfSrc, ZArray<ZFace> &pfDst, WORD wClipMask)
 
 	if( !m_bsFlag.test( F_VALID_CLIP_PLANES ) )
 	{
-		m_fClipMinX = min(-0.25f, g_pD3D->g_Caps.GuardBandLeft);
-		m_fClipMaxX = max(g_pD3D->GetWidth() - 0.25f, g_pD3D->g_Caps.GuardBandRight);
-		m_fClipMinY = min(-0.25f, g_pD3D->g_Caps.GuardBandTop);
-		m_fClipMaxY = max(g_pD3D->GetHeight() - 0.25f, g_pD3D->g_Caps.GuardBandBottom);
+		m_fClipMinX = std::min(-0.25f, g_pD3D->g_Caps.GuardBandLeft);
+		m_fClipMaxX = std::max(g_pD3D->GetWidth() - 0.25f, g_pD3D->g_Caps.GuardBandRight);
+		m_fClipMinY = std::min(-0.25f, g_pD3D->g_Caps.GuardBandTop);
+		m_fClipMaxY = std::max(g_pD3D->GetHeight() - 0.25f, g_pD3D->g_Caps.GuardBandBottom);
 		m_fClipMinZ = 0.001f;
 		m_fClipMaxZ = 1500.0f;
 	}

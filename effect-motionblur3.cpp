@@ -132,7 +132,7 @@ public:
 
 		if(fAvTotal > 6 || bReset)
 		{
-			fCamTarget = -250 + (min(1.0f, fAvTotal / fAvTime) * 190);
+			fCamTarget = -250 + (std::min(1.0f, fAvTotal / fAvTime) * 190);
 			if(bReset)
 			{
 				camera.m_vPosition.m_fZ = fCamTarget;

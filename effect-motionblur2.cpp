@@ -89,7 +89,7 @@ public:
 		fBezPos += 0.02 * pAudio->GetIntensity( ) * elapsed;
 
 		fTime += elapsed;
-		fChange = min(1.0f, fChange + (elapsed / 3.0));
+		fChange = std::min(1.0f, fChange + (elapsed / 3.0f));
 
 		if(fTime > UPDATETIME)
 		{

@@ -215,8 +215,8 @@ void ZObject::FindDelayValues()
 	for(int i = 0; i < pVertex.GetLength(); i++)
 	{
 		pfDelay[i] = pVertex[i].m_vPos.Length();
-		fDistMin = min(fDistMin, pfDelay[i]);
-		fDistMax = max(fDistMax, pfDelay[i]);
+		fDistMin = std::min(fDistMin, pfDelay[i]);
+		fDistMax = std::max(fDistMax, pfDelay[i]);
 	}
 	for(int i = 0; i < pfDelay.GetLength(); i++)
 	{
@@ -251,14 +251,14 @@ void ZObject::Calculate(ZCamera *pCamera, float fElapsed)
 	ZMatrix mTransform = ZMatrix::Rotation(fYaw, fPitch, fRoll) * ZMatrix::Translation(vPosition) * pCamera->GetTransform( );
 
 	// set up the lighting
-	int nMinLight = min(wcAmbientLight.GetMinComponent(), (wcAmbientLight + (nExposure * wcExposureLightChange)).GetMinComponent());
-	int nMaxLight = max(wcAmbientLight.GetMaxComponent(), (wcAmbientLight + (nExposure * wcExposureLightChange)).GetMaxComponent());
+	int nMinLight = std::min(wcAmbientLight.GetMinComponent(), (wcAmbientLight + (nExposure * wcExposureLightChange)).GetMinComponent());
+	int nMaxLight = std::max(wcAmbientLight.GetMaxComponent(), (wcAmbientLight + (nExposure * wcExposureLightChange)).GetMaxComponent());
 	if(ppLight.GetLength() > 0)
 	{
 		if(!m_bsFlag.test( F_VALID_VERTEX_NORMALS )) FindVertexNormals();
 		for(i = 0; i < ppLight.GetLength(); i++)
 		{
-			nMaxLight = max(nMaxLight, ppLight[i]->m_cColour.GetMaxComponent());
+			nMaxLight = std::max(nMaxLight, ppLight[i]->m_cColour.GetMaxComponent());
 		}
 	}
 
@@ -675,7 +675,7 @@ void ZObject::Calculate(ZCamera *pCamera, float fElapsed)
 	{
 		pCamera->m_fScreenX = (g_pD3D->GetWidth() / 2.0f) - 0.25f;
 		pCamera->m_fScreenY = (g_pD3D->GetHeight() / 2.0f) - 0.25f;
-		pCamera->m_fScale = min(g_pD3D->GetWidth() / 640.0f, g_pD3D->GetHeight() / 480.0f) * pCamera->m_fPerspective;
+		pCamera->m_fScale = std::min(g_pD3D->GetWidth() / 640.0f, g_pD3D->GetHeight() / 480.0f) * pCamera->m_fPerspective;
 	}
 	else
 	{

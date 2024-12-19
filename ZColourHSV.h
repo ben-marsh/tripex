@@ -57,8 +57,8 @@ void ZColourHSV::Set( const ZColour &c, FLOAT32 fDefH, FLOAT32 fDefS )
 	// sat = 0, hue doesn't matter (grey) (min = max)
 	// light = 0, sat + hue doesn't matter (black) (min = max = 0)
 
-	int nMin = min( c.m_nR, min( c.m_nG, c.m_nB ) );
-	int nMax = max( c.m_nR, max( c.m_nG, c.m_nB ) );
+	int nMin = std::min( c.m_nR, std::min( c.m_nG, c.m_nB ) );
+	int nMax = std::max( c.m_nR, std::max( c.m_nG, c.m_nB ) );
 	FLOAT32 fRange = nMax - nMin;
 
 	// lightness

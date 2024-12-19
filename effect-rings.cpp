@@ -49,7 +49,7 @@ public:
 		{
 			pObj[i].CreateTorus(RINGSTART + (i*RINGSEP), 2.0f, 20 + i, 4);//5 + i, 4);
 			pObj[i].m_bsFlag.set(ZObject::F_DRAW_TRANSPARENT);//property(objTransparent, true);
-			pObj[i].nExposure = max(1, 5 - (i / 3));
+			pObj[i].nExposure = std::max(1, 5 - (i / 3));
 			pObj[i].fFrameHistory = 2.0f;
 			pObj[i].wcExposureLightChange = ZWideColour(-8, -8, 0);
 		}
@@ -93,7 +93,7 @@ public:
 				pObj[i].fPitch = pitch[i * RINGDELAY];
 				pObj[i].fYaw = yaw[i * RINGDELAY];
 	
-				double b = max(min(1, br * brightness[i]), 0);
+				double b = std::max(std::min(1.0f, br * brightness[i]), 0.0f);
 
 				pObj[i].wcAmbientLight = ZColour::Grey((int)(b * 255.0f));//->color = D3DRGB(b,b,b);
 				pObj[i].vPosition.m_fZ = 50;

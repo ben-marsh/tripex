@@ -219,7 +219,7 @@ public:
 						else if(i == 3) m = (x / double(PRECISION)) * (y / double(PRECISION));
 						
 						double v = c * m;
-						double dm = 0.999999999 - max(0, (c - 192.0) * /*0.05*/0.02 / 64.0);
+						double dm = 0.999999999 - std::max(0.0, (c - 192.0) * /*0.05*/0.02 / 64.0);
 						multtab[j++] = v * dm;//0.9999999;//((v * v) / 65536.0);//* 0.9999999;// * 0.999;//986;//98;
 					}
 				}
@@ -281,7 +281,7 @@ public:
 			double y = y1;
 			for(int x = ((int)x1) - 1; x < ((int)x2) + 2; x++)
 			{
-				double t = Bound<double>(min(x2, x) - x1, 0, 1);
+				double t = Bound<double>(std::min(x2, (double)x) - x1, 0, 1);
 				int yn = (int)y;
 				double p = y - yn;
 				if(x > 0 && yn > 0 && x < xw - 2 && yn < h - 2)
@@ -306,7 +306,7 @@ public:
 			double x = x1;
 			for(int y = ((int)y1) - 1; y < ((int)y2) + 2; y++)
 			{
-				double t = Bound<double>(min(y2, y) - y1, 0, 1);
+				double t = Bound<double>(std::min(y2, (double)y) - y1, 0, 1);
 				int xn = (int)x;
 				double p = x - xn;
 				if(xn > 0 && y > 0 && xn < xw - 2 && y < h - 2)
@@ -408,7 +408,7 @@ public:
 				double dAng = atan2(yd, xd);
 				double dLen = sqrt(xd * xd + yd * yd);
 				double dMult = 50.0 / dLen;
-				double dLenMult = max(1.0, 1.05 - (dLen / (50.0 * 60.0)));
+				double dLenMult = std::max(1.0, 1.05 - (dLen / (50.0 * 60.0)));
 				pDst.x += (cos(dAng + (dMult * dMult * pdA[i])) * dLen * dLenMult) - xd;
 				pDst.y += (sin(dAng + (dMult * dMult * pdA[i])) * dLen * dLenMult) - yd;
 			}
@@ -465,8 +465,8 @@ public:
 			dLength = sqrt(pSrc.x * pSrc.x + pSrc.y * pSrc.y);
 			dMult = (cos((dLength - (30.0 * 3.14159 / 180.0)) * 3.14159 / RSZ) + 0.5) * 5;
 			
-			pDst.x = (dLength - dExpand - max(dMult, 0)) * cos(dAng);
-			pDst.y = (dLength - dExpand - max(dMult, 0)) * sin(dAng);
+			pDst.x = (dLength - dExpand - std::max(dMult, 0.0)) * cos(dAng);
+			pDst.y = (dLength - dExpand - std::max(dMult, 0.0)) * sin(dAng);
 			break;
 		case FM_EXPANDTOTOPBOTTOM:
 			dMult = (pSrc.y / height) + 0.5;
@@ -653,7 +653,7 @@ public:
 			pSrc.x = -255.5f;//(width - 1.0f) / 2.0f;
 			pSrc.y = fStartY;//(height - 1.0f) / 2.0f;
 		}
-		Calculate(tflowmap ^ 1, max(1, 512 * 3 * fMult * elapsed), max(2, 512 * 3 * fMult * elapsed), elapsed * MAX_CALC_TIME);
+		Calculate(tflowmap ^ 1, std::max<int>(1, 512 * 3 * fMult * elapsed), std::max<int>(2, 512 * 3 * fMult * elapsed), elapsed * MAX_CALC_TIME);
 		if(bSetColours || ((bMeasureTime && nSamples > 5) || nCalcY >= height))
 		{
 			if(bSetColours || !bMeasureTime)
@@ -761,14 +761,14 @@ public:
 		
 		//	int index[128];
 		double r = pAudio->GetIntensity( );
-		ang += elapsed * min(r / 200.0, 2) * 4.0 * 3.14159 / 180.0;
+		ang += elapsed * std::min(r / 200.0, 2.0) * 4.0 * 3.14159 / 180.0;
 		
 		int brt = pAudio->GetIntensity( ) * 30.0; //min(max(average * 10.0, 8), 50);
 		
 		r = (r / 20) + 10;
 		
 		j = 0;
-		double mlt = min(0.85, (pAudio->GetIntensity( ) * 1.6)) / 4.0;
+		double mlt = std::min(0.85, (pAudio->GetIntensity( ) * 1.6)) / 4.0;
 		//(0.7 + (average * 0.5))) / 4.0;
 		
 		//	ZeroMemory(dst, sizeof(char) * 256 * 512);
@@ -784,7 +784,7 @@ public:
 		//	obj->Rotate();
 		
 		static double amplitude = pAudio->GetIntensity( ); 
-		double target = max(20, (1 - pAudio->GetIntensity( )) * 70.0); //average * 70.0;
+		double target = std::max<int>(20, (1 - pAudio->GetIntensity( )) * 70.0); //average * 70.0;
 		
 		amplitude = target;
 		
@@ -824,7 +824,7 @@ public:
 				dOscFade = 0;
 			}
 		}
-		double dBr = min(1.0, pAudio->GetIntensity( )* 3.0);
+		double dBr = std::min(1.0, pAudio->GetIntensity( )* 3.0);
 		if(nOsc2 != -1 && dOscFade >= 1.0)
 		{
 			nOsc1 = nOsc2;

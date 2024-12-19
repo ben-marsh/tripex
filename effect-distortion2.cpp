@@ -55,9 +55,9 @@ public:
 		elapsed *= 1.5;
 
 		br = brightness;
-		xp += 0.008 * max(0.1, g_pAudio->GetDampenedBand( pEffectPtr->fSensitivity, 0, 0.2f ) ) * elapsed;
-		yp += 0.008 * max(0.1, g_pAudio->GetDampenedBand(pEffectPtr->fSensitivity, 0.15f, 0.5f ) + g_pAudio->GetBeat( ) ) * elapsed;
-		t += elapsed * max(0.5, g_pAudio->GetDampenedBand(pEffectPtr->fSensitivity, 0, 1.0f)) * 20 * 3.14159 / 180.0;
+		xp += 0.008 * std::max(0.1f, g_pAudio->GetDampenedBand( pEffectPtr->fSensitivity, 0, 0.2f ) ) * elapsed;
+		yp += 0.008 * std::max(0.1f, g_pAudio->GetDampenedBand(pEffectPtr->fSensitivity, 0.15f, 0.5f ) + g_pAudio->GetBeat( ) ) * elapsed;
+		t += elapsed * std::max(0.5f, g_pAudio->GetDampenedBand(pEffectPtr->fSensitivity, 0, 1.0f)) * 20 * 3.14159 / 180.0;
 
 		angle += 1 * elapsed;
 		fac = 0.5 + (0.15 * cos(angle * 3.14159 / 256.0));
@@ -84,7 +84,7 @@ public:
 		float pdMax[] = { 0.3f, 0.4f, 0.5f };//min(average, 0.4) / 0.4, max(0, min(1.0, (average - 0.4) / 0.4)) }; 
 
 		i = 0;
-		float fChange = 1.0f / max(grid.nWidth, grid.nHeight);
+		float fChange = 1.0f / std::max(grid.nWidth, grid.nHeight);
 		float fPosX = xp;
 		const float fMulX = 1.0f / GRW;
 		const float fMulY = 1.0f / GRH;
@@ -109,14 +109,14 @@ public:
 					float fNormX = fPosX * fMulX;//(1.0f / GRW);
 					float fNormY = fPosY * fMulY;//(1.0f / GRH);
 
-					float fRad = min(1.0, 100.0 / fabs(fPosX * fPosX + fPosY * fPosY));
+					float fRad = std::min(1.0, 100.0 / fabs(fPosX * fPosX + fPosY * fPosY));
 					fBr += fRad;
 					float fAng = atan2(fNormY, fNormX);
 					float fLen = fRad * (0.75 + (0.5 * cos((fAng * NSPIKES) + t + pdA[j])));
 					fX += fLen * fNormX;
 					fY += fLen * fNormY;
 
-					float fColMult = brightness * 0.5 * max(0.0f, 1.0f - (sqrt(fPosX * fPosX + fPosY * fPosY) / 30.0f));
+					float fColMult = brightness * 0.5 * std::max(0.0f, 1.0f - (sqrtf(fPosX * fPosX + fPosY * fPosY) / 30.0f));
 					cCol.m_nR += pc[j].m_nR * fColMult;
 					cCol.m_nG += pc[j].m_nG * fColMult;
 					cCol.m_nB += pc[j].m_nB * fColMult;
@@ -124,7 +124,7 @@ public:
 
 				grid.pVertex[i].m_aTex[0].x = fX;
 				grid.pVertex[i].m_aTex[0].y = fY;
-				ZColour cGrey = ZColour::Grey(min(1.0, brightness * fBr) * 255.0);
+				ZColour cGrey = ZColour::Grey(std::min(1.0f, brightness * fBr) * 255.0);
 				if(bLight) 
 				{
 					grid.pVertex[i].m_cSpecular = cCol * brightness * fBr * 0.5;

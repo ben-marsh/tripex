@@ -4,6 +4,7 @@
 #include "ZObject.h"
 #include "error.h"
 #include "general.h"
+#include <algorithm>
 
 #define SOURCES 512
 
@@ -80,7 +81,7 @@ public:
 		{
 			nStage = (nStage + 1) & 3;
 			dWaitTime = 0.0;
-			dTilt = min(max(dTilt, 0), 3.14159 / 2.0);
+			dTilt = std::min(std::max(dTilt, 0.0), 3.14159 / 2.0);
 		}
 
 		float fTwistMult = sin(dTilt);// * 3.14159 / 128.0);

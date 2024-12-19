@@ -78,7 +78,7 @@ public:
 			for(int i = 0; i < nSources; i++)
 			{
 				position[i] += speed[i] * pAudio->GetIntensity( ) * 0.3 * elapsed;
-				double linearity = max(0, 1 - pAudio->GetBeat( ) );//);//(bigbeat / 2.0));
+				double linearity = std::max(0.0f, 1 - pAudio->GetBeat( ) );//);//(bigbeat / 2.0));
 			
 				while(position[i] > 1.0 || position[i] < 0.0)
 				{

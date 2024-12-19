@@ -104,7 +104,7 @@ ZError* ZGrid::Render( )
 //		float fScaleY = nScrHeight / 480.0;
 
 //		scaleY = scaleX = max(scaleX, scaleY);
-		float fScale = max(nScrWidth / 640.0f, nScrHeight / 480.0f);
+		float fScale = std::max(nScrWidth / 640.0f, nScrHeight / 480.0f);
 
 		int i = 0;
 //		ZFlexibleVertex fv(pVertex);

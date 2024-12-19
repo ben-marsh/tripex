@@ -23,7 +23,7 @@ public:
 	void Set(const P &p1, const P &p2){ left = p1.x; top = p1.y; right = p2.x; bottom = p2.y; }
 	void Set(const P &p1, int nW, int nH){ Set(p1, ZPoint<T>(p1.x + nW, p1.y + nH)); }
 
-	ZRect<T> Validated(){ return ZRect<T>(ZPoint<T>(min(left, right), min(top, bottom)), ZPoint<T>(max(left, right), max(top, bottom))); }
+	ZRect<T> Validated(){ return ZRect<T>(ZPoint<T>(std::min(left, right), std::min(top, bottom)), ZPoint<T>(std::max(left, right), std::max(top, bottom))); }
 	void Validate(){ operator=(Validated()); }
 
 	void Move(int nX, int nY){ MoveX(nX); MoveY(nY); }
@@ -54,7 +54,7 @@ public:
 	bool IsValid() const { return bottom > top && right > left; }
 	bool Contains(const P &p) const { return p.x >= left && p.x < right && p.y >= top && p.y < bottom; }
 	bool Intersects(const R &r) const { return GetIntersection(r).IsValid(); }
-	ZRect<T> GetIntersection(const R &r) const { return ZRect<T>(ZPoint<T>(max(left, r.left), max(top, r.top)), ZPoint<T>(min(right, r.right), min(bottom, r.bottom))); }
+	ZRect<T> GetIntersection(const R &r) const { return ZRect<T>(ZPoint<T>(std::max(left, r.left), std::max(top, r.top)), ZPoint<T>(std::min(right, r.right), std::min(bottom, r.bottom))); }
 
 	ZRectTemplate<T, R, P> &operator=(const R &r){ Set(r); return *this; }
 	template < class W > operator ZRect<W>(){ return ZRect<W>((ZPoint<W>)GetTopLeft(), (ZPoint<W>)GetBotRight()); }

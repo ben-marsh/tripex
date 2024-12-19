@@ -145,7 +145,7 @@ public:
 			for( i = 0; i < 256; i++ )
 			{
 				int nTarget = i * TRAIL_W / 256;
-				m_pfHeight[ 0 ][ nTarget ] = max( m_pfHeight[ 0 ][ nTarget ], pAudio->GetBand( i ) );
+				m_pfHeight[ 0 ][ nTarget ] = std::max( m_pfHeight[ 0 ][ nTarget ], pAudio->GetBand( i ) );
 			}
 			for( i = 0; i < TRAIL_W; i++ )
 			{
@@ -166,7 +166,7 @@ public:
 					m_pfCubeTime[ j ][ i ] = 0.0;
 					m_pfCubeHeight[ j ][ i ] = m_pfCubeTop[ j ][ i ] - ( ACCELER * ( m_pfCubeTime[ j ][ i ] * m_pfCubeTime[ j ][ i ] ) / 2.0f );
 				}
-				m_pfCubeHeight[ j ][ i ] = max( m_pfCubeHeight[ j ][ i ], 0.0f );
+				m_pfCubeHeight[ j ][ i ] = std::max( m_pfCubeHeight[ j ][ i ], 0.0f );
 			}
 		}
 
@@ -193,8 +193,8 @@ public:
 				fBr = 1.0f;
 			}
 
-			fBr = fBrightness * min( fBr * 0.7f, 1.0f );
-			fBr = max( fBr, 0.0f );
+			fBr = fBrightness * std::min( fBr * 0.7f, 1.0f );
+			fBr = std::max( fBr, 0.0f );
 			m_pObj[ i ].wcAmbientLight = ZColour::Grey( ( int )( fBr * 255.0f ) );
 
 			int n = 0;

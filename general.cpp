@@ -51,7 +51,7 @@ void DrawMessage(ZSpriteBuffer &sb, ZTextureFont *pFont, int y, const char *sTex
 		{
 			std::string sLine(sText, nLength);
 			vsLine.push_back(sLine);
-			nWidth = max(nWidth, pFont->GetWidth(sLine.c_str()));
+			nWidth = std::max(nWidth, pFont->GetWidth(sLine.c_str()));
 			sText += nLength;
 		}
 	}

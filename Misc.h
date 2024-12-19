@@ -1,5 +1,7 @@
 #pragma once
 
+#include <algorithm>
+
 #pragma warning(disable: 4786)
 #pragma runtime_checks( "",off )
 
@@ -69,10 +71,10 @@ template< class T > inline T StepTo( T nValue, T nTarget, T nStep )
 {
 	if( nValue < nTarget )
 	{
-		return min( nTarget, nValue + nStep );
+		return std::min( nTarget, nValue + nStep );
 	}
 	else 
 	{
-		return max( nTarget, nValue - nStep );
+		return std::max( nTarget, nValue - nStep );
 	}
 }

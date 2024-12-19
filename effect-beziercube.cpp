@@ -141,8 +141,8 @@ public:
 
 		brt = brightness;
 	
-		if(dMultDest < dMult) dMult = max(dMultDest, dMult - 0.01);
-		if(dMultDest > dMult) dMult = min(dMultDest, dMult + 0.01);
+		if(dMultDest < dMult) dMult = std::max(dMultDest, dMult - 0.01);
+		if(dMultDest > dMult) dMult = std::min(dMultDest, dMult + 0.01);
 
 		double dTwistAng = PI * sin(dAng) / 2.0;
 		dAng += sm * pAudio->GetDampenedBand(pEffectPtr->fSensitivity, 0, 0.5f) * 0.25 * 4 * g_fDegToRad;

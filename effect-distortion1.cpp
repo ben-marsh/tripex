@@ -45,13 +45,13 @@ public:
 		br = brightness;
 		xp += 0.015/*08*/ * pAudio->GetDampenedBand(pEffectPtr->fSensitivity, 0, 0.25f) * elapsed;
 		yp += 0.02/*08*/ * pAudio->GetDampenedBand(pEffectPtr->fSensitivity, 0.25f, 0.5f) * elapsed;
-		t += elapsed * max(0.5, pAudio->GetDampenedBand(pEffectPtr->fSensitivity, 2/16.0f, 5/16.0f) + (3.0 * pAudio->GetDampenedBand(pEffectPtr->fSensitivity, 7/16.0f, 12/16.0f))) * 20 * 3.14159 / 180.0;
+		t += elapsed * std::max(0.5, pAudio->GetDampenedBand(pEffectPtr->fSensitivity, 2/16.0f, 5/16.0f) + (3.0 * pAudio->GetDampenedBand(pEffectPtr->fSensitivity, 7/16.0f, 12/16.0f))) * 20 * 3.14159 / 180.0;
 
 		angle += 1 * elapsed;
 		fac = 0.5 + (0.15 * cos(angle * 3.14159 / 256.0));
 
 		int x, y, i = 0;
-		double av = max(0.4, pAudio->GetDampenedBand(pEffectPtr->fSensitivity, 0, 1.0f));
+		double av = std::max(0.4f, pAudio->GetDampenedBand(pEffectPtr->fSensitivity, 0, 1.0f));
 		double fx, fy;
 		double w2 = grid.nWidth / 2.0, h2 = grid.nHeight / 2.0;
 		double rw = 1.0 / grid.nWidth, rh = 1.0 / grid.nHeight;

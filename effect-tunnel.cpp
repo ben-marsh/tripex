@@ -112,8 +112,8 @@ public:
 		static float fTexVOfs = 3;//0.99;1.5;//0.99;
 		fTexVOfs += 0.003f * fTBr * fElapsed;
 		while(fTexVOfs > 0) fTexVOfs--;
-		if(pAudio->GetIntensity( ) > fTBr) fTBr += min(pAudio->GetIntensity( ) - fTBr, 0.05f) * fElapsed;
-		if(pAudio->GetIntensity( ) < fTBr) fTBr += max(pAudio->GetIntensity( ) - fTBr, -0.05f) * fElapsed;
+		if(pAudio->GetIntensity( ) > fTBr) fTBr += std::min(pAudio->GetIntensity( ) - fTBr, 0.05f) * fElapsed;
+		if(pAudio->GetIntensity( ) < fTBr) fTBr += std::max(pAudio->GetIntensity( ) - fTBr, -0.05f) * fElapsed;
 
 		int nOldStart = (int)(fPos * nTunnelL);
 		bool fReset = false;
@@ -185,7 +185,7 @@ public:
 		for(int i = 0; i < nTunnelL; i++)
 		{
 			float fThisBr = ((nStart + i + 1) - (fPos * nTunnelL)) / float(nTunnelL + 1);
-			fThisBr = min(1.0f, max(0.0f, (0.5f / fThisBr ) - 0.5f));
+			fThisBr = std::min(1.0f, std::max(0.0f, (0.5f / fThisBr ) - 0.5f));
 			fThisBr = 1.0f - powf(1.0f - fThisBr, 5.0f);//1.6);
 
 			fThisBr = 1.0f;

@@ -107,7 +107,7 @@ void ZFft::Update( const short int *anSample )
 	{
 		float fValue = pc->Length( );
 		m_afAmplitude[ i ] *= m_fDecay;
-		m_afAmplitude[ i ] = max( m_afAmplitude[ i ], fValue / sqrtf( 256.0f ) );
+		m_afAmplitude[ i ] = std::max( m_afAmplitude[ i ], fValue / sqrtf( 256.0f ) );
 		pc++;
 	}
 }

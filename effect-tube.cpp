@@ -111,7 +111,7 @@ public:
 		}
 		for(i = 0; i < PTLENGTH; i++)
 		{
-			float br = min(1.0f, sinf(i * PI / PTLENGTH) * 1);
+			float br = std::min(1.0f, sinf(i * PI / PTLENGTH) * 1);
 
 			for(j = 0; j < PTCIRCUM; j++)
 			{
@@ -144,7 +144,7 @@ public:
 		{
 			for(i = 0; i < CLENGTH; i++)
 			{
-				double br = min(1, sin(i * 3.14159 / CLENGTH) * 5) * brightness;
+				double br = std::min(1.0, sin(i * 3.14159 / CLENGTH) * 5) * brightness;
 				for(j = 0; j < 4; j++)
 				{
 					coil.pVertex[(i * 4) + j].m_cDiffuse = ZColour::Grey((int)(255.0f * br));
@@ -152,7 +152,7 @@ public:
 			}
 			for(i = 0; i < PTLENGTH; i++)
 			{
-				double br = min(1, sin(i * 3.14159 / PTLENGTH) * 1) * brightness;
+				double br = std::min(1.0, sin(i * 3.14159 / PTLENGTH) * 1) * brightness;
 	
 				for(j = 0; j < PTCIRCUM; j++)
 				{

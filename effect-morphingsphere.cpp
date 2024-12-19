@@ -84,7 +84,7 @@ public:
 			pObj[i].fYaw += elapsed * 2.0 * PI / 180.0;
 			pObj[i].m_bsFlag.set( ZObject::F_VALID_VERTEX_NORMALS, false );
 			float fBlend = float(i) / NOBJ;
-			float fMult2 = (i == 0)? 1.0f : min(1.0, pAudio->GetIntensity( ) * 1.5);//(averagefloat(i) / NOBJ);
+			float fMult2 = (i == 0)? 1.0f : std::min(1.0, pAudio->GetIntensity( ) * 1.5);//(averagefloat(i) / NOBJ);
 			pObj[i].wcAmbientLight = br * (ZColour::Grey(96 * fMult2 * (1 - (0.4 * float(i) / NOBJ))) - ZColour(fBlend * 40.0, fBlend * 40.0, fBlend * 5.0));
 			pObj[i].Calculate(&camera, elapsed);
 		}

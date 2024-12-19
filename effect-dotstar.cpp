@@ -6,6 +6,7 @@
 #include "star.h"
 #include "ZObject.h"
 #include "ZBezier.h"
+#include <algorithm>
 
 
 #define NUMBEZ 10
@@ -129,8 +130,8 @@ public:
 			}
 			if(y >= 0 && y < 256)
 			{
-				left = min(xl, xr);
-				right = max(xl, xr);
+				left = std::min(xl, xr);
+				right = std::max(xl, xr);
 //				for(int i = max(left, 0); i < min(right, 512); i++)
 //				{
 //					pBuffer[bPos + i] = 1;//++;
@@ -192,7 +193,7 @@ public:
 		int nSub = 1.0f * fTotalElapsed;
 		for(int k = 0; k < pTarget.GetLength(); k++)
 		{
-			pTarget[k] = max(0, min(pTarget[k], 8) - nSub);//min(pTarget[k], 4) - 1);	
+			pTarget[k] = std::max(0, std::min<int>(pTarget[k], 8) - nSub);//min(pTarget[k], 4) - 1);	
 		}
 		fTotalElapsed -= nSub;
 
@@ -259,7 +260,7 @@ public:
 	{
 		ZError* error;
 
-		double dSize = /*1.2 **/ (min(g_pD3D->GetWidth(), g_pD3D->GetHeight()) - 1) / 64.0f;//min(d3d->GetWidth(), d3d->GetHeight()) / 64.0;
+		double dSize = /*1.2 **/ (std::min(g_pD3D->GetWidth(), g_pD3D->GetHeight()) - 1) / 64.0f;//min(d3d->GetWidth(), d3d->GetHeight()) / 64.0;
 
 		pTargetVertex.Empty();
 		pTargetFace.Empty();
@@ -286,7 +287,7 @@ public:
 			{
 				if(pTarget[nIndex] != 0)
 				{
-					int nH = min(pTarget[nIndex], 16);
+					int nH = std::min<int>(pTarget[nIndex], 16);
 					float p = dSize * (16 - nH) / 32.0f;// / 32.0f;  
 					double dX1 = dX + p, dX2 = dX + dSize - p;
 					double dY1 = dY + p, dY2 = dY + dSize - p;
@@ -308,7 +309,7 @@ public:
 						pVertex[3].m_vPos.m_fX = dX1;//dX + p;
 						pVertex[3].m_vPos.m_fY = dY2;//dY + dSize - p;
 
-						int nColour = min(4, pTarget[nIndex] / 2);
+						int nColour = std::min(4, pTarget[nIndex] / 2);
 						for(int k = 0; k < 4; k++)
 						{
 							pVertex[k].m_vPos.m_fZ = 1.0f;

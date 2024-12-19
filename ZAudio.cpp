@@ -19,7 +19,7 @@ void DrawLineBar(ZSpriteBuffer &sb, int x, int y, int h, float p)
 
 void DrawHorizontalBar(ZSpriteBuffer &sb, int x, int y, int w, int h, float p)
 {
-	p = min(1.0f, max(0.0f, p));
+	p = std::min(1.0f, std::max(0.0f, p));
 	sb.AddSprite(ZPoint<int>(x, y), NULL, 0, ZRect<int>(0, 0, w, h), ZColour::Grey(20));
 	sb.AddSprite(ZPoint<int>(x, y), NULL, 0, ZRect<int>(0, 0, (int)(w * p), h), ZColour::White());
 }
@@ -61,7 +61,7 @@ ZAudio::ZAudio( int nSamples ) : m_Fft( nSamples ), m_nSamples( nSamples )
 		fMidT = powf( ( i + 0.5f ) / FREQ_BANDS, fPower );
 		fMaxT = powf( ( i + 1.0f ) / FREQ_BANDS, fPower );
 
-		m_anBandIdx[ i ] = min( ( int )( ( m_nSamples / 2 ) * fMidT ), ( m_nSamples / 2 ) - 1 );
+		m_anBandIdx[ i ] = std::min( ( int )( ( m_nSamples / 2 ) * fMidT ), ( m_nSamples / 2 ) - 1 );
 		m_afBandMul[ i ] = fMul * ( ( fMaxT - fMinT ) * ( m_nSamples / 2 ) );
 
 		fMinT = fMaxT;
@@ -167,7 +167,7 @@ void ZAudio::Update( float fElapsed, float fSensitivity )
 		m_afBand[ i ] = m_afBandMul[ i ] * m_Fft.GetAmplitude( m_anBandIdx[ i ] );
 	}
 
-	m_fElapsed = min( m_fElapsed + fElapsed, 1.0f );
+	m_fElapsed = std::min( m_fElapsed + fElapsed, 1.0f );
 	for( ; m_fElapsed > 0.5f; m_fElapsed -= 0.5f )
 	{
 		memmove( m_aafFreqHistory[ 1 ], m_aafFreqHistory[ 0 ], sizeof( m_aafFreqHistory[ 0 ] ) * ( FREQ_HISTORY_SIZE - 1 ) );
@@ -175,7 +175,7 @@ void ZAudio::Update( float fElapsed, float fSensitivity )
 
 		for( int i = 0; i < 256; i++ )
 		{
-			m_aafFreqHistory[ 0 ][ i >> 4 ] += min( 1.0f, m_afBand[ i ] * 4.0f ) / 16.0f;
+			m_aafFreqHistory[ 0 ][ i >> 4 ] += std::min( 1.0f, m_afBand[ i ] * 4.0f ) / 16.0f;
 		}
 
 		float fSum = 0.0f;
@@ -193,7 +193,7 @@ void ZAudio::Update( float fElapsed, float fSensitivity )
 //		m_fIntensity /= ( 1 << 16 ) * m_nSamples;
 //		m_fIntensity /= 10.0f * 2.0f * 2.0f /*512.0f */* 2.0f;
 		m_fIntensity *= 1.0f / ( m_fIntensity + 0.6f );
-		m_fIntensity = min( max( m_fIntensity, 0.0f ), 1.0f );
+		m_fIntensity = std::min( std::max( m_fIntensity, 0.0f ), 1.0f );
 
 		if( bAvoidBigReactions )
 		{
@@ -206,7 +206,7 @@ void ZAudio::Update( float fElapsed, float fSensitivity )
 			float fSize = 0.0f;
 			for( int i = 0; i < BEATHISTORY; i++ )
 			{
-				fSize = max( fSize, fVal - m_afBeatHistory[ i ] );
+				fSize = std::max( fSize, fVal - m_afBeatHistory[ i ] );
 			}
 
 			float fLimit = 500.0f - 4.8f * fSensitivity;
@@ -223,7 +223,7 @@ void ZAudio::Update( float fElapsed, float fSensitivity )
 			memmove( &m_afBeatHistory[ 1 ], &m_afBeatHistory[ 0 ], sizeof( m_afBeatHistory[ 0 ] ) * ( BEATHISTORY - 1 ) );
 			m_afBeatHistory[ 0 ] = m_fBeat;
 
-			m_fBeat = min( m_fBeat, 1.0f );
+			m_fBeat = std::min( m_fBeat, 1.0f );
 			m_fBeat *= 0.6f;
 		}
 	}
@@ -268,12 +268,12 @@ float ZAudio::GetRandomSample( ) const
 float ZAudio::GetDampenedBand( float fDampen, float fMin, float fMax ) const
 {
 	int nHistory = ( int )( fDampen * FREQ_HISTORY_SIZE );
-	nHistory = min( max( nHistory, 1 ), FREQ_HISTORY_SIZE - 1 );
+	nHistory = std::min( std::max( nHistory, 1 ), FREQ_HISTORY_SIZE - 1 );
 
 	float fPeak = 0.0f;
 
-	int nMin = min( max( ( int )( fMin * 16.0f ), 0 ), 15 );
-	int nMax = min( max( ( int )( fMax * 16.0f ), 0 ), 15 );
+	int nMin = std::min( std::max( ( int )( fMin * 16.0f ), 0 ), 15 );
+	int nMax = std::min( std::max( ( int )( fMax * 16.0f ), 0 ), 15 );
 	for( int i = nMin; i < nMax; i++ )
 	{
 		float fSum = 0.0f;
@@ -281,7 +281,7 @@ float ZAudio::GetDampenedBand( float fDampen, float fMin, float fMax ) const
 		{
 			fSum += m_aafFreqHistory[ j ][ i ];
 		}
-		fPeak = max( fPeak, fSum );
+		fPeak = std::max( fPeak, fSum );
 	}
 	return fPeak / nHistory;
 }

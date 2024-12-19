@@ -2,6 +2,7 @@
 #include "effect.h"
 #include "ZObject.h"
 #include "error.h"
+#include <algorithm>
 
 #define RINGS 10//6//10//12 //7
 
@@ -57,7 +58,7 @@ public:
 		{
 			pObj[i].fRoll += rs[i] * pAudio->GetIntensity( )* elapsed;
 			pObj[i].fPitch += ps[i] * pAudio->GetIntensity( )* elapsed;
-			pObj[i].fYaw += ys[i] * max(0.1, pAudio->GetIntensity( )) * elapsed;
+			pObj[i].fYaw += ys[i] * std::max(0.1f, pAudio->GetIntensity( )) * elapsed;
 			pObj[i].wcAmbientLight = ZColour::Grey(brightness * 20.0f);// / pObj[i].nExposure);
 			pObj[i].Calculate(&camera, elapsed);
 		}

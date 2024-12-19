@@ -72,8 +72,8 @@ public:
 	ZBaseColour<T> Reverse(){ return ZBaseColour<T>(m_nB, m_nG, m_nR); }
 	ZBaseColour<T> Inverse(){ return ZBaseColour<T>(255 - m_nR, 255 - m_nG, 255 - m_nB); }
 	void Invert(){ operator=(Inverse()); }
-	int GetMaxComponent(){ return max(m_nR, max(m_nG, m_nB)); }
-	int GetMinComponent(){ return min(m_nR, min(m_nG, m_nB)); }
+	int GetMaxComponent(){ return std::max(m_nR, std::max(m_nG, m_nB)); }
+	int GetMinComponent(){ return std::min(m_nR, std::min(m_nG, m_nB)); }
 	static ZBaseColour<T> Blend(const ZBaseColour<T> &c1, const ZBaseColour<T> &c2, float fBlend){ return (ZBaseColour<T>)((c1 * (1.0f - fBlend)) + (c2 * fBlend)); }
 };
 template < class T, class U > inline ZBaseColour<T> operator*(U n, const ZBaseColour<T> &c)

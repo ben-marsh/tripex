@@ -194,7 +194,7 @@ public:
 				float ny = (y - 128.0f) / 128.0f;
 				float nz = 1.0f - sqrtf(nx*nx + ny*ny);
 				int br = (int)( (nz + (nz * nz * nz * nz)) * 256.0f );
-				pnLightMap[i++] = min(max(br, 0), 255);
+				pnLightMap[i++] = std::min(std::max(br, 0), 255);
 			}
 		}
 
@@ -222,7 +222,7 @@ public:
 
 				precalc_u[x][y] = (XM * xp);
 				precalc_v[x][y] = (YM * yp);
-				precalc_c[x][y] = min(max(dp, 0.0f), 1.0f);
+				precalc_c[x][y] = std::min(std::max(dp, 0.0f), 1.0f);
 			}
 		}
 
@@ -376,7 +376,7 @@ public:
 			float fNext = fPos + MIN_FRAME_TIME;
 			bool bLast = fNext > elapsed;
 
-			float fThis = min(MIN_FRAME_TIME, elapsed - fPos);
+			float fThis = std::min(MIN_FRAME_TIME, elapsed - fPos);
 			obj.fRoll += fThis * fTentacleDir * g_fDegToRad * 5.0f * (pAudio->GetIntensity( ) + 0.1f);
 			obj.fPitch += fThis * fTentacleDir * g_fDegToRad * 20.0f * pAudio->GetIntensity( );
 			obj.fYaw += fThis * fTentacleDir * g_fDegToRad * 10.0f * (pAudio->GetIntensity( ) + 0.1f);

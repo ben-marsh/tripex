@@ -281,7 +281,7 @@ void ZTextureFont::Draw(BYTE *pbData, int nSpan, const char *sText, int nX, int 
 					{
 						for(int k = 0; k < nWidth; k++)
 						{
-							*pbDst = min(255, *pbDst + *pbSrc);
+							*pbDst = std::min(255, *pbDst + *pbSrc);
 							pbSrc++;
 							pbDst++;
 						}

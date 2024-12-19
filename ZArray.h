@@ -136,7 +136,7 @@ template<typename T> bool ZArray<T>::SetLength(int nNewLength)
 {
 	if(nNewLength > nSize)
 	{
-		if(!SetSize(max(nSize + nStep, nNewLength))) return false;
+		if(!SetSize(std::max(nSize + nStep, nNewLength))) return false;
 	}
 	nLength = nNewLength;
 	return true;

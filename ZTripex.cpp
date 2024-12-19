@@ -273,7 +273,7 @@ ZError* ZTripex::Render()
 	static float fFrames = 0;
 	DWORD dwTimeChange = dwTime - dwLastTime;
 
-	fFrames += min(4.0f, dwTimeChange / (1000.0f / 15.0f));
+	fFrames += std::min(4.0f, dwTimeChange / (1000.0f / 15.0f));
 	dwLastTime = dwTime;
 //	AddFrameTime(false, dwTimeChange);
 
@@ -352,7 +352,7 @@ ZError* ZTripex::Render()
 				(*pvpEffect)[i]->fProb = 1.0f / (1.0f + expf(-weight / temperature));
 			}
 
-			(*pvpEffect)[i]->fProb *= (*pvpEffect)[i]->fPreference * max(0.1f, 1.0f - fabs(pAudio->GetIntensity( ) - (*pvpEffect)[i]->fActivity));
+			(*pvpEffect)[i]->fProb *= (*pvpEffect)[i]->fPreference * std::max(0.1f, 1.0f - fabsf(pAudio->GetIntensity( ) - (*pvpEffect)[i]->fActivity));
 
 			pt += (*pvpEffect)[i]->fProb;//vpEffect[i]->preference * p[i];
 		}
@@ -391,13 +391,13 @@ ZError* ZTripex::Render()
 	}
 
 	float fOut = (nEffect == 0)? 0 : (fFadeOut * 5000.0f);
-	float fFadeLength = (fFadeIn * 5000.0f) + fOut - (fCrossfading * min((fFadeIn * 5000.0f), fOut));
+	float fFadeLength = (fFadeIn * 5000.0f) + fOut - (fCrossfading * std::min((fFadeIn * 5000.0f), fOut));
 
-	float fBr = txs.test(TXS_IN_FADE)? min(1, max(0, 1 - (fFadePos / fOut))) : 1;
+	float fBr = txs.test(TXS_IN_FADE)? std::min(1.0f, std::max(0.0f, 1.0f - (fFadePos / fOut))) : 1;
 	ppDrawEffect[0] = (fBr < FLOAT_ZERO)? pEffectBlank : (*pvpEffect)[nEffect];
 	ppDrawEffect[0]->fBr = fBr;
 
-	fBr = txs.test(TXS_IN_FADE)? min(1.0f, max(0.0f, 1.0f - ((fFadeLength - fFadePos) / (fFadeIn * 5000.0f)))) : 0;
+	fBr = txs.test(TXS_IN_FADE)? std::min(1.0f, std::max(0.0f, 1.0f - ((fFadeLength - fFadePos) / (fFadeIn * 5000.0f)))) : 0;
 	ppDrawEffect[1] = (fBr < FLOAT_ZERO)? pEffectBlank : (*pvpEffect)[nNextEffect];
 	ppDrawEffect[1]->fBr = fBr;
 

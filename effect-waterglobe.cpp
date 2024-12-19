@@ -2,6 +2,7 @@
 #include "ZObject.h"
 #include "error.h"
 #include "effect.h"
+#include <algorithm>
 
 #define accelFac 0.9
 
@@ -175,7 +176,7 @@ public:
 
 //			float fAverage = pObj->AverageHeight();
 //			pObj->pfPos[0] = bh * sin(angle * 3.14159 / 128.0);
-			float fMult = min(1, pAudio->GetIntensity( ) * 2) - min(1, pAudio->GetIntensity( ) * 3) - (obj.AverageHeight() / 0.5f); //0.95 - average; //9; //0.95;
+			float fMult = std::min(1.0f, pAudio->GetIntensity( ) * 2) - std::min(1.f, pAudio->GetIntensity( ) * 3) - (obj.AverageHeight() / 0.5f); //0.95 - average; //9; //0.95;
 			obj.Update();
 //			pObj->fDamping = average / pObj->;//min(0.96, average * 2.0) * Bound<float>(1 - avHeight, 0, 1); /**/ //(AVSZ / avHeight); //0.95 - average; //9; //0.95;
 
