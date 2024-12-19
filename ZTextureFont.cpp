@@ -138,7 +138,8 @@ void ZTextureFont::Draw(ZSpriteBuffer *psb, const char *sText, ZPoint<int> p, ZC
 */	if((nFlags & TF_LIMITWIDTH) && pnWidth != NULL && GetWidth(sText) > *pnWidth)
 	{
 		// try with ellipsis
-		ZPtr<char> sBuf = new char[strlen(sText) + 5];
+		std::unique_ptr<char[]> sBufOwner(new char[strlen(sText) + 5]);
+		char* sBuf = sBufOwner.get();
 
 		strcpy(sBuf, sText);
 		for(int i = ( int )strlen(sText) - 1;;i--)

@@ -110,7 +110,7 @@ public:
 //	ZPtrArray<BumpmapData*> pBump;
 //	ZArray<unsigned char> pBuf;
 
-	std::map< ZTexture*, std::auto_ptr< unsigned short > > mpBumpIndex;
+	std::map< ZTexture*, std::unique_ptr<unsigned short[]> > mpBumpIndex;
 
 	ZObject obj;
 	ZCamera camera;
@@ -458,7 +458,7 @@ public:
 			texture = g_pD3D->Find(TC_WTBUMPMAPBACK);
 			if(texture != pBlankTexture)
 			{	
-				std::map< ZTexture*, std::auto_ptr< unsigned short > >::iterator it = mpBumpIndex.find(texture);
+				std::map< ZTexture*, std::unique_ptr< unsigned short[] > >::iterator it = mpBumpIndex.find(texture);
 				if(it != mpBumpIndex.end())
 				{
 					pnCurrentBump = it->second.get();
@@ -482,7 +482,7 @@ public:
 						d3dsd.Format == D3DFMT_X8R8G8B8 &&
 						SUCCEEDED(pSurface->LockRect(&d3dr, NULL, 0)))
 					{
-						std::auto_ptr< unsigned short > pb = std::auto_ptr< unsigned short >(new unsigned short[256 * 256]);
+						std::unique_ptr< unsigned short[] > pb(new unsigned short[256 * 256]);
 
 						unsigned char* pcSrc = (unsigned char*)d3dr.pBits;
 						unsigned char pbBump[256 * 256];

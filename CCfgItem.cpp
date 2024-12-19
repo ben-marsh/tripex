@@ -135,7 +135,7 @@ bool CCfgItem::SetIntArray(char c, int n, int n1, ...)
 }
 bool CCfgItem::SetFloatArray(char c, int n, float *pf)
 {
-	std::auto_ptr<int> pn(new int[n]);
+	std::unique_ptr<int[]> pn(new int[n]);
 	for(int i = 0; i < n; i++) pn.get()[i] = Bound<int>((int)(pf[i] * 1000.0f), 0, 1000);
 	return SetIntArray(c, n, pn.get());
 }
@@ -156,7 +156,7 @@ bool CCfgItem::GetFloatArray(int n, float *pf) const
 	int i;
 	for(i = 0; i < n; i++) pf[i] = 0.5f;
 
-	std::auto_ptr<int> pn(new int[n]);
+	std::unique_ptr<int[]> pn(new int[n]);
 	if(!GetIntArray(n, pn.get())) return false;
 	for(i = 0; i < n; i++) pf[i] = Bound<float>(pn.get()[i] / 1000.0f, 0.0f, 1.0f);
 	return true;
