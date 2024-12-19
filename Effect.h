@@ -138,10 +138,10 @@ public:
 	EffectBase();
 	virtual ~EffectBase();
 
-	virtual Error* Calculate(FLOAT32 fBr, FLOAT32 fElapsed, AudioData* pAudio) = 0;
+	virtual Error* Calculate(float fBr, float fElapsed, AudioData* pAudio) = 0;
 	virtual Error* Reconfigure(AudioData* pAudio);
 	virtual Error* Render() = 0;
-	virtual bool CanRender(FLOAT32 fElapsed);
+	virtual bool CanRender(float fElapsed);
 };
 
 class EffectHandler

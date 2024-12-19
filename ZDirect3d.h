@@ -21,16 +21,16 @@ public:
 	Vector3 m_vNormal;
 	ColorRgb m_cDiffuse;
 	ColorRgb m_cSpecular;
-	ZPoint< FLOAT32 > m_aTex[MAX_TEXTURES];
+	ZPoint< float > m_aTex[MAX_TEXTURES];
 };
 class ZVertexTL
 {
 public:
 	Vector3 m_vPos;
-	FLOAT32 m_fRHW;
+	float m_fRHW;
 	ColorRgb m_cDiffuse;
 	ColorRgb m_cSpecular;
-	ZPoint< FLOAT32 > m_aTex[MAX_TEXTURES];
+	ZPoint< float > m_aTex[MAX_TEXTURES];
 };
 
 class Texture;

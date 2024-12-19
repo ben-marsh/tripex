@@ -12,7 +12,7 @@ inline Vector3::Vector3( )
 {
 }
 
-inline Vector3::Vector3( FLOAT32 fX, FLOAT32 fY, FLOAT32 fZ )
+inline Vector3::Vector3( float fX, float fY, float fZ )
 {
 	Set( fX, fY, fZ );
 }
@@ -30,7 +30,7 @@ inline Vector3 Vector3::Origin( )
 * Polar( ):
 ---------------------------------------------*/
 
-inline Vector3 Polar( FLOAT32 fLength, FLOAT32 fPitch, FLOAT32 fYaw )
+inline Vector3 Polar( float fLength, float fPitch, float fYaw )
 {
 	return Vector3( 0, 0, fLength ) * Matrix44::Rotation( fPitch, fYaw );
 }
@@ -39,7 +39,7 @@ inline Vector3 Polar( FLOAT32 fLength, FLOAT32 fPitch, FLOAT32 fYaw )
 * Set( ):
 ---------------------------------------------*/
 
-inline void Vector3::Set( FLOAT32 fX, FLOAT32 fY, FLOAT32 fZ )
+inline void Vector3::Set( float fX, float fY, float fZ )
 {
 	m_fX = fX;
 	m_fY = fY;
@@ -78,12 +78,12 @@ inline Vector3 Vector3::operator-( const Vector3 &v ) const
 * operator*( ):
 ---------------------------------------------*/
 
-inline Vector3 Vector3::operator*( FLOAT32 fValue ) const
+inline Vector3 Vector3::operator*( float fValue ) const
 {
 	return Vector3( m_fX * fValue, m_fY * fValue, m_fZ * fValue );
 }
 
-inline Vector3 operator*( FLOAT32 fValue, const Vector3 &v )
+inline Vector3 operator*( float fValue, const Vector3 &v )
 {
 	return v * fValue;
 }
@@ -92,7 +92,7 @@ inline Vector3 operator*( FLOAT32 fValue, const Vector3 &v )
 * operator/( ):
 ---------------------------------------------*/
 
-inline Vector3 Vector3::operator/( FLOAT32 fValue ) const
+inline Vector3 Vector3::operator/( float fValue ) const
 {
 	return operator*( 1.0f / fValue );
 }
@@ -125,7 +125,7 @@ inline Vector3 &Vector3::operator-=( const Vector3 &v )
 * operator*=( ):
 ---------------------------------------------*/
 
-inline Vector3 &Vector3::operator*=( FLOAT32 fValue )
+inline Vector3 &Vector3::operator*=( float fValue )
 {
 	m_fX *= fValue;
 	m_fY *= fValue;
@@ -137,7 +137,7 @@ inline Vector3 &Vector3::operator*=( FLOAT32 fValue )
 * operator/=( ):
 ---------------------------------------------*/
 
-inline Vector3 &Vector3::operator/=( FLOAT32 fValue )
+inline Vector3 &Vector3::operator/=( float fValue )
 {
 	return operator*=( 1.0f / fValue );
 }
@@ -146,13 +146,13 @@ inline Vector3 &Vector3::operator/=( FLOAT32 fValue )
 * operator[ ]:
 ---------------------------------------------*/
 
-inline FLOAT32 &Vector3::operator[ ]( int nPos )
+inline float &Vector3::operator[ ]( int nPos )
 {
 	_ASSERT( nPos >= 0 && nPos < 3 );
 	return m_af[ nPos ];
 }
 
-inline const FLOAT32 &Vector3::operator[ ]( int nPos ) const
+inline const float &Vector3::operator[ ]( int nPos ) const
 {
 	_ASSERT( nPos >= 0 && nPos < 3 );
 	return m_af[ nPos ];
@@ -162,7 +162,7 @@ inline const FLOAT32 &Vector3::operator[ ]( int nPos ) const
 * Dot( ):
 ---------------------------------------------*/
 
-inline FLOAT32 Vector3::Dot( const Vector3 &v ) const
+inline float Vector3::Dot( const Vector3 &v ) const
 {
 	return ( m_fX * v.m_fX ) + ( m_fY * v.m_fY ) + ( m_fZ * v.m_fZ );
 }
@@ -171,7 +171,7 @@ inline FLOAT32 Vector3::Dot( const Vector3 &v ) const
 * Length( ):
 ---------------------------------------------*/
 
-inline FLOAT32 Vector3::Length( ) const
+inline float Vector3::Length( ) const
 {
 	return sqrtf( Dot( *this ) );
 }
@@ -180,12 +180,12 @@ inline FLOAT32 Vector3::Length( ) const
 * Normal( )/Normalize( ):
 ---------------------------------------------*/
 
-inline Vector3 Vector3::Normal( FLOAT32 fLength ) const
+inline Vector3 Vector3::Normal( float fLength ) const
 {
 	return operator*( fLength / Length( ) );
 }
 
-inline void Vector3::Normalize( FLOAT32 fLength )
+inline void Vector3::Normalize( float fLength )
 {
 	operator*=( fLength / Length( ) );
 }
@@ -194,12 +194,12 @@ inline void Vector3::Normalize( FLOAT32 fLength )
 * GetYaw( )/GetPitch( )/GetRoll( ):
 ---------------------------------------------*/
 
-inline FLOAT32 Vector3::GetYaw( ) const
+inline float Vector3::GetYaw( ) const
 {
 	return atan2f( m_fX, m_fZ );
 }
 
-inline FLOAT32 Vector3::GetPitch( ) const
+inline float Vector3::GetPitch( ) const
 {
 	return -atan2f( m_fY, sqrtf( m_fX * m_fX + m_fZ * m_fZ ) ); 
 }

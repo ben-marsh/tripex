@@ -14,14 +14,14 @@ public:
 
 	std::bitset< F_LAST > m_bsFlag;
 
-	FLOAT32 m_fScreenX, m_fScreenY;
-	FLOAT32 m_fScale;
+	float m_fScreenX, m_fScreenY;
+	float m_fScale;
 
-	FLOAT32 m_fPerspective;
-	FLOAT32 m_fTightness;
+	float m_fPerspective;
+	float m_fTightness;
 
 	Vector3 m_vPosition;
-	FLOAT32 m_fPitch, m_fYaw, m_fRoll;
+	float m_fPitch, m_fYaw, m_fRoll;
 
 	// Constructor:
 	Camera( );

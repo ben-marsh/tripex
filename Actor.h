@@ -30,9 +30,9 @@ class ZExposureData
 {
 public:
 	Matrix44 mTransform;
-	FLOAT32 m_fTime;
+	float m_fTime;
 	SINT32 m_nFrame;
-	FLOAT32 m_fPos;
+	float m_fPos;
 };
 
 class Actor

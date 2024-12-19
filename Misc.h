@@ -14,7 +14,7 @@
 //string FormatStringV( const char *sFormat, va_list pArg );
 
 // Wrap( ):
-FLOAT32 Wrap( FLOAT32 fValue, FLOAT32 fMin, FLOAT32 fMax );
+float Wrap( float fValue, float fMin, float fMax );
 
 /*---------------------------------------------
 * Bound( ):

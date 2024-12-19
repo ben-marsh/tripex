@@ -663,7 +663,7 @@ public:
 				memcpy( srccolour, dstcolour, sizeof( dstcolour ) );
 				
 				ColorHsv pcHSV[ 5 ];
-				FLOAT32 fDiff = rand() * (50.0f * 3.14159 / 180.0) / RAND_MAX;
+				float fDiff = rand() * (50.0f * 3.14159 / 180.0) / RAND_MAX;
 				if(rand() > RAND_MAX / 2) fDiff = -fDiff;
 				pcHSV[3].m_fH = (rand() * PI * 2.0f / RAND_MAX) - PI;
 				pcHSV[3].CorrectRange();

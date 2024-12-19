@@ -248,7 +248,7 @@
     <ClInclude Include="config-defaults.h" />
     <ClInclude Include="config.h" />
     <ClInclude Include="TextureSource.h" />
-    <ClInclude Include="effect.h" />
+    <ClInclude Include="Effect.h" />
     <ClInclude Include="Error.h" />
     <ClInclude Include="general.h" />
     <ClInclude Include="main.h" />

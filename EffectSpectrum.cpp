@@ -22,16 +22,16 @@
 class EffectSpectrum : public EffectBase
 {
 public:
-	FLOAT32 m_fBrAng;
+	float m_fBrAng;
 	Camera m_cCamera;
 	Actor m_pObj[TRAIL_H];
 	Actor m_pLimit[LIMITER_H];
-	FLOAT32 m_fAng;
-	FLOAT32 m_fRotAng;
-	FLOAT32 m_pfHeight[TRAIL_H][TRAIL_W];
-	FLOAT32 m_pfCubeHeight[LIMITER_H][TRAIL_W];
-	FLOAT32 m_pfCubeTop[LIMITER_H][TRAIL_W];
-	FLOAT32 m_pfCubeTime[LIMITER_H][TRAIL_W];
+	float m_fAng;
+	float m_fRotAng;
+	float m_pfHeight[TRAIL_H][TRAIL_W];
+	float m_pfCubeHeight[LIMITER_H][TRAIL_W];
+	float m_pfCubeTop[LIMITER_H][TRAIL_W];
+	float m_pfCubeTime[LIMITER_H][TRAIL_W];
 	bool m_fr;
 
 	/*---------------------------------------------
@@ -56,7 +56,7 @@ public:
 			for(int j = 0; j < TRAIL_W; j++)
 			{
 				int n = j * 4;
-				static const FLOAT32 s = 0.5f / sqrtf( 2.0f );
+				static const float s = 0.5f / sqrtf( 2.0f );
 				m_pObj[ i ].pVertex[ n + 0 ].m_vNormal = Vector3( 0.0f, -s, -s );
 				m_pObj[ i ].pVertex[ n + 1 ].m_vNormal = Vector3( 0.0f, +s, -s );
 				m_pObj[ i ].pVertex[ n + 2 ].m_vNormal = Vector3( 0.0f, +s, +s );
@@ -90,8 +90,8 @@ public:
 			m_pLimit[i].m_bsFlag.set(Actor::F_DRAW_VERTEX_SPRITES);
 			m_pLimit[i].fSpriteSize = 9.0f;//fRenderAsLights(15.0);
 
-//			FLOAT32 dMult = ((sin((CUBE_H + i + (dAng / TRAIL_ANGS)) * 3.14159 / TRAIL_H) * 0.7) + 0.8) * TRAIL_XS;
-			FLOAT32 fMult = ((sinf((CUBE_H + i) * PI / TRAIL_H) * 0.7f) + 0.8f) * TRAIL_XS;
+//			float dMult = ((sin((CUBE_H + i + (dAng / TRAIL_ANGS)) * 3.14159 / TRAIL_H) * 0.7) + 0.8) * TRAIL_XS;
+			float fMult = ((sinf((CUBE_H + i) * PI / TRAIL_H) * 0.7f) + 0.8f) * TRAIL_XS;
 			for(int j = 0; j < TRAIL_W; j++)
 			{
 				m_pLimit[i].pVertex[j].m_vPos.m_fX = (j - (TRAIL_W / 2.0f)) * fMult;
@@ -114,7 +114,7 @@ public:
 	* Calculate( ):
 	---------------------------------------------*/
 
-	Error* Calculate( FLOAT32 fBrightness, FLOAT32 fElapsed, AudioData* pAudio) override
+	Error* Calculate( float fBrightness, float fElapsed, AudioData* pAudio) override
 	{
 		int i, j;
 		m_fRotAng += fElapsed * ( 2.0f * g_fDegToRad );
@@ -170,16 +170,16 @@ public:
 			}
 		}
 
-		FLOAT32 fPosYMax = -CYLINDER_RADIUS + ( CYLINDER_RADIUS * cosf( TRAIL_ANGS * ( TRAIL_H * 0.5f ) + ANG_OFFSET ) );
+		float fPosYMax = -CYLINDER_RADIUS + ( CYLINDER_RADIUS * cosf( TRAIL_ANGS * ( TRAIL_H * 0.5f ) + ANG_OFFSET ) );
 		for(i = 0; i < TRAIL_H; i++)
 		{
-			FLOAT32 fThisAng = ( ( i - ( TRAIL_H * 0.5f ) ) * TRAIL_ANGS ) + m_fAng + ANG_OFFSET;
-			FLOAT32 fCos = cosf( fThisAng );
-			FLOAT32 fSin = sinf( fThisAng );
-			FLOAT32 fPosY = CYLINDER_RADIUS - ( CYLINDER_RADIUS * fCos );
-			FLOAT32 fPosZ = ( CYLINDER_RADIUS * fSin );
+			float fThisAng = ( ( i - ( TRAIL_H * 0.5f ) ) * TRAIL_ANGS ) + m_fAng + ANG_OFFSET;
+			float fCos = cosf( fThisAng );
+			float fSin = sinf( fThisAng );
+			float fPosY = CYLINDER_RADIUS - ( CYLINDER_RADIUS * fCos );
+			float fPosZ = ( CYLINDER_RADIUS * fSin );
 
-			FLOAT32 fBr;
+			float fBr;
 			if( i <= 1 )
 			{
 				fBr = ( i + ( m_fAng / TRAIL_ANGS ) ) * 0.5f;
@@ -198,12 +198,12 @@ public:
 			m_pObj[ i ].wcAmbientLight = ColorRgb::Grey( ( int )( fBr * 255.0f ) );
 
 			int n = 0;
-			FLOAT32 fMult = ((sinf((i + (m_fAng / TRAIL_ANGS)) * PI / TRAIL_H) * 0.9f) + 0.8f) * TRAIL_XS;
+			float fMult = ((sinf((i + (m_fAng / TRAIL_ANGS)) * PI / TRAIL_H) * 0.9f) + 0.8f) * TRAIL_XS;
 			for(int j = 0; j < TRAIL_W; j++)
 			{
-				FLOAT32 fX = ( j - ( TRAIL_W * 0.5f ) ) * fMult;
-				FLOAT32 fY = fPosY - ( fCos * m_pfHeight[ i ][ j ] );
-				FLOAT32 fZ = fPosZ - ( fSin * m_pfHeight[ i ][ j ] );
+				float fX = ( j - ( TRAIL_W * 0.5f ) ) * fMult;
+				float fY = fPosY - ( fCos * m_pfHeight[ i ][ j ] );
+				float fZ = fPosZ - ( fSin * m_pfHeight[ i ][ j ] );
 
 				m_pObj[ i ].pVertex[ n + 0 ].m_vPos = Vector3( fX, fY - BAR_SIZE, fZ - BAR_SIZE );
 				m_pObj[ i ].pVertex[ n + 1 ].m_vPos = Vector3( fX, fY + BAR_SIZE, fZ - BAR_SIZE );
@@ -218,18 +218,18 @@ public:
 
 		for( i = 0; i < LIMITER_H; i++ )
 		{
-			FLOAT32 dCubeAng = ((CUBE_H + i - (TRAIL_H * 0.5f )) * TRAIL_ANGS) + ANG_OFFSET;
-			FLOAT32 dCubeCos = cosf(dCubeAng);
-			FLOAT32 dCubeSin = sinf(dCubeAng);
-			FLOAT32 dCubePosY = CYLINDER_RADIUS - (CYLINDER_RADIUS * dCubeCos);
-			FLOAT32 dCubePosZ = (CYLINDER_RADIUS * dCubeSin);//sin(dThisAng));
+			float dCubeAng = ((CUBE_H + i - (TRAIL_H * 0.5f )) * TRAIL_ANGS) + ANG_OFFSET;
+			float dCubeCos = cosf(dCubeAng);
+			float dCubeSin = sinf(dCubeAng);
+			float dCubePosY = CYLINDER_RADIUS - (CYLINDER_RADIUS * dCubeCos);
+			float dCubePosZ = (CYLINDER_RADIUS * dCubeSin);//sin(dThisAng));
 			for(int j = 0; j < TRAIL_W; j++)
 			{
 				m_pLimit[i].pVertex[j].m_vPos.m_fY = dCubePosY - (dCubeCos * m_pfCubeHeight[i][j]);
 				m_pLimit[i].pVertex[j].m_vPos.m_fZ = dCubePosZ - (dCubeSin * m_pfCubeHeight[i][j]);
 			}
 			
-			FLOAT32 fBr = Bound< FLOAT32 >( 0.9f - ( ( FLOAT32 )i ) / LIMITER_H, 0.0f, 1.0f );
+			float fBr = Bound< float >( 0.9f - ( ( float )i ) / LIMITER_H, 0.0f, 1.0f );
 			m_pLimit[ i ].wcAmbientLight = ColorRgb::Grey( ( int )( 255.0f * fBr * fBrightness ) );
 			m_pLimit[ i ].Calculate( &m_cCamera, fElapsed );
 		}

@@ -5,7 +5,7 @@
 class EffectBlank : public EffectBase
 {
 public:
-	Error* Calculate( FLOAT32, FLOAT32, AudioData* )
+	Error* Calculate( float, float, AudioData* )
 	{
 		return nullptr;
 	};

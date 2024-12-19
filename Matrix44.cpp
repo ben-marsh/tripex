@@ -20,7 +20,7 @@ Matrix44 Matrix44::Identity()
 * Translation( ):
 ---------------------------------------------*/
 
-Matrix44 Matrix44::Translation( FLOAT32 fX, FLOAT32 fY, FLOAT32 fZ )
+Matrix44 Matrix44::Translation( float fX, float fY, float fZ )
 {
 	Matrix44 m;
 	m.SetRow( 0, 1.0f, 0.0f, 0.0f, 0.0f );
@@ -34,7 +34,7 @@ Matrix44 Matrix44::Translation( FLOAT32 fX, FLOAT32 fY, FLOAT32 fZ )
 * Scaling( ):
 ---------------------------------------------*/
 
-Matrix44 Matrix44::Scaling( FLOAT32 fX, FLOAT32 fY, FLOAT32 fZ )
+Matrix44 Matrix44::Scaling( float fX, float fY, float fZ )
 {
 	Matrix44 m;
 	m.SetRow( 0, fX,   0.0f, 0.0f, 0.0f );
@@ -48,9 +48,9 @@ Matrix44 Matrix44::Scaling( FLOAT32 fX, FLOAT32 fY, FLOAT32 fZ )
 * RotationX( ):
 ---------------------------------------------*/
 
-Matrix44 Matrix44::RotationX( FLOAT32 fPitch )
+Matrix44 Matrix44::RotationX( float fPitch )
 {
-	FLOAT32 fCos = cosf( fPitch ), fSin = sinf( fPitch );
+	float fCos = cosf( fPitch ), fSin = sinf( fPitch );
 
 	Matrix44 m;
 	m.SetRow( 0, 1.0f, 0.0f, 0.0f, 0.0f );
@@ -64,9 +64,9 @@ Matrix44 Matrix44::RotationX( FLOAT32 fPitch )
 * RotationY( ):
 ---------------------------------------------*/
 
-Matrix44 Matrix44::RotationY( FLOAT32 fYaw )
+Matrix44 Matrix44::RotationY( float fYaw )
 {
-	FLOAT32 fCos = cosf( fYaw ), fSin = sinf( fYaw );
+	float fCos = cosf( fYaw ), fSin = sinf( fYaw );
 
 	Matrix44 m;
 	m.SetRow( 0, fCos, 0.0f,-fSin, 0.0f ); 
@@ -80,9 +80,9 @@ Matrix44 Matrix44::RotationY( FLOAT32 fYaw )
 * RotationZ( ):
 ---------------------------------------------*/
 
-Matrix44 Matrix44::RotationZ( FLOAT32 fRoll )
+Matrix44 Matrix44::RotationZ( float fRoll )
 {
-	FLOAT32 fCos = cosf( fRoll ), fSin = sinf( fRoll );
+	float fCos = cosf( fRoll ), fSin = sinf( fRoll );
 
 	Matrix44 m;
 	m.SetRow( 0, fCos, fSin, 0.0f, 0.0f );
@@ -96,17 +96,17 @@ Matrix44 Matrix44::RotationZ( FLOAT32 fRoll )
 * Rotation( ):
 ---------------------------------------------*/
 
-Matrix44 Matrix44::Rotation( FLOAT32 fYaw, FLOAT32 fPitch )
+Matrix44 Matrix44::Rotation( float fYaw, float fPitch )
 {
 	return RotationY( fYaw ) * RotationX( fPitch );
 }
-Matrix44 Matrix44::Rotation( FLOAT32 fYaw, FLOAT32 fPitch, FLOAT32 fRoll)
+Matrix44 Matrix44::Rotation( float fYaw, float fPitch, float fRoll)
 {
 	return Rotation( fYaw, fPitch ) * RotationZ( fRoll );
 }
-Matrix44 Matrix44::Rotation( FLOAT32 fAng, const Vector3 &v )
+Matrix44 Matrix44::Rotation( float fAng, const Vector3 &v )
 {
-	FLOAT32 fYaw = v.GetYaw( ), fPitch = v.GetPitch( );
+	float fYaw = v.GetYaw( ), fPitch = v.GetPitch( );
 	return ( Rotation( -fPitch, -fYaw ) * RotationZ( fAng ) ) * Rotation( fPitch, fYaw );
 }
 

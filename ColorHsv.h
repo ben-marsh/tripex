@@ -8,35 +8,30 @@
 * ZColourHSV
 -----------------------------------*/
 
-class ColorHsv
+struct ColorHsv
 {
-public:
-	FLOAT32 m_fH, m_fS, m_fV;
+	float m_fH, m_fS, m_fV;
 
 	// Constructor:
-	inline ColorHsv();
-	inline ColorHsv( FLOAT32 fH, FLOAT32 fS, FLOAT32 fV );
+	ColorHsv() = default;
+	ColorHsv( float fH, float fS, float fV );
 
 	// Set( ):
-	inline void Set( FLOAT32 fH, FLOAT32 fS, FLOAT32 fV );
-	inline void Set( const ColorRgb &c, FLOAT32 fDefH = 0.0f, FLOAT32 fDefS = 0.0f );
+	void Set( float fH, float fS, float fV );
+	void Set( const ColorRgb &c, float fDefH = 0.0f, float fDefS = 0.0f );
 
 	// CorrectRange( ):
-	inline void CorrectRange( );
+	void CorrectRange( );
 	
 	// GetRGB( ):
-	inline WideColorRgb GetRGB( ) const;
+	WideColorRgb GetRGB( ) const;
 };
 
 /*---------------------------------
 * Constructor:
 -----------------------------------*/
 
-ColorHsv::ColorHsv( )
-{
-}
-
-ColorHsv::ColorHsv( FLOAT32 fH, FLOAT32 fS, FLOAT32 fV )
+inline ColorHsv::ColorHsv( float fH, float fS, float fV )
 {
 	Set( fH, fS, fV );
 }
@@ -45,21 +40,21 @@ ColorHsv::ColorHsv( FLOAT32 fH, FLOAT32 fS, FLOAT32 fV )
 * Set( ):
 -----------------------------------*/
 
-void ColorHsv::Set( FLOAT32 fH, FLOAT32 fS, FLOAT32 fV )
+inline void ColorHsv::Set( float fH, float fS, float fV )
 {
 	m_fH = fH;
 	m_fS = fS;
 	m_fV = fV;
 }
 
-void ColorHsv::Set( const ColorRgb &c, FLOAT32 fDefH, FLOAT32 fDefS )
+inline void ColorHsv::Set( const ColorRgb &c, float fDefH, float fDefS )
 {
 	// sat = 0, hue doesn't matter (grey) (min = max)
 	// light = 0, sat + hue doesn't matter (black) (min = max = 0)
 
 	int nMin = std::min( c.m_nR, std::min( c.m_nG, c.m_nB ) );
 	int nMax = std::max( c.m_nR, std::max( c.m_nG, c.m_nB ) );
-	FLOAT32 fRange = nMax - nMin;
+	float fRange = nMax - nMin;
 
 	// lightness
 	m_fV = nMax / 255.0f;
@@ -75,11 +70,11 @@ void ColorHsv::Set( const ColorRgb &c, FLOAT32 fDefH, FLOAT32 fDefS )
 	}
 	else
 	{
-		FLOAT32 fRangeRecip = 1.0f / fRange;
+		float fRangeRecip = 1.0f / fRange;
 
-		FLOAT32 fDiffR = ( nMax - c.m_nR ) * fRangeRecip;
-		FLOAT32 fDiffG = ( nMax - c.m_nG ) * fRangeRecip;
-		FLOAT32 fDiffB = ( nMax - c.m_nB ) * fRangeRecip;
+		float fDiffR = ( nMax - c.m_nR ) * fRangeRecip;
+		float fDiffG = ( nMax - c.m_nG ) * fRangeRecip;
+		float fDiffB = ( nMax - c.m_nB ) * fRangeRecip;
 
 		if( nMin == c.m_nB )		m_fH = 1.0f - fDiffG + fDiffR;
 		else if( nMin == c.m_nR )	m_fH = 3.0f - fDiffB + fDiffG;
@@ -93,18 +88,18 @@ void ColorHsv::Set( const ColorRgb &c, FLOAT32 fDefH, FLOAT32 fDefS )
 * ToRGB( ):
 -----------------------------------*/
 
-WideColorRgb ColorHsv::GetRGB( ) const
+inline WideColorRgb ColorHsv::GetRGB( ) const
 {
 	ColorHsv c = *this;
 	c.CorrectRange( );
 
-	FLOAT32 fPos = ( c.m_fH + PI ) / ( PI / 3.0f );
-	FLOAT32 fSpread = c.m_fS * c.m_fV * 255.0f;
-	FLOAT32 fMin = c.m_fV * 255.0f - fSpread;
+	float fPos = ( c.m_fH + PI ) / ( PI / 3.0f );
+	float fSpread = c.m_fS * c.m_fV * 255.0f;
+	float fMin = c.m_fV * 255.0f - fSpread;
 
-	FLOAT32 fR = fMin + Bound< FLOAT32 >( -1 + fabsf( fPos - 3.0f ), 0.0f, 1.0f ) * fSpread;
-	FLOAT32 fG = fMin + Bound< FLOAT32 >( +2 - fabsf( fPos - 2.0f ), 0.0f, 1.0f ) * fSpread;
-	FLOAT32 fB = fMin + Bound< FLOAT32 >( +2 - fabsf( fPos - 4.0f ), 0.0f, 1.0f ) * fSpread;
+	float fR = fMin + Bound< float >( -1 + fabsf( fPos - 3.0f ), 0.0f, 1.0f ) * fSpread;
+	float fG = fMin + Bound< float >( +2 - fabsf( fPos - 2.0f ), 0.0f, 1.0f ) * fSpread;
+	float fB = fMin + Bound< float >( +2 - fabsf( fPos - 4.0f ), 0.0f, 1.0f ) * fSpread;
 	return WideColorRgb( ( SINT32 )fR, ( SINT32 )fG, ( SINT32 )fB );
 }
 
@@ -112,9 +107,9 @@ WideColorRgb ColorHsv::GetRGB( ) const
 * CorrectRange( ):
 -----------------------------------*/
 
-void ColorHsv::CorrectRange( )
+inline void ColorHsv::CorrectRange( )
 {
 	m_fH = Wrap( m_fH, -PI, +PI );
-	m_fS = Bound< FLOAT32 >( m_fS, 0.0f, 1.0f );
-	m_fV = Bound< FLOAT32 >( m_fV, 0.0f, 1.0f );
+	m_fS = Bound< float >( m_fS, 0.0f, 1.0f );
+	m_fV = Bound< float >( m_fV, 0.0f, 1.0f );
 }

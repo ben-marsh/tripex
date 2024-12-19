@@ -4,32 +4,32 @@ class Matrix44
 {
 public:
 	// matrix values at (x,y) positions, not (r,c)
-	FLOAT32 m_aafValue[ 4 ][ 4 ];
+	float m_aafValue[ 4 ][ 4 ];
 
 	// Identity( ): 
  	static Matrix44 Identity();
 
 	// Translation( ): 
 	static Matrix44 Translation( const Vector3 &v );
-	static Matrix44 Translation( FLOAT32 fX, FLOAT32 fY, FLOAT32 fZ );
+	static Matrix44 Translation( float fX, float fY, float fZ );
 
 	// Scaling( ):
-	static Matrix44 Scaling( FLOAT32 fX, FLOAT32 fY, FLOAT32 fZ );
+	static Matrix44 Scaling( float fX, float fY, float fZ );
 
 	// Rotation/X/Y/Z( ):
-	static Matrix44 Rotation( FLOAT32 fYaw, FLOAT32 fPitch);
-	static Matrix44 Rotation( FLOAT32 fYaw, FLOAT32 fPitch, FLOAT32 fRoll);
-	static Matrix44 Rotation( FLOAT32 fAng, const Vector3 &v );
-	static Matrix44 RotationX( FLOAT32 fPitch );
-	static Matrix44 RotationY( FLOAT32 fYaw );
-	static Matrix44 RotationZ( FLOAT32 fRoll );
+	static Matrix44 Rotation( float fYaw, float fPitch);
+	static Matrix44 Rotation( float fYaw, float fPitch, float fRoll);
+	static Matrix44 Rotation( float fAng, const Vector3 &v );
+	static Matrix44 RotationX( float fPitch );
+	static Matrix44 RotationY( float fYaw );
+	static Matrix44 RotationZ( float fRoll );
 
 	// SetRow( ):
-	void SetRow( int nRow, FLOAT32 fVal0, FLOAT32 fVal1, FLOAT32 fVal2, FLOAT32 fVal3 );
+	void SetRow( int nRow, float fVal0, float fVal1, float fVal2, float fVal3 );
 
 	// operator[ ]( ):
-	FLOAT32 *operator[ ]( int nPos );
-	const FLOAT32 *operator[ ]( int nPos ) const;
+	float *operator[ ]( int nPos );
+	const float *operator[ ]( int nPos ) const;
 
 	// operator*( )/operator*=( ):
 	Matrix44 operator*( const Matrix44 &m ) const;

@@ -14,7 +14,7 @@ Error* EffectBase::Reconfigure(AudioData*)
 {
 	return nullptr;
 }
-bool EffectBase::CanRender(FLOAT32 fElapsed)
+bool EffectBase::CanRender(float fElapsed)
 {
 	return true;
 }

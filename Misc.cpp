@@ -25,10 +25,10 @@ const unsigned char g_anBitReverse[ 256 ] =
 * Wrap( ):
 ---------------------------------------------*/
 
-FLOAT32 Wrap( FLOAT32 fValue, FLOAT32 fMin, FLOAT32 fMax )
+float Wrap( float fValue, float fMin, float fMax )
 {
-	FLOAT32 fRange = fMax - fMin;
-	FLOAT32 fRes = fmodf( fValue - fMin, fRange );
+	float fRange = fMax - fMin;
+	float fRes = fmodf( fValue - fMin, fRange );
 	if( fRes < 0.0f ) fRes += fRange;
 	return fRes;
 }

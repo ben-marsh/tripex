@@ -11,9 +11,9 @@
 
 Vector3 Vector3::Cross( const Vector3 &v ) const
 {
-	FLOAT32 fX = ( m_fY * v.m_fZ ) - ( m_fZ * v.m_fY );
-	FLOAT32 fY = ( m_fZ * v.m_fX ) - ( m_fX * v.m_fZ );
-	FLOAT32 fZ = ( m_fX * v.m_fY ) - ( m_fY * v.m_fX );
+	float fX = ( m_fY * v.m_fZ ) - ( m_fZ * v.m_fY );
+	float fY = ( m_fZ * v.m_fX ) - ( m_fX * v.m_fZ );
+	float fZ = ( m_fX * v.m_fY ) - ( m_fY * v.m_fX );
 	return Vector3( fX, fY, fZ );
 }
 
@@ -21,11 +21,11 @@ Vector3 Vector3::Cross( const Vector3 &v ) const
 * GetRoll( ):
 ---------------------------------------------*/
 
-FLOAT32 Vector3::GetRoll( FLOAT32 fTightness ) const
+float Vector3::GetRoll( float fTightness ) const
 {
-	FLOAT32 fPos = fabsf( GetPitch( ) / ( PI / 2.0f ) );
-	FLOAT32 fRollT = ( fPos - ( 1.0f - fTightness ) ) / fTightness;
-	FLOAT32 fRoll = Bound< FLOAT32 >( fRollT, 0.0f, 1.0f ) * ( PI / 2.0f );
+	float fPos = fabsf( GetPitch( ) / ( PI / 2.0f ) );
+	float fRollT = ( fPos - ( 1.0f - fTightness ) ) / fTightness;
+	float fRoll = Bound< float >( fRollT, 0.0f, 1.0f ) * ( PI / 2.0f );
 	if( fabsf( GetYaw( ) ) > ( PI / 2.0f ) ) fRoll = -fRoll;
 	return fRoll;
 }
