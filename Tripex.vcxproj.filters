@@ -8,7 +8,6 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Misc.cpp" />
     <ClCompile Include="StdAfx.cpp" />
-    <ClCompile Include="TextureData.cpp" />
     <ClCompile Include="xbmc.cpp" />
     <ClCompile Include="AudioData.cpp" />
     <ClCompile Include="ZDirect3d.cpp" />
@@ -52,6 +51,12 @@
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TextureFont.cpp" />
     <ClCompile Include="Tripex.cpp" />
+    <ClCompile Include="StarModel.cpp">
+      <Filter>Data</Filter>
+    </ClCompile>
+    <ClCompile Include="TextureData.cpp">
+      <Filter>Data</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="config.h" />
@@ -61,9 +66,7 @@
     <ClInclude Include="general.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="Misc.h" />
-    <ClInclude Include="star.h" />
     <ClInclude Include="StdAfx.h" />
-    <ClInclude Include="TextureData.h" />
     <ClInclude Include="xbmc.h" />
     <ClInclude Include="ZArray.h" />
     <ClInclude Include="AudioData.h" />
@@ -91,6 +94,12 @@
     <ClInclude Include="Texture.h" />
     <ClInclude Include="TextureFont.h" />
     <ClInclude Include="Tripex.h" />
+    <ClInclude Include="StarModel.h">
+      <Filter>Data</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureData.h">
+      <Filter>Data</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="AudioFft.inl" />
@@ -99,5 +108,10 @@
     <None Include=".gitignore" />
     <None Include="Vector3.inl" />
     <None Include="Matrix44.inl" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Data">
+      <UniqueIdentifier>{2766085a-d0b7-4b72-8b8b-5174e1a65fc5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>

@@ -189,6 +189,7 @@
     <ClCompile Include="ConfigItem.cpp" />
     <ClCompile Include="config-defaults.cpp" />
     <ClCompile Include="config.cpp" />
+    <ClCompile Include="StarModel.cpp" />
     <ClCompile Include="TextureSource.cpp" />
     <ClCompile Include="EffectBezierCube.cpp" />
     <ClCompile Include="EffectBlank.cpp" />
@@ -252,7 +253,7 @@
     <ClInclude Include="main.h" />
     <ClInclude Include="Misc.h" />
     <ClInclude Include="Platform.h" />
-    <ClInclude Include="star.h" />
+    <ClInclude Include="StarModel.h" />
     <ClInclude Include="StdAfx.h" />
     <ClInclude Include="TextureData.h" />
     <ClInclude Include="Vector3.h" />

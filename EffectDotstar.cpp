@@ -3,7 +3,7 @@
 #include "effect.h"
 #include "error.h"
 #include "general.h"
-#include "star.h"
+#include "StarModel.h"
 #include "Actor.h"
 #include "BezierCurve.h"
 #include <algorithm>

@@ -1,4 +1,7 @@
-static float pfStarVertex[] = 
+#include "StdAfx.h"
+#include "StarModel.h"
+
+float pfStarVertex[] =
 {
 	-95.000000f, 0.000000f, 0.000000f,
 	-60.052170f, 24.874422f, -0.000002f,
@@ -130,7 +133,7 @@ static float pfStarVertex[] =
 	-36.394753f, -15.075200f, 10.606603f
 };
 
-static WORD pwStarFace[] = 
+extern WORD pwStarFace[] =
 {
 	0, 1, 2,
 	2, 3, 0,
@@ -388,8 +391,8 @@ static WORD pwStarFace[] =
 	123, 122, 5,
 	123, 7, 8,
 	8, 124, 123,
-	8, 124, 123 
+	8, 124, 123
 };
 
-static const int nStarVertices = sizeof(pfStarVertex) / (sizeof(float) * 3);
-static const int nStarFaces = sizeof(pwStarFace) / (sizeof(WORD) * 3);
+extern const int nStarVertices = sizeof(pfStarVertex) / (sizeof(float) * 3);
+extern const int nStarFaces = sizeof(pwStarFace) / (sizeof(WORD) * 3);
