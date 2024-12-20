@@ -189,7 +189,7 @@
   <ItemGroup>
     <ClCompile Include="ConfigItem.cpp" />
     <ClCompile Include="config-defaults.cpp" />
-    <ClCompile Include="config.cpp" />
+    <ClCompile Include="Config.cpp" />
     <ClCompile Include="StarModel.cpp" />
     <ClCompile Include="TextureSource.cpp" />
     <ClCompile Include="EffectBezierCube.cpp" />
@@ -243,7 +243,7 @@
   <ItemGroup>
     <ClInclude Include="ConfigItem.h" />
     <ClInclude Include="config-defaults.h" />
-    <ClInclude Include="config.h" />
+    <ClInclude Include="Config.h" />
     <ClInclude Include="TextureSource.h" />
     <ClInclude Include="Effect.h" />
     <ClInclude Include="Error.h" />
