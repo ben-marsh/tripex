@@ -13,15 +13,15 @@ extern float fHUDTransparency;
 void DrawLineBar(SpriteBuffer &sb, int x, int y, int h, float p)
 {
 	int n = (int)(h * Bound<float>(p, 0.0f, 1.0f));
-	sb.AddSprite(ZPoint<int>(x, y), NULL, g_pD3D->LuminanceOpacity, ZRect<int>(0, 0, 1, n), 0.1f);
-	sb.AddSprite(ZPoint<int>(x, y + n), NULL, g_pD3D->LuminanceOpacity, ZRect<int>(0, 0, 1, h - n), 1.0f);
+	sb.AddSprite(Point<int>(x, y), NULL, g_pD3D->LuminanceOpacity, Rect<int>(0, 0, 1, n), 0.1f);
+	sb.AddSprite(Point<int>(x, y + n), NULL, g_pD3D->LuminanceOpacity, Rect<int>(0, 0, 1, h - n), 1.0f);
 }
 
 void DrawHorizontalBar(SpriteBuffer &sb, int x, int y, int w, int h, float p)
 {
 	p = std::min(1.0f, std::max(0.0f, p));
-	sb.AddSprite(ZPoint<int>(x, y), NULL, 0, ZRect<int>(0, 0, w, h), ColorRgb::Grey(20));
-	sb.AddSprite(ZPoint<int>(x, y), NULL, 0, ZRect<int>(0, 0, (int)(w * p), h), ColorRgb::White());
+	sb.AddSprite(Point<int>(x, y), NULL, 0, Rect<int>(0, 0, w, h), ColorRgb::Grey(20));
+	sb.AddSprite(Point<int>(x, y), NULL, 0, Rect<int>(0, 0, (int)(w * p), h), ColorRgb::White());
 }
 
 
@@ -235,7 +235,7 @@ void AudioData::Update( float fElapsed, float fSensitivity )
 
 void AudioData::Render( SpriteBuffer &sb ) const
 {
-	sb.AddSprite(ZPoint<int>(10, 30), NULL, g_pD3D->InverseMultiply, ZRect<int>(0, 0, 600, 400), 1.0f - fHUDTransparency);
+	sb.AddSprite(Point<int>(10, 30), NULL, g_pD3D->InverseMultiply, Rect<int>(0, 0, 600, 400), 1.0f - fHUDTransparency);
 
 	DrawHorizontalBar( sb, 20, 40, 256, 10, m_fIntensity );
 	DrawHorizontalBar( sb, 20, 60, 256, 10, m_fBeat );

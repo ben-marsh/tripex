@@ -27,7 +27,7 @@ public:
 		fSetTexture = true;
 		// set lastframe to some constant thing
 
-		camera.m_vPosition.m_fZ = -110;
+		camera.position.z = -110;
 
 		for(int i = 0; i < RINGS; i++)
 		{

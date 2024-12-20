@@ -45,9 +45,9 @@ public:
 			{
 				for(int z = 0; z < DEPTH; z++)
 				{
-					obj.pVertex[index].m_vPos.m_fX = (x - (DEPTH/2)) * MAG;
-					obj.pVertex[index].m_vPos.m_fY = (y - (DEPTH/2)) * MAG;
-					obj.pVertex[index].m_vPos.m_fZ = (z - (DEPTH/2)) * MAG;
+					obj.pVertex[index].position.x = (x - (DEPTH/2)) * MAG;
+					obj.pVertex[index].position.y = (y - (DEPTH/2)) * MAG;
+					obj.pVertex[index].position.z = (z - (DEPTH/2)) * MAG;
 					index++;
 				}
 			}
@@ -73,7 +73,7 @@ public:
 
 		obj.Calculate(&camera, elapsed);
 
-		camera.m_vPosition = Vector3(40 * sin(a) * cos(a * 1.2), 40 * cos(a * 0.7) * sin(a * 0.9), 40 * cos(a * 1.4) * sin(0.7));
+		camera.position = Vector3(40 * sin(a) * cos(a * 1.2), 40 * cos(a * 0.7) * sin(a * 0.9), 40 * cos(a * 1.4) * sin(0.7));
 		return nullptr;
 	}
 	Error* Reconfigure(AudioData* pAudio) override

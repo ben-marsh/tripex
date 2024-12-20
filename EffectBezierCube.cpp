@@ -90,9 +90,9 @@ public:
 				float fRadius = TWISTPLANERADIUS;
 				float dAng = j * 2.0 * PI / BEZIERS;
 				if(i != 0 && i != TWISTPLANES - 1) fRadius *= 1.2f;
-				vCorner[j].m_fX = 0;
-				vCorner[j].m_fY = fRadius * cos(dAng);
-				vCorner[j].m_fZ = fRadius * sin(dAng);
+				vCorner[j].x = 0;
+				vCorner[j].y = fRadius * cos(dAng);
+				vCorner[j].z = fRadius * sin(dAng);
 			}
 			for(int j = 0; j < TWISTPLANECORNERS; j++)
 			{
@@ -100,7 +100,7 @@ public:
 				Vector3 &v1 = vCorner[j / TWISTPLANEEDGE];
 				Vector3 &v2 = vCorner[((j / TWISTPLANEEDGE) + 1) % BEZIERS];
 
-				pObjPlane[i].pVertex[j].m_vPos = (v1 * (1 - fPos)) + (v2 * fPos);
+				pObjPlane[i].pVertex[j].position = (v1 * (1 - fPos)) + (v2 * fPos);
 			}
 
 			pObjPlane[i].pTexture[0].m_nType = Actor::TextureEntry::T_SPRITE;
@@ -135,7 +135,7 @@ public:
 	Error* Calculate(float brightness, float elapsed, AudioData* pAudio) override
 	{
 		double dMultDest = 1 - pAudio->GetDampenedBand(pEffectPtr->fSensitivity, 0.0f, 1.0f);//average;
-		camera.m_vPosition.m_fZ = -110;//pScene->camera.z = -110;//60;
+		camera.position.z = -110;//pScene->camera.z = -110;//60;
 		double sm = 1.3 * elapsed;
 
 		brt = brightness;
@@ -162,8 +162,8 @@ public:
 			pObjPlane[i].fYaw += pfYS[i] * (pAudio->GetIntensity( ) + 0.1);
 			pObjPlane[i].fPitch += pfPS[i] * pAudio->GetIntensity( );
 
-			pObjPlane[i].vPosition.m_fX = -(BEZIERHEIGHT / 2) + (i * BEZIERHEIGHT / (TWISTPLANES - 1.0));
-			pObjPlane[i].vPosition.m_fZ = -60;
+			pObjPlane[i].vPosition.x = -(BEZIERHEIGHT / 2) + (i * BEZIERHEIGHT / (TWISTPLANES - 1.0));
+			pObjPlane[i].vPosition.z = -60;
 			double dBr = brightness * 0.2 * (0.1 + (0.9 * fabs((i / dCentre) - 1)));
 			pObjPlane[i].wcAmbientLight = ColorRgb::Grey(255.0 * dBr);
 			pObjPlane[i].Calculate(&camera, elapsed);
@@ -179,7 +179,7 @@ public:
 			}
 			for(int j = 0; j < BEZIERPOINTS; j++)	
 			{
-				pObj[i].pVertex[j].m_vPos = bcEdge.Calculate(double(j) / BEZIERPOINTS);
+				pObj[i].pVertex[j].position = bcEdge.Calculate(double(j) / BEZIERPOINTS);
 			//	, &pObj[i]->vertex[j].x, &pObj[i]->vertex[j].y, &pObj[i]->vertex[j].z);
 			}
 			double dBr = brightness * 0.2;
@@ -193,9 +193,9 @@ public:
 		{
 			fAng += 8.0f * g_fDegToRad;
 			obj.pVertex.SetLength(1);
-			obj.pVertex[0].m_vPos.m_fX = 5 * cos(fAng);//pObj[0].pVertex[0].GetPosition();
-			obj.pVertex[0].m_vPos.m_fY = 5 * sin(fAng);//pObj[0].pVertex[0].GetPosition();
-			obj.pVertex[0].m_vPos.m_fZ = -100;//pObj[0].pVertex[0].GetPosition();
+			obj.pVertex[0].position.x = 5 * cos(fAng);//pObj[0].pVertex[0].GetPosition();
+			obj.pVertex[0].position.y = 5 * sin(fAng);//pObj[0].pVertex[0].GetPosition();
+			obj.pVertex[0].position.z = -100;//pObj[0].pVertex[0].GetPosition();
 		}
 		obj.Calculate(&camera, elapsed);
 
@@ -208,7 +208,7 @@ public:
 		while(dAngY > PI2) dAngY -= PI2;
 		while(dAngZ > PI2) dAngZ -= PI2;
 
-		camera.m_fRoll += sm * pAudio->GetIntensity( ) * 4 * g_fDegToRad;
+		camera.roll += sm * pAudio->GetIntensity( ) * 4 * g_fDegToRad;
 	//	pScene->camera.turn(sm * average * 4 * 3.14159 / 180.0, 0, 0);
 		return nullptr;
 	}
@@ -245,7 +245,7 @@ public:
 			g_pD3D->SetRenderState(D3DRS_ZENABLE, FALSE);
 			g_pD3D->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
 
-			error = g_pD3D->DrawSprite(ZPoint<int>(0, 0), ZRect<int>(0, 0, g_pD3D->GetWidth(), g_pD3D->GetHeight()), ColorRgb::Grey(brt * 255.0));
+			error = g_pD3D->DrawSprite(Point<int>(0, 0), Rect<int>(0, 0, g_pD3D->GetWidth(), g_pD3D->GetHeight()), ColorRgb::Grey(brt * 255.0));
 			if(error) return TraceError(error);
 		}
 		return nullptr;

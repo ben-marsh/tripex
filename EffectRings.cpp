@@ -54,7 +54,7 @@ public:
 			pObj[i].wcExposureLightChange = WideColorRgb(-8, -8, 0);
 		}
 
-		camera.m_vPosition.m_fZ = -120;
+		camera.position.z = -120;
 	}
 	Error* Calculate(float br, float elapsed, AudioData* pAudio) override
 	{
@@ -96,7 +96,7 @@ public:
 				double b = std::max(std::min(1.0f, br * brightness[i]), 0.0f);
 
 				pObj[i].wcAmbientLight = ColorRgb::Grey((int)(b * 255.0f));//->color = D3DRGB(b,b,b);
-				pObj[i].vPosition.m_fZ = 50;
+				pObj[i].vPosition.z = 50;
 			}
 			bChanged = true;
 			accum--;

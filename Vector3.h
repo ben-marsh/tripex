@@ -1,11 +1,5 @@
 #pragma once
 
-/*
-#include <d3d.h>
-#include <assert.h>
-#include <stdio.h>
-#include <math.h>
-*/
 #include "Misc.h"
 
 class Matrix44;
@@ -17,65 +11,65 @@ public:
 	{
 		struct
 		{
-			float m_fX, m_fY, m_fZ;
+			float x, y, z;
 		};
-		float m_af[ 3 ];
+		float elements[3];
 	};
 
 	// Constructors
-	Vector3( );
-	Vector3( float fX, float fY, float fZ );
+	Vector3();
+	Vector3(float x, float y, float z);
 
 	// Origin( ):
-	static Vector3 Origin( );
+	static Vector3 Origin();
 
 	// Polar( ):
-	static Vector3 Polar( float fLength, float fPitch, float fYaw );
+	static Vector3 Polar(float length, float pitch, float yaw);
 
 	// Set( ):
-	void Set( float fX, float fY, float fZ );
+	void Set(float x, float y, float z);
 
 	// operator+( )/operator+=( ):
-	Vector3 operator+( ) const;
-	Vector3 operator+( const Vector3 &v ) const;
-	Vector3 &operator+=( const Vector3 &v );
+	Vector3 operator+() const;
+	Vector3 operator+(const Vector3& v) const;
+	Vector3& operator+=(const Vector3& v);
 
 	// operator-( )/operator-=( ):
-	Vector3 operator-( ) const;
-	Vector3 operator-( const Vector3 &v ) const;
-	Vector3 &operator-=( const Vector3 &v );
+	Vector3 operator-() const;
+	Vector3 operator-(const Vector3& v) const;
+	Vector3& operator-=(const Vector3& v);
 
 	// operator*( )/operator*=( ):
-	Vector3 operator*( float fValue ) const;
-	Vector3 operator*( const Matrix44 &m ) const;
-	Vector3 &operator*=( float fValue );
-	Vector3 &operator*=( const Matrix44 &m );
+	Vector3 operator*(float value) const;
+	Vector3 operator*(const Matrix44& m) const;
+	Vector3& operator*=(float value);
+	Vector3& operator*=(const Matrix44& m);
 
 	// operator/( ):
-	Vector3 operator/( float fValue ) const;
-	Vector3 &operator/=( float fValue );
+	Vector3 operator/(float value) const;
+	Vector3& operator/=(float value);
 
 	// operator[ ]:
-	float &operator[ ]( int nPos );
-	const float &operator[ ]( int nPos ) const;
+	float& operator[ ](int pos);
+	const float& operator[ ](int pos) const;
 
 	// Dot( ):
-	float Dot( const Vector3 &v ) const;
+	float Dot(const Vector3& v) const;
 
 	// Length( ):
-	float Length( ) const;
+	float Length() const;
 
 	// Normal( )/Normalize( ):
-	Vector3 Normal( float fLength = 1.0f ) const;
-	void Normalize( float fLength = 1.0f );
+	Vector3 Normal(float length = 1.0f) const;
+	void Normalize(float length = 1.0f);
 
 	// Cross( ):
-	Vector3 Cross( const Vector3 &v ) const;
+	Vector3 Cross(const Vector3& v) const;
 
 	// GetYaw( )/GetPitch( )/GetRoll( ):
-	float GetYaw( ) const;
-	float GetPitch( ) const;
-	float GetRoll( float fTightness = 0.1f ) const;
+	float GetYaw() const;
+	float GetPitch() const;
+	float GetRoll(float tightness = 0.1f) const;
 };
 
 #include "Vector3.inl"

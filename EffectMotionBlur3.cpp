@@ -36,7 +36,7 @@ public:
 
 	EffectMotionBlur3T() : bz(Vector3(20, 20, 20), -Vector3(20, 20, 20))//, cam(0)
 	{
-		cam.m_bsFlag.set( Camera::F_SCREEN_TRANSFORM, false );
+		cam.flags.set( Camera::F_SCREEN_TRANSFORM, false );
 
 		fCamPos = 0.0f;
 		fAvTotal = 0;
@@ -52,7 +52,7 @@ public:
 		nEffect = rand() % 5;
 		// set lastframe to some constant thing
 
-		camera.m_vPosition.m_fZ = -80;//110;
+		camera.position.z = -80;//110;
 
 		for(int i = 0; i < 9; i++)
 		{
@@ -123,7 +123,7 @@ public:
 		fAvTotal += elapsed * pAudio->GetIntensity( );
 		fAvTime += elapsed;
 
-		cam.m_vPosition.m_fZ = -80;
+		cam.position.z = -80;
 
 		obj.fRoll += elapsed * 3.14159 / 180.0f;
 		obj.fPitch += elapsed * 2.0f * 3.14159 / 180.0f;
@@ -135,15 +135,15 @@ public:
 			fCamTarget = -250 + (std::min(1.0f, fAvTotal / fAvTime) * 190);
 			if(bReset)
 			{
-				camera.m_vPosition.m_fZ = fCamTarget;
+				camera.position.z = fCamTarget;
 				bReset = false;
 			}
 			fAvTotal = 0;
 			fAvTime = 0;
-			fSpeed = fabs(camera.m_vPosition.m_fZ - fCamTarget) / 32.0;
+			fSpeed = fabs(camera.position.z - fCamTarget) / 32.0;
 		}
 
-		camera.m_vPosition.m_fZ = StepTo<float>(camera.m_vPosition.m_fZ, fCamTarget, fSpeed * elapsed);// * 2.0 * (-camera.vPosition.k / 250.0));//2);
+		camera.position.z = StepTo<float>(camera.position.z, fCamTarget, fSpeed * elapsed);// * 2.0 * (-camera.vPosition.k / 250.0));//2);
 
 		fCamPos += pAudio->GetIntensity( ) * elapsed * 0.02;
 		camera.SetTarget(bz.Calculate(fCamPos));
@@ -168,7 +168,7 @@ public:
 			}
 		}
 
-		camera.m_fRoll += pAudio->GetIntensity( ) * 3.14159 * 2.0 * elapsed / 180.0;
+		camera.roll += pAudio->GetIntensity( ) * 3.14159 * 2.0 * elapsed / 180.0;
 
 		for(int i = 0; i < 9; i++)
 		{

@@ -104,8 +104,8 @@ public:
 				WideColorRgb cCol(0, 0, 0);
 				for(int j = 0; j < NCENTRES; j++)
 				{
-					float fPosX = x - pvPos[j].m_fX;
-					float fPosY = y - pvPos[j].m_fY;
+					float fPosX = x - pvPos[j].x;
+					float fPosY = y - pvPos[j].y;
 					float fNormX = fPosX * fMulX;//(1.0f / GRW);
 					float fNormY = fPosY * fMulY;//(1.0f / GRH);
 
@@ -117,23 +117,23 @@ public:
 					fY += fLen * fNormY;
 
 					float fColMult = brightness * 0.5 * std::max(0.0f, 1.0f - (sqrtf(fPosX * fPosX + fPosY * fPosY) / 30.0f));
-					cCol.m_nR += pc[j].m_nR * fColMult;
-					cCol.m_nG += pc[j].m_nG * fColMult;
-					cCol.m_nB += pc[j].m_nB * fColMult;
+					cCol.r += pc[j].r * fColMult;
+					cCol.g += pc[j].g * fColMult;
+					cCol.b += pc[j].b * fColMult;
 				}
 
-				grid.pVertex[i].m_aTex[0].x = fX;
-				grid.pVertex[i].m_aTex[0].y = fY;
+				grid.pVertex[i].tex_coord[0].x = fX;
+				grid.pVertex[i].tex_coord[0].y = fY;
 				ColorRgb cGrey = ColorRgb::Grey(std::min(1.0f, brightness * fBr) * 255.0);
 				if(bLight) 
 				{
-					grid.pVertex[i].m_cSpecular = cCol * brightness * fBr * 0.5;
-					grid.pVertex[i].m_cDiffuse =  ColorRgb::Blend(cGrey, (ColorRgb)cCol, 0.2f);//ZColour::Grey(255);
+					grid.pVertex[i].specular = cCol * brightness * fBr * 0.5;
+					grid.pVertex[i].diffuse =  ColorRgb::Blend(cGrey, (ColorRgb)cCol, 0.2f);//ZColour::Grey(255);
 				}
 				else 
 				{
-					grid.pVertex[i].m_cDiffuse = cGrey;
-					grid.pVertex[i].m_cSpecular = ColorRgb::Black();
+					grid.pVertex[i].diffuse = cGrey;
+					grid.pVertex[i].specular = ColorRgb::Black();
 				}
 				i++;
 			}

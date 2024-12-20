@@ -72,7 +72,7 @@ class EffectWaterGlobe : public EffectBase
 			pvDir.SetLength(pVertex.GetLength());
 			for(int i = 0; i < pVertex.GetLength(); i++)
 			{
-				pvDir[i] = pVertex[i].m_vPos;
+				pvDir[i] = pVertex[i].position;
 			}
 			pfPos.SetLength(pVertex.GetLength());
 			pfPos.Fill(0);
@@ -110,7 +110,7 @@ class EffectWaterGlobe : public EffectBase
 		{
 			for(int i = 0; i < pVertex.GetLength(); i++)
 			{
-				pVertex[i].m_vPos = pvDir[i] * (1 + Bound<float>(pfPos[i], MINSZ, MAXSZ));
+				pVertex[i].position = pvDir[i] * (1 + Bound<float>(pfPos[i], MINSZ, MAXSZ));
 			}
 		}
 		void ResetPoint(int nPoint)
@@ -148,7 +148,7 @@ public:
 		obj.m_bsFlag.set(Actor::F_DRAW_Z_BUFFER);
 		obj.fAngle = 10000;
 
-		camera.m_vPosition = Vector3(0, 0, -320);
+		camera.position = Vector3(0, 0, -320);
 	}
 	Error* Calculate(float brightness, float elapsed, AudioData* pAudio) override
 	{

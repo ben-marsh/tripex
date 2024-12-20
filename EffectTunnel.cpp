@@ -98,8 +98,8 @@ public:
 			{
 				for(int i = 0; i < nCrossSection; i++)
 				{
-					pObj[no].pVertex[k].m_aTex[0].x = /*(no / 2.0) +*/ float(i) / float(nCrossSection - 1);
-					pObj[no].pVertex[k].m_aTex[0].y = /*(no / 2.0) +*/ float(j) / float(nTunnelL);
+					pObj[no].pVertex[k].tex_coord[0].x = /*(no / 2.0) +*/ float(i) / float(nCrossSection - 1);
+					pObj[no].pVertex[k].tex_coord[0].y = /*(no / 2.0) +*/ float(j) / float(nTunnelL);
 					k++;
 				}
 			}
@@ -137,7 +137,7 @@ public:
 					for(int k = 0; k < 4; k++)
 					{
 						pvPos[k] = b[j][i+1][k];
-						pvPos[k].m_fZ -= v.m_fZ;
+						pvPos[k].z -= v.z;
 						b[j][i][k] = pvPos[k];
 					}
 				}
@@ -155,13 +155,13 @@ public:
 				}
 				else
 				{
-					pvPos[2].m_fX = pvPos[1].m_fX + (cosf(fAng1) * RANDCH_R1);
-					pvPos[2].m_fY = pvPos[1].m_fY + (sinf(fAng1) * RANDCH_R1);
-					pvPos[2].m_fZ = pvPos[1].m_fZ + (fSepZ * 2);//cos(dAng1) * RANDCH_R1);
+					pvPos[2].x = pvPos[1].x + (cosf(fAng1) * RANDCH_R1);
+					pvPos[2].y = pvPos[1].y + (sinf(fAng1) * RANDCH_R1);
+					pvPos[2].z = pvPos[1].z + (fSepZ * 2);//cos(dAng1) * RANDCH_R1);
 
-					pvPos[3].m_fX = pvPos[2].m_fX + (cosf(fAng2) * RANDCH_R2);
-					pvPos[3].m_fY = pvPos[2].m_fY + (sinf(fAng2) * RANDCH_R2);
-					pvPos[3].m_fZ = pvPos[2].m_fZ + (fSepZ * 3);//cos(dAng1) * RANDCH_R1);
+					pvPos[3].x = pvPos[2].x + (cosf(fAng2) * RANDCH_R2);
+					pvPos[3].y = pvPos[2].y + (sinf(fAng2) * RANDCH_R2);
+					pvPos[3].z = pvPos[2].z + (fSepZ * 3);//cos(dAng1) * RANDCH_R1);
 				}
 
 				for(int k = 0; k < 4; k++)
@@ -178,7 +178,7 @@ public:
 		{
 			for(int no = 0; no < 2; no++)
 			{
-				memmove(&pObj[no].pVertex[0].m_vPos, &pObj[no].pVertex[nCrossSection * (nTunnelL - nCalc)].m_vPos, nCalc * nCrossSection * sizeof(ZVertex));//pObj[no].pVertex.GetItemSize());
+				memmove(&pObj[no].pVertex[0].position, &pObj[no].pVertex[nCrossSection * (nTunnelL - nCalc)].position, nCalc * nCrossSection * sizeof(Vertex));//pObj[no].pVertex.GetItemSize());
 			}
 		}
 
@@ -197,8 +197,8 @@ public:
 			int nIndex = i * nCrossSection;
 			for(int j = 0; j < nCrossSection; j++)
 			{
-				pObj[0].pVertex[nIndex].m_cDiffuse = c;
-				pObj[0].pVertex[nIndex].m_aTex[0].y = fTexV;//fvVertex.GetTexture().fV = fTexV;
+				pObj[0].pVertex[nIndex].diffuse = c;
+				pObj[0].pVertex[nIndex].tex_coord[0].y = fTexV;//fvVertex.GetTexture().fV = fTexV;
 				nIndex++;
 			}
 			pObj[0].m_bsFlag.set(Actor::F_VALID_VERTEX_DIFFUSE);
@@ -206,8 +206,8 @@ public:
 			nIndex = i * nCrossSection;
 			for(int j = 0; j < nCrossSection; j++)
 			{
-				pObj[1].pVertex[nIndex].m_cDiffuse = c2;//.GetDiffuse() = c2;
-				pObj[1].pVertex[nIndex].m_aTex[0].y = fTexV + fTexVOfs;
+				pObj[1].pVertex[nIndex].diffuse = c2;//.GetDiffuse() = c2;
+				pObj[1].pVertex[nIndex].tex_coord[0].y = fTexV + fTexVOfs;
 				nIndex++;
 	//			fvVertex++;
 			}
@@ -225,9 +225,9 @@ public:
 				//Vector3 n, v[3];
 				Vector3 v2 = GetBezPos(0/*no*/, float(nPos + 0.1f) / float(nTunnelL));//, &xp2, &yp2, &zp2);
 				Vector3 n = (v2 - v).Normal(1.0);
-				pvPos[0] = Vector3(n.m_fZ, n.m_fY, -n.m_fX);
-				pvPos[1] = Vector3(-n.m_fY, n.m_fZ, n.m_fX);
-				pvPos[2] = Vector3(n.m_fX, n.m_fY, n.m_fZ);
+				pvPos[0] = Vector3(n.z, n.y, -n.x);
+				pvPos[1] = Vector3(-n.y, n.z, n.x);
+				pvPos[2] = Vector3(n.x, n.y, n.z);
 
 				int nIndex = nCalc * nCrossSection;
 				for(int j = 0; j < nCrossSection; j++)
@@ -237,21 +237,21 @@ public:
 					float fY = sinf(fAng);
 
 					Vector3 vn;
-					vn.m_fX = -((pvPos[0].m_fX * fX) + (pvPos[1].m_fX * fY));
-					vn.m_fY = -((pvPos[0].m_fY * fX) + (pvPos[1].m_fY * fY));
-					vn.m_fZ = -((pvPos[0].m_fZ * fX) + (pvPos[1].m_fZ * fY));
+					vn.x = -((pvPos[0].x * fX) + (pvPos[1].x * fY));
+					vn.y = -((pvPos[0].y * fX) + (pvPos[1].y * fY));
+					vn.z = -((pvPos[0].z * fX) + (pvPos[1].z * fY));
 
-					pObj[no].pVertex[nIndex].m_vPos = v - (vn * fRadius);
+					pObj[no].pVertex[nIndex].position = v - (vn * fRadius);
 					nIndex++;
 				}
 			}
 		}
 
-		camera.m_vPosition = GetBezPos(0, fPos + 0.2f);
+		camera.position = GetBezPos(0, fPos + 0.2f);
 
-		Vector3 vDir = GetBezPos(0, fPos + 0.6f) - camera.m_vPosition;
-		camera.m_fPitch = vDir.GetPitch();
-		camera.m_fYaw = vDir.GetYaw();
+		Vector3 vDir = GetBezPos(0, fPos + 0.6f) - camera.position;
+		camera.pitch = vDir.GetPitch();
+		camera.yaw = vDir.GetYaw();
 
 		for(int i = 0; i < 2; i++)
 		{

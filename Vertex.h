@@ -6,20 +6,20 @@
 
 #define MAX_TEXTURES 1
 
-struct ZVertex
+struct Vertex
 {
-	Vector3 m_vPos;
-	Vector3 m_vNormal;
-	ColorRgb m_cDiffuse;
-	ColorRgb m_cSpecular;
-	ZPoint<float> m_aTex[MAX_TEXTURES];
+	Vector3 position;
+	Vector3 normal;
+	ColorRgb diffuse;
+	ColorRgb specular;
+	Point<float> tex_coord[MAX_TEXTURES];
 };
 
-struct ZVertexTL
+struct VertexTL // Transformed and lit vertex
 {
-	Vector3 m_vPos;
-	float m_fRHW;
-	ColorRgb m_cDiffuse;
-	ColorRgb m_cSpecular;
-	ZPoint<float> m_aTex[MAX_TEXTURES];
+	Vector3 position;
+	float rhw;
+	ColorRgb diffuse;
+	ColorRgb specular;
+	Point<float> tex_coord[MAX_TEXTURES];
 };

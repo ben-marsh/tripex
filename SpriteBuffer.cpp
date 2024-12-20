@@ -91,19 +91,19 @@ void SpriteBuffer::SetTexture(Texture *pTexture)
 	pCurTexture = pTexture;
 }
 // using current state
-void SpriteBuffer::Darken(const ZRect<int> &r, ColorRgb cDiffuse)
+void SpriteBuffer::Darken(const Rect<int> &r, ColorRgb cDiffuse)
 {
-	AddSprite(r.GetTopLeft(), NULL, g_pD3D->InverseMultiply, ZRect<int>(ZPoint<int>(0, 0), r.GetBotRight() - r.GetTopLeft()), cDiffuse);
+	AddSprite(r.GetTopLeft(), NULL, g_pD3D->InverseMultiply, Rect<int>(Point<int>(0, 0), r.GetBotRight() - r.GetTopLeft()), cDiffuse);
 }
-void SpriteBuffer::AddSprite(ZPoint<int> p, const ZRect<int> &spr, ColorRgb cDiffuse, ColorRgb cSpecular)
+void SpriteBuffer::AddSprite(Point<int> p, const Rect<int> &spr, ColorRgb cDiffuse, ColorRgb cSpecular)
 {
 	AddSprite(p, pCurTexture, nCurState, spr, cDiffuse);
 }
-void SpriteBuffer::AddBlendedSprites(ZPoint<int> p, float fBlend, const ZRect<int> &spr1, const ZRect<int> &spr2, ColorRgb cDiffuse)
+void SpriteBuffer::AddBlendedSprites(Point<int> p, float fBlend, const Rect<int> &spr1, const Rect<int> &spr2, ColorRgb cDiffuse)
 {
 	AddBlendedSprites(p, pCurTexture, nCurState, fBlend, spr1, spr2, cDiffuse);
 }
-void SpriteBuffer::AddSprite(ZPoint<int> p, Texture *pTexture, int nState, const ZRect<int> &spr, ColorRgb cDiffuse)
+void SpriteBuffer::AddSprite(Point<int> p, Texture *pTexture, int nState, const Rect<int> &spr, ColorRgb cDiffuse)
 {
 	Item item;
 	item.p = p;
@@ -113,7 +113,7 @@ void SpriteBuffer::AddSprite(ZPoint<int> p, Texture *pTexture, int nState, const
 	item.cDiffuse = cDiffuse;
 	AddItem(item);
 }
-void SpriteBuffer::AddBlendedSprites(ZPoint<int> p, Texture *pTexture, int nState, float fBlend, const ZRect<int> &spr1, const ZRect<int> &spr2, ColorRgb cDiffuse)
+void SpriteBuffer::AddBlendedSprites(Point<int> p, Texture *pTexture, int nState, float fBlend, const Rect<int> &spr1, const Rect<int> &spr2, ColorRgb cDiffuse)
 {
 	AddSprite(p, pTexture, nState, spr1, ColorRgb(cDiffuse * (1.0f - fBlend)));
 	AddSprite(p, pTexture, nState, spr2, ColorRgb(cDiffuse * fBlend));

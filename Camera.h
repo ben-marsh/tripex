@@ -12,26 +12,19 @@ public:
 		F_LAST,
 	};
 
-	std::bitset< F_LAST > m_bsFlag;
+	std::bitset<F_LAST> flags;
 
-	float m_fScreenX, m_fScreenY;
-	float m_fScale;
+	float screen_x, screen_y;
+	float scale;
 
-	float m_fPerspective;
-	float m_fTightness;
+	float perspective;
+	float tightness;
 
-	Vector3 m_vPosition;
-	float m_fPitch, m_fYaw, m_fRoll;
+	Vector3 position;
+	float pitch, yaw, roll;
 
-	// Constructor:
-	Camera( );
-
-	// SetDir( ):
-	void SetDir( const Vector3 &vDir );
-
-	// SetTarget( ):
-	void SetTarget( const Vector3 &vPosition );
-
-	// GetTransform( ):
-	Matrix44 GetTransform( ) const;
+	Camera();
+	void SetDir(const Vector3& vDir);
+	void SetTarget(const Vector3& vPosition);
+	Matrix44 GetTransform() const;
 };

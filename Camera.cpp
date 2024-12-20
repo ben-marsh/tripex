@@ -1,47 +1,34 @@
 #include "Platform.h"
 #include "Camera.h"
 
-/*---------------------------------
-* Constructor:
------------------------------------*/
-
-Camera::Camera( )
+Camera::Camera()
 {
-	m_bsFlag.set( F_SCREEN_TRANSFORM );
+	flags.set(F_SCREEN_TRANSFORM);
 
-	m_vPosition = Vector3::Origin();
-	m_fPitch = 0.0f;
-	m_fYaw = 0.0f;
-	m_fRoll = 0.0f;
-	m_fPerspective = 150.0f;
-	m_fTightness = 0.1f;
+	screen_x = 0.0f;
+	screen_y = 0.0f;
+	scale = 0.0f;
+	position = Vector3::Origin();
+	pitch = 0.0f;
+	yaw = 0.0f;
+	roll = 0.0f;
+	perspective = 150.0f;
+	tightness = 0.1f;
 }
 
-/*---------------------------------
-* GetTransform( ):
------------------------------------*/
-
-Matrix44 Camera::GetTransform( ) const
+Matrix44 Camera::GetTransform() const
 {
-	return Matrix44::Translation( -m_vPosition ) * Matrix44::Rotation( -m_fYaw, -m_fPitch, -m_fRoll );
+	return Matrix44::Translate(-position) * Matrix44::Rotate(-yaw, -pitch, -roll);
 }
 
-/*---------------------------------
-* SetDir( ):
------------------------------------*/
-
-void Camera::SetDir( const Vector3 &vDir )
+void Camera::SetDir(const Vector3& dir)
 {
-	m_fPitch = vDir.GetPitch( );
-	m_fYaw = vDir.GetYaw( );
-	m_fRoll = vDir.GetRoll( m_fTightness );
+	pitch = dir.GetPitch();
+	yaw = dir.GetYaw();
+	roll = dir.GetRoll(tightness);
 }
 
-/*---------------------------------
-* SetTarget( ):
------------------------------------*/
-
-void Camera::SetTarget( const Vector3 &vTarget )
+void Camera::SetTarget(const Vector3& target)
 {
-	SetDir( vTarget - m_vPosition );
+	SetDir(target - position);
 }

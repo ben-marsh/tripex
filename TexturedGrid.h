@@ -8,7 +8,7 @@ protected:
 	int nScrWidth, nScrHeight;
 
 public:
-	ZArray<ZVertexTL> pVertex;
+	ZArray<VertexTL> pVertex;
 	ZArray<Face> pFace;
 	int nWidth, nHeight;
 	int nStartX, nStartY;

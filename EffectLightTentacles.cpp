@@ -44,16 +44,16 @@ public:
 		{
 			for(int j = 0; j < LENGTH; j++)
 			{
-				obj.pVertex[(i * LENGTH) + j].m_vPos = sphere.pVertex[i].m_vPos * (50 + (j * STEPSIZE));
+				obj.pVertex[(i * LENGTH) + j].position = sphere.pVertex[i].position * (50 + (j * STEPSIZE));
 				double dBr = (double(j) / LENGTH);
 				dBr = 1.0 - (dBr * dBr);
-				obj.pVertex[(i * LENGTH) + j].m_cDiffuse = ColorRgb::Blend(ColorRgb::White(), cEdge, (float)j / LENGTH) * dBr;//Grey(255.0 * dBr);
+				obj.pVertex[(i * LENGTH) + j].diffuse = ColorRgb::Blend(ColorRgb::White(), cEdge, (float)j / LENGTH) * dBr;//Grey(255.0 * dBr);
 			}
 		}
 		obj.fFrameHistory = 11;
 		obj.fDelayHistory = 10.0f;
 		obj.FindDelayValues();
-		camera.m_vPosition.m_fZ = -120;
+		camera.position.z = -120;
 	}
 	Error* Calculate(float brightness, float elapsed, AudioData* pAudio) override
 	{
@@ -84,23 +84,23 @@ public:
 
 				double r = (i == 0)? 300 : 50;
 
-				pvPoint[i][2].m_fX = ((double(rand()) / RAND_MAX) - 0.5) * r;
-				pvPoint[i][2].m_fY = ((double(rand()) / RAND_MAX) - 0.5) * r;
-				pvPoint[i][2].m_fZ = ((double(rand()) / RAND_MAX) - 0.5) * r;
+				pvPoint[i][2].x = ((double(rand()) / RAND_MAX) - 0.5) * r;
+				pvPoint[i][2].y = ((double(rand()) / RAND_MAX) - 0.5) * r;
+				pvPoint[i][2].z = ((double(rand()) / RAND_MAX) - 0.5) * r;
 	
-				pvPoint[i][3].m_fX = ((double(rand()) / RAND_MAX) - 0.5) * r;
-				pvPoint[i][3].m_fY = ((double(rand()) / RAND_MAX) - 0.5) * r;
-				pvPoint[i][3].m_fZ = ((double(rand()) / RAND_MAX) - 0.5) * r;
+				pvPoint[i][3].x = ((double(rand()) / RAND_MAX) - 0.5) * r;
+				pvPoint[i][3].y = ((double(rand()) / RAND_MAX) - 0.5) * r;
+				pvPoint[i][3].z = ((double(rand()) / RAND_MAX) - 0.5) * r;
 			}
 			pos--;
 		}
 		for(int i = 0; i < 4; i++) b[i] = pvPoint[0][i];
 
-		camera.m_vPosition = b.Calculate(pos);//.moveTo(x, y, z);
+		camera.position = b.Calculate(pos);//.moveTo(x, y, z);
 		for(int i = 0; i < 4; i++) b[i] = pvPoint[1][i];//->setPoint(i, px[1][i], py[1][i], pz[1][i]);
 		Vector3 v = b.Calculate(pos);//, &x, &y, &z);
-		camera.m_fPitch = (v - camera.m_vPosition).GetPitch();
-		camera.m_fYaw = (v - camera.m_vPosition).GetYaw();
+		camera.pitch = (v - camera.position).GetPitch();
+		camera.yaw = (v - camera.position).GetYaw();
 		return nullptr;
 	}
 	Error* Render( ) override

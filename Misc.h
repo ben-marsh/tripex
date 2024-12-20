@@ -7,74 +7,52 @@
 
 #define FLOAT_ZERO 0.00001
 
-// FormatString( ):
-//string FormatString( const char *sFormat, ... );
-
-// FormatStringV( ):
-//string FormatStringV( const char *sFormat, va_list pArg );
-
 // Wrap( ):
-float Wrap( float fValue, float fMin, float fMax );
+float Wrap(float fValue, float fMin, float fMax);
 
-/*---------------------------------------------
-* Bound( ):
----------------------------------------------*/
-
-template< class T > inline T Bound( T x, T a, T b )
+template< class T > inline T Bound(T x, T a, T b)
 {
-	if( x < a )
+	if (x < a)
 	{
 		return a;
 	}
-	if( x > b )
+	if (x > b)
 	{
 		return b;
 	}
 	return x;
 }
 
-/*---------------------------------------------
-* IntegerLog2( ):
----------------------------------------------*/
-
-inline int IntegerLog2( int nValue )
+inline int IntegerLog2(int value)
 {
-	int nLog = 0;
-	while( nValue > ( 1 << nLog ) ) nLog++;
-	_ASSERT( 1 << nLog );
-	return nLog;
+	int log = 0;
+	while (value > (1 << log)) log++;
+	_ASSERT(1 << log);
+	return log;
 }
 
-/*---------------------------------------------
-* ReverseBitOrder( ):
----------------------------------------------*/
+extern const unsigned char g_anBitReverse[256];
 
-extern const unsigned char g_anBitReverse[ 256 ];
-
-template < class T > T ReverseBitOrder( const T tSrc )
+template < class T > T ReverseBitOrder(const T src)
 {
-	T tDst;
-	const unsigned char *anSrc = ( const unsigned char* )&tSrc;
-	unsigned char *anDst = ( unsigned char* )&tDst;
-	for( int i = 0; i < sizeof( T ); i++ )
+	T dst;
+	const uint8* src_bytes = (const uint8*)&src;
+	uint8* dst_bytes = (uint8*)&dst;
+	for (int i = 0; i < sizeof(T); i++)
 	{
-		anDst[ sizeof( T ) - 1 - i ] = g_anBitReverse[ anSrc[ i ] ];
+		dst_bytes[sizeof(T) - 1 - i] = g_anBitReverse[src_bytes[i]];
 	}
-	return tDst;
+	return dst;
 }
 
-/*---------------------------------------------
-* StepTo( ):
----------------------------------------------*/
-
-template< class T > inline T StepTo( T nValue, T nTarget, T nStep )
+template< class T > inline T StepTo(T value, T target, T nStep)
 {
-	if( nValue < nTarget )
+	if (value < target)
 	{
-		return std::min( nTarget, nValue + nStep );
+		return std::min(target, value + nStep);
 	}
-	else 
+	else
 	{
-		return std::max( nTarget, nValue - nStep );
+		return std::max(target, value - nStep);
 	}
 }

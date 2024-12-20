@@ -2,138 +2,108 @@
 #include "Vector3.h"
 #include "Matrix44.h"
 
-/*---------------------------------------------
-* Identity( ):
----------------------------------------------*/
+Matrix44::Matrix44()
+	: elements
+	{
+		{ 1.0f, 0.0f, 0.0f, 0.0f },
+		{ 0.0f, 1.0f, 0.0f, 0.0f },
+		{ 0.0f, 0.0f, 1.0f, 0.0f },
+		{ 0.0f, 0.0f, 0.0f, 1.0f }
+	}
+{
+}
 
 Matrix44 Matrix44::Identity()
 {
+	return Matrix44();
+}
+
+Matrix44 Matrix44::Translate(float x, float y, float z)
+{
 	Matrix44 m;
-	m.SetRow( 0, 1.0f, 0.0f, 0.0f, 0.0f );
-	m.SetRow( 1, 0.0f, 1.0f, 0.0f, 0.0f );
-	m.SetRow( 2, 0.0f, 0.0f, 1.0f, 0.0f );
-	m.SetRow( 3, 0.0f, 0.0f, 0.0f, 1.0f );
+	m.SetRow(0, 1.0f, 0.0f, 0.0f, 0.0f);
+	m.SetRow(1, 0.0f, 1.0f, 0.0f, 0.0f);
+	m.SetRow(2, 0.0f, 0.0f, 1.0f, 0.0f);
+	m.SetRow(3, x, y, z, 1.0f);
 	return m;
 }
 
-/*---------------------------------------------
-* Translation( ):
----------------------------------------------*/
-
-Matrix44 Matrix44::Translation( float fX, float fY, float fZ )
+Matrix44 Matrix44::Scale(float x, float y, float z)
 {
 	Matrix44 m;
-	m.SetRow( 0, 1.0f, 0.0f, 0.0f, 0.0f );
-	m.SetRow( 1, 0.0f, 1.0f, 0.0f, 0.0f );
-	m.SetRow( 2, 0.0f, 0.0f, 1.0f, 0.0f );
-	m.SetRow( 3, fX,   fY,   fZ,   1.0f );
+	m.SetRow(0, x, 0.0f, 0.0f, 0.0f);
+	m.SetRow(1, 0.0f, y, 0.0f, 0.0f);
+	m.SetRow(2, 0.0f, 0.0f, z, 0.0f);
+	m.SetRow(3, 0.0f, 0.0f, 0.0f, 1.0f);
 	return m;
 }
 
-/*---------------------------------------------
-* Scaling( ):
----------------------------------------------*/
-
-Matrix44 Matrix44::Scaling( float fX, float fY, float fZ )
+Matrix44 Matrix44::RotateAroundX(float pitch)
 {
+	float cos = cosf(pitch);
+	float sin = sinf(pitch);
+
 	Matrix44 m;
-	m.SetRow( 0, fX,   0.0f, 0.0f, 0.0f );
-	m.SetRow( 1, 0.0f, fY,   0.0f, 0.0f );
-	m.SetRow( 2, 0.0f, 0.0f, fZ,   0.0f );
-	m.SetRow( 3, 0.0f, 0.0f, 0.0f, 1.0f );
+	m.SetRow(0, 1.0f, 0.0f, 0.0f, 0.0f);
+	m.SetRow(1, 0.0f, cos, sin, 0.0f);
+	m.SetRow(2, 0.0f, -sin, cos, 0.0f);
+	m.SetRow(3, 0.0f, 0.0f, 0.0f, 1.0f);
 	return m;
 }
 
-/*---------------------------------------------
-* RotationX( ):
----------------------------------------------*/
-
-Matrix44 Matrix44::RotationX( float fPitch )
+Matrix44 Matrix44::RotateAroundY(float yaw)
 {
-	float fCos = cosf( fPitch ), fSin = sinf( fPitch );
+	float cos = cosf(yaw), sin = sinf(yaw);
 
 	Matrix44 m;
-	m.SetRow( 0, 1.0f, 0.0f, 0.0f, 0.0f );
-	m.SetRow( 1, 0.0f, fCos, fSin, 0.0f );
-	m.SetRow( 2, 0.0f,-fSin, fCos, 0.0f );
-	m.SetRow( 3, 0.0f, 0.0f, 0.0f, 1.0f );
+	m.SetRow(0, cos, 0.0f, -sin, 0.0f);
+	m.SetRow(1, 0.0f, 1.0f, 0.0f, 0.0f);
+	m.SetRow(2, sin, 0.0f, cos, 0.0f);
+	m.SetRow(3, 0.0f, 0.0f, 0.0f, 1.0f);
 	return m;
 }
 
-/*---------------------------------------------
-* RotationY( ):
----------------------------------------------*/
-
-Matrix44 Matrix44::RotationY( float fYaw )
+Matrix44 Matrix44::RotateAroundZ(float roll)
 {
-	float fCos = cosf( fYaw ), fSin = sinf( fYaw );
+	float cos = cosf(roll);
+	float sin = sinf(roll);
 
 	Matrix44 m;
-	m.SetRow( 0, fCos, 0.0f,-fSin, 0.0f ); 
-	m.SetRow( 1, 0.0f, 1.0f, 0.0f, 0.0f );
-	m.SetRow( 2, fSin, 0.0f, fCos, 0.0f );
-	m.SetRow( 3, 0.0f, 0.0f, 0.0f, 1.0f );
+	m.SetRow(0, cos, sin, 0.0f, 0.0f);
+	m.SetRow(1, -sin, cos, 0.0f, 0.0f);
+	m.SetRow(2, 0.0f, 0.0f, 1.0f, 0.0f);
+	m.SetRow(3, 0.0f, 0.0f, 0.0f, 1.0f);
 	return m;
 }
 
-/*---------------------------------------------
-* RotationZ( ):
----------------------------------------------*/
-
-Matrix44 Matrix44::RotationZ( float fRoll )
+Matrix44 Matrix44::Rotate(float yaw, float pitch)
 {
-	float fCos = cosf( fRoll ), fSin = sinf( fRoll );
-
-	Matrix44 m;
-	m.SetRow( 0, fCos, fSin, 0.0f, 0.0f );
-	m.SetRow( 1,-fSin, fCos, 0.0f, 0.0f );
-	m.SetRow( 2, 0.0f, 0.0f, 1.0f, 0.0f );
-	m.SetRow( 3, 0.0f, 0.0f, 0.0f, 1.0f );
-	return m;
+	return RotateAroundY(yaw) * RotateAroundX(pitch);
+}
+Matrix44 Matrix44::Rotate(float yaw, float pitch, float roll)
+{
+	return Rotate(yaw, pitch) * RotateAroundZ(roll);
+}
+Matrix44 Matrix44::Rotate(float ang, const Vector3& v)
+{
+	float yaw = v.GetYaw();
+	float pitch = v.GetPitch();
+	return (Rotate(-pitch, -yaw) * RotateAroundZ(ang)) * Rotate(pitch, yaw);
 }
 
-/*---------------------------------------------
-* Rotation( ):
----------------------------------------------*/
-
-Matrix44 Matrix44::Rotation( float fYaw, float fPitch )
+Matrix44 Matrix44::operator*(const Matrix44& m) const
 {
-	return RotationY( fYaw ) * RotationX( fPitch );
-}
-Matrix44 Matrix44::Rotation( float fYaw, float fPitch, float fRoll)
-{
-	return Rotation( fYaw, fPitch ) * RotationZ( fRoll );
-}
-Matrix44 Matrix44::Rotation( float fAng, const Vector3 &v )
-{
-	float fYaw = v.GetYaw( ), fPitch = v.GetPitch( );
-	return ( Rotation( -fPitch, -fYaw ) * RotationZ( fAng ) ) * Rotation( fPitch, fYaw );
-}
-
-/*---------------------------------------------
-* operator*( ):
----------------------------------------------*/
-
-Matrix44 Matrix44::operator*( const Matrix44 &m ) const
-{
-	Matrix44 mRes;
-	for(int i = 0; i < 4; i++)
+	Matrix44 result;
+	for (int i = 0; i < 4; i++)
 	{
-		for(int j = 0; j < 4; j++)
+		for (int j = 0; j < 4; j++)
 		{
-			mRes[i][j] = 0;
-			for(int k = 0; k < 4; k++)
+			result.elements[i][j] = 0;
+			for (int k = 0; k < 4; k++)
 			{
-//				check for 0s and 1s, because they are very common
-//				mRes[i][j] += (*this)[k][j] * m[i][k];
-				if(m[i][k] != 0.0f && (*this)[k][j] != 0.0f)
-				{
-					if(m[i][k] == 1.0f) mRes[i][j] += (*this)[k][j];
-					else if((*this)[k][j] == 1.0f) mRes[i][j] += m[i][k];
-					else mRes[i][j] += (*this)[k][j] * m[i][k];
-				}
+				result.elements[i][j] += elements[k][j] * m.elements[i][k];
 			}
 		}
 	}
-	return mRes;
+	return result;
 }

@@ -54,7 +54,7 @@ public:
 		position.SetLength(nSources);
 		speed.SetLength(nSources);
 
-		obj.vPosition.m_fZ = 50;
+		obj.vPosition.z = 50;
 		obj.pVertex.SetLength(nSources);
 		obj.m_bsFlag.set( Actor::F_DRAW_TRANSPARENT );
 		obj.m_bsFlag.set( Actor::F_DRAW_VERTEX_SPRITES );
@@ -84,17 +84,17 @@ public:
 					pvPosition[0][i] = pvPosition[3][i];
 					pvPosition[1][i] = pvPosition[3][i] + (pvPosition[3][i] - pvPosition[2][i]);
 
-					pvPosition[3][i].m_fX = (rand() * 70.0 / RAND_MAX) - 35.0;
-					pvPosition[3][i].m_fY = (rand() * 70.0 / RAND_MAX) - 35.0;
-					pvPosition[3][i].m_fZ = (rand() * 70.0 / RAND_MAX) - 35.0;
+					pvPosition[3][i].x = (rand() * 70.0 / RAND_MAX) - 35.0;
+					pvPosition[3][i].y = (rand() * 70.0 / RAND_MAX) - 35.0;
+					pvPosition[3][i].z = (rand() * 70.0 / RAND_MAX) - 35.0;
 
 					float c = pAudio->GetRandomSample( );
-					pvPosition[2][i].m_fX = (pvPosition[3][i].m_fX * (1 - c)) + ((c * rand() * 70.0 / RAND_MAX) - 35.0);
-					pvPosition[2][i].m_fY = (pvPosition[3][i].m_fY * (1 - c)) + ((c * rand() * 70.0 / RAND_MAX) - 35.0);
-					pvPosition[2][i].m_fZ = (pvPosition[3][i].m_fZ * (1 - c)) + ((c * rand() * 70.0 / RAND_MAX) - 35.0);
+					pvPosition[2][i].x = (pvPosition[3][i].x * (1 - c)) + ((c * rand() * 70.0 / RAND_MAX) - 35.0);
+					pvPosition[2][i].y = (pvPosition[3][i].y * (1 - c)) + ((c * rand() * 70.0 / RAND_MAX) - 35.0);
+					pvPosition[2][i].z = (pvPosition[3][i].z * (1 - c)) + ((c * rand() * 70.0 / RAND_MAX) - 35.0);
 
-					pvPosition[3][i].m_fY = (pvPosition[0][i].m_fY * (1 - linearity)) + (pvPosition[3][i].m_fY * linearity);
-					pvPosition[2][i].m_fY = (pvPosition[1][i].m_fY * (1 - linearity)) + (pvPosition[2][i].m_fY * linearity);
+					pvPosition[3][i].y = (pvPosition[0][i].y * (1 - linearity)) + (pvPosition[3][i].y * linearity);
+					pvPosition[2][i].y = (pvPosition[1][i].y * (1 - linearity)) + (pvPosition[2][i].y * linearity);
 
 					if(position[i] > 1.0) position[i] -= 1.0;
 					if(position[i] < 0.0) position[i] += 1.0;
@@ -105,7 +105,7 @@ public:
 				{
 					b[j] = pvPosition[j][i];
 				}
-				obj.pVertex[i].m_vPos = b.Calculate(position[i]);
+				obj.pVertex[i].position = b.Calculate(position[i]);
 			}
 
 			obj.fRoll += elapsed * pAudio->GetIntensity( ) * 4.0 * 3.14159 / 180.0;
@@ -126,13 +126,13 @@ public:
 				position[i] = 1;
 				speed[i] = rand() * 0.02 / RAND_MAX;	
 
-				pvPosition[3][i].m_fX = (rand() * 50.0 / RAND_MAX) - 25.0;
-				pvPosition[3][i].m_fY = (rand() * 50.0 / RAND_MAX) - 25.0;
-				pvPosition[3][i].m_fZ = (rand() * 50.0 / RAND_MAX) - 25.0;
+				pvPosition[3][i].x = (rand() * 50.0 / RAND_MAX) - 25.0;
+				pvPosition[3][i].y = (rand() * 50.0 / RAND_MAX) - 25.0;
+				pvPosition[3][i].z = (rand() * 50.0 / RAND_MAX) - 25.0;
 
-				pvPosition[2][i].m_fX = (rand() * 50.0 / RAND_MAX) - 25.0;
-				pvPosition[2][i].m_fY = pvPosition[3][i].m_fY;//(rand() * 50.0 / RAND_MAX) - 25.0;
-				pvPosition[2][i].m_fZ = (rand() * 50.0 / RAND_MAX) - 25.0;
+				pvPosition[2][i].x = (rand() * 50.0 / RAND_MAX) - 25.0;
+				pvPosition[2][i].y = pvPosition[3][i].y;//(rand() * 50.0 / RAND_MAX) - 25.0;
+				pvPosition[2][i].z = (rand() * 50.0 / RAND_MAX) - 25.0;
 			}
 			fNotRendered = false;
 		}
@@ -155,7 +155,7 @@ public:
 			g_pD3D->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
 			g_pD3D->SetRenderState(D3DRS_ZENABLE, FALSE);
 			g_pD3D->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
-			g_pD3D->DrawSprite(ZPoint<int>(0, 0), ZRect<int>(0, 0, g_pD3D->GetWidth(), g_pD3D->GetHeight()), ColorRgb::Grey(brt * 255.0));
+			g_pD3D->DrawSprite(Point<int>(0, 0), Rect<int>(0, 0, g_pD3D->GetWidth(), g_pD3D->GetHeight()), ColorRgb::Grey(brt * 255.0));
 		}
 		return nullptr;
 	}

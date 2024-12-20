@@ -135,9 +135,9 @@ Error* TexturedGrid::Render( )
 		{
 			for(int y = 0; y <= nHeight; y++)
 			{
-				pVertex[i].m_vPos.m_fX = pfX[x];
-				pVertex[i].m_vPos.m_fY = pfY[y];
-				pVertex[i].m_vPos.m_fZ = pVertex[i].m_fRHW = 1;
+				pVertex[i].position.x = pfX[x];
+				pVertex[i].position.y = pfY[y];
+				pVertex[i].position.z = pVertex[i].rhw = 1;
 				i++;
 			}
 		}
@@ -171,14 +171,14 @@ Error* TexturedGrid::Render( )
 		int nIndex2 = (nWidth - nStartX + 1) * (nHeight + 1);
 		for(int y = 0; y <= nHeight; y++)
 		{
-			pVertex[nIndex1].m_vPos.m_fX = -0.25f;
-			pVertex[nIndex1].m_aTex[0].x = (fPosX * pVertex[nIndex1].m_aTex[0].x) + ((1 - fPosX) * pVertex[nIndex1 + (nHeight + 1)].m_aTex[0].x);
-			pVertex[nIndex1].m_aTex[0].y = (fPosX * pVertex[nIndex1].m_aTex[0].y) + ((1 - fPosX) * pVertex[nIndex1 + (nHeight + 1)].m_aTex[0].y);
+			pVertex[nIndex1].position.x = -0.25f;
+			pVertex[nIndex1].tex_coord[0].x = (fPosX * pVertex[nIndex1].tex_coord[0].x) + ((1 - fPosX) * pVertex[nIndex1 + (nHeight + 1)].tex_coord[0].x);
+			pVertex[nIndex1].tex_coord[0].y = (fPosX * pVertex[nIndex1].tex_coord[0].y) + ((1 - fPosX) * pVertex[nIndex1 + (nHeight + 1)].tex_coord[0].y);
 			nIndex1++;
 
-			pVertex[nIndex2].m_vPos.m_fX = g_pD3D->GetWidth() - 1.25f;
-			pVertex[nIndex2].m_aTex[0].x = (fPosX * pVertex[nIndex2].m_aTex[0].x) + ((1 - fPosX) * pVertex[nIndex2 - (nHeight + 1)].m_aTex[0].x);
-			pVertex[nIndex2].m_aTex[0].y = (fPosX * pVertex[nIndex2].m_aTex[0].y) + ((1 - fPosX) * pVertex[nIndex2 - (nHeight + 1)].m_aTex[0].y);
+			pVertex[nIndex2].position.x = g_pD3D->GetWidth() - 1.25f;
+			pVertex[nIndex2].tex_coord[0].x = (fPosX * pVertex[nIndex2].tex_coord[0].x) + ((1 - fPosX) * pVertex[nIndex2 - (nHeight + 1)].tex_coord[0].x);
+			pVertex[nIndex2].tex_coord[0].y = (fPosX * pVertex[nIndex2].tex_coord[0].y) + ((1 - fPosX) * pVertex[nIndex2 - (nHeight + 1)].tex_coord[0].y);
 			nIndex2++;
 		}
 
@@ -186,14 +186,14 @@ Error* TexturedGrid::Render( )
 		nIndex2 = (nHeight - nStartY + 1);
 		for(int x = 0; x <= nWidth; x++)
 		{
-			pVertex[nIndex1].m_vPos.m_fY = -0.25f;
-			pVertex[nIndex1].m_aTex[0].x = (fPosX * pVertex[nIndex1].m_aTex[0].x) + ((1 - fPosX) * pVertex[nIndex1 + 1].m_aTex[0].x);
-			pVertex[nIndex1].m_aTex[0].y = (fPosX * pVertex[nIndex1].m_aTex[0].y) + ((1 - fPosX) * pVertex[nIndex1 + 1].m_aTex[0].y);
+			pVertex[nIndex1].position.y = -0.25f;
+			pVertex[nIndex1].tex_coord[0].x = (fPosX * pVertex[nIndex1].tex_coord[0].x) + ((1 - fPosX) * pVertex[nIndex1 + 1].tex_coord[0].x);
+			pVertex[nIndex1].tex_coord[0].y = (fPosX * pVertex[nIndex1].tex_coord[0].y) + ((1 - fPosX) * pVertex[nIndex1 + 1].tex_coord[0].y);
 			nIndex1 += nHeight + 1;
 
-			pVertex[nIndex2].m_vPos.m_fY = g_pD3D->GetHeight() - 1.25f;
-			pVertex[nIndex2].m_aTex[0].x = (fPosX * pVertex[nIndex2].m_aTex[0].x) + ((1 - fPosX) * pVertex[nIndex2 - 1].m_aTex[0].x);
-			pVertex[nIndex2].m_aTex[0].y = (fPosX * pVertex[nIndex2].m_aTex[0].y) + ((1 - fPosX) * pVertex[nIndex2 - 1].m_aTex[0].y);
+			pVertex[nIndex2].position.y = g_pD3D->GetHeight() - 1.25f;
+			pVertex[nIndex2].tex_coord[0].x = (fPosX * pVertex[nIndex2].tex_coord[0].x) + ((1 - fPosX) * pVertex[nIndex2 - 1].tex_coord[0].x);
+			pVertex[nIndex2].tex_coord[0].y = (fPosX * pVertex[nIndex2].tex_coord[0].y) + ((1 - fPosX) * pVertex[nIndex2 - 1].tex_coord[0].y);
 			nIndex2 += nHeight + 1;
 		}
 		bUpdateEdges = false;

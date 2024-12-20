@@ -34,7 +34,7 @@ public:
 		obj.m_bsFlag.set( Actor::F_DRAW_VERTEX_SPRITES );
 		obj.pTexture[0].m_nType = Actor::TextureEntry::T_SPRITE;
 		obj.fSpriteSize = 7.5;//pObj->fRenderAsLights(15.0);
-		camera.m_vPosition.m_fZ = -100;
+		camera.position.z = -100;
 
 		for(int i = 0; i < SOURCES; i++)
 		{
@@ -63,12 +63,12 @@ public:
 		obj.fYaw += 1.0f * g_fDegToRad;
 
 		dViewAng += 3.14159 / 180.0;
-		camera.m_vPosition.m_fZ = -50;
-		camera.m_vPosition.m_fY = -120;
+		camera.position.z = -50;
+		camera.position.y = -120;
 		//camera.pointAt(0,0,0);
-		Vector3 vDir = Vector3::Origin() - camera.m_vPosition;
-		camera.m_fPitch = vDir.GetPitch();
-		camera.m_fYaw = vDir.GetYaw();
+		Vector3 vDir = Vector3::Origin() - camera.position;
+		camera.pitch = vDir.GetPitch();
+		camera.yaw = vDir.GetYaw();
 
 		double dRadMult = 50.0 * sin(dRadAng);
 		for(int i = 0; i < SOURCES; i++)
@@ -76,9 +76,9 @@ public:
 			pdAng[i] += pdSpeed[i] * elapsed;
 			pdRadius[i] = 100 + (dRadMult * sin(pdAng[i] * nSpikes));
 
-			obj.pVertex[i].m_vPos.m_fX = sin(pdAng[i]) * pdRadius[i];
-			obj.pVertex[i].m_vPos.m_fY = pdHeight[i];
-			obj.pVertex[i].m_vPos.m_fZ = cos(pdAng[i]) * pdRadius[i];
+			obj.pVertex[i].position.x = sin(pdAng[i]) * pdRadius[i];
+			obj.pVertex[i].position.y = pdHeight[i];
+			obj.pVertex[i].position.z = cos(pdAng[i]) * pdRadius[i];
 		}
 		obj.wcAmbientLight = ColorRgb::Grey(128.0 * brightness);//->color = D3DRGB(dBr, dBr, dBr);
 		obj.Calculate(&camera, elapsed);
@@ -98,7 +98,7 @@ public:
 			g_pD3D->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
 			g_pD3D->SetRenderState(D3DRS_ZENABLE, FALSE);
 			g_pD3D->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
-			g_pD3D->DrawSprite(ZPoint<int>(0, 0), ZRect<int>(0, 0, g_pD3D->GetWidth(), g_pD3D->GetHeight()), ColorRgb::Grey(brt * 255.0));
+			g_pD3D->DrawSprite(Point<int>(0, 0), Rect<int>(0, 0, g_pD3D->GetWidth(), g_pD3D->GetHeight()), ColorRgb::Grey(brt * 255.0));
 		}
 
 		return nullptr;

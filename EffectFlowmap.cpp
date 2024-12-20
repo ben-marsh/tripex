@@ -665,30 +665,30 @@ public:
 				ColorHsv pcHSV[ 5 ];
 				float fDiff = rand() * (50.0f * 3.14159 / 180.0) / RAND_MAX;
 				if(rand() > RAND_MAX / 2) fDiff = -fDiff;
-				pcHSV[3].m_fH = (rand() * PI * 2.0f / RAND_MAX) - PI;
+				pcHSV[3].hue = (rand() * PI * 2.0f / RAND_MAX) - PI;
 				pcHSV[3].CorrectRange();
-				pcHSV[2].m_fH = pcHSV[3].m_fH + fDiff;
+				pcHSV[2].hue = pcHSV[3].hue + fDiff;
 				pcHSV[2].CorrectRange();
-				pcHSV[1].m_fH = pcHSV[2].m_fH + fDiff;
+				pcHSV[1].hue = pcHSV[2].hue + fDiff;
 				pcHSV[1].CorrectRange();
-				pcHSV[0].m_fH = pcHSV[1].m_fH + fDiff;
+				pcHSV[0].hue = pcHSV[1].hue + fDiff;
 				pcHSV[0].CorrectRange();
-				pcHSV[4].m_fH = pcHSV[3].m_fH;
+				pcHSV[4].hue = pcHSV[3].hue;
 				pcHSV[4].CorrectRange();
 				
 				for(i = 0; i < 5; i++)
 				{
-					pcHSV[i].m_fS = (i == 4)? 0 : (0.25 + (rand() * 0.25 / RAND_MAX));
-					pcHSV[i].m_fV = i / 4.0;// (i * i) / 16.0;
+					pcHSV[i].saturation = (i == 4)? 0 : (0.25 + (rand() * 0.25 / RAND_MAX));
+					pcHSV[i].value = i / 4.0;// (i * i) / 16.0;
 				}
-				pcHSV[0].m_fS = 0.1f;//25;
-				pcHSV[1].m_fS = 0.2f;//25;
-				pcHSV[2].m_fS = 0.3f;//25;
-				pcHSV[3].m_fS = 0.2f;//15;//5;//12;
-				pcHSV[4].m_fS = 0.0f;//(i == 4)? 0 : 0.25;//(0.25 + (rand() * 0.25 / RAND_MAX));
+				pcHSV[0].saturation = 0.1f;//25;
+				pcHSV[1].saturation = 0.2f;//25;
+				pcHSV[2].saturation = 0.3f;//25;
+				pcHSV[3].saturation = 0.2f;//15;//5;//12;
+				pcHSV[4].saturation = 0.0f;//(i == 4)? 0 : 0.25;//(0.25 + (rand() * 0.25 / RAND_MAX));
 
 				ColorRgb pc[ 5 ];
-				for(i = 0; i < 5; i++) pc[i] = pcHSV[i].GetRGB();
+				for(i = 0; i < 5; i++) pc[i] = pcHSV[i].ToWideColorRgb();
 				for(i = 0; i < 256; i++)
 				{
 					int nSec = i / 64;
@@ -726,9 +726,9 @@ public:
 				for( int32 i = 0; i < 256; i++ )
 				{
 					PALETTEENTRY *pEntry = &pCanvas->m_aPalette[ i ];
-					pEntry->peRed = dstcolour[ i ].m_nR;
-					pEntry->peGreen = dstcolour[ i ].m_nG;
-					pEntry->peBlue = dstcolour[ i ].m_nB;
+					pEntry->peRed = dstcolour[ i ].r;
+					pEntry->peGreen = dstcolour[ i ].g;
+					pEntry->peBlue = dstcolour[ i ].b;
 					pEntry->peFlags = 0xff;
 				}
 //				pCanvas
@@ -743,9 +743,9 @@ public:
 					ColorRgb c = ColorRgb::Blend( srccolour[ i ], dstcolour[ i ], fadecolour );
 
 					PALETTEENTRY *pEntry = &pCanvas->m_aPalette[ i ];
-					pEntry->peRed = c.m_nR;
-					pEntry->peGreen = c.m_nG;
-					pEntry->peBlue = c.m_nB;
+					pEntry->peRed = c.r;
+					pEntry->peGreen = c.g;
+					pEntry->peBlue = c.b;
 					pEntry->peFlags = 0xff;
 //					colour[i] = ZColour::Blend(srccolour[i], dstcolour[i], fadecolour);
 				}

@@ -44,7 +44,7 @@ public:
 		m_fr = true;
 		m_fBrAng = 0;
 		m_fRotAng = 45.0f * g_fDegToRad;
-		m_cCamera.m_fPerspective = 300;
+		m_cCamera.perspective = 300;
 
 		for(int i = 0; i < TRAIL_H; i++)
 		{
@@ -57,10 +57,10 @@ public:
 			{
 				int n = j * 4;
 				static const float s = 0.5f / sqrtf( 2.0f );
-				m_pObj[ i ].pVertex[ n + 0 ].m_vNormal = Vector3( 0.0f, -s, -s );
-				m_pObj[ i ].pVertex[ n + 1 ].m_vNormal = Vector3( 0.0f, +s, -s );
-				m_pObj[ i ].pVertex[ n + 2 ].m_vNormal = Vector3( 0.0f, +s, +s );
-				m_pObj[ i ].pVertex[ n + 3 ].m_vNormal = Vector3( 0.0f, -s, +s );
+				m_pObj[ i ].pVertex[ n + 0 ].normal = Vector3( 0.0f, -s, -s );
+				m_pObj[ i ].pVertex[ n + 1 ].normal = Vector3( 0.0f, +s, -s );
+				m_pObj[ i ].pVertex[ n + 2 ].normal = Vector3( 0.0f, +s, +s );
+				m_pObj[ i ].pVertex[ n + 3 ].normal = Vector3( 0.0f, -s, +s );
 
 				if(j < TRAIL_W - 1)
 				{
@@ -94,7 +94,7 @@ public:
 			float fMult = ((sinf((CUBE_H + i) * PI / TRAIL_H) * 0.7f) + 0.8f) * TRAIL_XS;
 			for(int j = 0; j < TRAIL_W; j++)
 			{
-				m_pLimit[i].pVertex[j].m_vPos.m_fX = (j - (TRAIL_W / 2.0f)) * fMult;
+				m_pLimit[i].pVertex[j].position.x = (j - (TRAIL_W / 2.0f)) * fMult;
 				m_pfCubeTime[i][j] = 0;
 				m_pfCubeTop[i][j] = 0.0;
 				m_pfCubeHeight[i][j] = 0.0;
@@ -121,13 +121,13 @@ public:
 		m_fBrAng += fElapsed * ( 2.0f * g_fDegToRad );
 
 		m_fAng += fElapsed * ( 1.0f * g_fDegToRad );
-		m_cCamera.m_vPosition.m_fX = -30 + ( SPIN_RADIUS * cosf( m_fRotAng ) );
-		m_cCamera.m_vPosition.m_fY = SPIN_HEIGHT;
-		m_cCamera.m_vPosition.m_fZ = SPIN_RADIUS * sinf( m_fRotAng );
+		m_cCamera.position.x = -30 + ( SPIN_RADIUS * cosf( m_fRotAng ) );
+		m_cCamera.position.y = SPIN_HEIGHT;
+		m_cCamera.position.z = SPIN_RADIUS * sinf( m_fRotAng );
 
-		Vector3 vDir = Vector3::Origin() - m_cCamera.m_vPosition;
-		m_cCamera.m_fPitch = vDir.GetPitch();
-		m_cCamera.m_fYaw = vDir.GetYaw();
+		Vector3 vDir = Vector3::Origin() - m_cCamera.position;
+		m_cCamera.pitch = vDir.GetPitch();
+		m_cCamera.yaw = vDir.GetYaw();
 
 		while( m_fAng >= TRAIL_ANGS )
 		{
@@ -205,10 +205,10 @@ public:
 				float fY = fPosY - ( fCos * m_pfHeight[ i ][ j ] );
 				float fZ = fPosZ - ( fSin * m_pfHeight[ i ][ j ] );
 
-				m_pObj[ i ].pVertex[ n + 0 ].m_vPos = Vector3( fX, fY - BAR_SIZE, fZ - BAR_SIZE );
-				m_pObj[ i ].pVertex[ n + 1 ].m_vPos = Vector3( fX, fY + BAR_SIZE, fZ - BAR_SIZE );
-				m_pObj[ i ].pVertex[ n + 2 ].m_vPos = Vector3( fX, fY + BAR_SIZE, fZ + BAR_SIZE );
-				m_pObj[ i ].pVertex[ n + 3 ].m_vPos = Vector3( fX, fY - BAR_SIZE, fZ + BAR_SIZE );
+				m_pObj[ i ].pVertex[ n + 0 ].position = Vector3( fX, fY - BAR_SIZE, fZ - BAR_SIZE );
+				m_pObj[ i ].pVertex[ n + 1 ].position = Vector3( fX, fY + BAR_SIZE, fZ - BAR_SIZE );
+				m_pObj[ i ].pVertex[ n + 2 ].position = Vector3( fX, fY + BAR_SIZE, fZ + BAR_SIZE );
+				m_pObj[ i ].pVertex[ n + 3 ].position = Vector3( fX, fY - BAR_SIZE, fZ + BAR_SIZE );
 
 				n += 4;
 			}
@@ -225,8 +225,8 @@ public:
 			float dCubePosZ = (CYLINDER_RADIUS * dCubeSin);//sin(dThisAng));
 			for(int j = 0; j < TRAIL_W; j++)
 			{
-				m_pLimit[i].pVertex[j].m_vPos.m_fY = dCubePosY - (dCubeCos * m_pfCubeHeight[i][j]);
-				m_pLimit[i].pVertex[j].m_vPos.m_fZ = dCubePosZ - (dCubeSin * m_pfCubeHeight[i][j]);
+				m_pLimit[i].pVertex[j].position.y = dCubePosY - (dCubeCos * m_pfCubeHeight[i][j]);
+				m_pLimit[i].pVertex[j].position.z = dCubePosZ - (dCubeSin * m_pfCubeHeight[i][j]);
 			}
 			
 			float fBr = Bound< float >( 0.9f - ( ( float )i ) / LIMITER_H, 0.0f, 1.0f );

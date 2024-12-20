@@ -102,7 +102,7 @@ Texture* ZDirect3D::Find(int nType)
 	}
 	return NULL;
 }
-Error* ZDirect3D::DrawIndexedPrimitive(ZArray<ZVertexTL>& pVertex, ZArray<Face>& pFace)
+Error* ZDirect3D::DrawIndexedPrimitive(ZArray<VertexTL>& pVertex, ZArray<Face>& pFace)
 {
 	Error* error;
 
@@ -112,7 +112,7 @@ Error* ZDirect3D::DrawIndexedPrimitive(ZArray<ZVertexTL>& pVertex, ZArray<Face>&
 	error = FlushTextureState();
 	if (error) return TraceError(error);
 
-	HRESULT hRes = g_pDevice->DrawIndexedPrimitiveUP(D3DPT_TRIANGLELIST, 0, pVertex.GetLength(), pFace.GetLength(), pFace.GetBuffer(), D3DFMT_INDEX16, pVertex.GetBuffer(), sizeof(ZVertexTL));
+	HRESULT hRes = g_pDevice->DrawIndexedPrimitiveUP(D3DPT_TRIANGLELIST, 0, pVertex.GetLength(), pFace.GetLength(), pFace.GetBuffer(), D3DFMT_INDEX16, pVertex.GetBuffer(), sizeof(VertexTL));
 	if (FAILED(hRes)) return TraceError(hRes);
 
 	return nullptr;
@@ -350,7 +350,7 @@ Error* ZDirect3D::UploadTexture(Texture* pTexture)
 {
 	if (pTexture->m_pSrcData == NULL) return nullptr;
 
-	const ZRect< int > rSrc(0, 0, 256, 256);
+	const Rect< int > rSrc(0, 0, 256, 256);
 
 	int32 nMipLevels = pTexture->m_pd3dTexture->GetLevelCount();
 	for (int32 i = 0; i < nMipLevels; i++)
@@ -384,9 +384,10 @@ Error* ZDirect3D::UploadTexture(Texture* pTexture)
 		}
 		else
 		{
+			RECT src_rect = { rSrc.left, rSrc.top, rSrc.right, rSrc.bottom };
 			hRes = D3DXLoadSurfaceFromMemory( pSurface, NULL, NULL, pTexture->m_pSrcData, 
 				pTexture->m_nSrcFmt, pTexture->m_nSrcSpan, pTexture->m_pSrcPalette, 
-				&rSrc, D3DX_FILTER_TRIANGLE | D3DX_FILTER_DITHER, 0 );
+				&src_rect, D3DX_FILTER_TRIANGLE | D3DX_FILTER_DITHER, 0 );
 			if( FAILED( hRes ) ) return TraceError( hRes );
 		}
 	}
@@ -509,13 +510,13 @@ void ZDirect3D::ResetTextureStageState(DWORD dwStage)
 		}
 	}
 }
-void ZDirect3D::BuildSprite(ZArray<ZVertexTL>& pVertex, ZArray<Face>& pFace, const ZPoint<int>& p, const ZRect<int>& spr, ColorRgb cDiffuse, ColorRgb cSpecular)
+void ZDirect3D::BuildSprite(ZArray<VertexTL>& pVertex, ZArray<Face>& pFace, const Point<int>& p, const Rect<int>& spr, ColorRgb cDiffuse, ColorRgb cSpecular)
 {
 	pVertex.SetLength(4);
 
 	const float fMult = 1.0f / 256.0f;
 
-	ZPoint<float> p2((spr.left * fMult), (spr.top * fMult));//(spr.left + 0.5f) * fMult, (spr.top + 0.5f) * fMult);
+	Point<float> p2((spr.left * fMult), (spr.top * fMult));//(spr.left + 0.5f) * fMult, (spr.top + 0.5f) * fMult);
 
 	float fW = (float)(spr.right - spr.left);
 	float fH = (float)(spr.bottom - spr.top);
@@ -523,30 +524,30 @@ void ZDirect3D::BuildSprite(ZArray<ZVertexTL>& pVertex, ZArray<Face>& pFace, con
 	float fTexH = fH * fMult;
 	for (int i = 0; i < 4; i++)
 	{
-		pVertex[i].m_vPos = Vector3(p.x - 0.5f, p.y - 0.5f, 0.1f);
-		pVertex[i].m_aTex[0] = p2;
+		pVertex[i].position = Vector3(p.x - 0.5f, p.y - 0.5f, 0.1f);
+		pVertex[i].tex_coord[0] = p2;
 		if (i == 1 || i == 2)
 		{
-			pVertex[i].m_vPos.m_fX += fW;
-			pVertex[i].m_aTex[0].x += fTexW;//fW * fMult) - (;
+			pVertex[i].position.x += fW;
+			pVertex[i].tex_coord[0].x += fTexW;//fW * fMult) - (;
 		}
 		if (i == 2 || i == 3)
 		{
-			pVertex[i].m_vPos.m_fY += fH;
-			pVertex[i].m_aTex[0].y += fTexH;//fH * fMult;
+			pVertex[i].position.y += fH;
+			pVertex[i].tex_coord[0].y += fTexH;//fH * fMult;
 		}
-		pVertex[i].m_fRHW = 1.0f;
-		pVertex[i].m_cSpecular = cSpecular;
-		pVertex[i].m_cDiffuse = cDiffuse;
+		pVertex[i].rhw = 1.0f;
+		pVertex[i].specular = cSpecular;
+		pVertex[i].diffuse = cDiffuse;
 	}
 
 	pFace.SetLength(2);
 	pFace[0] = Face(0, 1, 3);
 	pFace[1] = Face(1, 2, 3);
 }
-Error* ZDirect3D::DrawSprite(const ZPoint<int>& p, const ZRect<int>& spr, ColorRgb cDiffuse, ColorRgb cSpecular)
+Error* ZDirect3D::DrawSprite(const Point<int>& p, const Rect<int>& spr, ColorRgb cDiffuse, ColorRgb cSpecular)
 {
-	ZArray<ZVertexTL> pv;
+	ZArray<VertexTL> pv;
 	ZArray<Face> pf;
 	BuildSprite(pv, pf, p, spr, cDiffuse, cSpecular);
 	return DrawIndexedPrimitive(pv, pf);

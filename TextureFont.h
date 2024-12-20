@@ -46,9 +46,9 @@ public:
 	Letter *GetLetter(char cLetter);
 	int GetWidth(char c);
 	int GetWidth(const char *sText);
-	void Draw(SpriteBuffer &sb, Letter *pLet, const ZPoint<int> &p, ColorRgb c);
-	void Draw(SpriteBuffer *psb, const char *sText, ZPoint<int> p, ColorRgb c, int nInFrame, int nOutFrame, int nFrame, int nFlags = 0, int *pnWidth = NULL);
-	void Draw(SpriteBuffer *psb, const char *sText, const ZPoint<int> &p, ColorRgb c = ColorRgb::White(), int nFlags = 0, int *pnWidth = NULL);
+	void Draw(SpriteBuffer &sb, Letter *pLet, const Point<int> &p, ColorRgb c);
+	void Draw(SpriteBuffer *psb, const char *sText, Point<int> p, ColorRgb c, int nInFrame, int nOutFrame, int nFrame, int nFlags = 0, int *pnWidth = NULL);
+	void Draw(SpriteBuffer *psb, const char *sText, const Point<int> &p, ColorRgb c = ColorRgb::White(), int nFlags = 0, int *pnWidth = NULL);
 	void Draw(BYTE *pbData, int nSpan, const char *sText, int nX, int nY, ColorRgb c, int nInFrame, int nOutFrame, int nFrame, int nFlags, int *pnWidth = NULL);
 /*	HRESULT Draw(ZDirect3D *d3d, char *sText, int nX, int nY, ZColour c, int nFlags);
 

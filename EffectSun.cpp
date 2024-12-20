@@ -42,7 +42,7 @@ public:
 		o2 = new Object();
 		o2->create(TRI * 2 * LAYERS * 2, TRI * LAYERS * 2);
 */
-		cCamera.m_vPosition = Vector3(0, 0, -70);//-70);
+		cCamera.position = Vector3(0, 0, -70);//-70);
 //		scene->property(worldCull, false);
 	
 		for(int o = 0; o < RINGS; o++)
@@ -64,14 +64,14 @@ public:
 				float ang = 10 * PI * a / (180 * LAYERS);
 				for(int i = 0; i < TRI; i++)
 				{
-					pObj[o].pVertex[base + i].m_vPos.m_fX = sin(i * PI2 / TRI) * INNER * cos(ang);
-					pObj[o].pVertex[base + i].m_vPos.m_fY = cos(i * PI2 / TRI) * INNER * cos(ang);
-					pObj[o].pVertex[base + i].m_vPos.m_fZ = INNER * sin(ang);
+					pObj[o].pVertex[base + i].position.x = sin(i * PI2 / TRI) * INNER * cos(ang);
+					pObj[o].pVertex[base + i].position.y = cos(i * PI2 / TRI) * INNER * cos(ang);
+					pObj[o].pVertex[base + i].position.z = INNER * sin(ang);
 //					pObj[o].pVertex[base + i].GetDiffuse() = ZColour(128.0 / EXPDIV, 77.0 / EXPDIV, 243.0 / EXPDIV); //0.6 / 25, 0.5 / 25);
 
-					pObj[o].pVertex[base + i + TRI].m_vPos.m_fX = sin((i * PI2 / TRI) + (PI / TRI)) * OUTER * cos(ang);
-					pObj[o].pVertex[base + i + TRI].m_vPos.m_fY = cos((i * PI2 / TRI) + (PI / TRI)) * OUTER * cos(ang);
-					pObj[o].pVertex[base + i + TRI].m_vPos.m_fZ = OUTER * sin(ang);
+					pObj[o].pVertex[base + i + TRI].position.x = sin((i * PI2 / TRI) + (PI / TRI)) * OUTER * cos(ang);
+					pObj[o].pVertex[base + i + TRI].position.y = cos((i * PI2 / TRI) + (PI / TRI)) * OUTER * cos(ang);
+					pObj[o].pVertex[base + i + TRI].position.z = OUTER * sin(ang);
 //					pObj[o].pVertex[base + i + TRI].GetDiffuse() = ZColour(0, 64.0 / EXPDIV, 0);
 
 					pObj[o].pFace[base + i][0] = base + i;
@@ -110,7 +110,7 @@ public:
 	{
 		fBezPos += elapsed * pAudio->GetIntensity( ) * 0.01f;
 		fBezPos2 += elapsed * pAudio->GetIntensity( ) * 0.02f;
-		cCamera.m_vPosition = Vector3(0, 0, -70);//bez.Calculate(fBezPos);
+		cCamera.position = Vector3(0, 0, -70);//bez.Calculate(fBezPos);
 		cCamera.SetTarget(bez2.Calculate(fBezPos2));
 
 		static double accum = 0;
@@ -167,8 +167,8 @@ public:
 				{
 					for(int j = 0; j < TRI; j++)
 					{
-						pObj[i].pVertex[base + j].m_cDiffuse = ColorRgb((uint8)(brightness * 128.0f / EXPDIV), (uint8)(brightness * 77.0f / EXPDIV), (uint8)(brightness * 243.0f / EXPDIV)); //0.6 / 25, 0.5 / 25);
-						pObj[i].pVertex[base + j + TRI].m_cDiffuse = ColorRgb(0, (uint8)(brightness * 64.0f / EXPDIV), 0);
+						pObj[i].pVertex[base + j].diffuse = ColorRgb((uint8)(brightness * 128.0f / EXPDIV), (uint8)(brightness * 77.0f / EXPDIV), (uint8)(brightness * 243.0f / EXPDIV)); //0.6 / 25, 0.5 / 25);
+						pObj[i].pVertex[base + j + TRI].diffuse = ColorRgb(0, (uint8)(brightness * 64.0f / EXPDIV), 0);
 					}
 					base += 2 * TRI;
 				}

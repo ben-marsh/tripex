@@ -117,16 +117,16 @@ Texture *TextureFont::GetTexture()
 	}
 	return pTexture.get();
 }
-void TextureFont::Draw(SpriteBuffer &sb, Letter *pLet, const ZPoint<int> &p, ColorRgb c)
+void TextureFont::Draw(SpriteBuffer &sb, Letter *pLet, const Point<int> &p, ColorRgb c)
 {
 	if(pLet->cLetter != ' ')
 	{
-		sb.AddSprite(p, pTexture.get(), g_pD3D->LuminanceOpacity, ZRect<int>(pLet->nBitmapX, pLet->nBitmapY, nWidth, nHeight), c);
+		sb.AddSprite(p, pTexture.get(), g_pD3D->LuminanceOpacity, Rect<int>(pLet->nBitmapX, pLet->nBitmapY, nWidth, nHeight), c);
 	}
 //	else return DD_OK;
 //		return CopySprite(d3d, c, nX, nY, pLet->nBitmapX, pLet->nBitmapY, nWidth, nHeight);
 }
-void TextureFont::Draw(SpriteBuffer *psb, const char *sText, ZPoint<int> p, ColorRgb c, int nInFrame, int nOutFrame, int nFrame, int nFlags, int *pnWidth)
+void TextureFont::Draw(SpriteBuffer *psb, const char *sText, Point<int> p, ColorRgb c, int nInFrame, int nOutFrame, int nFrame, int nFlags, int *pnWidth)
 {
 /*	if(d3d != NULL)
 	{
@@ -187,7 +187,7 @@ void TextureFont::Draw(SpriteBuffer *psb, const char *sText, ZPoint<int> p, Colo
 						cLetter = c * fBr;
 					}
 
-					Draw(*psb, pLet, ZPoint<int>(p.x - pLet->nStart, p.y), cLetter);
+					Draw(*psb, pLet, Point<int>(p.x - pLet->nStart, p.y), cLetter);
 //					HRESULT hRes = Draw(d3d, pLet, nX - pLet->nStart, nY, cLetter);
 //					if(FAILED(hRes)) return hRes;
 				}
@@ -206,7 +206,7 @@ void TextureFont::Draw(SpriteBuffer *psb, const char *sText, ZPoint<int> p, Colo
 //		return DD_OK;
 	}
 }
-void TextureFont::Draw(SpriteBuffer *psb, const char *sText, const ZPoint<int> &p, ColorRgb c, int nFlags, int *pnWidth)
+void TextureFont::Draw(SpriteBuffer *psb, const char *sText, const Point<int> &p, ColorRgb c, int nFlags, int *pnWidth)
 {
 	Draw(psb, sText, p, c, -1, -1, -1, nFlags, pnWidth);
 }
@@ -218,7 +218,7 @@ int TextureFont::GetWidth(char c)
 int TextureFont::GetWidth(const char *sText)
 {
 	int nTextWidth;
-	Draw(NULL, sText, ZPoint<int>(0, 0), ColorRgb::Black(), 0, &nTextWidth);
+	Draw(NULL, sText, Point<int>(0, 0), ColorRgb::Black(), 0, &nTextWidth);
 	return nTextWidth;
 }
 void TextureFont::Draw(BYTE *pbData, int nSpan, const char *sText, int nX, int nY, ColorRgb c, int nInFrame, int nOutFrame, int nFrame, int nFlags, int *pnWidth)

@@ -1,13 +1,9 @@
-/*---------------------------------------------
-* SetRow( ):
----------------------------------------------*/
-
 inline void Matrix44::SetRow( int nRow, float fVal0, float fVal1, float fVal2, float fVal3 )
 {
-	m_aafValue[ 0 ][ nRow ] = fVal0;
-	m_aafValue[ 1 ][ nRow ] = fVal1;
-	m_aafValue[ 2 ][ nRow ] = fVal2;
-	m_aafValue[ 3 ][ nRow ] = fVal3;
+	elements[ 0 ][ nRow ] = fVal0;
+	elements[ 1 ][ nRow ] = fVal1;
+	elements[ 2 ][ nRow ] = fVal2;
+	elements[ 3 ][ nRow ] = fVal3;
 }
 
 /*---------------------------------------------
@@ -26,19 +22,19 @@ inline Matrix44 &Matrix44::operator*=( const Matrix44 &m )
 
 inline float *Matrix44::operator[ ]( int nPos )
 {
-	return m_aafValue[ nPos ];
+	return elements[ nPos ];
 }
 
 inline const float *Matrix44::operator[ ]( int nPos ) const
 {
-	return m_aafValue[ nPos ];
+	return elements[ nPos ];
 }
 
 /*---------------------------------------------
 * Translation( ):
 ---------------------------------------------*/
 
-inline Matrix44 Matrix44::Translation( const Vector3 &v )
+inline Matrix44 Matrix44::Translate( const Vector3 &v )
 {
-	return Translation( v.m_fX, v.m_fY, v.m_fZ );
+	return Translate( v.x, v.y, v.z );
 }

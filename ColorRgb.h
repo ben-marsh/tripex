@@ -15,7 +15,7 @@ public:
 	{
 		struct
 		{
-			T m_nB, m_nG, m_nR;
+			T b, g, r;
 		};
 		DWORD dw; // Need this to be at least 32 bits for ColorRgb
 	};
@@ -43,13 +43,13 @@ public:
 	// const operators
 	BaseColorRgb<T> operator+() const { return *this; }
 //	ZBaseColour<int> operator-() const { return ZBaseColour<int>(-((int)r), -((int)g), -((int)b)); }
-	template < class U > BaseColorRgb<int> operator+(const BaseColorRgb<U> &c) const { return BaseColorRgb<int>((int)m_nR + (int)c.m_nR, (int)m_nG + (int)c.m_nG, (int)m_nB + (int)c.m_nB); }
-	template < class U > BaseColorRgb<int> operator-(const BaseColorRgb<U> &c) const { return BaseColorRgb<int>((int)m_nR - (int)c.m_nR, (int)m_nG - (int)c.m_nG, (int)m_nB - (int)c.m_nB); }
-	template < class U > BaseColorRgb<int> operator*(U n) const { return BaseColorRgb<int>((int)((int)m_nR * n), (int)((int)m_nG * n), (int)((int)m_nB * n)); }
-	template < class U > BaseColorRgb<int> operator/(U n) const { return BaseColorRgb<int>((int)((int)m_nR / n), (int)((int)m_nG / n), (int)((int)m_nB / n)); }
-	BaseColorRgb<T> operator>>(int n) const { return BaseColorRgb<T>(m_nR >> n, m_nG >> n, m_nB >> n); }
-	BaseColorRgb<int> operator<<(int n) const { return BaseColorRgb<int>((int)m_nR << n, (int)m_nG << n, (int)m_nB << n); }
-	template < class U > bool operator==(const BaseColorRgb<U> &c) const { return m_nR == c.m_nR && m_nG == c.m_nG && m_nB == c.m_nB; }
+	template < class U > BaseColorRgb<int> operator+(const BaseColorRgb<U> &c) const { return BaseColorRgb<int>((int)r + (int)c.r, (int)g + (int)c.g, (int)b + (int)c.b); }
+	template < class U > BaseColorRgb<int> operator-(const BaseColorRgb<U> &c) const { return BaseColorRgb<int>((int)r - (int)c.r, (int)g - (int)c.g, (int)b - (int)c.b); }
+	template < class U > BaseColorRgb<int> operator*(U n) const { return BaseColorRgb<int>((int)((int)r * n), (int)((int)g * n), (int)((int)b * n)); }
+	template < class U > BaseColorRgb<int> operator/(U n) const { return BaseColorRgb<int>((int)((int)r / n), (int)((int)g / n), (int)((int)b / n)); }
+	BaseColorRgb<T> operator>>(int n) const { return BaseColorRgb<T>(r >> n, g >> n, b >> n); }
+	BaseColorRgb<int> operator<<(int n) const { return BaseColorRgb<int>((int)r << n, (int)g << n, (int)b << n); }
+	template < class U > bool operator==(const BaseColorRgb<U> &c) const { return r == c.r && g == c.g && b == c.b; }
 	template < class U > bool operator!=(const BaseColorRgb<U> &c) const { return !operator==(c); }
 	template < class U > operator BaseColorRgb<U>() const { BaseColorRgb<unsigned char> c; SetCastedColourData(c, *this); return c; }
 
@@ -69,11 +69,11 @@ public:
 	template < class U > BaseColorRgb<T> &operator=(const BaseColorRgb<U> &c){ SetCastedColourData<T, U>(*this, c); return *this; }
 
 	// other
-	BaseColorRgb<T> Reverse(){ return BaseColorRgb<T>(m_nB, m_nG, m_nR); }
-	BaseColorRgb<T> Inverse(){ return BaseColorRgb<T>(255 - m_nR, 255 - m_nG, 255 - m_nB); }
+	BaseColorRgb<T> Reverse(){ return BaseColorRgb<T>(b, g, r); }
+	BaseColorRgb<T> Inverse(){ return BaseColorRgb<T>(255 - r, 255 - g, 255 - b); }
 	void Invert(){ operator=(Inverse()); }
-	int GetMaxComponent(){ return std::max(m_nR, std::max(m_nG, m_nB)); }
-	int GetMinComponent(){ return std::min(m_nR, std::min(m_nG, m_nB)); }
+	int GetMaxComponent(){ return std::max(r, std::max(g, b)); }
+	int GetMinComponent(){ return std::min(r, std::min(g, b)); }
 	static BaseColorRgb<T> Blend(const BaseColorRgb<T> &c1, const BaseColorRgb<T> &c2, float fBlend){ return (BaseColorRgb<T>)((c1 * (1.0f - fBlend)) + (c2 * fBlend)); }
 };
 template < class T, class U > inline BaseColorRgb<T> operator*(U n, const BaseColorRgb<T> &c)
@@ -82,15 +82,15 @@ template < class T, class U > inline BaseColorRgb<T> operator*(U n, const BaseCo
 }
 template < class T, class U > inline void SetCastedColourData(BaseColorRgb<T> &pc, const BaseColorRgb<U> &c)
 {
-	pc.m_nR = c.m_nR;
-	pc.m_nG = c.m_nG;
-	pc.m_nB = c.m_nB;
+	pc.r = c.r;
+	pc.g = c.g;
+	pc.b = c.b;
 }
 template < > inline void SetCastedColourData(BaseColorRgb<unsigned char> &pc, const BaseColorRgb<int> &c)
 {
-	pc.m_nR = (unsigned char)Bound<int>(c.m_nR, 0, 255);
-	pc.m_nG = (unsigned char)Bound<int>(c.m_nG, 0, 255);
-	pc.m_nB = (unsigned char)Bound<int>(c.m_nB, 0, 255);
+	pc.r = (unsigned char)Bound<int>(c.r, 0, 255);
+	pc.g = (unsigned char)Bound<int>(c.g, 0, 255);
+	pc.b = (unsigned char)Bound<int>(c.b, 0, 255);
 }
 
 typedef BaseColorRgb<int> WideColorRgb;
@@ -125,7 +125,7 @@ template< class T > BaseColorRgb< T >::BaseColorRgb( T nR, T nG, T nB )
 
 template< class T > void BaseColorRgb< T >::Set( T nR, T nG, T nB )
 {
-	m_nR = nR;
-	m_nG = nG; 
-	m_nB = nB;
+	r = nR;
+	g = nG; 
+	b = nB;
 }

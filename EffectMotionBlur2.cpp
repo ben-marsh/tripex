@@ -58,13 +58,13 @@ public:
 
 					Vector3 vec;
 //				Vector3 vec;
-					vec.m_fX = 0;//(cp - (cp / 2)) * 20;
-					vec.m_fY = PIPE_TWISTRADIUS + (PIPE_RADIUS * cos(dCircumAng));
-					vec.m_fZ = PIPE_TWISTRADIUS + (PIPE_RADIUS * sin(dCircumAng));
-					vec *= Matrix44::RotationX(dTwistAng);
-					vec.m_fY += CIRCLE_RADIUS;
-					vec *= Matrix44::RotationZ(dAng);// = RotateVector3(vec, dAng, 0, 0);
-					pObj[p].pVertex[v + cp].m_vPos = vec;
+					vec.x = 0;//(cp - (cp / 2)) * 20;
+					vec.y = PIPE_TWISTRADIUS + (PIPE_RADIUS * cos(dCircumAng));
+					vec.z = PIPE_TWISTRADIUS + (PIPE_RADIUS * sin(dCircumAng));
+					vec *= Matrix44::RotateAroundX(dTwistAng);
+					vec.y += CIRCLE_RADIUS;
+					vec *= Matrix44::RotateAroundZ(dAng);// = RotateVector3(vec, dAng, 0, 0);
+					pObj[p].pVertex[v + cp].position = vec;
 
 					pObj[p].pFace[f][0] = v + cp;
 					pObj[p].pFace[f][1] = v + ((cp + 1) % PIPE_CIRCUMPOINTS);
@@ -80,11 +80,11 @@ public:
 			}
 			pObj[p].FindVertexNormals();
 		}
-		camera.m_vPosition.m_fZ = -130;
+		camera.position.z = -130;
 	}
 	Error* Calculate(float brightness, float elapsed, AudioData* pAudio)
 	{
-		camera.m_vPosition = b.Calculate(fBezPos);
+		camera.position = b.Calculate(fBezPos);
 		camera.SetTarget(Vector3::Origin());
 		fBezPos += 0.02 * pAudio->GetIntensity( ) * elapsed;
 

@@ -29,7 +29,7 @@ public:
 	};
 
 	Texture *pTexture, *pTint;
-	ZArray<ZVertexTL> pTargetVertex;
+	ZArray<VertexTL> pTargetVertex;
 	ZArray<Face> pTargetFace;
 
 	Camera camera;
@@ -58,7 +58,7 @@ public:
 		b(Vector3(-100, -100, 120), Vector3(100, 100, 140)),
 		b2(Vector3(-20, -20, -20), Vector3(20, 20, 20))
 	{
-		camera.m_bsFlag.set( Camera::F_SCREEN_TRANSFORM, false );
+		camera.flags.set( Camera::F_SCREEN_TRANSFORM, false );
 
 		fTotalElapsed = 1;
 		dPos = 70;
@@ -70,7 +70,7 @@ public:
 		fChange = 0;
 		fTotal = 0;
 
-		camera.m_vPosition.m_fZ = -80;
+		camera.position.z = -80;
 		pBuffer.SetLength(512 * 256);
 		pBuffer.Fill(0);
 		pTarget.SetLength(128 * 64);
@@ -86,7 +86,7 @@ public:
 		obj.pVertex.SetLength(nStarVertices);
 		for(int i = 0; i < nStarVertices; i++)
 		{
-			obj.pVertex[i].m_vPos = Vector3(pfStarVertex[nIndex], pfStarVertex[nIndex + 1], pfStarVertex[nIndex + 2]);
+			obj.pVertex[i].position = Vector3(pfStarVertex[nIndex], pfStarVertex[nIndex + 1], pfStarVertex[nIndex + 2]);
 			nIndex += 3;
 		}
 		nIndex = 0;
@@ -107,16 +107,16 @@ public:
 	void DrawTriangle(Vector3 *pv1, Vector3 *pv2, Vector3 *pv3)
 	{
 		Vector3 *pvt;
-		if(pv1->m_fY > pv2->m_fY){ pvt = pv1; pv1 = pv2; pv2 = pvt; }
-		if(pv2->m_fY > pv3->m_fY){ pvt = pv2; pv2 = pv3; pv3 = pvt; }
-		if(pv1->m_fY > pv2->m_fY){ pvt = pv1; pv1 = pv2; pv2 = pvt; }
+		if(pv1->y > pv2->y){ pvt = pv1; pv1 = pv2; pv2 = pvt; }
+		if(pv2->y > pv3->y){ pvt = pv2; pv2 = pv3; pv3 = pvt; }
+		if(pv1->y > pv2->y){ pvt = pv1; pv1 = pv2; pv2 = pvt; }
 
-		int y1 = pv1->m_fY, y2 = pv2->m_fY, y3 = pv3->m_fY;
+		int y1 = pv1->y, y2 = pv2->y, y3 = pv3->y;
 
-		float xl = pv1->m_fX;
-		float xr = pv1->m_fX;
-		float xls = (pv2->m_fX - pv1->m_fX) / (1 + y2 - y1);
-		float xrs = (pv3->m_fX - pv1->m_fX) / (1 + y3 - y1);
+		float xl = pv1->x;
+		float xr = pv1->x;
+		float xls = (pv2->x - pv1->x) / (1 + y2 - y1);
+		float xrs = (pv3->x - pv1->x) / (1 + y3 - y1);
 		int left, right;
 
 		int bPos = y1 * 512;
@@ -124,8 +124,8 @@ public:
 		{
 			if(y == y2)
 			{
-				xl = pv2->m_fX;
-				xls = (pv3->m_fX - pv2->m_fX) / (1 + y3 - y2);
+				xl = pv2->x;
+				xls = (pv3->x - pv2->x) / (1 + y3 - y2);
 			}
 			if(y >= 0 && y < 256)
 			{
@@ -146,7 +146,7 @@ public:
 //Object *makeTentacles(int segs, float l, float r);
 	Error* Calculate(float brightness, float elapsed, AudioData* pAudio) override
 	{
-		camera.m_vPosition = b.Calculate(fBezPos);
+		camera.position = b.Calculate(fBezPos);
 		camera.SetTarget(b2.Calculate(fBezPos2));//ZVector::Origin());
 		fBezPos += 0.02 * fSpeed * elapsed;
 		fBezPos2 += 0.02 * fSpeed * elapsed;
@@ -210,15 +210,15 @@ public:
 //	ZFlexibleVertex fvVertex = obj.pTransVertex[0];
 		for(int i = 0; i < obj.pTransVertex.GetLength(); i++)
 		{
-			obj.pTransVertex[i].m_vPos.m_fX += 256.0;
-			obj.pTransVertex[i].m_vPos.m_fY += 128.0;// - (4 * fPos);
+			obj.pTransVertex[i].position.x += 256.0;
+			obj.pTransVertex[i].position.y += 128.0;// - (4 * fPos);
 //		fvVertex++;
 		}
 
 		for(int i = 0; i < obj.pClippedFace.GetLength(); i++)
 		{
 			Face *pf = &obj.pClippedFace[i];
-			DrawTriangle(&obj.pTransVertex[(*pf)[0]].m_vPos, &obj.pTransVertex[(*pf)[1]].m_vPos, &obj.pTransVertex[(*pf)[2]].m_vPos);
+			DrawTriangle(&obj.pTransVertex[(*pf)[0]].position, &obj.pTransVertex[(*pf)[1]].position, &obj.pTransVertex[(*pf)[2]].position);
 		}
  
 		int nSrc = 0, nBase = 0, nDst= 0;
@@ -294,38 +294,38 @@ public:
 					if(dX1 >= 0 && dY1 >= 0 && dX2 < g_pD3D->GetWidth() - 1 && dY2 < g_pD3D->GetHeight() - 1)
 					{
 						int nV = pTargetVertex.AddEmpty(4);
-						ZVertexTL *pVertex = &pTargetVertex[nV];
+						VertexTL *pVertex = &pTargetVertex[nV];
 
-						pVertex[0].m_vPos.m_fX = dX1;//dX + p;
-						pVertex[0].m_vPos.m_fY = dY1;//dY + p;
+						pVertex[0].position.x = dX1;//dX + p;
+						pVertex[0].position.y = dY1;//dY + p;
 
-						pVertex[1].m_vPos.m_fX = dX2;//dX + dSize - p;
-						pVertex[1].m_vPos.m_fY = dY1;//dY + p;
+						pVertex[1].position.x = dX2;//dX + dSize - p;
+						pVertex[1].position.y = dY1;//dY + p;
 
-						pVertex[2].m_vPos.m_fX = dX2;//dX + dSize - p;
-						pVertex[2].m_vPos.m_fY = dY2;//dY + dSize - p;
+						pVertex[2].position.x = dX2;//dX + dSize - p;
+						pVertex[2].position.y = dY2;//dY + dSize - p;
 		
-						pVertex[3].m_vPos.m_fX = dX1;//dX + p;
-						pVertex[3].m_vPos.m_fY = dY2;//dY + dSize - p;
+						pVertex[3].position.x = dX1;//dX + p;
+						pVertex[3].position.y = dY2;//dY + dSize - p;
 
 						int nColour = std::min(4, pTarget[nIndex] / 2);
 						for(int k = 0; k < 4; k++)
 						{
-							pVertex[k].m_vPos.m_fZ = 1.0f;
-							pVertex[k].m_fRHW = 1.0f;//vPosition.z = 1.0f;
-							pVertex[k].m_cDiffuse = pcColour[nColour];
+							pVertex[k].position.z = 1.0f;
+							pVertex[k].rhw = 1.0f;//vPosition.z = 1.0f;
+							pVertex[k].diffuse = pcColour[nColour];
 						}
-						pVertex[0].m_aTex[0].x = 0;
-						pVertex[0].m_aTex[0].y = 0;
+						pVertex[0].tex_coord[0].x = 0;
+						pVertex[0].tex_coord[0].y = 0;
 		
-						pVertex[1].m_aTex[0].x = 1;
-						pVertex[1].m_aTex[0].y = 0;
+						pVertex[1].tex_coord[0].x = 1;
+						pVertex[1].tex_coord[0].y = 0;
 
-						pVertex[2].m_aTex[0].x = 1;
-						pVertex[2].m_aTex[0].y = 1;
+						pVertex[2].tex_coord[0].x = 1;
+						pVertex[2].tex_coord[0].y = 1;
 
-						pVertex[3].m_aTex[0].x = 0;
-						pVertex[3].m_aTex[0].y = 1;
+						pVertex[3].tex_coord[0].x = 0;
+						pVertex[3].tex_coord[0].y = 1;
 
 						Face *pFace = pTargetFace.AddEmptyPtr(2);
 						pFace[0] = Face(nV + 0, nV + 1, nV + 3);
@@ -350,7 +350,7 @@ public:
 			g_pD3D->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
 			g_pD3D->SetRenderState(D3DRS_ZENABLE, FALSE);
 			g_pD3D->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
-			g_pD3D->DrawSprite(ZPoint<int>(0, 0), ZRect<int>(0, 0, g_pD3D->GetWidth(), g_pD3D->GetHeight()), ColorRgb::Grey(brt * 255.0));
+			g_pD3D->DrawSprite(Point<int>(0, 0), Rect<int>(0, 0, g_pD3D->GetWidth(), g_pD3D->GetHeight()), ColorRgb::Grey(brt * 255.0));
 		}
 
 		return nullptr;

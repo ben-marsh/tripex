@@ -3,48 +3,31 @@
 class Matrix44
 {
 public:
-	// matrix values at (x,y) positions, not (r,c)
-	float m_aafValue[ 4 ][ 4 ];
+	// NOTE: matrix values are stored at (x,y) positions, not (r,c)
+	float elements[4][4];
 
-	// Identity( ): 
- 	static Matrix44 Identity();
+	Matrix44();
+	void SetRow(int row, float v0, float v1, float v2, float v3);
 
-	// Translation( ): 
-	static Matrix44 Translation( const Vector3 &v );
-	static Matrix44 Translation( float fX, float fY, float fZ );
+	static Matrix44 Identity();
 
-	// Scaling( ):
-	static Matrix44 Scaling( float fX, float fY, float fZ );
+	static Matrix44 Translate(const Vector3& v);
+	static Matrix44 Translate(float x, float y, float z);
 
-	// Rotation/X/Y/Z( ):
-	static Matrix44 Rotation( float fYaw, float fPitch);
-	static Matrix44 Rotation( float fYaw, float fPitch, float fRoll);
-	static Matrix44 Rotation( float fAng, const Vector3 &v );
-	static Matrix44 RotationX( float fPitch );
-	static Matrix44 RotationY( float fYaw );
-	static Matrix44 RotationZ( float fRoll );
+	static Matrix44 Scale(float x, float y, float z);
 
-	// SetRow( ):
-	void SetRow( int nRow, float fVal0, float fVal1, float fVal2, float fVal3 );
+	static Matrix44 Rotate(float yaw, float pitch);
+	static Matrix44 Rotate(float yaw, float pitch, float roll);
+	static Matrix44 Rotate(float ang, const Vector3& v);
+	static Matrix44 RotateAroundX(float pitch);
+	static Matrix44 RotateAroundY(float yaw);
+	static Matrix44 RotateAroundZ(float roll);
 
-	// operator[ ]( ):
-	float *operator[ ]( int nPos );
-	const float *operator[ ]( int nPos ) const;
+	float* operator[ ](int pos);
+	const float* operator[ ](int pos) const;
 
-	// operator*( )/operator*=( ):
-	Matrix44 operator*( const Matrix44 &m ) const;
-	Matrix44 &operator*=( const Matrix44 &m );
-
-
-//	inline ZMatrix(){}
-//	inline ZMatrix(float v00, float v01, float v02, float v03, float v10, float v11, float v12, float v13, float v20, float v21, float v22, float v23, float v30, float v31, float v32, float v33);
-
-//	inline float *operator[](int nPos);
-//	inline const float *operator[](int nPos) const;
-//	inline ZMatrix operator*(ZMatrix &m);
-//	inline ZMatrix &operator=(ZMatrix &m);
-//	inline ZMatrix &operator*=(ZMatrix &m);
-//	inline ZVector operator*(ZVector &v);
+	Matrix44 operator*(const Matrix44& m) const;
+	Matrix44& operator*=(const Matrix44& m);
 };
 
 #include "Matrix44.inl"

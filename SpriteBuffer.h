@@ -15,8 +15,8 @@ protected:
 		int nState;
 		class Texture *pTexture;
 
-		ZPoint<int> p;
-		ZRect<int> r;
+		Point<int> p;
+		Rect<int> r;
 		ColorRgb cDiffuse;
 	};
 
@@ -36,9 +36,9 @@ public:
 	void SetState(int nState);
 	void SetTexture(Texture *pTexture);
 
-	void Darken(const ZRect<int> &r, ColorRgb cDiffuse);
-	void AddSprite(ZPoint<int> p, const ZRect<int> &spr, ColorRgb cDiffuse = ColorRgb::White(), ColorRgb cSpecular = ColorRgb::Black());
-	void AddBlendedSprites(ZPoint<int> p, float fBlend, const ZRect<int> &spr1, const ZRect<int> &spr2, ColorRgb cDiffuse = ColorRgb::White());
-	void AddSprite(ZPoint<int> p, Texture *pTexture, int nState, const ZRect<int> &spr, ColorRgb cDiffuse = ColorRgb::White());
-	void AddBlendedSprites(ZPoint<int> p, Texture *pTexture, int nState, float fBlend, const ZRect<int> &spr1, const ZRect<int> &spr2, ColorRgb cDiffuse = ColorRgb::White());
+	void Darken(const Rect<int> &r, ColorRgb cDiffuse);
+	void AddSprite(Point<int> p, const Rect<int> &spr, ColorRgb cDiffuse = ColorRgb::White(), ColorRgb cSpecular = ColorRgb::Black());
+	void AddBlendedSprites(Point<int> p, float fBlend, const Rect<int> &spr1, const Rect<int> &spr2, ColorRgb cDiffuse = ColorRgb::White());
+	void AddSprite(Point<int> p, Texture *pTexture, int nState, const Rect<int> &spr, ColorRgb cDiffuse = ColorRgb::White());
+	void AddBlendedSprites(Point<int> p, Texture *pTexture, int nState, float fBlend, const Rect<int> &spr1, const Rect<int> &spr2, ColorRgb cDiffuse = ColorRgb::White());
 };

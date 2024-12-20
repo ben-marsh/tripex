@@ -66,14 +66,14 @@ void MakeTentacles(Actor &obj, int segs, float l, float r)
 				}
 				for(int k = 0; k < TTEMP; k++)
 				{
-					Vector3 vDir = Vector3((mu[i].m_fX * u[k]) + (mv[i].m_fX * v[k]), (mu[i].m_fY * u[k]) + (mv[i].m_fY * v[k]), (mu[i].m_fZ * u[k]) + (mv[i].m_fZ * v[k]));
-					obj.pVertex[vn].m_vPos = center + (vDir * ((segs - 1.0f - j) / (segs - 1.0f)));
+					Vector3 vDir = Vector3((mu[i].x * u[k]) + (mv[i].x * v[k]), (mu[i].y * u[k]) + (mv[i].y * v[k]), (mu[i].z * u[k]) + (mv[i].z * v[k]));
+					obj.pVertex[vn].position = center + (vDir * ((segs - 1.0f - j) / (segs - 1.0f)));
 					vn++;
 				}
 			}
 			else 
 			{
-				obj.pVertex[vn].m_vPos = center;
+				obj.pVertex[vn].position = center;
 				vn++;
 			}
 		}
@@ -156,7 +156,7 @@ public:
 		obj.FindDelayValues();
 //	obj->fDelay(96, 8);
 
-		camera.m_vPosition.m_fZ = -240;
+		camera.position.z = -240;
 
 //	scene->vpObject.Add(obj);
 //	scene->camera.z = -240;
@@ -294,13 +294,13 @@ public:
 			{
 				for(y = 0; y <= grid.nHeight; y++)
 				{
-					grid.pVertex[i].m_aTex[0].x = gridbm.pVertex[i].m_aTex[0].x = precalc_u[x][y] + (tx / 256.0f);
-					grid.pVertex[i].m_aTex[0].y = gridbm.pVertex[i].m_aTex[0].y = precalc_v[x][y] + (ty / 256.0f);
+					grid.pVertex[i].tex_coord[0].x = gridbm.pVertex[i].tex_coord[0].x = precalc_u[x][y] + (tx / 256.0f);
+					grid.pVertex[i].tex_coord[0].y = gridbm.pVertex[i].tex_coord[0].y = precalc_v[x][y] + (ty / 256.0f);
 
 					float brav = precalc_c[x][y] * br * pAudio->GetIntensity( );//min(average, 1);
 					brav *= 1.6f;
-					gridbm.pVertex[i].m_cDiffuse = ColorRgb::Grey((int)(255.0f * br));//max(0.2, min(brav, 1)) * 255.0);//gridbm->vertex[i].color = D3DRGB(brav, brav, brav);
-					grid.pVertex[i].m_cDiffuse = ColorRgb::Grey((int)(br * precalc_c[(int)(x + tx) % GRIDW][y % GRIDH] * 255.0f));
+					gridbm.pVertex[i].diffuse = ColorRgb::Grey((int)(255.0f * br));//max(0.2, min(brav, 1)) * 255.0);//gridbm->vertex[i].color = D3DRGB(brav, brav, brav);
+					grid.pVertex[i].diffuse = ColorRgb::Grey((int)(br * precalc_c[(int)(x + tx) % GRIDW][y % GRIDH] * 255.0f));
 					i++;
 				}
 			}
@@ -381,10 +381,10 @@ public:
 			obj.fPitch += fThis * fTentacleDir * g_fDegToRad * 20.0f * pAudio->GetIntensity( );
 			obj.fYaw += fThis * fTentacleDir * g_fDegToRad * 10.0f * (pAudio->GetIntensity( ) + 0.1f);
 			angle += pAudio->GetIntensity( ) * fMoveSpeed * fThis * g_fDegToRad;
-			obj.vPosition.m_fX = 200.0f * cosf(angle) * sinf(angle * 1.3f) * cosf(angle * 2.3f) * sinf(angle * 0.6f);
-			obj.vPosition.m_fY = 100.0f * cosf(angle * 0.2f) * sinf(angle * 1.1f) * cosf(angle * 1.6f) * sinf(angle * 1.2f);
-			obj.vPosition.m_fZ = 150.0f * cosf(angle * 1.6f) * sinf(angle * 0.5f) * cosf(angle * 1.1f) * sinf(angle * 1.2f);
-			if(texture == pBlankTexture) obj.vPosition.m_fZ = (obj.vPosition.m_fZ / 2) - 50;
+			obj.vPosition.x = 200.0f * cosf(angle) * sinf(angle * 1.3f) * cosf(angle * 2.3f) * sinf(angle * 0.6f);
+			obj.vPosition.y = 100.0f * cosf(angle * 0.2f) * sinf(angle * 1.1f) * cosf(angle * 1.6f) * sinf(angle * 1.2f);
+			obj.vPosition.z = 150.0f * cosf(angle * 1.6f) * sinf(angle * 0.5f) * cosf(angle * 1.1f) * sinf(angle * 1.2f);
+			if(texture == pBlankTexture) obj.vPosition.z = (obj.vPosition.z / 2) - 50;
 			obj.nExposure = bLast? 1 : 0;
 			obj.Calculate(&camera, fThis);
 

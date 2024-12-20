@@ -72,11 +72,11 @@ template < int nBez > Vector3 ContainedBezierCurve<nBez>::Calculate(float &fPos)
 }
 template < int nBez > void ContainedBezierCurve<nBez>::GetNewPoints(BezierCurve &b)
 {
-	b[2].m_fX = vBound1.m_fX + ((float(rand()) / RAND_MAX) * (vBound2.m_fX - vBound1.m_fX));
-	b[2].m_fY = vBound1.m_fY + ((float(rand()) / RAND_MAX) * (vBound2.m_fY - vBound1.m_fY));
-	b[2].m_fZ = vBound1.m_fZ + ((float(rand()) / RAND_MAX) * (vBound2.m_fZ - vBound1.m_fZ));
+	b[2].x = vBound1.x + ((float(rand()) / RAND_MAX) * (vBound2.x - vBound1.x));
+	b[2].y = vBound1.y + ((float(rand()) / RAND_MAX) * (vBound2.y - vBound1.y));
+	b[2].z = vBound1.z + ((float(rand()) / RAND_MAX) * (vBound2.z - vBound1.z));
 
-	b[3].m_fX = vBound1.m_fX + ((float(rand()) / RAND_MAX) * (vBound2.m_fX - vBound1.m_fX));
-	b[3].m_fY = vBound1.m_fY + ((float(rand()) / RAND_MAX) * (vBound2.m_fY - vBound1.m_fY));
-	b[3].m_fZ = vBound1.m_fZ + ((float(rand()) / RAND_MAX) * (vBound2.m_fZ - vBound1.m_fZ));
+	b[3].x = vBound1.x + ((float(rand()) / RAND_MAX) * (vBound2.x - vBound1.x));
+	b[3].y = vBound1.y + ((float(rand()) / RAND_MAX) * (vBound2.y - vBound1.y));
+	b[3].z = vBound1.z + ((float(rand()) / RAND_MAX) * (vBound2.z - vBound1.z));
 }

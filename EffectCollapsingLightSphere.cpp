@@ -57,7 +57,7 @@ public:
 		obj.nExposure = 3;
 		obj.fSpriteSize = 7.0;
 		obj.fFrameHistory = 2.0;
-		camera.m_vPosition.m_fZ = -240;
+		camera.position.z = -240;
 
 		for(int i = 0; i < SOURCES; i++)
 		{
@@ -96,9 +96,9 @@ public:
 			float sin_t = sin(pdTilt[i] * fTwistMult);
 			float cos_t = cos(pdTilt[i] * fTwistMult);
 
-			obj.pVertex[i].m_vPos.m_fX = (y * cos_t) + (x * sin_t);
-			obj.pVertex[i].m_vPos.m_fY = (y * sin_t) + (x * cos_t);
-			obj.pVertex[i].m_vPos.m_fZ = z;
+			obj.pVertex[i].position.x = (y * cos_t) + (x * sin_t);
+			obj.pVertex[i].position.y = (y * sin_t) + (x * cos_t);
+			obj.pVertex[i].position.z = z;
 
 			pdAng[i] += elapsed * multp * (pAudio->GetIntensity( ) + 0.1) * pdSpeed[i] * 3.14159 / 180.0;
 			pdTilt[i] += (pAudio->GetIntensity( ) + 0.1) * elapsed * multp * 1 * 3.14159 / 180.0;
@@ -106,7 +106,7 @@ public:
 			float fTransMult = FOREGROUNDBR + ((z / -100.0) * (1 - FOREGROUNDBR));
 			float fBr = brightness * fTransMult / 2.0;
 
-			obj.pVertex[i].m_cDiffuse = ColorRgb::Grey(0.6 * fBr * 255.0);
+			obj.pVertex[i].diffuse = ColorRgb::Grey(0.6 * fBr * 255.0);
 	//		alObject[i]->alpha = 128*brightness*transMult;
 	//		fvVertex++;
 		}
@@ -130,7 +130,7 @@ public:
 			g_pD3D->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
 			g_pD3D->SetRenderState(D3DRS_ZENABLE, FALSE);
 			g_pD3D->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
-			g_pD3D->DrawSprite(ZPoint<int>(0, 0), ZRect<int>(0, 0, g_pD3D->GetWidth(), g_pD3D->GetHeight()), ColorRgb::Grey(brt * 255.0));
+			g_pD3D->DrawSprite(Point<int>(0, 0), Rect<int>(0, 0, g_pD3D->GetWidth(), g_pD3D->GetHeight()), ColorRgb::Grey(brt * 255.0));
 		}
 		return nullptr;
 	}

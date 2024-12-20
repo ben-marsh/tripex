@@ -1,206 +1,135 @@
 #include "Matrix44.h"
 
-/*---------------------------------------------
-* ZVector methods
----------------------------------------------*/
-
-/*---------------------------------------------
-* Constructor:
----------------------------------------------*/
-
-inline Vector3::Vector3( )
+inline Vector3::Vector3()
 {
+	x = y = z = 0;
 }
 
-inline Vector3::Vector3( float fX, float fY, float fZ )
+inline Vector3::Vector3(float x, float y, float z)
 {
-	Set( fX, fY, fZ );
+	Set(x, y, z);
 }
 
-/*---------------------------------------------
-* Origin( ):
----------------------------------------------*/
-
-inline Vector3 Vector3::Origin( )
+inline Vector3 Vector3::Origin()
 {
-	return Vector3( 0.0f, 0.0f, 0.0f );
+	return Vector3(0.0f, 0.0f, 0.0f);
 }
 
-/*---------------------------------------------
-* Polar( ):
----------------------------------------------*/
-
-inline Vector3 Polar( float fLength, float fPitch, float fYaw )
+inline Vector3 Vector3::Polar(float length, float pitch, float yaw)
 {
-	return Vector3( 0, 0, fLength ) * Matrix44::Rotation( fPitch, fYaw );
+	return Vector3(0, 0, length) * Matrix44::Rotate(pitch, yaw);
 }
 
-/*---------------------------------------------
-* Set( ):
----------------------------------------------*/
-
-inline void Vector3::Set( float fX, float fY, float fZ )
+inline void Vector3::Set(float x, float y, float z)
 {
-	m_fX = fX;
-	m_fY = fY;
-	m_fZ = fZ;
+	this->x = x;
+	this->y = y;
+	this->z = z;
 }
 
-/*---------------------------------------------
-* operator+( ):
----------------------------------------------*/
-
-inline Vector3 Vector3::operator+( ) const
+inline Vector3 Vector3::operator+() const
 {
-	return Vector3( +m_fX, +m_fY, +m_fZ );
+	return Vector3(+x, +y, +z);
 }
 
-inline Vector3 Vector3::operator+( const Vector3 &v ) const
+inline Vector3 Vector3::operator+(const Vector3& v) const
 {
-	return Vector3( m_fX + v.m_fX, m_fY + v.m_fY, m_fZ + v.m_fZ );
+	return Vector3(x + v.x, y + v.y, z + v.z);
 }
 
-/*---------------------------------------------
-* operator-( ):
----------------------------------------------*/
-
-inline Vector3 Vector3::operator-( ) const
+inline Vector3 Vector3::operator-() const
 {
-	return Vector3( -m_fX, -m_fY, -m_fZ );
+	return Vector3(-x, -y, -z);
 }
 
-inline Vector3 Vector3::operator-( const Vector3 &v ) const
+inline Vector3 Vector3::operator-(const Vector3& v) const
 {
-	return Vector3( m_fX - v.m_fX, m_fY - v.m_fY, m_fZ - v.m_fZ );
+	return Vector3(x - v.x, y - v.y, z - v.z);
 }
 
-/*---------------------------------------------
-* operator*( ):
----------------------------------------------*/
-
-inline Vector3 Vector3::operator*( float fValue ) const
+inline Vector3 Vector3::operator*(float value) const
 {
-	return Vector3( m_fX * fValue, m_fY * fValue, m_fZ * fValue );
+	return Vector3(x * value, y * value, z * value);
 }
 
-inline Vector3 operator*( float fValue, const Vector3 &v )
+inline Vector3 operator*(float fValue, const Vector3& v)
 {
 	return v * fValue;
 }
 
-/*---------------------------------------------
-* operator/( ):
----------------------------------------------*/
-
-inline Vector3 Vector3::operator/( float fValue ) const
+inline Vector3 Vector3::operator/(float value) const
 {
-	return operator*( 1.0f / fValue );
+	return operator*(1.0f / value);
 }
 
-/*---------------------------------------------
-* operator+=( ):
----------------------------------------------*/
-
-inline Vector3 &Vector3::operator+=( const Vector3 &v )
+inline Vector3& Vector3::operator+=(const Vector3& v)
 {
-	m_fX += v.m_fX;
-	m_fY += v.m_fY;
-	m_fZ += v.m_fZ;
+	x += v.x;
+	y += v.y;
+	z += v.z;
 	return *this;
 }
 
-/*---------------------------------------------
-* operator-=( ):
----------------------------------------------*/
-
-inline Vector3 &Vector3::operator-=( const Vector3 &v )
+inline Vector3& Vector3::operator-=(const Vector3& v)
 {
-	m_fX -= v.m_fX;
-	m_fY -= v.m_fY;
-	m_fZ -= v.m_fZ;
+	x -= v.x;
+	y -= v.y;
+	z -= v.z;
 	return *this;
 }
 
-/*---------------------------------------------
-* operator*=( ):
----------------------------------------------*/
-
-inline Vector3 &Vector3::operator*=( float fValue )
+inline Vector3& Vector3::operator*=(float value)
 {
-	m_fX *= fValue;
-	m_fY *= fValue;
-	m_fZ *= fValue;
+	x *= value;
+	y *= value;
+	z *= value;
 	return *this;
 }
 
-/*---------------------------------------------
-* operator/=( ):
----------------------------------------------*/
-
-inline Vector3 &Vector3::operator/=( float fValue )
+inline Vector3& Vector3::operator/=(float value)
 {
-	return operator*=( 1.0f / fValue );
+	return operator*=(1.0f / value);
 }
 
-/*---------------------------------------------
-* operator[ ]:
----------------------------------------------*/
-
-inline float &Vector3::operator[ ]( int nPos )
+inline float& Vector3::operator[ ](int index)
 {
-	_ASSERT( nPos >= 0 && nPos < 3 );
-	return m_af[ nPos ];
+	_ASSERT(index >= 0 && index < 3);
+	return elements[index];
 }
 
-inline const float &Vector3::operator[ ]( int nPos ) const
+inline const float& Vector3::operator[ ](int index) const
 {
-	_ASSERT( nPos >= 0 && nPos < 3 );
-	return m_af[ nPos ];
+	_ASSERT(index >= 0 && index < 3);
+	return elements[index];
 }
 
-/*---------------------------------------------
-* Dot( ):
----------------------------------------------*/
-
-inline float Vector3::Dot( const Vector3 &v ) const
+inline float Vector3::Dot(const Vector3& v) const
 {
-	return ( m_fX * v.m_fX ) + ( m_fY * v.m_fY ) + ( m_fZ * v.m_fZ );
+	return (x * v.x) + (y * v.y) + (z * v.z);
 }
 
-/*---------------------------------------------
-* Length( ):
----------------------------------------------*/
-
-inline float Vector3::Length( ) const
+inline float Vector3::Length() const
 {
-	return sqrtf( Dot( *this ) );
+	return sqrtf(Dot(*this));
 }
 
-/*---------------------------------------------
-* Normal( )/Normalize( ):
----------------------------------------------*/
-
-inline Vector3 Vector3::Normal( float fLength ) const
+inline Vector3 Vector3::Normal(float length) const
 {
-	return operator*( fLength / Length( ) );
+	return operator*(length / Length());
 }
 
-inline void Vector3::Normalize( float fLength )
+inline void Vector3::Normalize(float length)
 {
-	operator*=( fLength / Length( ) );
+	operator*=(length / Length());
 }
 
-/*---------------------------------------------
-* GetYaw( )/GetPitch( )/GetRoll( ):
----------------------------------------------*/
-
-inline float Vector3::GetYaw( ) const
+inline float Vector3::GetYaw() const
 {
-	return atan2f( m_fX, m_fZ );
+	return atan2f(x, z);
 }
 
-inline float Vector3::GetPitch( ) const
+inline float Vector3::GetPitch() const
 {
-	return -atan2f( m_fY, sqrtf( m_fX * m_fX + m_fZ * m_fZ ) ); 
+	return -atan2f(y, sqrtf(x * x + z * z));
 }
 

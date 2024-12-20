@@ -99,7 +99,7 @@ protected:
 
 	Vector3 GetDelayedPosition(int nVertex, ExposureData *pData);
 
-	void Project(ZArray<ZVertexTL> &pVertex, Camera *pCamera);
+	void Project(ZArray<VertexTL> &pVertex, Camera *pCamera);
 
 	WORD GetClipFlag(WORD wClipMask, Vector3 &v);
 	void AddClippedFace(Face &f, WORD wPlaneMask, ZArray<Face> &);
@@ -171,8 +171,8 @@ public:
 
 	TextureEntry pTexture[MAX_TEXTURES];
 	ZArray<Light*> ppLight;
-	ZArray<ZVertex> pVertex;
-	ZArray<ZVertexTL> pTransVertex;
+	ZArray<Vertex> pVertex;
+	ZArray<VertexTL> pTransVertex;
 //	ZArray<ZVertexTL> pClippedVertex;
 	ZArray<Face> pFace, pClippedFace;//pClippedFace;
 	ZArray<Edge> pEdge, pClippedEdge;//, peClipped;//Edge;

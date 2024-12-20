@@ -39,24 +39,24 @@ public:
 		{
 			float angle = i * 4.0f * PI2 / CLENGTH;
 
-			coil.pVertex[v].m_vPos.m_fX = (i - (CLENGTH * 0.5f)) * CDIFF;
-			coil.pVertex[v].m_vPos.m_fY = CORADIUS * sinf(angle - CANGDIFF);
-			coil.pVertex[v].m_vPos.m_fZ = CORADIUS * cosf(angle - CANGDIFF);
+			coil.pVertex[v].position.x = (i - (CLENGTH * 0.5f)) * CDIFF;
+			coil.pVertex[v].position.y = CORADIUS * sinf(angle - CANGDIFF);
+			coil.pVertex[v].position.z = CORADIUS * cosf(angle - CANGDIFF);
 			v++;
 
-			coil.pVertex[v].m_vPos.m_fX = (i - (CLENGTH * 0.5f)) * CDIFF;
-			coil.pVertex[v].m_vPos.m_fY = CORADIUS * sinf(angle + CANGDIFF);
-			coil.pVertex[v].m_vPos.m_fZ = CORADIUS * cosf(angle + CANGDIFF);
+			coil.pVertex[v].position.x = (i - (CLENGTH * 0.5f)) * CDIFF;
+			coil.pVertex[v].position.y = CORADIUS * sinf(angle + CANGDIFF);
+			coil.pVertex[v].position.z = CORADIUS * cosf(angle + CANGDIFF);
 			v++;
 
-			coil.pVertex[v].m_vPos.m_fX = (i - (CLENGTH * 0.5f)) * CDIFF;
-			coil.pVertex[v].m_vPos.m_fY = CIRADIUS * sinf(angle + CANGDIFF);
-			coil.pVertex[v].m_vPos.m_fZ = CIRADIUS * cosf(angle + CANGDIFF);
+			coil.pVertex[v].position.x = (i - (CLENGTH * 0.5f)) * CDIFF;
+			coil.pVertex[v].position.y = CIRADIUS * sinf(angle + CANGDIFF);
+			coil.pVertex[v].position.z = CIRADIUS * cosf(angle + CANGDIFF);
 			v++;
 
-			coil.pVertex[v].m_vPos.m_fX = (i - (CLENGTH * 0.5f)) * CDIFF;
-			coil.pVertex[v].m_vPos.m_fY = CIRADIUS * sinf(angle - CANGDIFF);
-			coil.pVertex[v].m_vPos.m_fZ = CIRADIUS * cosf(angle - CANGDIFF);
+			coil.pVertex[v].position.x = (i - (CLENGTH * 0.5f)) * CDIFF;
+			coil.pVertex[v].position.y = CIRADIUS * sinf(angle - CANGDIFF);
+			coil.pVertex[v].position.z = CIRADIUS * cosf(angle - CANGDIFF);
 			v++;
 		}
 		for(i = 0; i < CLENGTH - 1; i++)
@@ -115,7 +115,7 @@ public:
 
 			for(j = 0; j < PTCIRCUM; j++)
 			{
-				obj.pVertex[(i * PTCIRCUM) + j].m_cDiffuse = ColorRgb::Grey((int)(br * 255.0f));
+				obj.pVertex[(i * PTCIRCUM) + j].diffuse = ColorRgb::Grey((int)(br * 255.0f));
 			}
 		}
 		obj.m_bsFlag.set(Actor::F_VALID_VERTEX_DIFFUSE);
@@ -125,7 +125,7 @@ public:
 //	scene = new World();
 //	scene->vpObject.Add(obj);
 //	scene->vpObject.Add(coil);
-		cCamera.m_vPosition.m_fZ = -120;//120;
+		cCamera.position.z = -120;//120;
 	}
 	Error* Calculate(float brightness, float elapsed, AudioData* pAudio) override
 	{
@@ -147,7 +147,7 @@ public:
 				double br = std::min(1.0, sin(i * 3.14159 / CLENGTH) * 5) * brightness;
 				for(j = 0; j < 4; j++)
 				{
-					coil.pVertex[(i * 4) + j].m_cDiffuse = ColorRgb::Grey((int)(255.0f * br));
+					coil.pVertex[(i * 4) + j].diffuse = ColorRgb::Grey((int)(255.0f * br));
 				}
 			}
 			for(i = 0; i < PTLENGTH; i++)
@@ -156,7 +156,7 @@ public:
 	
 				for(j = 0; j < PTCIRCUM; j++)
 				{
-					obj.pVertex[(i * PTCIRCUM) + j].m_cDiffuse = ColorRgb::Grey((int)(255.0f * br));
+					obj.pVertex[(i * PTCIRCUM) + j].diffuse = ColorRgb::Grey((int)(255.0f * br));
 				}
 			}
 
@@ -176,9 +176,9 @@ public:
 				{
 					float angle = j * PI2 / PTCIRCUM;
 
-					obj.pVertex[k].m_vPos.m_fX = (i - (PTLENGTH*0.5f)) * PTDIST;
-					obj.pVertex[k].m_vPos.m_fY = height[i][j] * fLenMult * sinf(angle);	
-					obj.pVertex[k].m_vPos.m_fZ = height[i][j] * fLenMult * cosf(angle);
+					obj.pVertex[k].position.x = (i - (PTLENGTH*0.5f)) * PTDIST;
+					obj.pVertex[k].position.y = height[i][j] * fLenMult * sinf(angle);	
+					obj.pVertex[k].position.z = height[i][j] * fLenMult * cosf(angle);
 
 					k++;
 				}

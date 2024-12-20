@@ -597,15 +597,15 @@ void Tripex::DrawMessage(SpriteBuffer& sb, TextureFont* pFont, int y, const char
 	if (fBackBr > FLOAT_ZERO)
 	{
 		float fDarkBr = (fBackBr * fBr);
-		const ZPoint<int> p(nCentreX - (nWidth / 2) - 15, y);
-		const ZRect<int> r(0, 0, nWidth + 30, 25 + ((int)vsLine.size() - 1) * nLineHeight);
+		const Point<int> p(nCentreX - (nWidth / 2) - 15, y);
+		const Rect<int> r(0, 0, nWidth + 30, 25 + ((int)vsLine.size() - 1) * nLineHeight);
 		sb.AddSprite(p, NULL, g_pD3D->InverseMultiply, r, fDarkBr);
 	}
 
 	for (int i = 0; i < (int)vsLine.size(); i++)
 	{
 		int nLineWidth = pFont->GetWidth(vsLine[i].c_str());
-		pFont->Draw(&sb, vsLine[i].c_str(), ZPoint<int>(nCentreX - (nLineWidth / 2), y + 5 + (i * nLineHeight)), ColorRgb::Grey((int)(fBr * 255.0f)));
+		pFont->Draw(&sb, vsLine[i].c_str(), Point<int>(nCentreX - (nLineWidth / 2), y + 5 + (i * nLineHeight)), ColorRgb::Grey((int)(fBr * 255.0f)));
 	}
 }
 

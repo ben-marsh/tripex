@@ -48,7 +48,7 @@ public:
 		accum = 0;
 		r = p = y = 0;
 
-		camera.m_vPosition.m_fZ = -50;
+		camera.position.z = -50;
 		b.Create(4);
 		for(int i = 0; i < SOURCES; i++)
 		{
@@ -86,9 +86,9 @@ public:
 
 				double r = 2.0 * er[i] * cos(ehp[i]);
 
-				obj.pVertex[i].m_vPos.m_fX = (46.0 + (r * sin(ehp[i]))) * sin(position[i]);
-				obj.pVertex[i].m_vPos.m_fZ = (46.0 + (r * cos(ehp[i]))) * cos(position[i]);
-				obj.pVertex[i].m_vPos.m_fY = er[i] * sin(ehp[i]);	
+				obj.pVertex[i].position.x = (46.0 + (r * sin(ehp[i]))) * sin(position[i]);
+				obj.pVertex[i].position.z = (46.0 + (r * cos(ehp[i]))) * cos(position[i]);
+				obj.pVertex[i].position.y = er[i] * sin(ehp[i]);	
 			}
 	
 			static double a2 = 0;
@@ -125,7 +125,7 @@ public:
 			g_pD3D->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
 			g_pD3D->SetRenderState(D3DRS_ZENABLE, FALSE);
 			g_pD3D->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
-			g_pD3D->DrawSprite(ZPoint<int>(0, 0), ZRect<int>(0, 0, g_pD3D->GetWidth(), g_pD3D->GetHeight()), ColorRgb::Grey(brt * 255.0));
+			g_pD3D->DrawSprite(Point<int>(0, 0), Rect<int>(0, 0, g_pD3D->GetWidth(), g_pD3D->GetHeight()), ColorRgb::Grey(brt * 255.0));
 		}
 		return nullptr;
 	}

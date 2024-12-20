@@ -11,7 +11,7 @@ typedef struct
 
 ZArray<ClipInfo> *ppClip;
 
-ZArray<ZVertexTL> *ppvOut;
+ZArray<VertexTL> *ppvOut;
 ZArray<Face> *ppfOut;
 ZArray<int> *ppnEmptyVertex;
 ZArray<int> *ppnEmptyFace;
@@ -19,7 +19,7 @@ ZArray<int> *ppnEmptyFace;
 void InitObjectClipper( )
 {
 	ppClip = new ZArray<ClipInfo>;
-	ppvOut = new ZArray<ZVertexTL>;
+	ppvOut = new ZArray<VertexTL>;
 	ppfOut = new ZArray<Face>;
 	ppnEmptyVertex = new ZArray<int>;
 	ppnEmptyFace = new ZArray<int>;
@@ -38,22 +38,22 @@ bool IsClipRequired(Face &f, uint16 wPlaneMask)
 uint16 Actor::GetClipFlag(uint16 wClipMask, Vector3 &v)
 {
 	uint16 wClip = 0;
-	if(wClipMask & CLIP_FLAG_MIN_X && v.m_fX < m_fClipMinX) wClip |= CLIP_FLAG_MIN_X;
-	if(wClipMask & CLIP_FLAG_MAX_X && v.m_fX > m_fClipMaxX) wClip |= CLIP_FLAG_MAX_X;
+	if(wClipMask & CLIP_FLAG_MIN_X && v.x < m_fClipMinX) wClip |= CLIP_FLAG_MIN_X;
+	if(wClipMask & CLIP_FLAG_MAX_X && v.x > m_fClipMaxX) wClip |= CLIP_FLAG_MAX_X;
 
-	if(wClipMask & CLIP_FLAG_MIN_Y && v.m_fY < m_fClipMinY) wClip |= CLIP_FLAG_MIN_Y;
-	if(wClipMask & CLIP_FLAG_MAX_Y && v.m_fY > m_fClipMaxY) wClip |= CLIP_FLAG_MAX_Y;
+	if(wClipMask & CLIP_FLAG_MIN_Y && v.y < m_fClipMinY) wClip |= CLIP_FLAG_MIN_Y;
+	if(wClipMask & CLIP_FLAG_MAX_Y && v.y > m_fClipMaxY) wClip |= CLIP_FLAG_MAX_Y;
 		
-	if(wClipMask & CLIP_FLAG_MIN_Z && v.m_fZ < m_fClipMinZ) wClip |= CLIP_FLAG_MIN_Z;
-	if(wClipMask & CLIP_FLAG_MAX_Z && v.m_fZ > m_fClipMaxZ) wClip |= CLIP_FLAG_MAX_Z;
+	if(wClipMask & CLIP_FLAG_MIN_Z && v.z < m_fClipMinZ) wClip |= CLIP_FLAG_MIN_Z;
+	if(wClipMask & CLIP_FLAG_MAX_Z && v.z > m_fClipMaxZ) wClip |= CLIP_FLAG_MAX_Z;
 	return wClip;
 }
 //WORD wClipRequired;
 int Actor::GetClippedIndex(Face *pf, int nIn, int nOut, uint16 wPlaneFlag, uint16 wClipRequired)
 {
 	ClipInfo *pci = &(*ppClip)[(*pf)[nIn]];
-	ZVertexTL &vIn = (pci->wClip != 0)? (*ppvOut)[pci->wIndex] : pTransVertex[pci->wIndex];
-	ZVertexTL &vOut = (*ppvOut)[(*ppClip)[(*pf)[nOut]].wIndex];
+	VertexTL &vIn = (pci->wClip != 0)? (*ppvOut)[pci->wIndex] : pTransVertex[pci->wIndex];
+	VertexTL &vOut = (*ppvOut)[(*ppClip)[(*pf)[nOut]].wIndex];
 //	ZVertexTL &vIn = pTransVertex[(*ppClip)[pf->v[nIn]].wIndex];
 //	ZVertexTL &vOut = (*ppvOut)[(*ppClip)[pf->v[nOut]].wIndex];
 
@@ -61,32 +61,32 @@ int Actor::GetClippedIndex(Face *pf, int nIn, int nOut, uint16 wPlaneFlag, uint1
 	switch(wPlaneFlag)
 	{
 	case CLIP_FLAG_MIN_X:
-		fPos = (vIn.m_vPos.m_fX - m_fClipMinX) / (vIn.m_vPos.m_fX - vOut.m_vPos.m_fX);
+		fPos = (vIn.position.x - m_fClipMinX) / (vIn.position.x - vOut.position.x);
 		break;
 	case CLIP_FLAG_MAX_X:
-		fPos = (m_fClipMaxX - vIn.m_vPos.m_fX) / (vOut.m_vPos.m_fX - vIn.m_vPos.m_fX);
+		fPos = (m_fClipMaxX - vIn.position.x) / (vOut.position.x - vIn.position.x);
 		break;
 	case CLIP_FLAG_MIN_Y:
-		fPos = (vIn.m_vPos.m_fY - m_fClipMinY) / (vIn.m_vPos.m_fY - vOut.m_vPos.m_fY);
+		fPos = (vIn.position.y - m_fClipMinY) / (vIn.position.y - vOut.position.y);
 		break;
 	case CLIP_FLAG_MAX_Y:
-		fPos = (m_fClipMaxY - vIn.m_vPos.m_fY) / (vOut.m_vPos.m_fY - vIn.m_vPos.m_fY);
+		fPos = (m_fClipMaxY - vIn.position.y) / (vOut.position.y - vIn.position.y);
 		break;
 	case CLIP_FLAG_MIN_Z:
-		fPos = (vIn.m_vPos.m_fZ - m_fClipMinZ) / (vIn.m_vPos.m_fZ - vOut.m_vPos.m_fZ);
+		fPos = (vIn.position.z - m_fClipMinZ) / (vIn.position.z - vOut.position.z);
 		break;
 	case CLIP_FLAG_MAX_Z:
-		fPos = (m_fClipMaxZ - vIn.m_vPos.m_fZ) / (vOut.m_vPos.m_fZ - vIn.m_vPos.m_fZ);
+		fPos = (m_fClipMaxZ - vIn.position.z) / (vOut.position.z - vIn.position.z);
 		break;
 	default:
 		__assume(0);
 		break;
 	}
 
-	Vector3 vPos = (vIn.m_vPos * (1 - fPos)) + (vOut.m_vPos * fPos);
+	Vector3 vPos = (vIn.position * (1 - fPos)) + (vOut.position * fPos);
 
 	int nVertex;
-	ZVertexTL *pNewVertex;
+	VertexTL *pNewVertex;
 
 	uint16 wClip = GetClipFlag(wClipRequired & (wPlaneFlag - 1), vPos);
 	if(wClip == 0)
@@ -113,21 +113,21 @@ int Actor::GetClippedIndex(Face *pf, int nIn, int nOut, uint16 wPlaneFlag, uint1
 	(*ppClip)[nIndex].wIndex = nVertex;
 	(*ppClip)[nIndex].wClip = wClip;
 	
-	pNewVertex->m_vPos = vPos;
-	pNewVertex->m_cDiffuse = (vIn.m_cDiffuse * (1 - fPos)) + (vOut.m_cDiffuse * fPos);
-	pNewVertex->m_cSpecular = (vIn.m_cSpecular * (1 - fPos)) + (vOut.m_cSpecular * fPos);
+	pNewVertex->position = vPos;
+	pNewVertex->diffuse = (vIn.diffuse * (1 - fPos)) + (vOut.diffuse * fPos);
+	pNewVertex->specular = (vIn.specular * (1 - fPos)) + (vOut.specular * fPos);
 
 	if(wPlaneFlag & ~(CLIP_FLAG_MAX_Z | CLIP_FLAG_MIN_Z))
 	{
 		// work out texture position with texture perspective
-		pNewVertex->m_fRHW = (vIn.m_fRHW * (1 - fPos)) + (vOut.m_fRHW * fPos);
-		pNewVertex->m_aTex[0].x = ((vIn.m_aTex[0].x * vIn.m_fRHW * (1 - fPos)) + (vOut.m_aTex[0].x * vOut.m_fRHW * fPos)) / pNewVertex->m_fRHW;
-		pNewVertex->m_aTex[0].y = ((vIn.m_aTex[0].y * vIn.m_fRHW * (1 - fPos)) + (vOut.m_aTex[0].y * vOut.m_fRHW * fPos)) / pNewVertex->m_fRHW;
+		pNewVertex->rhw = (vIn.rhw * (1 - fPos)) + (vOut.rhw * fPos);
+		pNewVertex->tex_coord[0].x = ((vIn.tex_coord[0].x * vIn.rhw * (1 - fPos)) + (vOut.tex_coord[0].x * vOut.rhw * fPos)) / pNewVertex->rhw;
+		pNewVertex->tex_coord[0].y = ((vIn.tex_coord[0].y * vIn.rhw * (1 - fPos)) + (vOut.tex_coord[0].y * vOut.rhw * fPos)) / pNewVertex->rhw;
 	}
 	else
 	{
-		pNewVertex->m_aTex[0].x = (vIn.m_aTex[0].x * (1 - fPos)) + (vOut.m_aTex[0].x * fPos);
-		pNewVertex->m_aTex[0].y = (vIn.m_aTex[0].y * (1 - fPos)) + (vOut.m_aTex[0].y * fPos);
+		pNewVertex->tex_coord[0].x = (vIn.tex_coord[0].x * (1 - fPos)) + (vOut.tex_coord[0].x * fPos);
+		pNewVertex->tex_coord[0].y = (vIn.tex_coord[0].y * (1 - fPos)) + (vOut.tex_coord[0].y * fPos);
 	}
 	return nIndex;
 }
@@ -184,7 +184,7 @@ void Actor::Clip(ZArray<Face> &pfSrc, ZArray<Face> &pfDst, uint16 wClipMask)
 
 	for(int i = 0; i < pTransVertex.GetLength(); i++)
 	{
-		(*ppClip)[i].wClip = GetClipFlag(wClipMask, pTransVertex[i].m_vPos);
+		(*ppClip)[i].wClip = GetClipFlag(wClipMask, pTransVertex[i].position);
 		if((*ppClip)[i].wClip != 0)
 		{
 			(*ppClip)[i].wIndex = (uint16)(*ppvOut).Add(pTransVertex[i]);

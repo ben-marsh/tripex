@@ -62,7 +62,7 @@ public:
 
 	Error* Open( );
 	Error* Close( );
-	Error* DrawIndexedPrimitive(ZArray<ZVertexTL> &pVertex, ZArray<Face> &pfFace);
+	Error* DrawIndexedPrimitive(ZArray<VertexTL> &pVertex, ZArray<Face> &pfFace);
 
 	Error* AddTexture( Texture *pTexture );
 	Error* UploadTexture( Texture *pTexture );
@@ -89,8 +89,8 @@ public:
 	void SetTextureStageState(DWORD dwStage, D3DTEXTURESTAGESTATETYPE dwKey, DWORD dwValue);
 	Error* FlushTextureState();
 
-	static void BuildSprite(ZArray<ZVertexTL> &pVertex, ZArray<Face> &pFace, const ZPoint<int> &p, const ZRect<int> &spr, ColorRgb cDiffuse = ColorRgb::White(), ColorRgb cSpecular = ColorRgb::Black());
-	Error* DrawSprite(const ZPoint<int> &p, const ZRect<int> &spr, ColorRgb cDiffuse = ColorRgb::White(), ColorRgb cSpecular = ColorRgb::Black());
+	static void BuildSprite(ZArray<VertexTL> &pVertex, ZArray<Face> &pFace, const Point<int> &p, const Rect<int> &spr, ColorRgb cDiffuse = ColorRgb::White(), ColorRgb cSpecular = ColorRgb::Black());
+	Error* DrawSprite(const Point<int> &p, const Rect<int> &spr, ColorRgb cDiffuse = ColorRgb::White(), ColorRgb cSpecular = ColorRgb::Black());
 };
 
 extern ZDirect3D *g_pD3D;
