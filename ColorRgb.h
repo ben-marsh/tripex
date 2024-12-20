@@ -11,7 +11,14 @@ template < class T, class U > void SetCastedColourData(BaseColorRgb<T> &pc, cons
 template < class T > class BaseColorRgb
 {
 public:
-	T m_nB, m_nG, m_nR;
+	union
+	{
+		struct
+		{
+			T m_nB, m_nG, m_nR;
+		};
+		DWORD dw; // Need this to be at least 32 bits for ColorRgb
+	};
 
 	// Constructors:
 	inline BaseColorRgb( );
