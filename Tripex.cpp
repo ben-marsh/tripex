@@ -20,8 +20,6 @@
 #define MSG_FADEOUT_TIME 1000
 
 Texture *pBlankTexture;
-void InitObjectArrays( );
-void InitObjectClipper( );
 
 Tripex::Tripex()
 {
@@ -163,9 +161,6 @@ DWORD WINAPI Tripex::InitialiseThread(void *pParam)
 
 Error* Tripex::Startup()
 {
-	InitObjectArrays( );
-	InitObjectClipper( );
-
 	txs.reset();
 
 	pBlankTexture = NULL;

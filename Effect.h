@@ -10,9 +10,7 @@
 
 #define EFFECT_CHANGE_FRAMES 400.0f
 
-//#include "tripex2.h"
-
-enum // TC_WT (wrap), TC_EM (envmap), TC_LB (lightbob)
+enum
 {
 	TC_GUI,
 
@@ -192,13 +190,10 @@ template < class T > class EffectHandlerT : public EffectHandler
 public:
 	void Create()
 	{
-		//		_ASSERT(pEffect == NULL);
-		//		Destroy();
 		pEffect = std::make_unique<T>();
 		pEffect->pEffectPtr = this;
 	}
 };
 
-//#define DECLARE_EFFECT_PTR(type, varname) static ZEffectPtrT<type> pTemp_##varname; ZEffectPtr *varname = &pTemp_##varname;
 #define IMPORT_EFFECT(name) extern std::shared_ptr<EffectHandler> CreateEffect_##name( );
 #define EXPORT_EFFECT(name, type) std::shared_ptr<EffectHandler> CreateEffect_##name( ){ return std::make_shared<EffectHandlerT<type>>(); }

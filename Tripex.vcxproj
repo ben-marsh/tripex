@@ -233,7 +233,6 @@
     <ClCompile Include="Fourier.cpp" />
     <ClCompile Include="TexturedGrid.cpp" />
     <ClCompile Include="Matrix44.cpp" />
-    <ClCompile Include="Actor-Clip.cpp" />
     <ClCompile Include="Actor.cpp" />
     <ClCompile Include="Canvas.cpp" />
     <ClCompile Include="SpriteBuffer.cpp" />

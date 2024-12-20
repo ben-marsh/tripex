@@ -94,6 +94,19 @@ public:
 	};
 
 protected:
+	struct ClipInfo
+	{
+		uint16 wClip;
+		uint16 wIndex;
+	};
+
+	ZArray<ClipInfo> pClip;
+
+	ZArray<VertexTL> pvOut;
+	ZArray<Face> pfOut;
+	ZArray<int> pnEmptyVertex;
+	ZArray<int> pnEmptyFace;
+
 	ZArray<Vector3> pvFaceNormal; // buffer for calculating vertex normals
 	int nTextures;
 
@@ -101,6 +114,7 @@ protected:
 
 	void Project(ZArray<VertexTL> &pVertex, Camera *pCamera);
 
+	bool IsClipRequired(const Face& f, uint16 plane_mask);
 	WORD GetClipFlag(WORD wClipMask, Vector3 &v);
 	void AddClippedFace(Face &f, WORD wPlaneMask, ZArray<Face> &);
 	int GetClippedIndex(Face *pf, int nIn, int nOut, WORD wPlaneFlag, WORD wClipRequired);
