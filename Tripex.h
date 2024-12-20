@@ -24,8 +24,8 @@ public:
 	DWORD dwLastTime;
 	std::unique_ptr<AudioData> pAudio;
 
-	std::vector< EffectHandler* >* pvpEffect;
-	std::vector< EffectHandler* >* pvpEffectList;
+	std::vector<std::shared_ptr<EffectHandler>> effects;
+	std::vector<std::shared_ptr<EffectHandler>> enabled_effects;
 
 	Tripex();
 	void ShowStatusMsg( const char *sFormat, ... );
@@ -56,7 +56,7 @@ private:
 	void DrawMessage(SpriteBuffer& sb, TextureFont* pFont, int y, const char* sText, float fBr, float fBackBr);
 	int GetClippedLineLength(TextureFont* pFont, const char* sText, int nClipWidth);
 
-	void AddEffect(EffectHandler* (*fn)(), const char* sName, int nDrawOrder, float fStartupWeight, int nTex, ...);
+	void AddEffect(std::shared_ptr<EffectHandler> (*fn)(), const char* sName, int nDrawOrder, float fStartupWeight, int nTex, ...);
 	void CreateEffectList();
 
 	ConfigItem* AddCfgItem(ConfigItem* pItem);

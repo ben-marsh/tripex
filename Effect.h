@@ -187,7 +187,7 @@ public:
 	std::string GetCfgItemName() const;
 };
 
-template < class T > class EffectFactoryT : public EffectHandler
+template < class T > class EffectHandlerT : public EffectHandler
 {
 public:
 	void Create()
@@ -200,5 +200,5 @@ public:
 };
 
 //#define DECLARE_EFFECT_PTR(type, varname) static ZEffectPtrT<type> pTemp_##varname; ZEffectPtr *varname = &pTemp_##varname;
-#define IMPORT_EFFECT(name) extern EffectHandler *CreateEffect_##name( );
-#define EXPORT_EFFECT(name, type) EffectHandler *CreateEffect_##name( ){ return (EffectHandler*)new EffectFactoryT< type >( ); }
+#define IMPORT_EFFECT(name) extern std::shared_ptr<EffectHandler> CreateEffect_##name( );
+#define EXPORT_EFFECT(name, type) std::shared_ptr<EffectHandler> CreateEffect_##name( ){ return std::make_shared<EffectHandlerT<type>>(); }

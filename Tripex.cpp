@@ -43,11 +43,11 @@ DWORD WINAPI Tripex::InitialiseThread(void *pParam)
 	std::vector< TextureSource* > ppItem;
 	LoadTextureSettings(ppItem);
 
-	for(int i = 1; i < (int)pvpEffectList->size(); i++)
+	for(int i = 1; i < (int)effects.size(); i++)
 	{
-		if((*pvpEffectList)[i]->fPreference > FLOAT_ZERO)
+		if(effects[i]->fPreference > FLOAT_ZERO)
 		{
-			pvpEffect->push_back((*pvpEffectList)[i]);
+			enabled_effects.push_back(effects[i]);
 		}
 	}
 
@@ -154,9 +154,9 @@ DWORD WINAPI Tripex::InitialiseThread(void *pParam)
 //		vpTexture.push_back(ppItem[i]->pTexture);
 	}
 
-	for(int i = 0; i < (int)pvpEffect->size(); i++)
+	for(int i = 0; i < enabled_effects.size(); i++)
 	{
-		(*pvpEffect)[i]->Create();
+		enabled_effects[i]->Create();
 	}
 	return 0;
 }
@@ -170,8 +170,7 @@ Error* Tripex::Startup()
 
 	pBlankTexture = NULL;
 
-	pvpEffect = new std::vector< EffectHandler* >;
-	pvpEffect->push_back((*pvpEffectList)[0]);
+	enabled_effects.push_back(effects[0]);
 
 	vpTexture.clear();
 	fEffectFrames = 0.0f;
@@ -243,7 +242,7 @@ Error* Tripex::Startup()
 //		g_pD3D->vpTexture.push_back(vpTexture[i].get());
 	}
 
-	id = (int)pvpEffect->size();
+	id = (int)enabled_effects.size();
 
 	txs.set(TXS_CHANGE_EFFECT);
 
@@ -290,14 +289,14 @@ Error* Tripex::Render()
 		}
 		else
 		{
-			if(nEffect < ( int )pvpEffect->size() - 1) nNewEffect++;
+			if(nEffect < ( int )enabled_effects.size() - 1) nNewEffect++;
 			txs.reset(TXS_EFFECT_RIGHT);
 		}
 
 		if(nNewEffect != nEffect)
 		{
 			nEffect = nNewEffect;
-			ShowStatusMsg("Current Effect: %s", (*pvpEffect)[nEffect]->sName.c_str());
+			ShowStatusMsg("Current Effect: %s", enabled_effects[nEffect]->sName.c_str());
 
 //				if(bEffectLeft) nEffect--;
 //				else if(bEffectRight) nEffect++;
@@ -307,14 +306,14 @@ Error* Tripex::Render()
 //				bInFade = false;
 			fEffectFrames = 0;
 
-			Error* error = (*pvpEffect)[nEffect]->Reconfigure(pAudio.get());
+			Error* error = enabled_effects[nEffect]->Reconfigure(pAudio.get());
 			if(error) return TraceError(error); 
 		}
 	}
 	if(!txs.test(TXS_IN_FADE) && (!txs.test(TXS_HOLD) || txs.test(TXS_CHANGE_EFFECT)) && 
 		(nEffect == 0 || 
-		fEffectFrames > ((*pvpEffect)[nEffect]->fChange * EFFECT_CHANGE_FRAMES)) && 
-		pvpEffect->size() > 1)
+		fEffectFrames > (enabled_effects[nEffect]->fChange * EFFECT_CHANGE_FRAMES)) && 
+		enabled_effects.size() > 1)
 	{
 		txs.reset(TXS_CHANGE_EFFECT);
 //				bChangeEffect = false;
@@ -324,51 +323,54 @@ Error* Tripex::Render()
 //				bInFade = true;
 		fEffectFrames = 0;
 
-		for(int i = 1; i < ( int )pvpEffect->size(); i++) 
+		for(int i = 1; i < ( int )enabled_effects.size(); i++) 
 		{
-			(*pvpEffect)[i]->bValid = (i != nEffect && (*pvpEffect)[nEffect]->nDrawOrder != (*pvpEffect)[i]->nDrawOrder);
+			enabled_effects[i]->bValid = (i != nEffect && enabled_effects[nEffect]->nDrawOrder != enabled_effects[i]->nDrawOrder);
 		}
 
 		float pt = 0;
 		// fairness = (random)0-1(ordered)
 		float temperature = (1.0f / (fFairness)) - 1;
 		// temperature = (random)+inf - 0(ordered)
-		for(int i = 1; i < ( int )pvpEffect->size(); i++)
+		for(int i = 1; i < ( int )enabled_effects.size(); i++)
 		{
-			float weight = (float(id - (*pvpEffect)[i]->nLastUsed) / (pvpEffect->size() - 1)) - 1;
+			float weight = (float(id - enabled_effects[i]->nLastUsed) / (enabled_effects.size() - 1)) - 1;
 			// weight = small (last used) - large (not used)
 
-			if(!(*pvpEffect)[i]->bValid)
+			if(!enabled_effects[i]->bValid)
 			{
-				(*pvpEffect)[i]->fProb = 0.0f;
+				enabled_effects[i]->fProb = 0.0f;
 			}
 			else if(temperature < FLOAT_ZERO)
 			{
-				(*pvpEffect)[i]->fProb = (weight >= 0)? 0.5f : 0.0f;
+				enabled_effects[i]->fProb = (weight >= 0)? 0.5f : 0.0f;
 			}
 			else 
 			{
-				(*pvpEffect)[i]->fProb = 1.0f / (1.0f + expf(-weight / temperature));
+				enabled_effects[i]->fProb = 1.0f / (1.0f + expf(-weight / temperature));
 			}
 
-			(*pvpEffect)[i]->fProb *= (*pvpEffect)[i]->fPreference * std::max(0.1f, 1.0f - fabsf(pAudio->GetIntensity( ) - (*pvpEffect)[i]->fActivity));
+			enabled_effects[i]->fProb *= enabled_effects[i]->fPreference * std::max(0.1f, 1.0f - fabsf(pAudio->GetIntensity( ) - enabled_effects[i]->fActivity));
 
-			pt += (*pvpEffect)[i]->fProb;//vpEffect[i]->preference * p[i];
+			pt += enabled_effects[i]->fProb;//vpEffect[i]->preference * p[i];
 		}
 
 		nNextEffect = 0;
 		if(pt > FLOAT_ZERO)
 		{
-			for(int i = 1; i < ( int )pvpEffect->size(); i++) (*pvpEffect)[i]->fProb /= pt;
+			for (int i = 1; i < (int)enabled_effects.size(); i++)
+			{
+				enabled_effects[i]->fProb /= pt;
+			}
 
 			double r = (rand() % 1000);
-			for(nNextEffect = 1; nNextEffect < ( int )pvpEffect->size() - 1; nNextEffect++) 
+			for(nNextEffect = 1; nNextEffect < ( int )enabled_effects.size() - 1; nNextEffect++)
 			{
-				r -= (*pvpEffect)[nNextEffect]->fProb * 1000.0;
+				r -= enabled_effects[nNextEffect]->fProb * 1000.0;
 				if(r < 0) break;
 			}
 		}
-		(*pvpEffect)[nNextEffect]->nLastUsed = id;
+		enabled_effects[nNextEffect]->nLastUsed = id;
 
 		fFadePos = 0;
 		txs.reset(TXS_RESET_TARGET);
@@ -376,7 +378,7 @@ Error* Tripex::Render()
 	}
 	if(txs[TXS_RECONFIGURE])//bReconfigure)
 	{
-		Error* error = (*pvpEffect)[nEffect]->Reconfigure(pAudio.get());
+		Error* error = enabled_effects[nEffect]->Reconfigure(pAudio.get());
 		if(error) return TraceError(error);
 
 		txs.reset(TXS_IN_FADE);
@@ -393,11 +395,11 @@ Error* Tripex::Render()
 	float fFadeLength = (fFadeIn * 5000.0f) + fOut - (fCrossfading * std::min((fFadeIn * 5000.0f), fOut));
 
 	float fBr = txs.test(TXS_IN_FADE)? std::min(1.0f, std::max(0.0f, 1.0f - (fFadePos / fOut))) : 1;
-	ppDrawEffect[0] = (fBr < FLOAT_ZERO)? pEffectBlank : (*pvpEffect)[nEffect];
+	ppDrawEffect[0] = (fBr < FLOAT_ZERO)? pEffectBlank : enabled_effects[nEffect].get();
 	ppDrawEffect[0]->fBr = fBr;
 
 	fBr = txs.test(TXS_IN_FADE)? std::min(1.0f, std::max(0.0f, 1.0f - ((fFadeLength - fFadePos) / (fFadeIn * 5000.0f)))) : 0;
-	ppDrawEffect[1] = (fBr < FLOAT_ZERO)? pEffectBlank : (*pvpEffect)[nNextEffect];
+	ppDrawEffect[1] = (fBr < FLOAT_ZERO)? pEffectBlank : enabled_effects[nNextEffect].get();
 	ppDrawEffect[1]->fBr = fBr;
 
 	if(ppDrawEffect[1]->fBr > FLOAT_ZERO && !txs[TXS_RESET_TARGET])
@@ -424,7 +426,7 @@ Error* Tripex::Render()
 		return nullptr;
 	}
 
-	pAudio->Update( fFrames, (*pvpEffect)[nEffect]->fSensitivity );
+	pAudio->Update( fFrames, enabled_effects[nEffect]->fSensitivity );
 //	UpdateBeat(fFrames);
 
 	for(int i = 0; i < 2; i++)
@@ -533,9 +535,9 @@ void Tripex::Shutdown( )
 //	gui = auto_ptr<ZTexture>(NULL);
 //	pcHUD = NULL;
 
-	for(int i = 0; i < ( int )pvpEffect->size(); i++)
+	for(int i = 0; i < ( int )enabled_effects.size(); i++)
 	{
-		(*pvpEffect)[i]->Destroy();
+		enabled_effects[i]->Destroy();
 	}
 
 	SaveCfgItems();
@@ -662,9 +664,9 @@ extern ZEffectPtr *pEffectLightSphere;
 extern ZEffectPtr *pEffectLightRing;
 extern ZEffectPtr *pEffectSuperSampling;
 */
-void Tripex::AddEffect(EffectHandler* (*fn)(), const char* sName, int nDrawOrder, float fStartupWeight, int nTex, ...)
+void Tripex::AddEffect(std::shared_ptr<EffectHandler> (*fn)(), const char* sName, int nDrawOrder, float fStartupWeight, int nTex, ...)
 {
-	EffectHandler* pEffect = fn();
+	std::shared_ptr<EffectHandler> pEffect = fn();
 	pEffect->sName = sName;
 	pEffect->nDrawOrder = nDrawOrder;
 	pEffect->fStartupWeight = fStartupWeight;
@@ -678,14 +680,17 @@ void Tripex::AddEffect(EffectHandler* (*fn)(), const char* sName, int nDrawOrder
 	}
 	va_end(pArg);
 
-	if (pvpEffectList->size() == 0) pvpEffectList->push_back(pEffect);
+	if (effects.size() == 0)
+	{
+		effects.push_back(pEffect);
+	}
 	else
 	{
 		for (int i = 1;; i++)
 		{
-			if (i == pvpEffectList->size() || _stricmp(pEffect->sName.c_str(), (*pvpEffectList)[i]->sName.c_str()) < 0)
+			if (i == effects.size() || _stricmp(pEffect->sName.c_str(), effects[i]->sName.c_str()) < 0)
 			{
-				pvpEffectList->insert(pvpEffectList->begin() + i, pEffect);
+				effects.insert(effects.begin() + i, pEffect);
 				break;
 			}
 		}
@@ -694,15 +699,11 @@ void Tripex::AddEffect(EffectHandler* (*fn)(), const char* sName, int nDrawOrder
 
 void Tripex::CreateEffectList()
 {
-	_ASSERT(pvpEffectList == NULL);
-	pvpEffectList = new std::vector< EffectHandler* >;
-
 	AddEffect(&CreateEffect_Blank, "Blank", ZORDER_BLANK, 1.0f, 0);
+
+	pEffectBlank = effects[0].get();
+
 	AddEffect(&CreateEffect_Tunnel, "Tunnel", ZORDER_TUNNEL, 1.0f, TC_WTTUNNEL, 0);
-
-	pEffectBlank = (*pvpEffectList)[0];
-
-
 	AddEffect(&CreateEffect_WaterGlobe, "WaterGlobe", ZORDER_WATERGLOBE, 10.0f, TC_EMWATERGLOBE, 0);
 	AddEffect(&CreateEffect_Tube, "Tube", ZORDER_TUBE, 1.0f, TC_EMTUBE, 0);
 	AddEffect(&CreateEffect_Sun, "Sun", ZORDER_SUN, 1.0f, 0);
@@ -741,7 +742,7 @@ void Tripex::CreateCfgItems()
 	{
 		pppCfgItem = new std::vector<ConfigItem*>;
 		pmpCfgItem = new std::map< std::string, std::vector< ConfigItem* >, CI_STR_CMP >();
-		psEffect = new std::string[pvpEffectList->size()];
+		psEffect = new std::string[effects.size()];
 
 		AddCfgItem(ConfigItem::Bool("MeshHQ", &bMeshHQ, true));
 
@@ -766,9 +767,9 @@ void Tripex::CreateCfgItems()
 		AddCfgItem(ConfigItem::Float("SelectionFairness", &fFairness));
 		AddCfgItem(ConfigItem::Int("FlowmapW", &nFlowmapW, true));
 		AddCfgItem(ConfigItem::Int("FlowmapH", &nFlowmapH, true));
-		for (int i = 0; i < (int)pvpEffectList->size(); i++)
+		for (int i = 0; i < (int)effects.size(); i++)
 		{
-			AddCfgItem(ConfigItem::String((*pvpEffectList)[i]->GetCfgItemName().c_str(), &psEffect[i]));
+			AddCfgItem(ConfigItem::String(effects[i]->GetCfgItemName().c_str(), &psEffect[i]));
 		}
 	}
 }
@@ -779,11 +780,15 @@ void Tripex::UpdateCfgItems(bool bInit)
 	{
 		(*pppCfgItem)[i]->Update(bInit);
 	}
-	for (unsigned int i = 0; i < pvpEffectList->size(); i++)
+	for (unsigned int i = 0; i < effects.size(); i++)
 	{
-		for (int j = 0; j < 5; j++) (*pvpEffectList)[i]->pfSetting[j] = 0.0f;
-		ConfigItem* pItem = FindCfgItem((*pvpEffectList)[i]->GetCfgItemName().c_str());
-		pItem->GetFloatArray(5, (*pvpEffectList)[i]->pfSetting);
+		for (int j = 0; j < 5; j++)
+		{
+			effects[i]->pfSetting[j] = 0.0f;
+		}
+
+		ConfigItem* pItem = FindCfgItem(effects[i]->GetCfgItemName().c_str());
+		pItem->GetFloatArray(5, effects[i]->pfSetting);
 	}
 	// filtering -> num
 }
