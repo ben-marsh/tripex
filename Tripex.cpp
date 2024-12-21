@@ -215,7 +215,7 @@ Error* Tripex::Startup()
 //	g_pD3D->vpTexture.push_back(gui.get());//auto_ptr< ZTexture >(gui);
 
 	tef.Add( ( uint8* )&g_anTexRawFont[ 1 ] );
-	tef.GetLetter(' ')->nEnd = 2;
+	tef.FindGlyph(' ')->end = 2;
 	g_pD3D->AddTexture( tef.GetTexture( ) );
 //	g_pD3D->vpTexture.push_back(tef.GetTexture());
 

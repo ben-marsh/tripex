@@ -1,302 +1,218 @@
 #include "Platform.h"
 #include "TextureFont.h"
 #include "Error.h"
-	
-#define LETTER_APPEAR_FRAMES 200 //120
-#define LETTER_DIFF_FRAMES 10
 
 TextureFont::TextureFont()
 {
-	nWidth = nHeight = 0;
-	nSpacing = 1;
-	m_pcData = NULL;
+	width = height = 0;
+	memset(char_to_glyph, 0xff, sizeof(char_to_glyph));
 }
+
 TextureFont::~TextureFont()
 {
-	if( m_pcData != NULL ) delete m_pcData;
 }
-bool TextureFont::LineAboveThreshold(BYTE *pbData)
+
+bool TextureFont::LineAboveThreshold(BYTE* data)
 {
-	for(int i = 0; i < nHeight; i++)
+	for (int i = 0; i < height; i++)
 	{
-		if(*pbData > 70) return true;//128) return true;
-		pbData += nWidth;
+		if (*data > 70) return true;
+		data += width;
 	}
 	return false;
 }
-void TextureFont::Add(BYTE *pbData)
-{
-	nWidth = ((SIZE*)pbData)->cx;
-	nHeight = ((SIZE*)pbData)->cy;
-	pbData += sizeof(SIZE);
-	int nLength = *((int*)pbData);
-	pbData += sizeof(int);
-	char *sAlphabet = (char*)pbData;
-	pbData += nLength;
-	for(int i = 0; i < nLength; i++)
-	{
-		Letter *pLet = pLetter.AddEmptyPtr();
-		pLet->cLetter = sAlphabet[i];
-		pLet->pbData = new BYTE[nWidth * nHeight];
-		CopyMemory(pLet->pbData, pbData, nWidth * nHeight);
-			pbData += nWidth * nHeight;
 
-			for(pLet->nEnd = nWidth - 1; pLet->nEnd > 0; pLet->nEnd--)
-			{
-				if(LineAboveThreshold(pLet->pbData + pLet->nEnd)) break;
-			}
-			for(pLet->nStart = 0; pLet->nStart < pLet->nEnd; pLet->nStart++)
-			{
-				if(LineAboveThreshold(pLet->pbData + pLet->nStart)) break;
-			}
-			pLet->nStart = 0;
-			pLet->nEnd++;
-//		}
-	}
-}
-TextureFont::Letter *TextureFont::GetLetter(char cLetter)
+void TextureFont::Add(const uint8* source_data)
 {
-	for(int i = 0; i < pLetter.GetLength(); i++)
+	memset(char_to_glyph, 0xff, sizeof(char_to_glyph));
+
+	width = *((const int*)source_data);
+	source_data += sizeof(int);
+
+	height = *((const int*)source_data);
+	source_data += sizeof(int);
+
+	int length = *((const int*)source_data);
+	source_data += sizeof(int);
+
+	const char* alphabet = (const char*)source_data;
+	source_data += length;
+
+	for (int i = 0; i < length; i++)
 	{
-		if(pLetter[i].cLetter == cLetter) return &pLetter[i];
+		glyphs.resize(glyphs.size() + 1);
+		Glyph& glyph = glyphs.back();
+
+		glyph.character = alphabet[i];
+		glyph.data = std::make_unique<uint8[]>(width * height);
+		memcpy(glyph.data.get(), source_data, width * height);
+		source_data += width * height;
+
+		for (glyph.end = width - 1; glyph.end > 0; glyph.end--)
+		{
+			if (LineAboveThreshold(glyph.data.get() + glyph.end))
+			{
+				break;
+			}
+		}
+		for (glyph.start = 0; glyph.start < glyph.end; glyph.start++)
+		{
+			if (LineAboveThreshold(glyph.data.get() + glyph.start))
+			{
+				break;
+			}
+		}
+
+		glyph.start = 0;
+		glyph.end++;
+
+		char_to_glyph[(uint8)glyph.character] = (uint8)(glyphs.size() - 1);
 	}
-	return NULL;
 }
-ColorRgb *TextureFont::GetBitmap()
+
+TextureFont::Glyph* TextureFont::FindGlyph(char character)
 {
-	if( m_pcData == NULL ) m_pcData = new ColorRgb[ 256 * 256 ];
-	memset( m_pcData, 0, 256 * 256 * sizeof( ColorRgb ) );
+	uint8 index = char_to_glyph[(uint8)character];
+	if (index == 0xff)
+	{
+		return nullptr;
+	}
+	return &glyphs[index];
+}
+
+ColorRgb* TextureFont::GetBitmap()
+{
+	if (pixels == NULL)
+	{
+		pixels = std::make_unique<ColorRgb[]>(256 * 256);
+	}
+	memset(pixels.get(), 0, 256 * 256 * sizeof(ColorRgb));
 
 	POINT p = { 0, 0 };
-	for(int i = 0; i < pLetter.GetLength(); i++)
+	for (int i = 0; i < glyphs.size(); i++)
 	{
-		if(p.y + nHeight >= 256)
+		if (p.y + height >= 256)
 		{
-			p.x += nWidth;
+			p.x += width;
 			p.y = 0;
 		}
-		if(p.x + nWidth >= 256)
+		if (p.x + width >= 256)
 		{
-			for(; i < pLetter.GetLength(); i++)
+			for (; i < glyphs.size(); i++)
 			{
-				pLetter[i].nBitmapX = 0;
-				pLetter[i].nBitmapY = 0;
-				pLetter[i].nStart = 0;
-				pLetter[i].nEnd = 0;
+				glyphs[i].bitmap_x = 0;
+				glyphs[i].bitmap_y = 0;
+				glyphs[i].start = 0;
+				glyphs[i].end = 0;
 			}
 			break;
 		}
-		pLetter[i].nBitmapX = p.x;
-		pLetter[i].nBitmapY = p.y;
+		glyphs[i].bitmap_x = p.x;
+		glyphs[i].bitmap_y = p.y;
 
-		int nSrc = 0;
-		int nDst = (256 * p.y) + p.x;
-		for(int y = 0; y < nHeight; y++)
+		int src = 0;
+		int dst = (256 * p.y) + p.x;
+		for (int y = 0; y < height; y++)
 		{
-			for(int x = 0; x < nWidth; x++)
+			for (int x = 0; x < width; x++)
 			{
-				if(pLetter[i].cLetter != ' ')
+				if (glyphs[i].character != ' ')
 				{
-					unsigned char c = pLetter[i].pbData[nSrc++];
-					m_pcData[ nDst++ ] = ColorRgb( c, c, c );
+					unsigned char c = glyphs[i].data[src++];
+					pixels[dst++] = ColorRgb(c, c, c);
 				}
 			}
-			nDst += 256 - nWidth;
+			dst += 256 - width;
 		}
 
-		p.y += nHeight;
+		p.y += height;
 	}
-	return m_pcData;
+	return pixels.get();
 }
-Texture *TextureFont::GetTexture()
-{
-	if(pTexture.get() == NULL)
-	{
-		pTexture = std::make_unique<Texture>();
-		pTexture->SetSource( D3DFMT_X8R8G8B8, GetBitmap( ), 256 * 256 * 4, 256 * 4 );
-	}
-	return pTexture.get();
-}
-void TextureFont::Draw(SpriteBuffer &sb, Letter *pLet, const Point<int> &p, ColorRgb c)
-{
-	if(pLet->cLetter != ' ')
-	{
-		sb.AddSprite(p, pTexture.get(), g_pD3D->LuminanceOpacity, Rect<int>(pLet->nBitmapX, pLet->nBitmapY, nWidth, nHeight), c);
-	}
-//	else return DD_OK;
-//		return CopySprite(d3d, c, nX, nY, pLet->nBitmapX, pLet->nBitmapY, nWidth, nHeight);
-}
-void TextureFont::Draw(SpriteBuffer *psb, const char *sText, Point<int> p, ColorRgb c, int nInFrame, int nOutFrame, int nFrame, int nFlags, int *pnWidth)
-{
-/*	if(d3d != NULL)
-	{
-		HRESULT hRes = d3d->SetTexture(0, GetTexture());
-		if(FAILED(hRes)) return TraceError(hRes);
-	}
-*/	if((nFlags & TF_LIMITWIDTH) && pnWidth != NULL && GetWidth(sText) > *pnWidth)
-	{
-		// try with ellipsis
-		std::unique_ptr<char[]> sBufOwner(new char[strlen(sText) + 5]);
-		char* sBuf = sBufOwner.get();
 
-		strcpy(sBuf, sText);
-		for(int i = ( int )strlen(sText) - 1;;i--)
+Texture* TextureFont::GetTexture()
+{
+	if (texture.get() == NULL)
+	{
+		texture = std::make_unique<Texture>();
+		texture->SetSource(D3DFMT_X8R8G8B8, GetBitmap(), 256 * 256 * 4, 256 * 4);
+	}
+	return texture.get();
+}
+
+void TextureFont::Draw(SpriteBuffer& sb, Glyph* glyph, const Point<int>& pos, ColorRgb c)
+{
+	if (glyph->character != ' ')
+	{
+		sb.AddSprite(pos, texture.get(), ZDirect3D::LuminanceOpacity, Rect<int>(glyph->bitmap_x, glyph->bitmap_y, width, height), c);
+	}
+}
+
+void TextureFont::Draw(SpriteBuffer* sb, const char* text, Point<int> pos, ColorRgb color, int frame_in, int frame_out, int frame, int flags)
+{
+	int relative_in = frame - frame_in;
+	int relative_out = frame - frame_out;
+	ColorRgb glyph_color = color;
+	bool faded = (frame != -1 && relative_in != 0 && relative_out != 0);
+	if (flags & TF_FADE_IN_FINISH)
+	{
+		relative_in -= ((int)strlen(text) * LETTER_DIFF_FRAMES) + (LETTER_APPEAR_FRAMES - LETTER_DIFF_FRAMES);
+	}
+	if (flags & TF_FADE_OUT_FINISH)
+	{
+		relative_out -= ((int)strlen(text) * LETTER_DIFF_FRAMES) + (LETTER_APPEAR_FRAMES - LETTER_DIFF_FRAMES);
+	}
+
+	// just draw
+	int start_x = pos.x;
+	for (int i = 0; text[i] != 0; i++)
+	{
+		Glyph* glyph = FindGlyph(text[i]);
+		if (glyph != NULL)
 		{
-			if(GetWidth(sBuf) < *pnWidth)
+			if (sb != NULL)
 			{
-				Draw(psb, sBuf, p, c, nInFrame, nOutFrame, nFrame, nFlags & ~TF_LIMITWIDTH, pnWidth);
-				return;
-//				return Draw(d3d, sBuf, nX, nY, c, nInFrame, nOutFrame, nFrame, nFlags & ~TF_LIMITWIDTH, pnWidth);
+				if (faded)
+				{
+					float brightness = Bound<float>(float(relative_in) / LETTER_APPEAR_FRAMES, 0, 1);
+					brightness *= 1 - Bound<float>(float(relative_out) / LETTER_APPEAR_FRAMES, 0, 1);
+					glyph_color = color * brightness;
+				}
+
+				Draw(*sb, glyph, Point<int>(pos.x - glyph->start, pos.y), glyph_color);
 			}
-			if(i < 0) break;
-			strcpy(sBuf + i, "...");
-		}
-//		return DD_OK;
-	}
-	else
-	{
-		if(nFlags & TF_ALIGNRIGHT) p.x -= GetWidth(sText);
-		else if(nFlags & TF_ALIGNCENTER) p.x -= GetWidth(sText) / 2;
+			pos.x += glyph->end - glyph->start;
 
-		int nRelIn = nFrame - nInFrame;
-		int nRelOut = nFrame - nOutFrame;
-		ColorRgb cLetter = c;
-		bool bFaded = (nFrame != -1 && nRelIn != 0 && nRelOut != 0);
-		if(nFlags & TF_FADE_IN_FINISH)
-		{
-			nRelIn -= ((int)strlen(sText) * LETTER_DIFF_FRAMES) + (LETTER_APPEAR_FRAMES - LETTER_DIFF_FRAMES);
-		}
-		if(nFlags & TF_FADE_OUT_FINISH)
-		{
-			nRelOut -= ((int)strlen(sText) * LETTER_DIFF_FRAMES) + (LETTER_APPEAR_FRAMES - LETTER_DIFF_FRAMES);
-		}
-
-		// just draw
-		int nStartX = p.x;
-		for(int i = 0; sText[i] != 0; i++)
-		{
-			Letter *pLet = GetLetter(sText[i]);
-			if(pLet != NULL)
+			if (faded)
 			{
-				if(psb != NULL)
-				{
-					if(bFaded)
-					{
-						float fBr = Bound<float>(float(nRelIn) / LETTER_APPEAR_FRAMES, 0, 1);
-						fBr *= 1 - Bound<float>(float(nRelOut) / LETTER_APPEAR_FRAMES, 0, 1);
-						cLetter = c * fBr;
-					}
-
-					Draw(*psb, pLet, Point<int>(p.x - pLet->nStart, p.y), cLetter);
-//					HRESULT hRes = Draw(d3d, pLet, nX - pLet->nStart, nY, cLetter);
-//					if(FAILED(hRes)) return hRes;
-				}
-				p.x += pLet->nEnd - pLet->nStart;
-//				nX += pLet->nEnd - pLet->nStart;
-//				nX++;
-
-				if(bFaded)
-				{
-					nRelIn -= LETTER_DIFF_FRAMES;
-					nRelOut -= LETTER_DIFF_FRAMES;
-				}
+				relative_in -= LETTER_DIFF_FRAMES;
+				relative_out -= LETTER_DIFF_FRAMES;
 			}
 		}
-		if(pnWidth != NULL) *pnWidth = p.x - nStartX;
-//		return DD_OK;
 	}
 }
-void TextureFont::Draw(SpriteBuffer *psb, const char *sText, const Point<int> &p, ColorRgb c, int nFlags, int *pnWidth)
+
+void TextureFont::Draw(SpriteBuffer* psb, const char* text, const Point<int>& p, ColorRgb c, int flags)
 {
-	Draw(psb, sText, p, c, -1, -1, -1, nFlags, pnWidth);
+	Draw(psb, text, p, c, -1, -1, -1, flags);
 }
+
 int TextureFont::GetWidth(char c)
 {
 	char sBuf[2] = { c, 0 };
 	return GetWidth(sBuf);
 }
-int TextureFont::GetWidth(const char *sText)
+
+int TextureFont::GetWidth(const char* text)
 {
-	int nTextWidth;
-	Draw(NULL, sText, Point<int>(0, 0), ColorRgb::Black(), 0, &nTextWidth);
-	return nTextWidth;
-}
-void TextureFont::Draw(BYTE *pbData, int nSpan, const char *sText, int nX, int nY, ColorRgb c, int nInFrame, int nOutFrame, int nFrame, int nFlags, int *pnWidth)
-{
-	if((nFlags & TF_LIMITWIDTH) && pnWidth != NULL && GetWidth(sText) > *pnWidth)
+	int width = 0;
+	for (int i = 0; text[i] != 0; i++)
 	{
-		// try with ellipsis
-		char *sBuf = new char[strlen(sText) + 5];
-		strcpy(sBuf, sText);
-		for(int i = (int)strlen(sText) - 1;;i--)
+		Glyph* glyph = FindGlyph(text[i]);
+		if (glyph != NULL)
 		{
-			if(GetWidth(sBuf) <= *pnWidth)
-			{
-				Draw(pbData, nSpan, sBuf, nX, nY, c, nInFrame, nOutFrame, nFrame, nFlags & ~TF_LIMITWIDTH, pnWidth);
-				delete sBuf;
-				return;
-			}
-			if(i < 0) break;
-			strcpy(sBuf + i, "...");
+			width += glyph->end - glyph->start;
 		}
-		delete sBuf;
 	}
-	else
-	{
-		if(nFlags & TF_ALIGNRIGHT) nX -= GetWidth(sText);
-		else if(nFlags & TF_ALIGNCENTER) nX -= GetWidth(sText) / 2;
-
-		int nRelIn = nFrame - nInFrame;
-		int nRelOut = nFrame - nOutFrame;
-		ColorRgb cLetter = c;
-		bool bFaded = (nFrame != -1 && nRelIn != 0 && nRelOut != 0);
-		if(nFlags & TF_FADE_IN_FINISH)
-		{
-			nRelIn -= ((int)strlen(sText) * LETTER_DIFF_FRAMES) + (LETTER_APPEAR_FRAMES - LETTER_DIFF_FRAMES);
-		}
-		if(nFlags & TF_FADE_OUT_FINISH)
-		{
-			nRelOut -= ((int)strlen(sText) * LETTER_DIFF_FRAMES) + (LETTER_APPEAR_FRAMES - LETTER_DIFF_FRAMES);
-		}
-
-		// just draw
-		int nStartX = nX;
-		for(int i = 0; sText[i] != 0; i++)
-		{
-			Letter *pLet = GetLetter(sText[i]);
-			if(pLet != NULL)
-			{
-				if(bFaded)
-				{
-					float fBr = Bound<float>(float(nRelIn) / LETTER_APPEAR_FRAMES, 0, 1);
-					fBr *= 1 - Bound<float>(float(nRelOut) / LETTER_APPEAR_FRAMES, 0, 1);
-					cLetter = c * fBr;
-				}
-
-				if(pbData != NULL)
-				{
-					BYTE *pbSrc = pLet->pbData, *pbDst = pbData + nX + (nY * nSpan); 
-					for(int j = 0; j < nHeight; j++)
-					{
-						for(int k = 0; k < nWidth; k++)
-						{
-							*pbDst = std::min(255, *pbDst + *pbSrc);
-							pbSrc++;
-							pbDst++;
-						}
-						pbDst += nSpan - nWidth; 
-					}
-				}
-				nX += pLet->nEnd - pLet->nStart;
-//				nX++;
-
-				if(bFaded)
-				{
-					nRelIn -= LETTER_DIFF_FRAMES;
-					nRelOut -= LETTER_DIFF_FRAMES;
-				}
-			}	
-		}
-		if(pnWidth != NULL) *pnWidth = nX - nStartX;
-	}
+	return width;
 }
