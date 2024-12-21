@@ -53,28 +53,28 @@ public:
 		int x, y, i = 0;
 		double av = std::max(0.4f, pAudio->GetDampenedBand(pEffectPtr->fSensitivity, 0, 1.0f));
 		double fx, fy;
-		double w2 = grid.nWidth / 2.0, h2 = grid.nHeight / 2.0;
-		double rw = 1.0 / grid.nWidth, rh = 1.0 / grid.nHeight;
+		double w2 = grid.width / 2.0, h2 = grid.height / 2.0;
+		double rw = 1.0 / grid.width, rh = 1.0 / grid.height;
 
 		i = 0;
 		ColorRgb cColour = ColorRgb::Grey(255.0 * brightness);
-		for(x = 0; x <= grid.nWidth; x++)
+		for(x = 0; x <= grid.width; x++)
 		{
-			for(y = 0; y <= grid.nHeight; y++)
+			for(y = 0; y <= grid.height; y++)
 			{
 				fx = (x - w2) * rw;
 				fy = (y - h2) * rh;
 
 				double len = 0.75 + (av * 0.25 * cos(precalc_atan[i] + t));//);
 
-				grid.pVertex[i].tex_coords[0].x = (len * fx) + xp;
-				grid.pVertex[i].tex_coords[0].y = (len * fy) + yp;
-				grid.pVertex[i].diffuse = cColour;
+				grid.vertices[i].tex_coords[0].x = (len * fx) + xp;
+				grid.vertices[i].tex_coords[0].y = (len * fy) + yp;
+				grid.vertices[i].diffuse = cColour;
 				i++;
 			}
 		}
 
-		grid.bUpdateEdges = true;
+		grid.update_edges = true;
 		return nullptr;
 	}
 	Error* Render() override

@@ -3,19 +3,25 @@
 #include "error.h"
 #include <memory>
 
-TexturedGrid::TexturedGrid(int nWidth, int nHeight)//, DWORD dwVertexFormat)//, GridCoordCallbackFunction callback)
+TexturedGrid::TexturedGrid(int width, int height)//, DWORD dwVertexFormat)//, GridCoordCallbackFunction callback)
 {
-	this->nWidth = nWidth;
-	this->nHeight = nHeight;
+	pos_x = 0.0f;
+	pos_y = 0.0f;
+	start_x = 0;
+	start_y = 0;
+	update_edges = true;
+
+	this->width = width;
+	this->height = height;
 //	this->nWidth = 3;//nWidth;
 //	this->nHeight = 3;//nHeight;
-	nScrWidth = nScrHeight = -1;
+	scr_width = scr_height = -1;
 //	this->width = width;
 //	this->height = height;
 //	this->sWidth = this->sHeight = -1;
 
 //	pVertex.SetFormat(dwVertexFormat);
-	pVertex.SetLength((this->nWidth + 1) * (this->nHeight + 1));
+	vertices.SetLength((this->width + 1) * (this->height + 1));
 //	vertices = (width + 1) * (height + 1);
 //	vertex = new D3DTLVERTEX[vertices];
 //	pFace.SetLength(this->nWidth * this->nHeight * 2);
@@ -96,110 +102,110 @@ HRESULT ZGrid::Calculate()
 //}
 Error* TexturedGrid::Render( )
 {
-	if(nScrWidth != g_pD3D->GetWidth() || nScrHeight != g_pD3D->GetHeight() )
+	if(scr_width != g_pD3D->GetWidth() || scr_height != g_pD3D->GetHeight() )
 	{
-		nScrWidth = g_pD3D->GetWidth();
-		nScrHeight = g_pD3D->GetHeight();
+		scr_width = g_pD3D->GetWidth();
+		scr_height = g_pD3D->GetHeight();
 //		float fScaleX = nScrWidth / 640.0;
 //		float fScaleY = nScrHeight / 480.0;
 
 //		scaleY = scaleX = max(scaleX, scaleY);
-		float fScale = std::max(nScrWidth / 640.0f, nScrHeight / 480.0f);
+		float scale = std::max(scr_width / 640.0f, scr_height / 480.0f);
 
 		int i = 0;
 //		ZFlexibleVertex fv(pVertex);
-		nStartX = -1;
-		nStartY = -1;
+		start_x = -1;
+		start_y = -1;
 
-		std::unique_ptr<float[]> pfY = std::make_unique<float[]>(nHeight + 1);
-		for(int y = 0; y <= nHeight; y++)
+		std::unique_ptr<float[]> pfY = std::make_unique<float[]>(height + 1);
+		for(int y = 0; y <= height; y++)
 		{
-			pfY[y] = (y * 479 * fScale / nHeight) + ((nScrHeight - (480 * fScale)) / 2);
-			if(nStartY == -1 && y > 0 && pfY[y] > 0)
+			pfY[y] = (y * 479 * scale / height) + ((scr_height - (480 * scale)) / 2);
+			if(start_y == -1 && y > 0 && pfY[y] > 0)
 			{
-				nStartY = y;
-				fPosY = pfY[y] / (pfY[y] - pfY[y - 1]);
+				start_y = y;
+				pos_y = pfY[y] / (pfY[y] - pfY[y - 1]);
 			}
 		}
-		std::unique_ptr<float[]> pfX = std::make_unique<float[]>(nWidth + 1);
-		for(int x = 0; x <= nWidth; x++)
+		std::unique_ptr<float[]> pfX = std::make_unique<float[]>(width + 1);
+		for(int x = 0; x <= width; x++)
 		{
-			pfX[x] = (x * 639 * fScale / nWidth) + ((nScrWidth - (640 * fScale)) / 2);
-			if(nStartX == -1 && x > 0 && pfX[x] > 0)
+			pfX[x] = (x * 639 * scale / width) + ((scr_width - (640 * scale)) / 2);
+			if(start_x == -1 && x > 0 && pfX[x] > 0)
 			{
-				nStartX = x;
-				fPosX = pfX[x] / (pfX[x] - pfX[x - 1]);
+				start_x = x;
+				pos_x = pfX[x] / (pfX[x] - pfX[x - 1]);
 			}
 		}
-		for(int x = 0; x <= nWidth; x++)
+		for(int x = 0; x <= width; x++)
 		{
-			for(int y = 0; y <= nHeight; y++)
+			for(int y = 0; y <= height; y++)
 			{
-				pVertex[i].position.x = pfX[x];
-				pVertex[i].position.y = pfY[y];
-				pVertex[i].position.z = pVertex[i].rhw = 1;
+				vertices[i].position.x = pfX[x];
+				vertices[i].position.y = pfY[y];
+				vertices[i].position.z = vertices[i].rhw = 1;
 				i++;
 			}
 		}
-		pFace.SetLength(0);
+		faces.SetLength(0);
 //		nStartX = nStartY = 3;
 //		nStartX+=1;
 //		nStartY+=1;
 // no limit texas holdem
 //		pFace.SetLength(4);//(nWidth - ((nStartX - 1) * 2)) * (nHeight - ((nStartY - 1) * 2)));
 //		int nSpan = nHeight - ((nStartY - 1) * 2) + 1;
-		int nVertex = 0;
+		int vertex_index = 0;
 		i = 0;
-		for(int x = 0; x < nWidth; x++)
+		for(int x = 0; x < width; x++)
 		{
-			for(int y = 0; y <= nHeight; y++)
+			for(int y = 0; y <= height; y++)
 			{
-				if(x >= nStartX - 1 && x <= nWidth - nStartX && y >= nStartY - 1 && y <= nHeight - nStartY)
+				if(x >= start_x - 1 && x <= width - start_x && y >= start_y - 1 && y <= height - start_y)
 				{
-					pFace.Add(Face(nVertex, nVertex + nHeight + 1, nVertex + nHeight + 2));
-					pFace.Add(Face(nVertex, nVertex + nHeight + 2, nVertex + 1));
+					faces.Add(Face(vertex_index, vertex_index + height + 1, vertex_index + height + 2));
+					faces.Add(Face(vertex_index, vertex_index + height + 2, vertex_index + 1));
 				}
-				nVertex++;
+				vertex_index++;
 			}
 		}
-		bUpdateEdges = true;
+		update_edges = true;
 //		assert(i == pFace.GetLength());
 	}
-	if(bUpdateEdges)
+	if(update_edges)
 	{
-		int nIndex1 = (nStartX - 1) * (nHeight + 1);
-		int nIndex2 = (nWidth - nStartX + 1) * (nHeight + 1);
-		for(int y = 0; y <= nHeight; y++)
+		int index1 = (start_x - 1) * (height + 1);
+		int index2 = (width - start_x + 1) * (height + 1);
+		for(int y = 0; y <= height; y++)
 		{
-			pVertex[nIndex1].position.x = -0.25f;
-			pVertex[nIndex1].tex_coords[0].x = (fPosX * pVertex[nIndex1].tex_coords[0].x) + ((1 - fPosX) * pVertex[nIndex1 + (nHeight + 1)].tex_coords[0].x);
-			pVertex[nIndex1].tex_coords[0].y = (fPosX * pVertex[nIndex1].tex_coords[0].y) + ((1 - fPosX) * pVertex[nIndex1 + (nHeight + 1)].tex_coords[0].y);
-			nIndex1++;
+			vertices[index1].position.x = -0.25f;
+			vertices[index1].tex_coords[0].x = (pos_x * vertices[index1].tex_coords[0].x) + ((1 - pos_x) * vertices[index1 + (height + 1)].tex_coords[0].x);
+			vertices[index1].tex_coords[0].y = (pos_x * vertices[index1].tex_coords[0].y) + ((1 - pos_x) * vertices[index1 + (height + 1)].tex_coords[0].y);
+			index1++;
 
-			pVertex[nIndex2].position.x = g_pD3D->GetWidth() - 1.25f;
-			pVertex[nIndex2].tex_coords[0].x = (fPosX * pVertex[nIndex2].tex_coords[0].x) + ((1 - fPosX) * pVertex[nIndex2 - (nHeight + 1)].tex_coords[0].x);
-			pVertex[nIndex2].tex_coords[0].y = (fPosX * pVertex[nIndex2].tex_coords[0].y) + ((1 - fPosX) * pVertex[nIndex2 - (nHeight + 1)].tex_coords[0].y);
-			nIndex2++;
+			vertices[index2].position.x = g_pD3D->GetWidth() - 1.25f;
+			vertices[index2].tex_coords[0].x = (pos_x * vertices[index2].tex_coords[0].x) + ((1 - pos_x) * vertices[index2 - (height + 1)].tex_coords[0].x);
+			vertices[index2].tex_coords[0].y = (pos_x * vertices[index2].tex_coords[0].y) + ((1 - pos_x) * vertices[index2 - (height + 1)].tex_coords[0].y);
+			index2++;
 		}
 
-		nIndex1 = (nStartY - 1);
-		nIndex2 = (nHeight - nStartY + 1);
-		for(int x = 0; x <= nWidth; x++)
+		index1 = (start_y - 1);
+		index2 = (height - start_y + 1);
+		for(int x = 0; x <= width; x++)
 		{
-			pVertex[nIndex1].position.y = -0.25f;
-			pVertex[nIndex1].tex_coords[0].x = (fPosX * pVertex[nIndex1].tex_coords[0].x) + ((1 - fPosX) * pVertex[nIndex1 + 1].tex_coords[0].x);
-			pVertex[nIndex1].tex_coords[0].y = (fPosX * pVertex[nIndex1].tex_coords[0].y) + ((1 - fPosX) * pVertex[nIndex1 + 1].tex_coords[0].y);
-			nIndex1 += nHeight + 1;
+			vertices[index1].position.y = -0.25f;
+			vertices[index1].tex_coords[0].x = (pos_x * vertices[index1].tex_coords[0].x) + ((1 - pos_x) * vertices[index1 + 1].tex_coords[0].x);
+			vertices[index1].tex_coords[0].y = (pos_x * vertices[index1].tex_coords[0].y) + ((1 - pos_x) * vertices[index1 + 1].tex_coords[0].y);
+			index1 += height + 1;
 
-			pVertex[nIndex2].position.y = g_pD3D->GetHeight() - 1.25f;
-			pVertex[nIndex2].tex_coords[0].x = (fPosX * pVertex[nIndex2].tex_coords[0].x) + ((1 - fPosX) * pVertex[nIndex2 - 1].tex_coords[0].x);
-			pVertex[nIndex2].tex_coords[0].y = (fPosX * pVertex[nIndex2].tex_coords[0].y) + ((1 - fPosX) * pVertex[nIndex2 - 1].tex_coords[0].y);
-			nIndex2 += nHeight + 1;
+			vertices[index2].position.y = g_pD3D->GetHeight() - 1.25f;
+			vertices[index2].tex_coords[0].x = (pos_x * vertices[index2].tex_coords[0].x) + ((1 - pos_x) * vertices[index2 - 1].tex_coords[0].x);
+			vertices[index2].tex_coords[0].y = (pos_x * vertices[index2].tex_coords[0].y) + ((1 - pos_x) * vertices[index2 - 1].tex_coords[0].y);
+			index2 += height + 1;
 		}
-		bUpdateEdges = false;
+		update_edges = false;
 	}
 
-	Error* error = g_pD3D->DrawIndexedPrimitive(pVertex, pFace);
+	Error* error = g_pD3D->DrawIndexedPrimitive(vertices, faces);
 	if(error) return TraceError(error);
 
 	return nullptr;

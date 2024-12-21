@@ -44,7 +44,7 @@ bool LoadTextureSettings(std::vector< TextureSource* > &ppItem)
 	std::map< int, std::string > mpIntUse, mpExtFile, mpExtUse;
 
 	int i;
-	for(i = 1; i < nIntTextures; i++)
+	for(i = 1; i < num_internal_textures; i++)
 	{
 		char sKey[ 100 ];
 		strcpy( sKey, "Textures\\InternalUse" );
@@ -100,7 +100,7 @@ bool LoadTextureSettings(std::vector< TextureSource* > &ppItem)
 //		}
 	
 	ppItem.clear();
-	for(i = 1; i < nIntTextures; i++)
+	for(i = 1; i < num_internal_textures; i++)
 	{
 		std::string s = mpIntUse[i];
 		ppItem.push_back(TextureSource::Internal(i, s.c_str()));

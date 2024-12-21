@@ -4,17 +4,17 @@
 
 class TexturedGrid
 {
-protected:
-	int nScrWidth, nScrHeight;
+private:
+	int scr_width, scr_height;
 
 public:
-	ZArray<VertexTL> pVertex;
-	ZArray<Face> pFace;
-	int nWidth, nHeight;
-	int nStartX, nStartY;
-	float fPosX, fPosY;
-	bool bUpdateEdges;
+	ZArray<VertexTL> vertices;
+	ZArray<Face> faces;
+	int width, height;
+	int start_x, start_y;
+	float pos_x, pos_y;
+	bool update_edges;
 
-	TexturedGrid( int nWidth, int nHeight );
-	Error* Render( );
+	TexturedGrid(int width, int height);
+	Error* Render();
 };

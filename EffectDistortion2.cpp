@@ -78,22 +78,22 @@ public:
 		}
 
 		double av = g_pAudio->GetIntensity( );//((average * average) + average) / 2;
-		double w2 = grid.nWidth / 2.0, h2 = grid.nHeight / 2.0;
-		double rw = 1.0 / grid.nWidth, rh = 1.0 / grid.nHeight;
+		double w2 = grid.width / 2.0, h2 = grid.height / 2.0;
+		double rw = 1.0 / grid.width, rh = 1.0 / grid.height;
 
 		float pdMax[] = { 0.3f, 0.4f, 0.5f };//min(average, 0.4) / 0.4, max(0, min(1.0, (average - 0.4) / 0.4)) }; 
 
 		i = 0;
-		float fChange = 1.0f / std::max(grid.nWidth, grid.nHeight);
+		float fChange = 1.0f / std::max(grid.width, grid.height);
 		float fPosX = xp;
 		const float fMulX = 1.0f / GRW;
 		const float fMulY = 1.0f / GRH;
-		for(x = 0; x <= grid.nWidth; x++)
+		for(x = 0; x <= grid.width; x++)
 		{
 			fPosX += fChange;
 
 			float fPosY = yp;
-			for(y = 0; y <= grid.nHeight; y++)
+			for(y = 0; y <= grid.height; y++)
 			{
 				fPosY += fChange;
 
@@ -122,18 +122,18 @@ public:
 					cCol.b += pc[j].b * fColMult;
 				}
 
-				grid.pVertex[i].tex_coords[0].x = fX;
-				grid.pVertex[i].tex_coords[0].y = fY;
+				grid.vertices[i].tex_coords[0].x = fX;
+				grid.vertices[i].tex_coords[0].y = fY;
 				ColorRgb cGrey = ColorRgb::Grey(std::min(1.0f, brightness * fBr) * 255.0);
 				if(bLight) 
 				{
-					grid.pVertex[i].specular = cCol * brightness * fBr * 0.5;
-					grid.pVertex[i].diffuse =  ColorRgb::Blend(cGrey, (ColorRgb)cCol, 0.2f);//ZColour::Grey(255);
+					grid.vertices[i].specular = cCol * brightness * fBr * 0.5;
+					grid.vertices[i].diffuse =  ColorRgb::Blend(cGrey, (ColorRgb)cCol, 0.2f);//ZColour::Grey(255);
 				}
 				else 
 				{
-					grid.pVertex[i].diffuse = cGrey;
-					grid.pVertex[i].specular = ColorRgb::Black();
+					grid.vertices[i].diffuse = cGrey;
+					grid.vertices[i].specular = ColorRgb::Black();
 				}
 				i++;
 			}

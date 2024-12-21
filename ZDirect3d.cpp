@@ -87,14 +87,14 @@ Texture* ZDirect3D::Find(int nType)
 	std::set< Texture* >::iterator it;
 	for (it = g_spTexture.begin(); it != g_spTexture.end(); it++)
 	{
-		if ((*it)->m_snType.count(nType) > 0) mt++;
+		if ((*it)->classes.count(nType) > 0) mt++;
 	}
 
 	int ct = rand() * mt / (RAND_MAX + 1);
 
 	for (it = g_spTexture.begin(); it != g_spTexture.end(); it++)
 	{
-		if ((*it)->m_snType.count(nType) > 0)
+		if ((*it)->classes.count(nType) > 0)
 		{
 			if (ct == 0) return *it;
 			ct--;
@@ -258,7 +258,7 @@ Error* ZDirect3D::FlushTextureState()
 			IDirect3DTexture9* pTex = NULL;
 			if (pTextureStage[dwStage].pNewTexture != NULL)
 			{
-				pTex = pTextureStage[dwStage].pNewTexture->m_pd3dTexture;
+				pTex = pTextureStage[dwStage].pNewTexture->d3d_texture;
 			}
 
 			hRes = g_pDevice->SetTexture(dwStage, pTex);
@@ -269,7 +269,7 @@ Error* ZDirect3D::FlushTextureState()
 			Texture* pTexture = pTextureStage[dwStage].pTexture;
 			if (pTexture != NULL)
 			{
-				if (pTexture->m_nFlags & Texture::F_MIP_CHAIN)
+				if (pTexture->flags & Texture::F_MIP_CHAIN)
 				{
 					if (g_Caps.TextureFilterCaps & D3DPTFILTERCAPS_MIPFPOINT)
 					{
@@ -285,7 +285,7 @@ Error* ZDirect3D::FlushTextureState()
 					SetSamplerState(dwStage, D3DSAMP_MIPFILTER, D3DTEXF_NONE);
 				}
 
-				if (pTexture->m_nFlags & Texture::F_FILTERING)
+				if (pTexture->flags & Texture::F_FILTERING)
 				{
 					if (g_Caps.TextureFilterCaps & D3DPTFILTERCAPS_MINFLINEAR)
 					{
@@ -385,16 +385,16 @@ Error* ZDirect3D::AddTexture(Texture* pTexture)
 
 Error* ZDirect3D::UploadTexture(Texture* pTexture)
 {
-	if (pTexture->m_pSrcData == NULL) return nullptr;
+	if (pTexture->data == NULL) return nullptr;
 
 	const Rect< int > rSrc(0, 0, 256, 256);
 
-	int32 nMipLevels = pTexture->m_pd3dTexture->GetLevelCount();
+	int32 nMipLevels = pTexture->d3d_texture->GetLevelCount();
 	for (int32 i = 0; i < nMipLevels; i++)
 	{
 		IDirect3DSurface9* pSurface;
 
-		HRESULT hRes = pTexture->m_pd3dTexture->GetSurfaceLevel(i, &pSurface);
+		HRESULT hRes = pTexture->d3d_texture->GetSurfaceLevel(i, &pSurface);
 		if (FAILED(hRes)) return TraceError(hRes);
 
 		D3DSURFACE_DESC d3dsd;
@@ -404,16 +404,16 @@ Error* ZDirect3D::UploadTexture(Texture* pTexture)
 		D3DLOCKED_RECT d3dr;
 		if (d3dsd.Width == 256 &&
 			d3dsd.Height == 256 &&
-			d3dsd.Format == pTexture->m_nSrcFmt &&
+			d3dsd.Format == pTexture->format &&
 			SUCCEEDED(pSurface->LockRect(&d3dr, NULL, 0)))
 		{
-			const uint8* pnSrc = (const uint8*)pTexture->m_pSrcData;
+			const uint8* pnSrc = (const uint8*)pTexture->data;
 			for (int32 i = 0; i < 256; i++)
 			{
 				//					( ( uint8* )d3dr.pBits )[ i ] = rand( );
 				memcpy(d3dr.pBits, pnSrc, 256);
 				d3dr.pBits = (uint8*)(d3dr.pBits) + d3dr.Pitch;
-				pnSrc += pTexture->m_nSrcSpan;
+				pnSrc += pTexture->data_stride;
 			}
 
 			hRes = pSurface->UnlockRect();
@@ -422,8 +422,8 @@ Error* ZDirect3D::UploadTexture(Texture* pTexture)
 		else
 		{
 			RECT src_rect = { rSrc.left, rSrc.top, rSrc.right, rSrc.bottom };
-			hRes = D3DXLoadSurfaceFromMemory( pSurface, NULL, NULL, pTexture->m_pSrcData, 
-				pTexture->m_nSrcFmt, pTexture->m_nSrcSpan, pTexture->m_pSrcPalette, 
+			hRes = D3DXLoadSurfaceFromMemory( pSurface, NULL, NULL, pTexture->data, 
+				pTexture->format, pTexture->data_stride, pTexture->palette, 
 				&src_rect, D3DX_FILTER_TRIANGLE | D3DX_FILTER_DITHER, 0 );
 			if( FAILED( hRes ) ) return TraceError( hRes );
 		}
@@ -434,16 +434,16 @@ Error* ZDirect3D::UploadTexture(Texture* pTexture)
 Error* ZDirect3D::CreateTexture(Texture* pTexture)
 {
 	_ASSERT(g_pd3dDevice != NULL);
-	_ASSERT(pTexture->m_pd3dTexture == NULL);
+	_ASSERT(pTexture->d3d_texture == NULL);
 
-	if (pTexture->m_nSrcFmt == D3DFMT_UNKNOWN)//pTexture->m_nFlags & ZTexture::F_SRC_FILE )
+	if (pTexture->format == D3DFMT_UNKNOWN)//pTexture->m_nFlags & ZTexture::F_SRC_FILE )
 	{
-		HRESULT hRes = D3DXCreateTextureFromFileInMemory(g_pDevice, pTexture->m_pSrcData, pTexture->m_nSrcSize, &pTexture->m_pd3dTexture);
+		HRESULT hRes = D3DXCreateTextureFromFileInMemory(g_pDevice, pTexture->data, pTexture->data_size, &pTexture->d3d_texture);
 		if (FAILED(hRes)) return TraceError(hRes);
 	}
 	else
 	{
-		uint32 nMipLevels = (pTexture->m_nFlags & Texture::F_MIP_CHAIN) ? 0 : 1;
+		uint32 nMipLevels = (pTexture->flags & Texture::F_MIP_CHAIN) ? 0 : 1;
 		//			uint32 nUsage = 0;//( pTexture->m_nFlags & ZTexture::F_DYNAMIC )? D3DUSAGE_DYNAMIC : 0;
 		//			D3DPOOL nPool = ( pTexture->m_nFlags & ZTexture::F_DYNAMIC )? D3DPOOL_DEFAULT : D3DPOOL_MANAGED;
 		//			D3DPOOL nPool = ( pTexture->m_nFlags & ZTexture::F_DYNAMIC )? D3DPOOL_SYSMEMORY : D3DPOOL_MANAGED;
@@ -460,7 +460,7 @@ Error* ZDirect3D::CreateTexture(Texture* pTexture)
 				D3DPOOL_MANAGED, &pTexture->pd3dTexture);
 		*/
 
-		HRESULT hRes = D3DXCreateTexture(g_pDevice, 256, 256, nMipLevels, nUsage, pTexture->m_nSrcFmt /*D3DFMT_R5G6B5*/, nPool, &pTexture->m_pd3dTexture);
+		HRESULT hRes = D3DXCreateTexture(g_pDevice, 256, 256, nMipLevels, nUsage, pTexture->format /*D3DFMT_R5G6B5*/, nPool, &pTexture->d3d_texture);
 		if (FAILED(hRes)) return TraceError(hRes);
 
 		PALETTEENTRY pe[256];
@@ -521,10 +521,10 @@ void ZDirect3D::DestroyTexture(Texture* pTexture)
 {
 	//		assert(HasTexture(pTexture));
 
-	if (pTexture->m_pd3dTexture != NULL)
+	if (pTexture->d3d_texture != NULL)
 	{
-		pTexture->m_pd3dTexture->Release();
-		pTexture->m_pd3dTexture = NULL;
+		pTexture->d3d_texture->Release();
+		pTexture->d3d_texture = NULL;
 	}
 }
 void ZDirect3D::SetTextureStageState(DWORD dwStage, D3DTEXTURESTAGESTATETYPE dwKey, DWORD dwValue)

@@ -53,12 +53,12 @@ DWORD WINAPI Tripex::InitialiseThread(void *pParam)
 
 	srand( timeGetTime( ) );
 
-	_ASSERT(nIntTextures >= 1);
+	_ASSERT(num_internal_textures >= 1);
 
 	int nTexture = 0;
 	for(int i = 0; i < (int)ppItem.size(); i++ )//nIntTextures + nDiskTextures; i++)
 	{
-		const uint32 *pnTexData = g_apnIntTexture[ ppItem[ i ]->nInternalID ];
+		const uint32 *pnTexData = internal_textures[ ppItem[ i ]->internal_id ];
 
 		Texture *pTexture = new Texture( );
 		pTexture->SetFlags( Texture::F_FILTERING | Texture::F_MIP_CHAIN );
@@ -70,7 +70,7 @@ DWORD WINAPI Tripex::InitialiseThread(void *pParam)
 //		pTexture->m_pnData = ( BYTE* )( pnTexData + 1 );
 //		pTexture->m_nDataSize = *pnTexData;
 
-		ppItem[ i ]->pTexture = pTexture;
+		ppItem[ i ]->texture = pTexture;
 
 /*
 		uint32 *pnTex = UnpackJpeg( ( const uint8* )( pnTexData + 1 ), pnTexData[ 0 ] );
@@ -139,16 +139,16 @@ DWORD WINAPI Tripex::InitialiseThread(void *pParam)
 	pBlankTexture = NULL;
 	for(int i = 0; i < (int)ppItem.size(); i++)
 	{
-		if(ppItem[i]->bInternal && ppItem[i]->nInternalID == 1)
+		if(ppItem[i]->internal && ppItem[i]->internal_id == 1)
 		{
-			pBlankTexture = ppItem[i]->pTexture;//.release();
+			pBlankTexture = ppItem[i]->texture;//.release();
 		}
-		for(std::set<int>::iterator it = ppItem[i]->snClass.begin(); it != ppItem[i]->snClass.end(); it++)
+		for(std::set<int>::iterator it = ppItem[i]->classes.begin(); it != ppItem[i]->classes.end(); it++)
 		{
-			ppItem[i]->pTexture->m_snType.insert(*it);
+			ppItem[i]->texture->classes.insert(*it);
 		}
 
-		g_pD3D->AddTexture( ppItem[ i ]->pTexture );
+		g_pD3D->AddTexture( ppItem[ i ]->texture );
 //		vpTexture.push_back(ppItem[i]->pTexture);
 	}
 

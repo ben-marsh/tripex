@@ -290,17 +290,17 @@ public:
 			}
 
 			int x, y, i = 0;
-			for(x = 0; x <= grid.nWidth; x++)
+			for(x = 0; x <= grid.width; x++)
 			{
-				for(y = 0; y <= grid.nHeight; y++)
+				for(y = 0; y <= grid.height; y++)
 				{
-					grid.pVertex[i].tex_coords[0].x = gridbm.pVertex[i].tex_coords[0].x = precalc_u[x][y] + (tx / 256.0f);
-					grid.pVertex[i].tex_coords[0].y = gridbm.pVertex[i].tex_coords[0].y = precalc_v[x][y] + (ty / 256.0f);
+					grid.vertices[i].tex_coords[0].x = gridbm.vertices[i].tex_coords[0].x = precalc_u[x][y] + (tx / 256.0f);
+					grid.vertices[i].tex_coords[0].y = gridbm.vertices[i].tex_coords[0].y = precalc_v[x][y] + (ty / 256.0f);
 
 					float brav = precalc_c[x][y] * br * pAudio->GetIntensity( );//min(average, 1);
 					brav *= 1.6f;
-					gridbm.pVertex[i].diffuse = ColorRgb::Grey((int)(255.0f * br));//max(0.2, min(brav, 1)) * 255.0);//gridbm->vertex[i].color = D3DRGB(brav, brav, brav);
-					grid.pVertex[i].diffuse = ColorRgb::Grey((int)(br * precalc_c[(int)(x + tx) % GRIDW][y % GRIDH] * 255.0f));
+					gridbm.vertices[i].diffuse = ColorRgb::Grey((int)(255.0f * br));//max(0.2, min(brav, 1)) * 255.0);//gridbm->vertex[i].color = D3DRGB(brav, brav, brav);
+					grid.vertices[i].diffuse = ColorRgb::Grey((int)(br * precalc_c[(int)(x + tx) % GRIDW][y % GRIDH] * 255.0f));
 					i++;
 				}
 			}
@@ -467,7 +467,7 @@ public:
 				{
 					IDirect3DSurface9* pSurface;
 
-					HRESULT hRes = texture->m_pd3dTexture->GetSurfaceLevel(0, &pSurface);
+					HRESULT hRes = texture->d3d_texture->GetSurfaceLevel(0, &pSurface);
 					if (FAILED(hRes)) return TraceError(hRes);
 
 					RECT Rect = { 0, 0, 256, 256 };

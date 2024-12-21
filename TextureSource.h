@@ -6,15 +6,14 @@
 class TextureSource
 {
 public:
-	bool bInternal;
-	int nInternalID;
-	std::string sFilename;
-	std::set<int> snClass;
-	Texture *pTexture;
-//	auto_ptr<ZTexture> pTexture;
+	bool internal;
+	int internal_id;
+	std::string filename;
+	std::set<int> classes;
+	Texture *texture;
 
-	static TextureSource *Internal(int nID, const char *sUsage = "");
-	static TextureSource *External(const char *sPath, const char *sUsage = "");
+	static TextureSource *Internal(int id, const char *usage = "");
+	static TextureSource *External(const char *filename, const char *usage = "");
 
 	std::string GetPath();
 	std::string GetFile();
@@ -23,9 +22,5 @@ public:
 	std::string MakeUsageString();
 };
 
-extern const uint32 *g_apnIntTexture[ ];
-//const char *psIntTexture[];
-extern const int nIntTextures;
-//extern CTextureItem pInternalTexture[];
-//extern vector< auto_ptr < CTextureItem > > ppTexture;
-
+extern const uint32 *internal_textures[];
+extern const int num_internal_textures;
