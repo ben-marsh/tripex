@@ -206,7 +206,7 @@ public:
 	}
 	Error* Reconfigure(AudioData* pAudio) override
 	{
-		obj.textures[0].Set(Actor::TextureType::Envmap, g_pD3D->Find(TC_EMWATERGLOBE));
+		obj.textures[0].Set(Actor::TextureType::Envmap, g_pD3D->Find(TextureClass::WaterGlobeEnvMap));
 		return nullptr;
 	}
 	Error* Render()

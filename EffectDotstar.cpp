@@ -251,8 +251,8 @@ public:
 	Error* Reconfigure(AudioData* pAudio) override
 	{
 		fSpeed = pAudio->GetIntensity( );
-		pTexture = g_pD3D->Find(TC_LBDOTSTAR);
-		pTint = g_pD3D->Find(TC_WTDOTSTAR);
+		pTexture = g_pD3D->Find(TextureClass::DotStarSprite);
+		pTint = g_pD3D->Find(TextureClass::DotStarBackground);
 		return nullptr;
 	}
 	Error* Render( ) override

@@ -56,7 +56,7 @@ private:
 	void DrawMessage(SpriteBuffer& sb, TextureFont* pFont, int y, const char* sText, float fBr, float fBackBr);
 	int GetClippedLineLength(TextureFont* pFont, const char* sText, int nClipWidth);
 
-	void AddEffect(std::shared_ptr<EffectHandler> (*fn)(), const char* sName, int nDrawOrder, float fStartupWeight, int nTex, ...);
+	void AddEffect(std::shared_ptr<EffectHandler> (*fn)(), const char* sName, int nDrawOrder, float fStartupWeight, TextureClass nTex, ...);
 	void CreateEffectList();
 
 	ConfigItem* AddCfgItem(ConfigItem* pItem);

@@ -80,7 +80,7 @@ Error* ZDirect3D::Open()
 	}
 	return nullptr;
 }
-Texture* ZDirect3D::Find(int nType)
+Texture* ZDirect3D::Find(TextureClass nType)
 {
 	int mt = 0;
 

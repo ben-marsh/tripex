@@ -8,7 +8,7 @@
 * Constructor:
 -----------------------------------*/
 
-Canvas::Canvas(int32 width, int32 height)
+Canvas::Canvas(int width, int height)
 	: num_textures_x((width + (texture_w - 1)) / texture_w)
 	, num_textures_y((height + (texture_h - 1)) / texture_h)
 	, stride(num_textures_x * texture_w)
@@ -57,7 +57,7 @@ Error* Canvas::UploadTextures()
 	return nullptr;
 }
 
-Texture* Canvas::GetTexture(int32 x, int32 y)
+Texture* Canvas::GetTexture(int x, int y)
 {
 	return &textures[(y * num_textures_x) + x];
 }

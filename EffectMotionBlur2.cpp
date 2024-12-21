@@ -118,7 +118,7 @@ public:
 	}
 	Error* Reconfigure(AudioData* pAudio) override
 	{
-		Texture *pTexture = g_pD3D->Find(TC_EMMOTIONBLUR2);//2);
+		Texture *pTexture = g_pD3D->Find(TextureClass::MotionBlur2EnvMap);//2);
 		for(int i = 0; i < PIPES; i++)
 		{
 			pObj[i].textures[0].type = Actor::TextureType::Lightmap;

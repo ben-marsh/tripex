@@ -78,7 +78,7 @@ public:
 	}
 	Error* Reconfigure(AudioData* pAudio) override
 	{
-		Texture *tx = g_pD3D->Find(TC_LBPHASED);
+		Texture *tx = g_pD3D->Find(TextureClass::PhasedSprite);
 		obj.textures[0].Set(Actor::TextureType::Sprite, tx);
 		return nullptr;
 	}

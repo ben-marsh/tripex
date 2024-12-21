@@ -9,7 +9,7 @@ public:
 	bool internal;
 	int internal_id;
 	std::string filename;
-	std::set<int> classes;
+	std::set<TextureClass> classes;
 	Texture *texture;
 
 	static TextureSource *Internal(int id, const char *usage = "");

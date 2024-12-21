@@ -22,12 +22,12 @@ public:
 	const void* data;
 	const PALETTEENTRY* palette;
 
-	std::set<int> classes;
+	std::set<TextureClass> classes;
 
 	Texture();
 	~Texture();
 
-	void SetFlags(uint32 nFlag);
+	void SetFlags(uint32 flags);
 
 	void SetSource(const void* data, uint32 data_size);
 	void SetSource(D3DFORMAT format, const void* data, uint32 data_size, uint32 data_stride);

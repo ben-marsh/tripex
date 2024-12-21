@@ -12,90 +12,6 @@
 
 enum
 {
-	TC_GUI,
-
-	// bezier cube
-	TC_LBBEZIERCUBE,
-	TC_WTBEZIERCUBE,
-
-	// collapsing sphere
-	TC_LBCOLLAPSINGSPHERE,
-	TC_WTCOLLAPSINGSPHERE,
-
-	// distortion
-	TC_WTDISTORTION,
-
-	// distortion 2
-	TC_WTDISTORTION2,
-
-	// dot star
-	TC_LBDOTSTAR,
-	TC_WTDOTSTAR,
-
-	// light ring
-	TC_LBLIGHTRING,
-	TC_WTLIGHTRING,
-
-	// light sphere
-	TC_LBLIGHTSPHERE,
-	TC_WTLIGHTSPHERE,
-
-	// light star
-	TC_LBLIGHTSTAR,
-	TC_WTLIGHTSTAR,
-
-	// light tentacles
-	TC_LBLIGHTTENTACLES,
-	TC_WTLIGHTTENTACLES,
-
-	// metaballs
-	TC_EMMETABALLS,
-
-	// morphing sphere
-	TC_EMMORPHINGSPHERE,
-
-	// motion blur
-	TC_EMMOTIONBLUR,
-
-	// motion blur 2
-	TC_EMMOTIONBLUR2,
-
-	// phased
-	TC_LBPHASED,
-
-	// rings
-	TC_EMRINGS,
-
-	// bumpmapping
-	TC_WTBUMPMAPBACK,
-	TC_EMBUMPMAPTENTACLES,
-
-	// tube
-	TC_EMTUBE,
-
-	// tunnel
-	TC_WTTUNNEL,
-
-	// water globe
-	TC_EMWATERGLOBE,
-
-	// spectrum
-	TC_EMANALYSER,
-
-	// motion blur 3
-	TC_EMMOTIONBLUR3,
-
-	// motion blur 3 alt
-	TC_EMMOTIONBLUR3ALT,
-
-	// distortion 2 col
-	TC_WTDISTORTION2COL,
-
-	TC_END,
-};
-
-enum
-{
 	// z buffering
 	ZORDER_BUMPMAPPING,
 	ZORDER_METABALLS,
@@ -154,7 +70,7 @@ public:
 	float fProb;
 
 	std::string sName;
-	std::set<int> snTexture;
+	std::set<TextureClass> snTexture;
 	int nDrawOrder;
 	float fStartupWeight;
 

@@ -50,16 +50,19 @@ bool TextureSource::ParseUsageString(const char *text)
 	{
 		return false;
 	}
-	classes.insert(vn.begin(), vn.end());
+	for (int value : vn)
+	{
+		classes.insert((TextureClass)value);
+	}
 	return true;
 }
 
 std::string TextureSource::MakeUsageString()
 {
 	std::vector<int> vn;
-	for (int value : classes)
+	for (TextureClass value : classes)
 	{
-		vn.push_back(value);
+		vn.push_back((int)value);
 	}
 	return ConfigItem::MakeArrayString(',', vn);
 }

@@ -252,7 +252,7 @@ public:
 	}
 	Error* Reconfigure(AudioData* pAudio) override
 	{
-		pTexture = g_pD3D->Find(TC_LBBEZIERCUBE);
+		pTexture = g_pD3D->Find(TextureClass::BezierCubeSprite);
 		testobj.textures[0].texture = pTexture;
 		obj.textures[0].texture = pTexture;
 		for(int i = 0; i < TWISTPLANES; i++)
@@ -263,7 +263,7 @@ public:
 		{
 			pObj[i].textures[0].texture = pTexture;
 		}
-		pTint = g_pD3D->Find(TC_WTBEZIERCUBE);
+		pTint = g_pD3D->Find(TextureClass::BezierCubeBackground);
 		return nullptr;
 	}
 };

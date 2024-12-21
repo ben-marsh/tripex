@@ -245,7 +245,7 @@ public:
 	Error* Reconfigure(AudioData* pAudio) override
 	{
 		static Texture *pTexture;
-		pTexture = g_pD3D->Find(TC_EMANALYSER);
+		pTexture = g_pD3D->Find(TextureClass::AnalyzerEnvMap);
 		for(int i = 0; i < TRAIL_H; i++)
 		{
 			m_pObj[i].textures[0].Set(Actor::TextureType::Envmap, pTexture);

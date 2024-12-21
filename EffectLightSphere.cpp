@@ -137,9 +137,9 @@ public:
 			fNotRendered = false;
 		}
 
-		obj.textures[0].Set(Actor::TextureType::Sprite, g_pD3D->Find(TC_LBLIGHTSPHERE));
+		obj.textures[0].Set(Actor::TextureType::Sprite, g_pD3D->Find(TextureClass::LightSphereSprite));
 
-		pTint = g_pD3D->Find(TC_WTLIGHTSPHERE);
+		pTint = g_pD3D->Find(TextureClass::LightSphereBackground);
 		return nullptr;
 	}
 	Error* Render( ) override

@@ -105,8 +105,8 @@ public:
 	}
 	Error* Reconfigure(AudioData* pAudio) override
 	{
-		obj.textures[0].texture = g_pD3D->Find(TC_LBLIGHTSTAR);
-		pTint = g_pD3D->Find(TC_WTLIGHTSTAR);
+		obj.textures[0].texture = g_pD3D->Find(TextureClass::LightStarSprite);
+		pTint = g_pD3D->Find(TextureClass::LightStarBackground);
 		return nullptr;
 	}
 };

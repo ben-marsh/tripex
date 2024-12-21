@@ -105,8 +105,8 @@ public:
 	}
 	Error* Reconfigure(AudioData* pAudio) override
 	{
-		tx = g_pD3D->Find(TC_LBLIGHTRING);
-		ptTint = g_pD3D->Find(TC_WTLIGHTRING);
+		tx = g_pD3D->Find(TextureClass::LightRingSprite);
+		ptTint = g_pD3D->Find(TextureClass::LightRingBackground);
 		return nullptr;
 	}
 	Error* Render( ) override

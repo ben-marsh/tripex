@@ -449,13 +449,13 @@ public:
 	Error* Reconfigure(AudioData* pAudio) override
 	{
 		obj.textures[0].type = Actor::TextureType::Envmap;
-		obj.textures[0].texture = g_pD3D->Find(TC_EMBUMPMAPTENTACLES);//ENVIRONMENTMAP));
+		obj.textures[0].texture = g_pD3D->Find(TextureClass::BumpMapTentaclesEnvMap);//ENVIRONMENTMAP));
 		fMoveSpeed = 1.0f + (rand() * 4.0f / RAND_MAX);
 
 //		if(pBump.GetLength() == 0) texture = pBlankTexture;
 //		else
 //		{
-			texture = g_pD3D->Find(TC_WTBUMPMAPBACK);
+			texture = g_pD3D->Find(TextureClass::BumpMapBackground);
 			if(texture != pBlankTexture)
 			{	
 				std::map< Texture*, std::unique_ptr< unsigned short[] > >::iterator it = mpBumpIndex.find(texture);

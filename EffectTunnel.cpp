@@ -261,7 +261,7 @@ public:
 	}
 	Error* Reconfigure(AudioData* pAudio) override
 	{
-		tx = g_pD3D->Find(TC_WTTUNNEL);
+		tx = g_pD3D->Find(TextureClass::TunnelBackground);
 		pObj[0].textures[0].Set(Actor::TextureType::Normal, tx);//SetTexture(tx);
 		pObj[1].textures[0].Set(Actor::TextureType::Normal, tx);///.pTexture = tx;//SetTexture(tx);
 		return nullptr;

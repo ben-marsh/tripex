@@ -90,7 +90,7 @@ public:
 	}
 	Error* Reconfigure(AudioData* pAudio) override
 	{
-		tx = g_pD3D->Find(TC_WTDISTORTION);
+		tx = g_pD3D->Find(TextureClass::DistortionBackground);
 //	grid->SetTexture(d3d->Select(TC_WRAPTEXTURE));//TC_ENVIRONMENTMAP));
 		return nullptr;
 	}

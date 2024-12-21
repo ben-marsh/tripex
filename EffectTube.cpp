@@ -226,7 +226,7 @@ public:
 	}
 	Error* Reconfigure(AudioData* pAudio) override
 	{
-		Texture *tx = g_pD3D->Find(TC_EMTUBE);
+		Texture *tx = g_pD3D->Find(TextureClass::TubeEnvMap);
 		coil.textures[0].Set(Actor::TextureType::Envmap, tx);
 		obj.textures[0].Set(Actor::TextureType::Envmap, tx);
 

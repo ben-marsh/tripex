@@ -113,7 +113,7 @@ public:
 	}
 	Error* Reconfigure(AudioData* pAudio) override
 	{
-		Texture *tx = g_pD3D->Find(TC_EMRINGS);
+		Texture *tx = g_pD3D->Find(TextureClass::RingsEnvMap);
 		for (int i = 0; i < RINGS; i++)
 		{
 			pObj[i].textures[0].Set(Actor::TextureType::Envmap, tx);

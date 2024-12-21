@@ -136,8 +136,8 @@ public:
 	}
 	Error* Reconfigure(AudioData* pAudio) override
 	{
-		obj.textures[0].Set(Actor::TextureType::Sprite, g_pD3D->Find(TC_LBCOLLAPSINGSPHERE));
-		pTint = g_pD3D->Find(TC_WTCOLLAPSINGSPHERE);
+		obj.textures[0].Set(Actor::TextureType::Sprite, g_pD3D->Find(TextureClass::CollapsingSphereSprite));
+		pTint = g_pD3D->Find(TextureClass::CollapsingSphereBackground);
 		return nullptr;
 	}
 };

@@ -157,7 +157,7 @@ public:
 	}
 	Error* Reconfigure(AudioData* pAudio) override
 	{
-		tx = g_pD3D->Find(bLight? TC_WTDISTORTION2COL : TC_WTDISTORTION2);
+		tx = g_pD3D->Find(bLight? TextureClass::Distortion2ColBackground : TextureClass::Distortion2Background);
 		return nullptr;
 	}
 };

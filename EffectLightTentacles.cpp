@@ -113,8 +113,8 @@ public:
 	Error* Reconfigure(AudioData* pAudio) override
 	{
 		obj.textures[0].type = Actor::TextureType::Sprite;
-		obj.textures[0].texture = g_pD3D->Find(TC_LBLIGHTTENTACLES);
-		ptTint = g_pD3D->Find(TC_WTLIGHTTENTACLES);
+		obj.textures[0].texture = g_pD3D->Find(TextureClass::LightTentaclesSprite);
+		ptTint = g_pD3D->Find(TextureClass::LightTentaclesBackground);
 		return nullptr;
 	}
 };

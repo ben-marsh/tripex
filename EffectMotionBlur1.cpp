@@ -76,7 +76,7 @@ public:
 	}
 	Error* Reconfigure(AudioData* pAudio) override
 	{
-		Texture *t = g_pD3D->Find(TC_EMMOTIONBLUR);
+		Texture *t = g_pD3D->Find(TextureClass::MotionBlurEnvMap);
 		for (int i = 0; i < RINGS; i++)
 		{
 			pObj[i].textures[0].texture = t;
