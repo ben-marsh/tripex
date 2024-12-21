@@ -193,8 +193,11 @@ MMRESULT DestroyWaveIn()
 * TxWndProc( )
 -----------------------------------*/
 
+static const int TICK_TIMER_ID = 0x1234;
+
 void HandleError(HWND hWnd, Error* error)
 {
+	KillTimer(hWnd, TICK_TIMER_ID);
 	MessageBoxA(hWnd, error->GetDescription().c_str(), NULL, MB_OK);
 	CloseWindow(hWnd);
 }
@@ -225,7 +228,7 @@ LRESULT CALLBACK TxWndProc(HWND hWnd, uint32 nMsg, WPARAM wParam, LPARAM lParam)
 				{
 					HandleError(hWnd, error);
 				}
-				SetTimer(hWnd, 0x1234, 10, NULL);
+				SetTimer(hWnd, TICK_TIMER_ID, 10, NULL);
 			}
 		}
 		return FALSE;
@@ -250,8 +253,7 @@ LRESULT CALLBACK TxWndProc(HWND hWnd, uint32 nMsg, WPARAM wParam, LPARAM lParam)
 			Error* error = g_pTripex->Render();
 			if (error)
 			{
-				MessageBoxA(hWnd, error->GetDescription().c_str(), NULL, MB_OK);
-				CloseWindow(hWnd);
+				HandleError(hWnd, error);
 			}
 		}
 		break;
@@ -261,7 +263,7 @@ LRESULT CALLBACK TxWndProc(HWND hWnd, uint32 nMsg, WPARAM wParam, LPARAM lParam)
 			if (FAILED(mRes)) OutputWaveInError(mRes);
 		}
 
-		KillTimer(hWnd, 1);
+		KillTimer(hWnd, TICK_TIMER_ID);
 
 		if (g_pTripex != nullptr)
 		{

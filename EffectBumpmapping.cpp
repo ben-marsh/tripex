@@ -177,10 +177,10 @@ public:
 		ColorRgb colour[256];
 		for(i = 0; i < 256; i++)
 		{
-			pc.m_aPalette[ i ].peRed = i;
-			pc.m_aPalette[ i ].peGreen = i;
-			pc.m_aPalette[ i ].peBlue = i;
-			pc.m_aPalette[ i ].peFlags = 0xff;
+			pc.palette[ i ].peRed = i;
+			pc.palette[ i ].peGreen = i;
+			pc.palette[ i ].peBlue = i;
+			pc.palette[ i ].peFlags = 0xff;
 		}
 //			colour[i] = ZColour(i, i, i);
 //		pc.SetPalette(colour);

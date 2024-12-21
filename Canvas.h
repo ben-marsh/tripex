@@ -2,34 +2,29 @@
 
 #include "ZDirect3D.h"
 #include "ColorRgb.h"
+#include <memory>
 
 class Canvas
 {
-protected:
-	int32 m_nWidth;
-	int32 m_nHeight;
-	uint8 *m_anData;
-	Texture *m_aTexture;
-
 public:
-	ColorRgb m_cColour;
-	PALETTEENTRY m_aPalette[ 256 ];
+	static const int texture_w = 256;
+	static const int texture_h = 256;
 
-	// Constructor:
-	Canvas( int32 nWidth, int32 nHeight );
+	const int num_textures_x;
+	const int num_textures_y;
+	const int stride;
 
-	// Create( ):
-	Error* Create( );
+	ColorRgb color;
+	PALETTEENTRY palette[256];
 
-	// GetDataPtr( ):
-	uint8 *GetDataPtr( );
+	Canvas(int width, int height);
+	Error* Create();
+	uint8* GetDataPtr();
+	Error* UploadTextures();
+	Texture* GetTexture(int x, int y);
+	Error* Render();
 
-	// UploadTextures( ):
-	Error* UploadTextures( );
-
-	// GetTexture( ):
-	Texture *GetTexture( int32 nX, int32 nY );
-
-	// Render( ):
-	Error* Render( );
+private:
+	std::unique_ptr<uint8[]> data;
+	std::vector<Texture> textures;
 };

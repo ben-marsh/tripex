@@ -193,11 +193,11 @@ public:
 		*/	fMagnify = nFlowmapW / 2.0f;
 		fStartY = -(256.0f * nFlowmapH / nFlowmapW) + 0.5;
 		
-		pCanvas = new Canvas( nFlowmapW, nFlowmapH );
-//		pc.Create(false, nFlowmapW, nFlowmapH);
-		
 		width = nFlowmapW * 256;
 		height = nFlowmapH * 256;
+		pCanvas = new Canvas( width, height );
+//		pc.Create(false, nFlowmapW, nFlowmapH);
+		
 		bf1.SetLength(width * height);
 		bf2.SetLength(width * height);
 		multtab.SetLength(PRECISION*PRECISION*4*256);
@@ -725,7 +725,7 @@ public:
 			{
 				for( int32 i = 0; i < 256; i++ )
 				{
-					PALETTEENTRY *pEntry = &pCanvas->m_aPalette[ i ];
+					PALETTEENTRY *pEntry = &pCanvas->palette[ i ];
 					pEntry->peRed = dstcolour[ i ].r;
 					pEntry->peGreen = dstcolour[ i ].g;
 					pEntry->peBlue = dstcolour[ i ].b;
@@ -742,7 +742,7 @@ public:
 				{
 					ColorRgb c = ColorRgb::Blend( srccolour[ i ], dstcolour[ i ], fadecolour );
 
-					PALETTEENTRY *pEntry = &pCanvas->m_aPalette[ i ];
+					PALETTEENTRY *pEntry = &pCanvas->palette[ i ];
 					pEntry->peRed = c.r;
 					pEntry->peGreen = c.g;
 					pEntry->peBlue = c.b;
@@ -838,7 +838,7 @@ public:
 		}
 		else DrawOscilloscope(elapsed, nOsc1, dBr, pAudio, dst);
 
-		pCanvas->m_cColour = ColorRgb::Grey(255.0 * brightness);//D3DRGB(brightness, brightness, brightness);
+		pCanvas->color = ColorRgb::Grey(255.0 * brightness);//D3DRGB(brightness, brightness, brightness);
 
 		memcpy( pCanvas->GetDataPtr( ), (fOddFrame? bf2 : bf1).GetBuffer( ), bf1.GetSize());
 		error = pCanvas->UploadTextures( );
