@@ -64,7 +64,10 @@ public:
 
 	Error* Open( );
 	Error* Close( );
-	Error* DrawIndexedPrimitive(ZArray<VertexTL> &pVertex, ZArray<Face> &pfFace);
+
+	Error* DrawIndexedPrimitive(ZArray<VertexTL>& vertices, ZArray<Face>& faces);
+	Error* DrawIndexedPrimitive(const std::vector<VertexTL>& vertices, const std::vector<Face>& faces);
+	Error* DrawIndexedPrimitive(uint32_t num_vertices, const VertexTL* vertices, uint32_t num_faces, const Face* faces);
 
 	Error* AddTexture( Texture *pTexture );
 	Error* UploadTexture( Texture *pTexture );
@@ -92,7 +95,6 @@ public:
 	void SetSamplerState(DWORD dwStage, D3DSAMPLERSTATETYPE dwState, DWORD dwValue);
 	Error* FlushTextureState();
 
-	static void BuildSprite(ZArray<VertexTL> &pVertex, ZArray<Face> &pFace, const Point<int> &p, const Rect<int> &spr, ColorRgb cDiffuse = ColorRgb::White(), ColorRgb cSpecular = ColorRgb::Black());
 	Error* DrawSprite(const Point<int> &p, const Rect<int> &spr, ColorRgb cDiffuse = ColorRgb::White(), ColorRgb cSpecular = ColorRgb::Black());
 };
 

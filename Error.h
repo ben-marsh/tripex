@@ -7,8 +7,8 @@
 
 struct Error
 {
-	std::string Message;
-	std::vector<std::pair<const char*, uint32_t>> Trace;
+	std::string message;
+	std::vector<std::pair<const char*, uint32_t>> trace;
 
 	Error(HRESULT code);
 	~Error();
@@ -20,4 +20,4 @@ struct Error
 Error* TraceErrorImpl(Error* error, const char* file, uint32_t line);
 Error* TraceErrorImpl(HRESULT hRes, const char* file, uint32_t line);
 
-#define TraceError(Error) (TraceErrorImpl(Error, __FILE__, __LINE__))
+#define TraceError(x) (TraceErrorImpl(x, __FILE__, __LINE__))

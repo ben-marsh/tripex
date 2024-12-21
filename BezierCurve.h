@@ -1,14 +1,10 @@
 #pragma once
 
+#include <vector>
 #include "Vector3.h"
 
 class BezierCurve
 {
-private:
-	int nPoints;
-	Vector3 *pvPoint;
-	int *pnBin;
-
 public:
 	BezierCurve();
 	BezierCurve(int nPoints);
@@ -16,10 +12,15 @@ public:
 
 	void Create(int nPoints);
 	void Clear();
-	int Binomial(int nLevel, int nPos);
-	Vector3 Calculate(float fPos);
-	Vector3 &operator[](int nPos);
-	Vector3 &Get(int nPos);
+	Vector3 Calculate(float pos);
+	Vector3 &operator[](int index);
+	Vector3 &GetPoint(int index);
+
+private:
+	std::vector<Vector3> points;
+	std::vector<int> coefficients;
+
+	int Binomial(int level, int index);
 };
 
 template < int nBez > class ContainedBezierCurve : public BezierCurve

@@ -3,72 +3,68 @@
 
 BezierCurve::BezierCurve()
 {
-	nPoints = 0;
-	pvPoint = NULL;
-	pnBin = NULL;
 }
-BezierCurve::BezierCurve(int nPoints)
-{
-	this->nPoints = 0;
-	pvPoint = NULL;
-	pnBin = NULL;
-	Create(nPoints);
-}
+
 BezierCurve::~BezierCurve()
 {
-	Clear();
 }
-void BezierCurve::Create(int nPoints)
+
+BezierCurve::BezierCurve(int num_points)
 {
-	Clear();
-	if(nPoints >= 1)
+	Create(num_points);
+}
+
+void BezierCurve::Create(int num_points)
+{
+	points.clear();
+
+	points.resize(num_points);
+	coefficients.resize(num_points);
+
+	for(int i = 0; i < num_points; i++)
 	{
-		this->nPoints = nPoints;
-		pvPoint = new Vector3[nPoints];
-		pnBin = new int[nPoints];
-		for(int i = 0; i < nPoints; i++)
-		{
-			pnBin[i] = Binomial(nPoints - 1, i);
-		}
+		coefficients[i] = Binomial(num_points - 1, i);
 	}
 }
+
 void BezierCurve::Clear()
 {
-	if(pnBin != NULL)
-	{
-		delete pnBin;
-		pnBin = NULL;
-	}
-	if(pvPoint != NULL)
-	{
-		delete pvPoint;
-		pvPoint= NULL;
-	}
-	nPoints = 0;
+	points.clear();
+	coefficients.clear();
 }
-Vector3 &BezierCurve::Get(int nPos)
+
+Vector3 &BezierCurve::GetPoint(int index)
 {
-	_ASSERT(nPos >= 0 && nPos < nPoints);
-	return pvPoint[nPos];
+	_ASSERT(index >= 0 && index < points.size());
+	return points[index];
 }
+
 Vector3 &BezierCurve::operator[](int nPos)
 {
-	return Get(nPos);
+	return GetPoint(nPos);
 }
-int BezierCurve::Binomial(int nLevel, int nNum)
+
+int BezierCurve::Binomial(int level, int index)
 {
-	_ASSERT(nNum >= 0 && nNum <= nLevel && nLevel >= 0);
-	if(nNum == 0 || nNum == nLevel) return 1;
-	else return Binomial(nLevel - 1, nNum - 1) + Binomial(nLevel - 1, nNum);
+	_ASSERT(index >= 0 && index <= level && level >= 0);
+	if (index == 0 || index == level)
+	{
+		return 1;
+	}
+	else
+	{
+		return Binomial(level - 1, index - 1) + Binomial(level - 1, index);
+	}
 }
+
 Vector3 BezierCurve::Calculate(float fPos)
 {
 	_ASSERT(fPos >= 0 && fPos <= 1);
+
 	Vector3 v(0, 0, 0);
-	for(int i = 0; i < nPoints; i++)
+	for(int i = 0; i < points.size(); i++)
 	{
-		v += (float)(pnBin[i] * pow(fPos, i) * pow(1 - fPos, (nPoints - 1) - i)) * pvPoint[i];
+		v += (float)(coefficients[i] * pow(fPos, i) * pow(1 - fPos, (points.size() - 1) - i)) * points[i];
 	}
 	return v;
 }
-

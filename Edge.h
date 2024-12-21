@@ -2,157 +2,102 @@
 
 #include "Misc.h"
 
-class Edge
+struct Edge
 {
-public:
-	uint16 m_anVtx[ 2 ];
+	uint16 vertices[2];
 
-	// Constructor:
-	inline Edge();
-	inline Edge( const Edge &e );
-	inline Edge( uint16 nVtx1, uint16 nVtx2 );
+	Edge();
+	Edge(const Edge& other);
+	Edge(uint16 vtx1, uint16 vtx2);
 
-	// Set( ):
-	inline void Set( const Edge &e );
-	inline void Set(uint16 nVtx1, uint16 nVtx2 );
+	void Set(const Edge& other);
+	void Set(uint16 vtx1, uint16 vtx2);
 
-	// Flipped( ):
-	inline Edge Flipped( ) const;
+	Edge Reverse() const;
+	Edge OrderIndices() const;
 
-	// Ordered( ):
-	inline Edge Ordered( ) const;
+	bool Contains(uint16 nVtx) const;
 
-	// Contains( ):
-	inline bool Contains(uint16 nVtx) const;
+	uint16 CommonIndex(const Edge& other) const;
 
-	// CommonIndex( ):
-	inline uint16 CommonIndex( const Edge &e ) const;
+	bool operator==(const Edge& other) const;
 
-	// operator=( ):
-	inline Edge &operator=( const Edge &e );
-
-	// operator==( ):
-	inline bool operator==( const Edge &e ) const;
-
-	// operator[ ]( ):
-	inline uint16 &operator[ ]( int nIdx );
-	inline const uint16 &operator[ ]( int nIdx ) const;
+	uint16& operator[ ](int idx);
+	const uint16& operator[ ](int idx) const;
 };
 
-/*---------------------------------
-* Constructor:
------------------------------------*/
-
-Edge::Edge( )
+inline Edge::Edge()
+	: vertices{ 0, }
 {
 }
 
-Edge::Edge( const Edge &e )
+inline Edge::Edge(const Edge& other)
+	: vertices{ other.vertices[0], other.vertices[1] }
 {
-	Set(e);
 }
 
-Edge::Edge(uint16 nVtx1, uint16 nVtx2 )
+inline Edge::Edge(uint16 vtx1, uint16 vtx2)
+	: vertices{ vtx1, vtx2 }
 {
-	Set( nVtx1, nVtx2 );
 }
 
-/*---------------------------------
-* Set( ):
------------------------------------*/
-
-void Edge::Set( const Edge &e )
+inline void Edge::Set(const Edge& other)
 {
-	Set( e.m_anVtx[ 0 ], e.m_anVtx[ 1 ] );
+	Set(other.vertices[0], other.vertices[1]);
 }
 
-void Edge::Set(uint16 nVtx1, uint16 nVtx2 )
+inline void Edge::Set(uint16 vtx1, uint16 vtx2)
 {
-	m_anVtx[ 0 ] = nVtx1;
-	m_anVtx[ 1 ] = nVtx2;
+	vertices[0] = vtx1;
+	vertices[1] = vtx2;
 }
 
-/*---------------------------------
-* Flipped( ):
------------------------------------*/
-
-Edge Edge::Flipped( ) const
+inline Edge Edge::Reverse() const
 {
-	return Edge( m_anVtx[ 1 ], m_anVtx[ 0 ] );
+	return Edge(vertices[1], vertices[0]);
 }
 
-/*---------------------------------
-* Ordered( ):
------------------------------------*/
-
-Edge Edge::Ordered( ) const
+inline Edge Edge::OrderIndices() const
 {
-	if( m_anVtx[ 0 ] < m_anVtx[ 1 ] )
+	if (vertices[0] < vertices[1])
 	{
-		return Edge( m_anVtx[ 0 ], m_anVtx[ 1 ] );
+		return Edge(vertices[0], vertices[1]);
 	}
-	else 
+	else
 	{
-		return Edge( m_anVtx[ 1 ], m_anVtx[ 0 ] );
+		return Edge(vertices[1], vertices[0]);
 	}
 }
 
-/*---------------------------------
-* Contains( ):
------------------------------------*/
-
-bool Edge::Contains(uint16 nVtx ) const
+inline bool Edge::Contains(uint16 vertex) const
 {
-	return m_anVtx[ 0 ] == nVtx || m_anVtx[ 1 ] == nVtx;
+	return vertices[0] == vertex || vertices[1] == vertex;
 }
 
-/*---------------------------------
-* CommonIndex( ):
------------------------------------*/
-
-uint16 Edge::CommonIndex( const Edge &e ) const
+inline uint16 Edge::CommonIndex(const Edge& other) const
 {
-	if( e.Contains( m_anVtx[ 0 ] ) )
+	if (other.Contains(vertices[0]))
 	{
-		return m_anVtx[ 0 ];
+		return vertices[0];
 	}
-	else if( e.Contains( m_anVtx[ 1 ] ) )
+	else if (other.Contains(vertices[1]))
 	{
-		return m_anVtx[ 1 ];
+		return vertices[1];
 	}
 	return (uint16)-1;
 }
 
-
-/*---------------------------------
-* operator=( ):
------------------------------------*/
-
-Edge &Edge::operator=( const Edge &e )
+inline bool Edge::operator==(const Edge& other) const
 {
-	Set( e );
-	return *this;
+	return vertices[0] == other.vertices[0] && vertices[1] == other.vertices[1];
 }
 
-/*---------------------------------
-* operator==( ):
------------------------------------*/
-
-bool Edge::operator==( const Edge &e ) const
+inline uint16& Edge::operator[ ](int index)
 {
-	return m_anVtx[ 0 ] == e.m_anVtx[ 0 ] && m_anVtx[ 1 ] == e.m_anVtx[ 1 ];
+	return vertices[index];
 }
 
-/*---------------------------------
-* operator[ ]( ):
------------------------------------*/
-
-uint16&Edge::operator[ ]( int nIdx )
+inline const uint16& Edge::operator[ ](int index) const
 {
-	return m_anVtx[ nIdx ];
-}
-
-const uint16&Edge::operator[ ]( int nIdx ) const
-{
-	return m_anVtx[ nIdx ];
+	return vertices[index];
 }

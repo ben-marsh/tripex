@@ -2,6 +2,7 @@
 #include "ZDirect3d.h"
 #include <d3dx9.h>
 #include "Texture.h"
+#include "SpriteBuffer.h"
 #include "error.h"
 
 /*
@@ -102,7 +103,20 @@ Texture* ZDirect3D::Find(int nType)
 	}
 	return NULL;
 }
-Error* ZDirect3D::DrawIndexedPrimitive(ZArray<VertexTL>& pVertex, ZArray<Face>& pFace)
+
+Error* ZDirect3D::DrawIndexedPrimitive(ZArray<VertexTL>& vertices, ZArray<Face>& faces)
+{
+	Error* error = DrawIndexedPrimitive(vertices.GetLength(), vertices.GetBuffer(), faces.GetLength(), faces.GetBuffer());
+	return TraceError(error);
+}
+
+Error* ZDirect3D::DrawIndexedPrimitive(const std::vector<VertexTL>& vertices, const std::vector<Face>& faces)
+{
+	Error* error = DrawIndexedPrimitive((uint32_t)vertices.size(), vertices.data(), (uint32_t)faces.size(), faces.data());
+	return TraceError(error);
+}
+
+Error* ZDirect3D::DrawIndexedPrimitive(uint32_t num_vertices, const VertexTL* vertices, uint32_t num_faces, const Face* faces)
 {
 	Error* error;
 
@@ -112,7 +126,7 @@ Error* ZDirect3D::DrawIndexedPrimitive(ZArray<VertexTL>& pVertex, ZArray<Face>& 
 	error = FlushTextureState();
 	if (error) return TraceError(error);
 
-	HRESULT hRes = g_pDevice->DrawIndexedPrimitiveUP(D3DPT_TRIANGLELIST, 0, pVertex.GetLength(), pFace.GetLength(), pFace.GetBuffer(), D3DFMT_INDEX16, pVertex.GetBuffer(), sizeof(VertexTL));
+	HRESULT hRes = g_pDevice->DrawIndexedPrimitiveUP(D3DPT_TRIANGLELIST, 0, num_vertices, num_faces, faces, D3DFMT_INDEX16, vertices, sizeof(VertexTL));
 	if (FAILED(hRes)) return TraceError(hRes);
 
 	return nullptr;
@@ -546,46 +560,11 @@ void ZDirect3D::ResetTextureStageState(DWORD dwStage)
 		}
 	}
 }
-void ZDirect3D::BuildSprite(ZArray<VertexTL>& pVertex, ZArray<Face>& pFace, const Point<int>& p, const Rect<int>& spr, ColorRgb cDiffuse, ColorRgb cSpecular)
-{
-	pVertex.SetLength(4);
-
-	const float fMult = 1.0f / 256.0f;
-
-	Point<float> p2((spr.left * fMult), (spr.top * fMult));//(spr.left + 0.5f) * fMult, (spr.top + 0.5f) * fMult);
-
-	float fW = (float)(spr.right - spr.left);
-	float fH = (float)(spr.bottom - spr.top);
-	float fTexW = fW * fMult;
-	float fTexH = fH * fMult;
-	for (int i = 0; i < 4; i++)
-	{
-		pVertex[i].position = Vector3(p.x - 0.5f, p.y - 0.5f, 0.1f);
-		pVertex[i].tex_coords[0] = p2;
-		if (i == 1 || i == 2)
-		{
-			pVertex[i].position.x += fW;
-			pVertex[i].tex_coords[0].x += fTexW;//fW * fMult) - (;
-		}
-		if (i == 2 || i == 3)
-		{
-			pVertex[i].position.y += fH;
-			pVertex[i].tex_coords[0].y += fTexH;//fH * fMult;
-		}
-		pVertex[i].rhw = 1.0f;
-		pVertex[i].specular = cSpecular;
-		pVertex[i].diffuse = cDiffuse;
-	}
-
-	pFace.SetLength(2);
-	pFace[0] = Face(0, 1, 3);
-	pFace[1] = Face(1, 2, 3);
-}
 Error* ZDirect3D::DrawSprite(const Point<int>& p, const Rect<int>& spr, ColorRgb cDiffuse, ColorRgb cSpecular)
 {
-	ZArray<VertexTL> pv;
-	ZArray<Face> pf;
-	BuildSprite(pv, pf, p, spr, cDiffuse, cSpecular);
+	std::vector<VertexTL> pv;
+	std::vector<Face> pf;
+	SpriteBuffer::AddSprite(p, spr, cDiffuse, cSpecular, pv, pf);
 	return DrawIndexedPrimitive(pv, pf);
 }
 void ZDirect3D::ResetTextureState()

@@ -132,7 +132,7 @@ public:
 	float fMoveSpeed;
 	float accum;
 
-	EffectBumpmapping() : grid(GRIDW, GRIDH), gridbm(GRIDW, GRIDH), pc( 1, 1 )
+	EffectBumpmapping() : grid(GRIDW, GRIDH), gridbm(GRIDW, GRIDH), pc( 256, 256 )
 	{
 		fTentacleAng = 0.0f;
 		fTentacleDir = 1.0f;

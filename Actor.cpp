@@ -185,19 +185,19 @@ void Actor::FindMeshEdges()
 	Edge e;
 	for (int i = 0; i < faces.GetLength(); i++)
 	{
-		e = Edge(faces[i][0], faces[i][1]).Ordered();
+		e = Edge(faces[i][0], faces[i][1]).OrderIndices();
 		if (edges.IndexOf(e) == -1)
 		{
 			edges.Add(e);
 		}
 
-		e = Edge(faces[i][1], faces[i][2]).Ordered();
+		e = Edge(faces[i][1], faces[i][2]).OrderIndices();
 		if (edges.IndexOf(e) == -1)
 		{
 			edges.Add(e);
 		}
 
-		e = Edge(faces[i][2], faces[i][0]).Ordered();
+		e = Edge(faces[i][2], faces[i][0]).OrderIndices();
 		if (edges.IndexOf(e) == -1)
 		{
 			edges.Add(e);
@@ -1238,7 +1238,7 @@ void Actor::CreateGeosphere(float radius, int num_vertices)
 	{
 		for (int j = 0; j < 3; j++)
 		{
-			Edge e = faces[i].GetEdge(j).Ordered();
+			Edge e = faces[i].GetEdge(j).OrderIndices();
 			for (int k = 0;; k++)
 			{
 				if (k < geo_edges.GetLength())
@@ -1321,12 +1321,12 @@ void Actor::CreateGeosphere(float radius, int num_vertices)
 			geo_edges[new_edge].faces[i] = face2;
 
 			int new_split = geo_edges.AddEmpty();
-			geo_edges[new_split].Set(Edge(vertex, new_vertex).Ordered());
+			geo_edges[new_split].Set(Edge(vertex, new_vertex).OrderIndices());
 			geo_edges[new_split].FindLength(this);
 			geo_edges[new_split].faces[0] = face1;
 			geo_edges[new_split].faces[1] = face2;
 
-			Edge ce = Edge(te[1], vertex).Ordered();
+			Edge ce = Edge(te[1], vertex).OrderIndices();
 			for (int k = 0; k < geo_edges.GetLength(); k++)
 			{
 				if (geo_edges[k] == ce)

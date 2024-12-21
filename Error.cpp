@@ -8,7 +8,7 @@ Error::Error(HRESULT hRes)
 {
 	char sBuf[100];
 	sprintf(sBuf, "Error %08x\n", hRes);
-	Message = sBuf;
+	message = sBuf;
 }
 
 Error::~Error()
@@ -17,26 +17,35 @@ Error::~Error()
 
 Error* Error::AddTrace(const char* file, uint32_t line)
 {
-	Trace.push_back(std::make_pair(file, line));
+	trace.push_back(std::make_pair(file, line));
 	return this;
 }
 
 std::string Error::GetDescription() const
 {
-	std::string description = Message;
+	std::string description = message;
 	description += "Trace: ";
-	if (Trace.size() > 0)
+	if (trace.size() > 0)
 	{
-		for (unsigned int i = 0; i < Trace.size(); i++)
+		for (unsigned int i = 0; i < trace.size(); i++)
 		{
-			if (i > 0) description += ", ";
+			if (i > 0)
+			{
+				description += ", ";
+			}
 
-			const char* sPos = strrchr(Trace[i].first, '\\');
-			if (sPos == NULL) sPos = Trace[i].first;
-			else sPos++;
+			const char* sPos = strrchr(trace[i].first, '\\');
+			if (sPos == NULL)
+			{
+				sPos = trace[i].first;
+			}
+			else
+			{
+				sPos++;
+			}
 
 			char sBuf[256];
-			sprintf(sBuf, "%s(%d)", sPos, Trace[i].second);
+			sprintf(sBuf, "%s(%d)", sPos, trace[i].second);
 			description += sBuf;
 		}
 	}
