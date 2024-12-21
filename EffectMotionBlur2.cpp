@@ -39,13 +39,13 @@ public:
 		{
 			pObj[p].CreateTetrahedron(100);
 //		pObj[p].pVertex.SetFormat(D3DFVF_NORMAL | D3DFVF_TEX1);
-			pObj[p].pVertex.SetLength(nVertices);
-			pObj[p].pFace.SetLength(PIPE_LENGTH * PIPE_CIRCUMPOINTS * 2);
-			pObj[p].m_bsFlag.set( Actor::F_NO_CULL );
-			pObj[p].m_bsFlag.set( Actor::F_DRAW_TRANSPARENT );
-			pObj[p].fFrameHistory = 4.0f;
-			pObj[p].nExposure = 6;
-			pObj[p].wcExposureLightChange = WideColorRgb(-10, -10, -1);
+			pObj[p].vertices.SetLength(nVertices);
+			pObj[p].faces.SetLength(PIPE_LENGTH * PIPE_CIRCUMPOINTS * 2);
+			pObj[p].flags.set( Actor::F_NO_CULL );
+			pObj[p].flags.set( Actor::F_DRAW_TRANSPARENT );
+			pObj[p].frame_history = 4.0f;
+			pObj[p].exposure = 6;
+			pObj[p].exposure_light_delta = WideColorRgb(-10, -10, -1);
 
 			int v = 0, f = 0;
 			for(int i = 0; i < PIPE_LENGTH; i++)
@@ -64,16 +64,16 @@ public:
 					vec *= Matrix44::RotateAroundX(dTwistAng);
 					vec.y += CIRCLE_RADIUS;
 					vec *= Matrix44::RotateAroundZ(dAng);// = RotateVector3(vec, dAng, 0, 0);
-					pObj[p].pVertex[v + cp].position = vec;
+					pObj[p].vertices[v + cp].position = vec;
 
-					pObj[p].pFace[f][0] = v + cp;
-					pObj[p].pFace[f][1] = v + ((cp + 1) % PIPE_CIRCUMPOINTS);
-					pObj[p].pFace[f][2] = (v + cp + PIPE_CIRCUMPOINTS) % nVertices;
+					pObj[p].faces[f][0] = v + cp;
+					pObj[p].faces[f][1] = v + ((cp + 1) % PIPE_CIRCUMPOINTS);
+					pObj[p].faces[f][2] = (v + cp + PIPE_CIRCUMPOINTS) % nVertices;
 					f++;
 
-					pObj[p].pFace[f][0] = v + ((cp + 1) % PIPE_CIRCUMPOINTS);
-					pObj[p].pFace[f][1] = (v + ((cp + 1) % PIPE_CIRCUMPOINTS) + PIPE_CIRCUMPOINTS) % nVertices;
-					pObj[p].pFace[f][2] = (v + cp + PIPE_CIRCUMPOINTS) % nVertices;
+					pObj[p].faces[f][0] = v + ((cp + 1) % PIPE_CIRCUMPOINTS);
+					pObj[p].faces[f][1] = (v + ((cp + 1) % PIPE_CIRCUMPOINTS) + PIPE_CIRCUMPOINTS) % nVertices;
+					pObj[p].faces[f][2] = (v + cp + PIPE_CIRCUMPOINTS) % nVertices;
 					f++;
 				}
 				v += PIPE_CIRCUMPOINTS;
@@ -108,10 +108,10 @@ public:
 
 		for(int i = 0; i < 3; i++)
 		{
-			pObj[i].wcAmbientLight = ColorRgb::Grey(60.0 * brightness);
-			pObj[i].fRoll += pfa[0] * elapsed * (pAudio->GetIntensity( ) + 0.1);
-			pObj[i].fPitch += pfa[1] * elapsed * pAudio->GetIntensity( ) ;
-			pObj[i].fYaw += pfa[2] * elapsed * (pAudio->GetIntensity( ) + 0.2);
+			pObj[i].ambient_light_color = ColorRgb::Grey(60.0 * brightness);
+			pObj[i].roll += pfa[0] * elapsed * (pAudio->GetIntensity( ) + 0.1);
+			pObj[i].pitch += pfa[1] * elapsed * pAudio->GetIntensity( ) ;
+			pObj[i].yaw += pfa[2] * elapsed * (pAudio->GetIntensity( ) + 0.2);
 			pObj[i].Calculate(&camera, elapsed);
 		}
 		return nullptr;
@@ -121,8 +121,8 @@ public:
 		Texture *pTexture = g_pD3D->Find(TC_EMMOTIONBLUR2);//2);
 		for(int i = 0; i < PIPES; i++)
 		{
-			pObj[i].pTexture[0].m_nType = Actor::TextureEntry::T_LIGHTMAP;
-			pObj[i].pTexture[0].m_pTexture = pTexture;
+			pObj[i].textures[0].type = Actor::TextureType::Lightmap;
+			pObj[i].textures[0].texture = pTexture;
 		}
 		return nullptr;
 	}

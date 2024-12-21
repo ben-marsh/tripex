@@ -49,13 +49,13 @@ class EffectWaterGlobe : public EffectBase
 //		FindFaceEdges();
 			FindVertexFaceList();
 
-			ppwAdjacent.SetLength(pVertex.GetLength());
-			for(int i = 0; i < pVertex.GetLength(); i++)
+			ppwAdjacent.SetLength(vertices.GetLength());
+			for(int i = 0; i < vertices.GetLength(); i++)
 			{
 				ZArray<uint16> pwIndex;
-				for(int j = 0; ppwVertexFaceList[i][j] != WORD_INVALID_INDEX; j++)
+				for(int j = 0; vertex_face_list[i][j] != WORD_INVALID_INDEX; j++)
 				{
-					Face &f = pFace[ppwVertexFaceList[i][j]];
+					Face &f = faces[vertex_face_list[i][j]];
 					for(int k = 0; k < 3; k++)
 					{
 						if(f[k] != i && pwIndex.IndexOf(f[k]) == -1)
@@ -69,14 +69,14 @@ class EffectWaterGlobe : public EffectBase
 			}
 
 			fDamping = 1.0f;
-			pvDir.SetLength(pVertex.GetLength());
-			for(int i = 0; i < pVertex.GetLength(); i++)
+			pvDir.SetLength(vertices.GetLength());
+			for(int i = 0; i < vertices.GetLength(); i++)
 			{
-				pvDir[i] = pVertex[i].position;
+				pvDir[i] = vertices[i].position;
 			}
-			pfPos.SetLength(pVertex.GetLength());
+			pfPos.SetLength(vertices.GetLength());
 			pfPos.Fill(0);
-			pfVel.SetLength(pVertex.GetLength());
+			pfVel.SetLength(vertices.GetLength());
 			pfVel.Fill(0);
 		}
 		void Update()
@@ -84,11 +84,11 @@ class EffectWaterGlobe : public EffectBase
 			if(fAngle > 360.0f)
 			{
 				fAngle = 0.0f;
-				nPos = rand() * pVertex.GetLength() / RAND_MAX;
+				nPos = rand() * vertices.GetLength() / RAND_MAX;
 				fSize = fAverage * 0.5f;
 			}
 			fAngle += 20.0f;//= 3.14159 / 180.0;
-			for(int i = 0; i < pVertex.GetLength(); i++)
+			for(int i = 0; i < vertices.GetLength(); i++)
 			{
 				float fAccel = 0;
 				int j;
@@ -99,7 +99,7 @@ class EffectWaterGlobe : public EffectBase
 				fAccel /= j;
 				pfVel[i] += fAccel - pfPos[i];
 			}
-			for(int i = 0; i < pVertex.GetLength(); i++)
+			for(int i = 0; i < vertices.GetLength(); i++)
 			{
 				pfPos[i] += pfVel[i];
 				pfPos[i] *= fDamping;
@@ -108,29 +108,29 @@ class EffectWaterGlobe : public EffectBase
 		}
 		void Create()
 		{
-			for(int i = 0; i < pVertex.GetLength(); i++)
+			for(int i = 0; i < vertices.GetLength(); i++)
 			{
-				pVertex[i].position = pvDir[i] * (1 + Bound<float>(pfPos[i], MINSZ, MAXSZ));
+				vertices[i].position = pvDir[i] * (1 + Bound<float>(pfPos[i], MINSZ, MAXSZ));
 			}
 		}
 		void ResetPoint(int nPoint)
 		{
 			float fPos = 0;
 			int i;
-			for(i = 0; ppwVertexFaceList[nPoint][i] != WORD_INVALID_INDEX; i++)
+			for(i = 0; vertex_face_list[nPoint][i] != WORD_INVALID_INDEX; i++)
 			{
-				fPos += pfPos[ppwVertexFaceList[nPoint][i]];
+				fPos += pfPos[vertex_face_list[nPoint][i]];
 			}	
 			pfPos[nPoint] = fPos / i;
 		}
 		float AverageHeight()
 		{
 			float fHeight = 0;
-			for(int i = 0; i < pVertex.GetLength(); i++) 
+			for(int i = 0; i < vertices.GetLength(); i++) 
 			{
 				fHeight += pfPos[i];
 			}
-			return fHeight / pVertex.GetLength();
+			return fHeight / vertices.GetLength();
 		}
 	};
 	WaterObj obj;
@@ -145,7 +145,7 @@ public:
 		nPos = 0;
 
 		obj.Start();
-		obj.m_bsFlag.set(Actor::F_DRAW_Z_BUFFER);
+		obj.flags.set(Actor::F_DRAW_Z_BUFFER);
 		obj.fAngle = 10000;
 
 		camera.position = Vector3(0, 0, -320);
@@ -189,16 +189,16 @@ public:
 //			pObj->ResetPoint(0);
 			//	obj->textureMap(waTexture);
 	
-			obj.fPitch += 2.0f * g_fDegToRad;
-			obj.fYaw += 1.5f * g_fDegToRad;
-			obj.wcAmbientLight = ColorRgb::Grey((int)(255.0f * brightness));
+			obj.pitch += 2.0f * g_fDegToRad;
+			obj.yaw += 1.5f * g_fDegToRad;
+			obj.ambient_light_color = ColorRgb::Grey((int)(255.0f * brightness));
 
 //			angle += average;
 			accum--;
 		}
 //	obj.fPitch = pObj->fPitch;
 //	obj.fYaw = pObj->fYaw;
-		obj.m_bsFlag.reset(Actor::F_VALID_VERTEX_NORMALS);
+		obj.flags.reset(Actor::F_VALID_VERTEX_NORMALS);
 
 		obj.Create();
 		obj.Calculate(&camera, elapsed);
@@ -206,13 +206,13 @@ public:
 	}
 	Error* Reconfigure(AudioData* pAudio) override
 	{
-		obj.pTexture[0].Set(Actor::TextureEntry::T_ENVMAP, g_pD3D->Find(TC_EMWATERGLOBE));
+		obj.textures[0].Set(Actor::TextureType::Envmap, g_pD3D->Find(TC_EMWATERGLOBE));
 		return nullptr;
 	}
 	Error* Render()
 	{
 		Error* error;
-		obj.m_bsFlag.set(Actor::F_DRAW_TRANSPARENT);
+		obj.flags.set(Actor::F_DRAW_TRANSPARENT);
 
 		error = obj.Render();//scene->render(d3d);
 		if(error) return TraceError(error);

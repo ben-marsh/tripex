@@ -21,5 +21,5 @@ struct VertexTL // Transformed and lit vertex
 	float rhw;
 	ColorRgb diffuse;
 	ColorRgb specular;
-	Point<float> tex_coord[MAX_TEXTURES];
+	Point<float> tex_coords[MAX_TEXTURES];
 };

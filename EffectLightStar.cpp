@@ -28,12 +28,12 @@ public:
 		dViewAng = 0;
 		nSpikes = 8;
 
-		obj.pVertex.SetLength(SOURCES);
-		obj.m_bsFlag.set( Actor::F_DRAW_TRANSPARENT );
-		obj.m_bsFlag.set( Actor::F_DRAW_Z_BUFFER, false );
-		obj.m_bsFlag.set( Actor::F_DRAW_VERTEX_SPRITES );
-		obj.pTexture[0].m_nType = Actor::TextureEntry::T_SPRITE;
-		obj.fSpriteSize = 7.5;//pObj->fRenderAsLights(15.0);
+		obj.vertices.SetLength(SOURCES);
+		obj.flags.set( Actor::F_DRAW_TRANSPARENT );
+		obj.flags.set( Actor::F_DRAW_Z_BUFFER, false );
+		obj.flags.set( Actor::F_DRAW_VERTEX_SPRITES );
+		obj.textures[0].type = Actor::TextureType::Sprite;
+		obj.sprite_size = 7.5;//pObj->fRenderAsLights(15.0);
 		camera.position.z = -100;
 
 		for(int i = 0; i < SOURCES; i++)
@@ -60,7 +60,7 @@ public:
 
 			while(dRadAng > 3.14159 * 2.0) dRadAng -= 3.14159 * 2.0;
 		}
-		obj.fYaw += 1.0f * g_fDegToRad;
+		obj.yaw += 1.0f * g_fDegToRad;
 
 		dViewAng += 3.14159 / 180.0;
 		camera.position.z = -50;
@@ -76,11 +76,11 @@ public:
 			pdAng[i] += pdSpeed[i] * elapsed;
 			pdRadius[i] = 100 + (dRadMult * sin(pdAng[i] * nSpikes));
 
-			obj.pVertex[i].position.x = sin(pdAng[i]) * pdRadius[i];
-			obj.pVertex[i].position.y = pdHeight[i];
-			obj.pVertex[i].position.z = cos(pdAng[i]) * pdRadius[i];
+			obj.vertices[i].position.x = sin(pdAng[i]) * pdRadius[i];
+			obj.vertices[i].position.y = pdHeight[i];
+			obj.vertices[i].position.z = cos(pdAng[i]) * pdRadius[i];
 		}
-		obj.wcAmbientLight = ColorRgb::Grey(128.0 * brightness);//->color = D3DRGB(dBr, dBr, dBr);
+		obj.ambient_light_color = ColorRgb::Grey(128.0 * brightness);//->color = D3DRGB(dBr, dBr, dBr);
 		obj.Calculate(&camera, elapsed);
 
 		return nullptr;
@@ -105,7 +105,7 @@ public:
 	}
 	Error* Reconfigure(AudioData* pAudio) override
 	{
-		obj.pTexture[0].m_pTexture = g_pD3D->Find(TC_LBLIGHTSTAR);
+		obj.textures[0].texture = g_pD3D->Find(TC_LBLIGHTSTAR);
 		pTint = g_pD3D->Find(TC_WTLIGHTSTAR);
 		return nullptr;
 	}

@@ -122,8 +122,8 @@ public:
 					cCol.b += pc[j].b * fColMult;
 				}
 
-				grid.pVertex[i].tex_coord[0].x = fX;
-				grid.pVertex[i].tex_coord[0].y = fY;
+				grid.pVertex[i].tex_coords[0].x = fX;
+				grid.pVertex[i].tex_coords[0].y = fY;
 				ColorRgb cGrey = ColorRgb::Grey(std::min(1.0f, brightness * fBr) * 255.0);
 				if(bLight) 
 				{

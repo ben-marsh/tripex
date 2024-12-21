@@ -30,6 +30,8 @@ public:
 	protected:
 		StateBuffer mpState;
 		NewStateBuffer mpNewState;
+		StateBuffer mpSamplerState;
+		NewStateBuffer mpNewSamplerState;
 		Texture *pTexture;
 		Texture *pNewTexture;
 
@@ -87,6 +89,7 @@ public:
 	void ResetTextureStageState(DWORD dwStage);
 	void SetTexture(DWORD dwStage, Texture *pTexture, DWORD dwOp = D3DTOP_MODULATE, DWORD dwArg2 = D3DTA_CURRENT);
 	void SetTextureStageState(DWORD dwStage, D3DTEXTURESTAGESTATETYPE dwKey, DWORD dwValue);
+	void SetSamplerState(DWORD dwStage, D3DSAMPLERSTATETYPE dwState, DWORD dwValue);
 	Error* FlushTextureState();
 
 	static void BuildSprite(ZArray<VertexTL> &pVertex, ZArray<Face> &pFace, const Point<int> &p, const Rect<int> &spr, ColorRgb cDiffuse = ColorRgb::White(), ColorRgb cSpecular = ColorRgb::Black());

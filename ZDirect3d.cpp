@@ -259,61 +259,84 @@ Error* ZDirect3D::FlushTextureState()
 				{
 					if (g_Caps.TextureFilterCaps & D3DPTFILTERCAPS_MIPFPOINT)
 					{
-						g_pDevice->SetSamplerState(dwStage, D3DSAMP_MIPFILTER, D3DTEXF_POINT);
+						SetSamplerState(dwStage, D3DSAMP_MIPFILTER, D3DTEXF_POINT);
 					}
 					else if (g_Caps.TextureFilterCaps & D3DPTFILTERCAPS_MIPFLINEAR)
 					{
-						g_pDevice->SetSamplerState(dwStage, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
+						SetSamplerState(dwStage, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
 					}
 				}
 				else
 				{
-					g_pDevice->SetSamplerState(dwStage, D3DSAMP_MIPFILTER, D3DTEXF_NONE);
+					SetSamplerState(dwStage, D3DSAMP_MIPFILTER, D3DTEXF_NONE);
 				}
 
 				if (pTexture->m_nFlags & Texture::F_FILTERING)
 				{
 					if (g_Caps.TextureFilterCaps & D3DPTFILTERCAPS_MINFLINEAR)
 					{
-						g_pDevice->SetSamplerState(dwStage, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
+						SetSamplerState(dwStage, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
 					}
 					if (g_Caps.TextureFilterCaps & D3DPTFILTERCAPS_MAGFLINEAR)
 					{
-						g_pDevice->SetSamplerState(dwStage, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
+						SetSamplerState(dwStage, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
 					}
 				}
 				else
 				{
 					if (g_Caps.TextureFilterCaps & D3DPTFILTERCAPS_MINFPOINT)
 					{
-						g_pDevice->SetSamplerState(dwStage, D3DSAMP_MINFILTER, D3DTEXF_POINT);
+						SetSamplerState(dwStage, D3DSAMP_MINFILTER, D3DTEXF_POINT);
 					}
 					if (g_Caps.TextureFilterCaps & D3DPTFILTERCAPS_MAGFPOINT)
 					{
-						g_pDevice->SetSamplerState(dwStage, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
+						SetSamplerState(dwStage, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
 					}
 				}
 			}
 		}
 
-		std::vector< StateBufferChange > vc;
-		GetStateChanges(pTextureStage[dwStage].mpNewState, pTextureStage[dwStage].mpState, vc);
-
-		for (int i = 0; i < (int)vc.size(); i++)
 		{
-			StateBuffer::iterator it = vc[i].first;
+			std::vector< StateBufferChange > vc;
+			GetStateChanges(pTextureStage[dwStage].mpNewState, pTextureStage[dwStage].mpState, vc);
 
-			if (vc[i].second)
+			for (int i = 0; i < (int)vc.size(); i++)
 			{
-				hRes = g_pDevice->GetTextureStageState(dwStage, (D3DTEXTURESTAGESTATETYPE)it->first, &it->second.second);
+				StateBuffer::iterator it = vc[i].first;
+
+				if (vc[i].second)
+				{
+					hRes = g_pDevice->GetTextureStageState(dwStage, (D3DTEXTURESTAGESTATETYPE)it->first, &it->second.second);
+					if (FAILED(hRes)) return TraceError(hRes);
+				}
+
+				hRes = g_pDevice->SetTextureStageState(dwStage, (D3DTEXTURESTAGESTATETYPE)it->first, it->second.first);
 				if (FAILED(hRes)) return TraceError(hRes);
 			}
 
-			hRes = g_pDevice->SetTextureStageState(dwStage, (D3DTEXTURESTAGESTATETYPE)it->first, it->second.first);
-			if (FAILED(hRes)) return TraceError(hRes);
+			pTextureStage[dwStage].mpNewState.clear();
 		}
 
-		pTextureStage[dwStage].mpNewState.clear();
+		{
+			std::vector< StateBufferChange > vc;
+			GetStateChanges(pTextureStage[dwStage].mpNewSamplerState, pTextureStage[dwStage].mpSamplerState, vc);
+
+			for (int i = 0; i < (int)vc.size(); i++)
+			{
+				StateBuffer::iterator it = vc[i].first;
+
+				if (vc[i].second)
+				{
+					hRes = g_pDevice->GetSamplerState(dwStage, (D3DSAMPLERSTATETYPE)it->first, &it->second.second);
+					if (FAILED(hRes)) return TraceError(hRes);
+				}
+
+				hRes = g_pDevice->SetSamplerState(dwStage, (D3DSAMPLERSTATETYPE)it->first, it->second.first);
+				if (FAILED(hRes)) return TraceError(hRes);
+			}
+
+			pTextureStage[dwStage].mpNewSamplerState.clear();
+		}
 	}
 	return nullptr;
 }
@@ -494,6 +517,10 @@ void ZDirect3D::SetTextureStageState(DWORD dwStage, D3DTEXTURESTAGESTATETYPE dwK
 {
 	pTextureStage[dwStage].mpNewState[(DWORD)dwKey] = dwValue;
 }
+void ZDirect3D::SetSamplerState(DWORD dwStage, D3DSAMPLERSTATETYPE dwKey, DWORD dwValue)
+{
+	pTextureStage[dwStage].mpNewSamplerState[(DWORD)dwKey] = dwValue;
+}
 void ZDirect3D::ResetTextureStageState(DWORD dwStage)
 {
 	if (pTextureStage[dwStage].pNewTexture != (Texture*)-1)
@@ -507,6 +534,15 @@ void ZDirect3D::ResetTextureStageState(DWORD dwStage)
 		if (it->second.first != it->second.second)
 		{
 			SetTextureStageState(dwStage, (D3DTEXTURESTAGESTATETYPE)it->first, it->second.second);
+		}
+	}
+
+	pTextureStage[dwStage].mpNewSamplerState.clear();
+	for (StateBuffer::iterator it = pTextureStage[dwStage].mpSamplerState.begin(); it != pTextureStage[dwStage].mpSamplerState.end(); it++)
+	{
+		if (it->second.first != it->second.second)
+		{
+			SetSamplerState(dwStage, (D3DSAMPLERSTATETYPE)it->first, it->second.second);
 		}
 	}
 }
@@ -525,16 +561,16 @@ void ZDirect3D::BuildSprite(ZArray<VertexTL>& pVertex, ZArray<Face>& pFace, cons
 	for (int i = 0; i < 4; i++)
 	{
 		pVertex[i].position = Vector3(p.x - 0.5f, p.y - 0.5f, 0.1f);
-		pVertex[i].tex_coord[0] = p2;
+		pVertex[i].tex_coords[0] = p2;
 		if (i == 1 || i == 2)
 		{
 			pVertex[i].position.x += fW;
-			pVertex[i].tex_coord[0].x += fTexW;//fW * fMult) - (;
+			pVertex[i].tex_coords[0].x += fTexW;//fW * fMult) - (;
 		}
 		if (i == 2 || i == 3)
 		{
 			pVertex[i].position.y += fH;
-			pVertex[i].tex_coord[0].y += fTexH;//fH * fMult;
+			pVertex[i].tex_coords[0].y += fTexH;//fH * fMult;
 		}
 		pVertex[i].rhw = 1.0f;
 		pVertex[i].specular = cSpecular;

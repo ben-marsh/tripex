@@ -60,22 +60,22 @@ public:
 			ehps[i] = rand() * 3.0 * (3.14159 / 180.0) / RAND_MAX;
 		}
 
-		obj.m_bsFlag.set( Actor::F_DRAW_TRANSPARENT );
-		obj.m_bsFlag.set( Actor::F_DRAW_VERTEX_SPRITES );
-		obj.m_bsFlag.set( Actor::F_DRAW_VERTEX_SPRITE_HISTORY );
+		obj.flags.set( Actor::F_DRAW_TRANSPARENT );
+		obj.flags.set( Actor::F_DRAW_VERTEX_SPRITES );
+		obj.flags.set( Actor::F_DRAW_VERTEX_SPRITE_HISTORY );
 
-		obj.fSpriteHistoryLength = 4.0f;
-		obj.fFrameHistory = 12.0f;
-		obj.fSpriteSize = 2.0f;//2.0f;
-		obj.wcExposureLightChange = WideColorRgb(-2, -2, -2);//10, -10, -10);
+		obj.sprite_history_length = 4.0f;
+		obj.frame_history = 12.0f;
+		obj.sprite_size = 2.0f;//2.0f;
+		obj.exposure_light_delta = WideColorRgb(-2, -2, -2);//10, -10, -10);
 	
-		obj.pVertex.SetLength(SOURCES);
+		obj.vertices.SetLength(SOURCES);
 	}
 	Error* Calculate(float brightness, float elapsed, AudioData* pAudio) override
 	{
 		brt = brightness;
 		accum += elapsed * 3.0;
-		obj.wcAmbientLight = ColorRgb::Grey(brightness * 255.0);
+		obj.ambient_light_color = ColorRgb::Grey(brightness * 255.0);
 		for(; accum > 1.0f; accum--)
 		{
 			float elapsed = 1.0f;
@@ -86,19 +86,19 @@ public:
 
 				double r = 2.0 * er[i] * cos(ehp[i]);
 
-				obj.pVertex[i].position.x = (46.0 + (r * sin(ehp[i]))) * sin(position[i]);
-				obj.pVertex[i].position.z = (46.0 + (r * cos(ehp[i]))) * cos(position[i]);
-				obj.pVertex[i].position.y = er[i] * sin(ehp[i]);	
+				obj.vertices[i].position.x = (46.0 + (r * sin(ehp[i]))) * sin(position[i]);
+				obj.vertices[i].position.z = (46.0 + (r * cos(ehp[i]))) * cos(position[i]);
+				obj.vertices[i].position.y = er[i] * sin(ehp[i]);	
 			}
 	
 			static double a2 = 0;
 			a2 += elapsed * (pAudio->GetIntensity( ) + pAudio->GetBeat( )) * 3.14159 / 180.0;
 
-			obj.fRoll += elapsed * 0.25 * pAudio->GetIntensity( ) * 4.0 * 3.14159 / 180.0;
-			obj.fPitch += elapsed * 0.25 * pAudio->GetIntensity( ) * 3.0 * 3.14159 / 180.0;
-			obj.fYaw += elapsed * 0.25 * 2.0 * 3.14159 / 180.0;
+			obj.roll += elapsed * 0.25 * pAudio->GetIntensity( ) * 4.0 * 3.14159 / 180.0;
+			obj.pitch += elapsed * 0.25 * pAudio->GetIntensity( ) * 3.0 * 3.14159 / 180.0;
+			obj.yaw += elapsed * 0.25 * 2.0 * 3.14159 / 180.0;
 
-			obj.pTexture[0].Set(Actor::TextureEntry::T_SPRITE, tx);
+			obj.textures[0].Set(Actor::TextureType::Sprite, tx);
 			obj.Calculate(&camera, elapsed);
 		}
 		return nullptr;

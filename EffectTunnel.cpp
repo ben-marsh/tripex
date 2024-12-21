@@ -79,7 +79,7 @@ public:
 				}
 			}
 
-			pObj[no].m_bsFlag.set(Actor::F_DRAW_TRANSPARENT);
+			pObj[no].flags.set(Actor::F_DRAW_TRANSPARENT);
 
 			int f = 0;
 			for(int j = 0; j < nTunnelL - 1; j++)
@@ -87,19 +87,19 @@ public:
 				int nIndex = j * nCrossSection;
 				for(int i = 0; i < nCrossSection - 1; i++)
 				{
-					pObj[no].pFace.Add(Face(nIndex + i, nIndex + (i + 1), nIndex + nCrossSection + i)); 
-					pObj[no].pFace.Add(Face(nIndex + (i + 1), nIndex + nCrossSection + (i + 1), nIndex + nCrossSection + i)); 
+					pObj[no].faces.Add(Face(nIndex + i, nIndex + (i + 1), nIndex + nCrossSection + i)); 
+					pObj[no].faces.Add(Face(nIndex + (i + 1), nIndex + nCrossSection + (i + 1), nIndex + nCrossSection + i)); 
 				}
 			}
-			pObj[no].pVertex.SetLength(nTunnelL * nCrossSection);
+			pObj[no].vertices.SetLength(nTunnelL * nCrossSection);
 
 			int k = 0;
 			for(int j = 0; j < nTunnelL; j++)
 			{
 				for(int i = 0; i < nCrossSection; i++)
 				{
-					pObj[no].pVertex[k].tex_coord[0].x = /*(no / 2.0) +*/ float(i) / float(nCrossSection - 1);
-					pObj[no].pVertex[k].tex_coord[0].y = /*(no / 2.0) +*/ float(j) / float(nTunnelL);
+					pObj[no].vertices[k].tex_coord[0].x = /*(no / 2.0) +*/ float(i) / float(nCrossSection - 1);
+					pObj[no].vertices[k].tex_coord[0].y = /*(no / 2.0) +*/ float(j) / float(nTunnelL);
 					k++;
 				}
 			}
@@ -178,7 +178,7 @@ public:
 		{
 			for(int no = 0; no < 2; no++)
 			{
-				memmove(&pObj[no].pVertex[0].position, &pObj[no].pVertex[nCrossSection * (nTunnelL - nCalc)].position, nCalc * nCrossSection * sizeof(Vertex));//pObj[no].pVertex.GetItemSize());
+				memmove(&pObj[no].vertices[0].position, &pObj[no].vertices[nCrossSection * (nTunnelL - nCalc)].position, nCalc * nCrossSection * sizeof(Vertex));//pObj[no].pVertex.GetItemSize());
 			}
 		}
 
@@ -197,21 +197,21 @@ public:
 			int nIndex = i * nCrossSection;
 			for(int j = 0; j < nCrossSection; j++)
 			{
-				pObj[0].pVertex[nIndex].diffuse = c;
-				pObj[0].pVertex[nIndex].tex_coord[0].y = fTexV;//fvVertex.GetTexture().fV = fTexV;
+				pObj[0].vertices[nIndex].diffuse = c;
+				pObj[0].vertices[nIndex].tex_coord[0].y = fTexV;//fvVertex.GetTexture().fV = fTexV;
 				nIndex++;
 			}
-			pObj[0].m_bsFlag.set(Actor::F_VALID_VERTEX_DIFFUSE);
+			pObj[0].flags.set(Actor::F_VALID_VERTEX_DIFFUSE);
 	//		fvVertex = pObj[1].pVertex[i * nCrossSection];
 			nIndex = i * nCrossSection;
 			for(int j = 0; j < nCrossSection; j++)
 			{
-				pObj[1].pVertex[nIndex].diffuse = c2;//.GetDiffuse() = c2;
-				pObj[1].pVertex[nIndex].tex_coord[0].y = fTexV + fTexVOfs;
+				pObj[1].vertices[nIndex].diffuse = c2;//.GetDiffuse() = c2;
+				pObj[1].vertices[nIndex].tex_coord[0].y = fTexV + fTexVOfs;
 				nIndex++;
 	//			fvVertex++;
 			}
-			pObj[1].m_bsFlag.set(Actor::F_VALID_VERTEX_DIFFUSE);
+			pObj[1].flags.set(Actor::F_VALID_VERTEX_DIFFUSE);
 		}
 		for(; nCalc < nTunnelL; nCalc++)
 		{
@@ -241,7 +241,7 @@ public:
 					vn.y = -((pvPos[0].y * fX) + (pvPos[1].y * fY));
 					vn.z = -((pvPos[0].z * fX) + (pvPos[1].z * fY));
 
-					pObj[no].pVertex[nIndex].position = v - (vn * fRadius);
+					pObj[no].vertices[nIndex].position = v - (vn * fRadius);
 					nIndex++;
 				}
 			}
@@ -262,8 +262,8 @@ public:
 	Error* Reconfigure(AudioData* pAudio) override
 	{
 		tx = g_pD3D->Find(TC_WTTUNNEL);
-		pObj[0].pTexture[0].Set(Actor::TextureEntry::T_USER, tx);//SetTexture(tx);
-		pObj[1].pTexture[0].Set(Actor::TextureEntry::T_USER, tx);///.pTexture = tx;//SetTexture(tx);
+		pObj[0].textures[0].Set(Actor::TextureType::Normal, tx);//SetTexture(tx);
+		pObj[1].textures[0].Set(Actor::TextureType::Normal, tx);///.pTexture = tx;//SetTexture(tx);
 		return nullptr;
 	}
 	Error* Render() override

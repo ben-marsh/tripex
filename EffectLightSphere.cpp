@@ -54,16 +54,16 @@ public:
 		position.SetLength(nSources);
 		speed.SetLength(nSources);
 
-		obj.vPosition.z = 50;
-		obj.pVertex.SetLength(nSources);
-		obj.m_bsFlag.set( Actor::F_DRAW_TRANSPARENT );
-		obj.m_bsFlag.set( Actor::F_DRAW_VERTEX_SPRITES );
-		obj.m_bsFlag.set( Actor::F_DRAW_VERTEX_SPRITE_HISTORY );
-		obj.fFrameHistory = 10.0;
-		obj.fSpriteSize = 2.0f;
-		obj.fSpriteHistoryLength = 1.0f;
-		obj.nMaxHistoryLength = 25;
-		obj.wcExposureLightChange = WideColorRgb(-2, -2, -2);
+		obj.position.z = 50;
+		obj.vertices.SetLength(nSources);
+		obj.flags.set( Actor::F_DRAW_TRANSPARENT );
+		obj.flags.set( Actor::F_DRAW_VERTEX_SPRITES );
+		obj.flags.set( Actor::F_DRAW_VERTEX_SPRITE_HISTORY );
+		obj.frame_history = 10.0;
+		obj.sprite_size = 2.0f;
+		obj.sprite_history_length = 1.0f;
+		obj.max_history_length = 25;
+		obj.exposure_light_delta = WideColorRgb(-2, -2, -2);
 	}
 	Error* Calculate(float brightness, float elapsed, AudioData* pAudio) override
 	{
@@ -105,14 +105,14 @@ public:
 				{
 					b[j] = pvPosition[j][i];
 				}
-				obj.pVertex[i].position = b.Calculate(position[i]);
+				obj.vertices[i].position = b.Calculate(position[i]);
 			}
 
-			obj.fRoll += elapsed * pAudio->GetIntensity( ) * 4.0 * 3.14159 / 180.0;
-			obj.fPitch += elapsed * pAudio->GetIntensity( ) * 3.0 * 3.14159 / 180.0;
-			obj.fYaw += elapsed * 2.0 * 3.14159 / 180.0;
+			obj.roll += elapsed * pAudio->GetIntensity( ) * 4.0 * 3.14159 / 180.0;
+			obj.pitch += elapsed * pAudio->GetIntensity( ) * 3.0 * 3.14159 / 180.0;
+			obj.yaw += elapsed * 2.0 * 3.14159 / 180.0;
 			obj.Calculate(&camera, 1.0);
-			obj.wcAmbientLight = ColorRgb::Grey(64.0 * brightness);
+			obj.ambient_light_color = ColorRgb::Grey(64.0 * brightness);
 		}
 		return nullptr;
 	}
@@ -137,7 +137,7 @@ public:
 			fNotRendered = false;
 		}
 
-		obj.pTexture[0].Set(Actor::TextureEntry::T_SPRITE, g_pD3D->Find(TC_LBLIGHTSPHERE));
+		obj.textures[0].Set(Actor::TextureType::Sprite, g_pD3D->Find(TC_LBLIGHTSPHERE));
 
 		pTint = g_pD3D->Find(TC_WTLIGHTSPHERE);
 		return nullptr;

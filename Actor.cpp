@@ -2,374 +2,407 @@
 #include "Actor.h"
 #include "error.h"
 
-float pSpriteTexU[ 4 ] = { 0.0f, 1.0f, 1.0f, 0.0f };
-float pSpriteTexV[ 4 ] = { 0.0f, 0.0f, 1.0f, 1.0f };
-
-extern ZArray<int> pnEmptyVertex;
-
-/*---------------------------------
-* ZObject::Texture
------------------------------------*/
-
-/*---------------------------------
-* Constructor:
------------------------------------*/
-
-Actor::TextureEntry::TextureEntry( )
+const Point<float> Actor::sprite_tex_coords[4] =
 {
-	m_fPitch = m_fYaw = m_fRoll = 0.0f; 
-	m_pTexture = NULL; 
-	m_nType = T_UNUSED;
+	Point<float>(0.0f, 0.0f),
+	Point<float>(1.0f, 0.0f),
+	Point<float>(1.0f, 1.0f),
+	Point<float>(0.0f, 1.0f)
+};
+
+const float Actor::OBJECT_NORMAL_LENGTH = 0.5f;
+
+////// Actor::TextureEntry //////
+
+Actor::TextureEntry::TextureEntry()
+{
+	pitch = yaw = roll = 0.0f;
+	texture = NULL;
+	type = TextureType::Unused;
 }
 
-/*---------------------------------
-* Set( ):
------------------------------------*/
-
-void Actor::TextureEntry::Set( Type nType, Texture *pTexture )
+void Actor::TextureEntry::Set(TextureType type, Texture* texture)
 {
-	m_nType = nType;
-	m_pTexture = pTexture;
+	this->type = type;
+	this->texture = texture;
 }
 
+////// Actor::Light //////
 
-
-
-
-
-
-
-
-/*---------------------------------
-* ZObject::Light
------------------------------------*/
-
-/*---------------------------------
-* Constructor:
------------------------------------*/
-
-Actor::Light::Light( Type nType, WideColorRgb cColour )
+Actor::Light::Light(LightType nType, WideColorRgb cColour)
 {
-	m_nType = nType;
-	m_bAttenuate = false; 
-	m_cColour = cColour; 
+	type = nType;
+	attenuate = false;
+	attenuation_factor = 0.0f;
+	color = cColour;
 }
 
-
-
-
-
-
-
-/*---------------------------------
-* ZObject:
------------------------------------*/
+////// Actor //////
 
 Actor::Actor()
 {
-	wClipMask = CLIP_FLAG_MIN_X | CLIP_FLAG_MAX_X | CLIP_FLAG_MIN_Y | CLIP_FLAG_MAX_Y | CLIP_FLAG_MIN_Z | CLIP_FLAG_MAX_Z;
-	wcAmbientLight = ColorRgb::White();
-	fFrameHistory = 1.0f;
-	fFrameTime = 0.3f;
-	fRoll = fPitch = fYaw = 0.0f;
-	vPosition = Vector3(0, 0, 0);
-	nExposure = 1;
-	pTransVertex.nStep = 1000;
-	fDelayHistory = 0;
-//	pClippedFace.nStep = 50;
-	fReflectivity = 1.0;
-	fSpriteSize = 7.5f;
-	fSpriteHistoryLength = 0.5;
-	wcExposureLightChange = ColorRgb(0, 0, 0);
-	nMaxHistoryLength = 15;
+	clip_mask = CLIP_PLANE_MIN_X | CLIP_PLANE_MAX_X | CLIP_PLANE_MIN_Y | CLIP_PLANE_MAX_Y | CLIP_PLANE_MIN_Z | CLIP_FLAG_MAX_Z;
+	ambient_light_color = ColorRgb::White();
+	frame_history = 1.0f;
+	frame_time = 0.3f;
+	roll = pitch = yaw = 0.0f;
+	position = Vector3(0, 0, 0);
+	exposure = 1;
+	transformed_vertices.nStep = 1000;
+	delay_history = 0;
+	//	pClippedFace.nStep = 50;
+	reflectivity = 1.0;
+	sprite_size = 7.5f;
+	sprite_history_length = 0.5;
+	exposure_light_delta = ColorRgb(0, 0, 0);
+	max_history_length = 15;
+	clip_min_x = 0.0f;
+	clip_max_x = 0.0f;
+	clip_min_y = 0.0f;
+	clip_max_y = 0.0f;
+	clip_min_z = 0.0f;
+	clip_max_z = 0.0f;
+	num_textures = 0;
+	rotation_history = 0;
 }
+
 Actor::~Actor()
 {
-	for(int i = 0; i < ppwVertexFaceList.GetLength(); i++)
+	for (int i = 0; i < vertex_face_list.GetLength(); i++)
 	{
-		free(ppwVertexFaceList[i]);
+		free(vertex_face_list[i]);
 	}
 }
+
 Vector3 Actor::GetCentre()
 {
 	Vector3 v(0, 0, 0);
-	for(int i = 0; i < pVertex.GetLength(); i++)
+	for (int i = 0; i < vertices.GetLength(); i++)
 	{
-		v += pVertex[i].position;
+		v += vertices[i].position;
 	}
-	v /= (float)pVertex.GetLength();
+	v /= (float)vertices.GetLength();
 	return v;
 }
-void Actor::TransformVertices(Matrix44 &m)
+
+void Actor::TransformVertices(Matrix44& m)
 {
-	for(int i = 0; i < pVertex.GetLength(); i++)
+	for (int i = 0; i < vertices.GetLength(); i++)
 	{
-		pVertex[i].position *= m;
+		vertices[i].position *= m;
 	}
 }
-void Actor::FindFaceOrder(const Vector3 &vIntPoint)
+
+void Actor::FindFaceOrder(const Vector3& vIntPoint)
 {
-	for(int i = 0; i < pFace.GetLength(); i++)
+	for (int i = 0; i < faces.GetLength(); i++)
 	{
-		Face f = pFace[i];
-		Vector3 vNormal = (pVertex[f[1]].position - pVertex[f[0]].position).Cross(pVertex[f[2]].position - pVertex[f[0]].position);
-		if((pVertex[pFace[i][0]].position - vIntPoint).Dot(vNormal) > 0)
+		Face face = faces[i];
+		Vector3 normal = (vertices[face[1]].position - vertices[face[0]].position).Cross(vertices[face[2]].position - vertices[face[0]].position);
+		if ((vertices[faces[i][0]].position - vIntPoint).Dot(normal) > 0)
 		{
-			pFace[i].SwapCull();
+			faces[i].SwapCull();
 		}
 	}
 }
+
 void Actor::FindVertexFaceList()
 {
-	for(int i = 0; i < ppwVertexFaceList.GetLength(); i++)
+	for (int i = 0; i < vertex_face_list.GetLength(); i++)
 	{
-		free(ppwVertexFaceList[i]);
+		free(vertex_face_list[i]);
 	}
-	ppwVertexFaceList.SetLength(pVertex.GetLength());
-	for(int i = 0; i < pVertex.GetLength(); i++) 
+	vertex_face_list.SetLength(vertices.GetLength());
+	for (int i = 0; i < vertices.GetLength(); i++)
 	{
-		ppwVertexFaceList[i] = NULL;
+		vertex_face_list[i] = NULL;
 	}
-	for(int i = 0; i < pFace.GetLength(); i++)
+	for (int i = 0; i < faces.GetLength(); i++)
 	{
-		for(int j = 0; j < 3; j++)
+		for (int j = 0; j < 3; j++)
 		{
-			uint16*&pwFace = ppwVertexFaceList[pFace[i][j]];
-			int k = 0; 
-			if(pwFace == NULL) pwFace = (uint16*)malloc(4 * sizeof(uint16));
+			uint16*& face_list = vertex_face_list[faces[i][j]];
+
+			int k = 0;
+			if (face_list == NULL)
+			{
+				face_list = (uint16*)malloc(4 * sizeof(uint16));
+			}
 			else
 			{
-				while(pwFace[k] != WORD_INVALID_INDEX) k++;
-				if(k >= 3) pwFace = (uint16*)realloc(pwFace, (k + 2) * sizeof(uint16));
+				while (face_list[k] != WORD_INVALID_INDEX)
+				{
+					k++;
+				}
+				if (k >= 3)
+				{
+					face_list = (uint16*)realloc(face_list, (k + 2) * sizeof(uint16));
+				}
 			}
-			pwFace[k] = i;
-			pwFace[k+1] = WORD_INVALID_INDEX;
+			face_list[k] = i;
+			face_list[k + 1] = WORD_INVALID_INDEX;
 		}
 	}
-	m_bsFlag.set( F_VALID_VERTEX_FACE_LIST );
+	flags.set(F_VALID_VERTEX_FACE_LIST);
 }
+
 void Actor::FindVertexNormals()
 {
-	if(!m_bsFlag.test( F_VALID_VERTEX_FACE_LIST )) FindVertexFaceList();
-
-	pvFaceNormal.SetLength(pFace.GetLength());
-	for(int i = 0; i < pFace.GetLength(); i++)
+	if (!flags.test(F_VALID_VERTEX_FACE_LIST))
 	{
-		Face f = pFace[i];
-		pvFaceNormal[i] = ((pVertex[f[1]].position - pVertex[f[0]].position).Cross(pVertex[f[2]].position - pVertex[f[0]].position)).Normal(fObjectNormal);
+		FindVertexFaceList();
 	}
 
-	for(int i = 0; i < pVertex.GetLength(); i++)
+	face_normals.SetLength(faces.GetLength());
+	for (int i = 0; i < faces.GetLength(); i++)
 	{
-		Vector3 vNormal = Vector3(0, 0, 0);
-		uint16 *pwFace = ppwVertexFaceList[i];
-		for(int j = 0; pwFace[j] != WORD_INVALID_INDEX; j++)
+		Face face = faces[i];
+
+		Vector3 edge1 = vertices[face[1]].position - vertices[face[0]].position;
+		Vector3 edge2 = vertices[face[2]].position - vertices[face[0]].position;
+
+		face_normals[i] = edge1.Cross(edge2).Normal(OBJECT_NORMAL_LENGTH);
+	}
+
+	for (int i = 0; i < vertices.GetLength(); i++)
+	{
+		Vector3 normal = Vector3(0, 0, 0);
+
+		uint16* face_list = vertex_face_list[i];
+		for (int j = 0; face_list[j] != WORD_INVALID_INDEX; j++)
 		{
-			vNormal += pvFaceNormal[pwFace[j]];
+			normal += face_normals[face_list[j]];
 		}
-		pVertex[i].normal = vNormal.Normal(fObjectNormal);
+
+		vertices[i].normal = normal.Normal(OBJECT_NORMAL_LENGTH);
 	}
 
-	m_bsFlag.set( F_VALID_VERTEX_NORMALS );
+	flags.set(F_VALID_VERTEX_NORMALS);
 }
+
 void Actor::FindMeshEdges()
 {
 	Edge e;
-	for(int i = 0; i < pFace.GetLength(); i++)
+	for (int i = 0; i < faces.GetLength(); i++)
 	{
-		e = Edge(pFace[i][0], pFace[i][1]).Ordered();
-		if(pEdge.IndexOf(e) == -1) pEdge.Add(e);
-		e = Edge(pFace[i][1], pFace[i][2]).Ordered();
-		if(pEdge.IndexOf(e) == -1) pEdge.Add(e);
-		e = Edge(pFace[i][2], pFace[i][0]).Ordered();
-		if(pEdge.IndexOf(e) == -1) pEdge.Add(e);
+		e = Edge(faces[i][0], faces[i][1]).Ordered();
+		if (edges.IndexOf(e) == -1)
+		{
+			edges.Add(e);
+		}
+
+		e = Edge(faces[i][1], faces[i][2]).Ordered();
+		if (edges.IndexOf(e) == -1)
+		{
+			edges.Add(e);
+		}
+
+		e = Edge(faces[i][2], faces[i][0]).Ordered();
+		if (edges.IndexOf(e) == -1)
+		{
+			edges.Add(e);
+		}
 	}
 }
+
 void Actor::FindDelayValues()
 {
-	pfDelay.SetLength(pVertex.GetLength());
+	vertex_delay_factor.SetLength(vertices.GetLength());
 
-	float fDistMax = FLT_MIN, fDistMin = FLT_MAX;
-	for(int i = 0; i < pVertex.GetLength(); i++)
+	float dist_max = FLT_MIN;
+	float dist_min = FLT_MAX;
+	for (int i = 0; i < vertices.GetLength(); i++)
 	{
-		pfDelay[i] = pVertex[i].position.Length();
-		fDistMin = std::min(fDistMin, pfDelay[i]);
-		fDistMax = std::max(fDistMax, pfDelay[i]);
+		vertex_delay_factor[i] = vertices[i].position.Length();
+		dist_min = std::min(dist_min, vertex_delay_factor[i]);
+		dist_max = std::max(dist_max, vertex_delay_factor[i]);
 	}
-	for(int i = 0; i < pfDelay.GetLength(); i++)
+
+	for (int i = 0; i < vertex_delay_factor.GetLength(); i++)
 	{
-		pfDelay[i] = (pfDelay[i] - fDistMin) / (fDistMax - fDistMin);
-	}
-}
-Vector3 Actor::GetDelayedPosition(int nVertex, ExposureData *pData)
-{
-	float fTime = pData->m_fTime + (pfDelay[nVertex] * fDelayHistory);
-	float fTotalElapsed = 0;
- 	for(int k = pData->m_nFrame; ; k++)
-	{
-		if(!(k + 1 < ppFrame.GetLength()))
-		{
-			return ppFrame[k]->m_pvPosition[nVertex];
-		}
-		float fNextElapsed = fTotalElapsed + ppFrame[k]->m_fElapsed;
-		if(fNextElapsed > fTime)
-		{
-			float fPos = (fTime - fTotalElapsed) / ppFrame[k]->m_fElapsed;
-			return (ppFrame[k]->m_pvPosition[nVertex] * (1 - fPos)) + (ppFrame[k + 1]->m_pvPosition[nVertex] * fPos);
-		}
-		fTotalElapsed = fNextElapsed;
+		vertex_delay_factor[i] = (vertex_delay_factor[i] - dist_min) / (dist_max - dist_min);
 	}
 }
-void Actor::Calculate(Camera *pCamera, float fElapsed)
+
+Vector3 Actor::GetDelayedPosition(int vertex, ExposureData* exposure_data)
 {
-	Vector3 pvSprite[4] = { Vector3(-fSpriteSize, -fSpriteSize, 0), Vector3(fSpriteSize, -fSpriteSize, 0), Vector3(fSpriteSize, fSpriteSize, 0), Vector3(-fSpriteSize, fSpriteSize, 0) };
+	float time = exposure_data->time + (vertex_delay_factor[vertex] * delay_history);
+	float total_elapsed = 0;
+	for (int k = exposure_data->frame; ; k++)
+	{
+		if (!(k + 1 < frames.GetLength()))
+		{
+			return frames[k]->positions[vertex];
+		}
+		float next_elapsed = total_elapsed + frames[k]->elapsed;
+		if (next_elapsed > time)
+		{
+			float pos = (time - total_elapsed) / frames[k]->elapsed;
+			return (frames[k]->positions[vertex] * (1 - pos)) + (frames[k + 1]->positions[vertex] * pos);
+		}
+		total_elapsed = next_elapsed;
+	}
+}
+
+void Actor::Calculate(Camera* camera, float elapsed)
+{
 	int i, j;
-	m_bsFlag.set( F_VALID_TRANSFORMED_DATA, false );
+	flags.set(F_VALID_TRANSFORMED_DATA, false);
 
-	Matrix44 mTransform = Matrix44::Rotate(fYaw, fPitch, fRoll) * Matrix44::Translate(vPosition) * pCamera->GetTransform( );
+	Matrix44 mTransform = Matrix44::Rotate(yaw, pitch, roll) * Matrix44::Translate(position) * camera->GetTransform();
 
 	// set up the lighting
-	int nMinLight = std::min(wcAmbientLight.GetMinComponent(), (wcAmbientLight + (nExposure * wcExposureLightChange)).GetMinComponent());
-	int nMaxLight = std::max(wcAmbientLight.GetMaxComponent(), (wcAmbientLight + (nExposure * wcExposureLightChange)).GetMaxComponent());
-	if(ppLight.GetLength() > 0)
+	int min_light = std::min(ambient_light_color.GetMinComponent(), (ambient_light_color + (exposure * exposure_light_delta)).GetMinComponent());
+	int max_light = std::max(ambient_light_color.GetMaxComponent(), (ambient_light_color + (exposure * exposure_light_delta)).GetMaxComponent());
+	if (lights.size() > 0)
 	{
-		if(!m_bsFlag.test( F_VALID_VERTEX_NORMALS )) FindVertexNormals();
-		for(i = 0; i < ppLight.GetLength(); i++)
+		if (!flags.test(F_VALID_VERTEX_NORMALS))
 		{
-			nMaxLight = std::max(nMaxLight, ppLight[i]->m_cColour.GetMaxComponent());
+			FindVertexNormals();
+		}
+		for (const Light& light : lights)
+		{
+			max_light = std::max(max_light, light.color.GetMaxComponent());
 		}
 	}
 
-	m_bsFlag.set( F_USE_DIFFUSE, (nMinLight < 255) || m_bsFlag.test( F_VALID_VERTEX_DIFFUSE ));
-	m_bsFlag.set( F_USE_SPECULAR, (nMaxLight > 255) || m_bsFlag.test( F_VALID_VERTEX_SPECULAR) );
+	flags.set(F_USE_DIFFUSE, (min_light < 255) || flags.test(F_VALID_VERTEX_DIFFUSE));
+	flags.set(F_USE_SPECULAR, (max_light > 255) || flags.test(F_VALID_VERTEX_SPECULAR));
 
 	// set up the texturing
-	ZArray<TextureEntry*> ppUseTexture;
-	if(m_bsFlag.test(F_DRAW_VERTEX_SPRITES))
+	ZArray<TextureEntry*> use_textures;
+	if (flags.test(F_DRAW_VERTEX_SPRITES))
 	{
-		_ASSERT(pTexture[0].m_nType == TextureEntry::T_SPRITE);
-		nTextures = 1;
+		_ASSERT(textures[0].type == TextureType::Sprite);
+		num_textures = 1;
 	}
 	else
 	{
-		for(i = 0; i < MAX_TEXTURES; i++)
+		for (i = 0; i < MAX_TEXTURES; i++)
 		{
-			switch(pTexture[i].m_nType)
+			switch (textures[i].type)
 			{
-			case TextureEntry::T_USER:
-				ppUseTexture.Add(&pTexture[i]);
+			case TextureType::Normal:
+				use_textures.Add(&textures[i]);
 				break;
-			case TextureEntry::T_LIGHTMAP:
-			case TextureEntry::T_ENVMAP:
-				if(!m_bsFlag.test(F_VALID_VERTEX_NORMALS)) FindVertexNormals();
-
-				if(pTexture[i].m_nType == TextureEntry::T_LIGHTMAP)
+			case TextureType::Lightmap:
+			case TextureType::Envmap:
+				if (!flags.test(F_VALID_VERTEX_NORMALS))
 				{
-					pTexture[i].m_mRotation = Matrix44::Rotate(pTexture[i].m_fPitch, pTexture[i].m_fYaw, pTexture[i].m_fRoll);
+					FindVertexNormals();
+				}
+
+				if (textures[i].type == TextureType::Lightmap)
+				{
+					textures[i].rotation = Matrix44::Rotate(textures[i].pitch, textures[i].yaw, textures[i].roll);
 				}
 				else
 				{
-					pTexture[i].m_mRotation = Matrix44::Rotate(fYaw, fPitch, fRoll);
+					textures[i].rotation = Matrix44::Rotate(yaw, pitch, roll);
 				}
-				ppUseTexture.Add(&pTexture[i]);
+				use_textures.Add(&textures[i]);
 				break;
 			}
 		}
-		nTextures = ppUseTexture.GetLength();
+		num_textures = use_textures.GetLength();
 	}
 
 	// set up the frame array
-	Frame *pStoreFrame = NULL;
-	for(i = 0; i < ppUnusedFrame.GetLength();)
+	Frame* store_frame = NULL;
+	for (i = 0; i < unused_frames.GetLength();)
 	{
-		if(ppUnusedFrame[i]->m_nTimeToLive > timeGetTime( ))
+		if (unused_frames[i]->time_to_live > timeGetTime())
 		{
-			delete ppUnusedFrame[i];
-			ppUnusedFrame.Remove(i);
-		}
-		else i++;
-	}
-	if(m_bsFlag.test(F_DRAW_VERTEX_SPRITE_HISTORY) ||
-		m_bsFlag.test(F_DO_POSITION_DELAY) || 
-		m_bsFlag.test(F_DO_FRAME_HISTORY) || 
-		nExposure > 1)
-	{
-		if(ppFrame.GetLength() == 0 || ppFrame[0]->m_fElapsed > fFrameTime)
-		{
-			float fTotalElapsed = fElapsed;
-			for(int i = 0;;i++)
-			{
-				if(fTotalElapsed > fFrameHistory)
-				{
-					// remove i + 1 and upwards
-					while(ppFrame.GetLength() > i + 1)
-					{
-						int nIndex = ppFrame.GetLength() - 1;
-						ppFrame[nIndex]->m_nTimeToLive = timeGetTime( ) + FRAME_TTL;
-						ppUnusedFrame.Add(ppFrame[nIndex]);
-						ppFrame.Remove(nIndex);
-					}
-				}
-				if(!(i + 1 < ppFrame.GetLength()))
-				{
-					if(ppUnusedFrame.GetLength() > 0)
-					{
-						ppFrame.Insert(0, ppUnusedFrame[0]);
-						ppUnusedFrame.Remove(0);
-					}
-					else 
-					{
-						ppFrame.Insert(0, new Frame);
-					}
-					break;
-				}
-				fTotalElapsed += ppFrame[i]->m_fElapsed;
-			}
-			ppFrame[0]->m_fElapsed = 0;
-		}
-		ppFrame[0]->m_fElapsed += fElapsed;
-		if(m_bsFlag.test( F_DO_ROTATION_HISTORY ) )
-		{
-			ppFrame[0]->m_fRoll = fRoll;
-			ppFrame[0]->m_fPitch = fPitch;
-			ppFrame[0]->m_fYaw = fYaw;
+			delete unused_frames[i];
+			unused_frames.Remove(i);
 		}
 		else
 		{
-			pStoreFrame = ppFrame[0];
-			pStoreFrame->m_pvPosition.SetLength(pVertex.GetLength());
-			if(m_bsFlag.test( F_DRAW_VERTEX_SPRITE_HISTORY ) )
+			i++;
+		}
+	}
+
+	if (flags.test(F_DRAW_VERTEX_SPRITE_HISTORY) ||
+		flags.test(F_DO_POSITION_DELAY) ||
+		flags.test(F_DO_FRAME_HISTORY) ||
+		exposure > 1)
+	{
+		if (frames.GetLength() == 0 || frames[0]->elapsed > frame_time)
+		{
+			float total_elapsed = elapsed;
+			for (int i = 0;; i++)
 			{
-				pStoreFrame->m_pfDistance.SetLength(pVertex.GetLength());
+				if (total_elapsed > frame_history)
+				{
+					// remove i + 1 and upwards
+					while (frames.GetLength() > i + 1)
+					{
+						int frame_index = frames.GetLength() - 1;
+						frames[frame_index]->time_to_live = timeGetTime() + FRAME_TTL;
+						unused_frames.Add(frames[frame_index]);
+						frames.Remove(frame_index);
+					}
+				}
+				if (!(i + 1 < frames.GetLength()))
+				{
+					if (unused_frames.GetLength() > 0)
+					{
+						frames.Insert(0, unused_frames[0]);
+						unused_frames.Remove(0);
+					}
+					else
+					{
+						frames.Insert(0, new Frame());
+					}
+					break;
+				}
+				total_elapsed += frames[i]->elapsed;
+			}
+			frames[0]->elapsed = 0;
+		}
+		frames[0]->elapsed += elapsed;
+		if (flags.test(F_DO_ROTATION_HISTORY))
+		{
+			frames[0]->roll = roll;
+			frames[0]->pitch = pitch;
+			frames[0]->yaw = yaw;
+		}
+		else
+		{
+			store_frame = frames[0];
+			store_frame->positions.SetLength(vertices.GetLength());
+			if (flags.test(F_DRAW_VERTEX_SPRITE_HISTORY))
+			{
+				store_frame->distances.SetLength(vertices.GetLength());
 			}
 		}
 	}
 
 	// calculate the target vertex format
-	if(nExposure > 0)
+	if (exposure > 0)
 	{
 		// build the state list
-		mpState.clear();
-		if(!m_bsFlag.test( F_DRAW_Z_BUFFER ))
+		state.clear();
+		if (!flags.test(F_DRAW_Z_BUFFER))
 		{
-			mpState[D3DRS_ZENABLE] = D3DZB_FALSE;
+			state[D3DRS_ZENABLE] = D3DZB_FALSE;
 		}
-		if( m_bsFlag.test( F_DRAW_TRANSPARENT ) )
+		if (flags.test(F_DRAW_TRANSPARENT))
 		{
-			mpState[D3DRS_DESTBLEND] = D3DBLEND_ONE;
-			mpState[D3DRS_ALPHABLENDENABLE] = TRUE;
+			state[D3DRS_DESTBLEND] = D3DBLEND_ONE;
+			state[D3DRS_ALPHABLENDENABLE] = TRUE;
 		}
-		if( m_bsFlag.test( F_NO_CULL ) )
+		if (flags.test(F_NO_CULL))
 		{
-			mpState[D3DRS_CULLMODE] = D3DCULL_NONE;
+			state[D3DRS_CULLMODE] = D3DCULL_NONE;
 		}
-		if(ppLight.GetLength() == 0 && !m_bsFlag.test( F_VALID_VERTEX_DIFFUSE ) && !m_bsFlag.test( F_VALID_VERTEX_SPECULAR ) )
+		if (lights.size() == 0 && !flags.test(F_VALID_VERTEX_DIFFUSE) && !flags.test(F_VALID_VERTEX_SPECULAR))
 		{
-			mpState[D3DRS_SHADEMODE] = D3DSHADE_FLAT;
+			state[D3DRS_SHADEMODE] = D3DSHADE_FLAT;
 		}
-		if(m_bsFlag.test( F_USE_SPECULAR ))
+		if (flags.test(F_USE_SPECULAR))
 		{
-			mpState[D3DRS_SPECULARENABLE] = TRUE;
+			state[D3DRS_SPECULARENABLE] = TRUE;
 		}
 	}
 
@@ -377,945 +410,1020 @@ void Actor::Calculate(Camera *pCamera, float fElapsed)
 //	pnClipped.SetLength(nExposure * pVertex.GetLength());
 //	pClippedEdge.SetLength(0);
 //	pClippedFace.SetLength(0);
-	pTransVertex.SetLength(0);
-//	pClippedVertex.SetLength(0);
-	bool bClipped = false;
+	transformed_vertices.SetLength(0);
+	//	pClippedVertex.SetLength(0);
+	bool clipped = false;
 
-//	ZTexturePosition pTex[8];
-	Vector3 vTransNormal;
-	ZArray<Vector3> pvPos;
-	float fAngle;
-	Vector3 vTransDirection;
-	ColorRgb cInitDiffuse(wcAmbientLight);
-	ColorRgb cInitSpecular(wcAmbientLight - ColorRgb(255, 255, 255));
+	//	ZTexturePosition pTex[8];
+	Vector3 trans_normal;
+	ZArray<Vector3> pos;
+	float angle;
+	Vector3 trans_direction;
+	ColorRgb init_diffuse(ambient_light_color);
+	ColorRgb init_specular(ambient_light_color - ColorRgb(255, 255, 255));
 
-	ZArray<ExposureData> pfExpBase;
-	ZArray<Matrix44> pmExposure;
-	for(int nExp = 0; nExp < nExposure; nExp++)
+	ZArray<ExposureData> exp_base;
+	ZArray<Matrix44> exposure_matrix;
+	for (int nExp = 0; nExp < exposure; nExp++)
 	{
-		if(nExp == 0)
+		if (nExp == 0)
 		{
-			ExposureData *pData = pfExpBase.AddEmptyPtr();
-			pData->m_fTime = 0;
-			pData->m_nFrame = 0;
-			pData->m_fPos = 0;
+			ExposureData* pData = exp_base.AddEmptyPtr();
+			pData->time = 0;
+			pData->frame = 0;
+			pData->pos = 0;
 		}
 		else
 		{
-			float fTime = nExp * (fFrameHistory - fDelayHistory) / (nExposure - 1);
+			float fTime = nExp * (frame_history - delay_history) / (exposure - 1);
 			float fTotalElapsed = 0;
 			int k;
-			for(k = 0; ; k++)
+			for (k = 0; ; k++)
 			{
-				if(!(k + 1 < ppFrame.GetLength())) break;
-				float fNextElapsed = fTotalElapsed + ppFrame[k]->m_fElapsed;
-				if(fNextElapsed > fTime)
+				if (!(k + 1 < frames.GetLength())) break;
+				float fNextElapsed = fTotalElapsed + frames[k]->elapsed;
+				if (fNextElapsed > fTime)
 				{
-					ExposureData *pData = pfExpBase.AddEmptyPtr();
-					pData->m_fTime = fTime;
-					pData->m_nFrame = k;
-					pData->m_fPos = (pData->m_fTime - fTotalElapsed) / ppFrame[k]->m_fElapsed;
-					if(m_bsFlag.test( F_DO_ROTATION_HISTORY ) )
+					ExposureData* pData = exp_base.AddEmptyPtr();
+					pData->time = fTime;
+					pData->frame = k;
+					pData->pos = (pData->time - fTotalElapsed) / frames[k]->elapsed;
+					if (flags.test(F_DO_ROTATION_HISTORY))
 					{
-						float fThisYaw = (ppFrame[k]->m_fYaw * (1 - pData->m_fPos)) + (ppFrame[k + 1]->m_fYaw * pData->m_fPos);
-						float fThisPitch = (ppFrame[k]->m_fPitch * (1 - pData->m_fPos)) + (ppFrame[k + 1]->m_fPitch * pData->m_fPos);
-						float fThisRoll = (ppFrame[k]->m_fRoll * (1 - pData->m_fPos)) + (ppFrame[k + 1]->m_fRoll * pData->m_fPos);
-						pData->mTransform = Matrix44::Rotate(fThisYaw, fThisPitch, fThisRoll) * Matrix44::Translate(vPosition) * pCamera->GetTransform();
+						float fThisYaw = (frames[k]->yaw * (1 - pData->pos)) + (frames[k + 1]->yaw * pData->pos);
+						float fThisPitch = (frames[k]->pitch * (1 - pData->pos)) + (frames[k + 1]->pitch * pData->pos);
+						float fThisRoll = (frames[k]->roll * (1 - pData->pos)) + (frames[k + 1]->roll * pData->pos);
+						pData->transform = Matrix44::Rotate(fThisYaw, fThisPitch, fThisRoll) * Matrix44::Translate(position) * camera->GetTransform();
 					}
 					break;
 				}
 				fTotalElapsed = fNextElapsed;
 			}
-			if(!(k + 1 < ppFrame.GetLength())) break;
+			if (!(k + 1 < frames.GetLength())) break;
 		}
 	}
 
-	if(pVertex.GetLength() == 0) return;
+	if (vertices.GetLength() == 0) return;
 
-	int nMaxHistoryLength = nMaxVertices / (4 * pVertex.GetLength());
+	int max_history_length = MAX_VERTICES / (4 * vertices.GetLength());
 
 	// transform
-	for(i = 0; i < pVertex.GetLength(); i++)
+	for (i = 0; i < vertices.GetLength(); i++)
 	{
-		VertexTL *pVert = pTransVertex.AddEmptyPtr();
-		if(m_bsFlag.test( F_NO_TRANSFORM ) ) pVert->position = pVertex[i].position;
-		else pVert->position = pVertex[i].position * mTransform;
+		VertexTL* pVert = transformed_vertices.AddEmptyPtr();
+		if (flags.test(F_NO_TRANSFORM)) pVert->position = vertices[i].position;
+		else pVert->position = vertices[i].position * mTransform;
 
-		if(pStoreFrame) pStoreFrame->m_pvPosition[i] = pVert->position;
+		if (store_frame) store_frame->positions[i] = pVert->position;
 	}
 
-	if(nExposure == 0) return;
+	if (exposure == 0) return;
 
 	// light
-	if(ppLight.GetLength() > 0)
+	if (lights.size() > 0)
 	{
-		for(i = 0; i < pVertex.GetLength(); i++)
+		for (i = 0; i < vertices.GetLength(); i++)
 		{
-			WideColorRgb wcLight = wcAmbientLight;
-			for(j = 0; j < ppLight.GetLength(); j++)
+			WideColorRgb wcLight = ambient_light_color;
+			for (const Light& light : lights)
 			{
-				switch(ppLight[j]->m_nType)
+				switch (light.type)
 				{
-				case Light::T_DIRECTIONAL:
-					vTransDirection = (ppLight[j]->m_vDirection * (Matrix44::Rotate(-fPitch, -fYaw) * Matrix44::RotateAroundZ(-fRoll))).Normal();
-					fAngle = 4.0f * pVertex[i].normal.Dot(vTransDirection);
-					if(fAngle > 0) wcLight += ppLight[j]->m_cColour * fAngle;
+				case LightType::Directional:
+					trans_direction = (light.direction * (Matrix44::Rotate(-pitch, -yaw) * Matrix44::RotateAroundZ(-roll))).Normal();
+					angle = 4.0f * vertices[i].normal.Dot(trans_direction);
+					if (angle > 0)
+					{
+						wcLight += light.color * angle;
+					}
 					break;
-				case Light::T_POINT:
-					Vector3 vDirection = ppLight[j]->m_vPosition - pTransVertex[i].position;
-					fAngle = vDirection.Dot(pVertex[i].normal);
-					if(fAngle > 0)
+				case LightType::Point:
+					Vector3 vDirection = light.position - transformed_vertices[i].position;
+					angle = vDirection.Dot(vertices[i].normal);
+					if (angle > 0)
 					{
 						float fDistance = vDirection.Length();
-						if(ppLight[j]->m_bAttenuate) fAngle *= ppLight[j]->m_fAttenuate / (fDistance * fDistance);
-						else fAngle /= fDistance;
-						wcLight += ppLight[j]->m_cColour * fAngle;
+						if (light.attenuate)
+						{
+							angle *= light.attenuation_factor / (fDistance * fDistance);
+						}
+						else
+						{
+							angle /= fDistance;
+						}
+						wcLight += light.color * angle;
 					}
 					break;
 				}
 			}
-			pTransVertex[i].diffuse = wcLight;
-			pTransVertex[i].specular = wcLight - ColorRgb(255, 255, 255);
+			transformed_vertices[i].diffuse = wcLight;
+			transformed_vertices[i].specular = wcLight - ColorRgb(255, 255, 255);
 		}
 	}
 	else
 	{
-		for(i = 0; i < pVertex.GetLength(); i++)
+		for (i = 0; i < vertices.GetLength(); i++)
 		{
-			pTransVertex[i].diffuse = cInitDiffuse;
-			pTransVertex[i].specular = cInitSpecular;
+			transformed_vertices[i].diffuse = init_diffuse;
+			transformed_vertices[i].specular = init_specular;
 		}
 	}
-	if(m_bsFlag.test( F_VALID_VERTEX_DIFFUSE ) ) 
+	if (flags.test(F_VALID_VERTEX_DIFFUSE))
 	{
-		for(i = 0; i < pVertex.GetLength(); i++)
+		for (i = 0; i < vertices.GetLength(); i++)
 		{
-			pTransVertex[i].diffuse.r = (uint8)(pTransVertex[i].diffuse.r * pVertex[i].diffuse.r / 255.0f);
-			pTransVertex[i].diffuse.g = (uint8)(pTransVertex[i].diffuse.g * pVertex[i].diffuse.g / 255.0f);
-			pTransVertex[i].diffuse.b = (uint8)(pTransVertex[i].diffuse.b * pVertex[i].diffuse.b / 255.0f);
+			transformed_vertices[i].diffuse.r = (uint8)(transformed_vertices[i].diffuse.r * vertices[i].diffuse.r / 255.0f);
+			transformed_vertices[i].diffuse.g = (uint8)(transformed_vertices[i].diffuse.g * vertices[i].diffuse.g / 255.0f);
+			transformed_vertices[i].diffuse.b = (uint8)(transformed_vertices[i].diffuse.b * vertices[i].diffuse.b / 255.0f);
 		}
 	}
-	if(m_bsFlag.test( F_VALID_VERTEX_SPECULAR ) )
+	if (flags.test(F_VALID_VERTEX_SPECULAR))
 	{
-		for(i = 0; i < pVertex.GetLength(); i++)
+		for (i = 0; i < vertices.GetLength(); i++)
 		{
-			pTransVertex[i].specular = pTransVertex[i].specular + pVertex[i].specular;
+			transformed_vertices[i].specular = transformed_vertices[i].specular + vertices[i].specular;
 		}
 	}
-		
+
 	// texture
-	for(j = 0; j < ppUseTexture.GetLength(); j++)
+	for (j = 0; j < use_textures.GetLength(); j++)
 	{
-		if(ppUseTexture[j]->m_nType == TextureEntry::T_USER)
+		if (use_textures[j]->type == TextureType::Normal)
 		{
-			for(i = 0; i < pVertex.GetLength(); i++)
+			for (i = 0; i < vertices.GetLength(); i++)
 			{
-				pTransVertex[i].tex_coord[j] = pVertex[i].tex_coord[j];
+				transformed_vertices[i].tex_coords[j] = vertices[i].tex_coord[j];
 			}
 		}
 		else
 		{
-			for(i = 0; i < pVertex.GetLength(); i++)
+			for (i = 0; i < vertices.GetLength(); i++)
 			{
-				vTransNormal = pVertex[i].normal * ppUseTexture[j]->m_mRotation;
-				pTransVertex[i].tex_coord[j].x = (vTransNormal.x * 1.0f) + 0.5f;
-				pTransVertex[i].tex_coord[j].y = (vTransNormal.y * 1.0f) + 0.5f;
+				trans_normal = vertices[i].normal * use_textures[j]->rotation;
+				transformed_vertices[i].tex_coords[j].x = (trans_normal.x * 1.0f) + 0.5f;
+				transformed_vertices[i].tex_coords[j].y = (trans_normal.y * 1.0f) + 0.5f;
 			}
 		}
 	}
 
-	if(!m_bsFlag.test( F_DRAW_VERTEX_SPRITE_HISTORY ) )
+	if (!flags.test(F_DRAW_VERTEX_SPRITE_HISTORY))
 	{
-		VertexTL *pExposureVx = pTransVertex.GetBuffer(pVertex.GetLength() * pfExpBase.GetLength());
-		for(int nExp = 0;;)
+		VertexTL* exposure_vertex = transformed_vertices.GetBuffer(vertices.GetLength() * exp_base.GetLength());
+		for (int exp = 0;;)
 		{
-			if(m_bsFlag.test(F_DO_POSITION_DELAY))
+			if (flags.test(F_DO_POSITION_DELAY))
 			{
-				for(int i = 0; i < pVertex.GetLength(); i++)
+				for (int i = 0; i < vertices.GetLength(); i++)
 				{
-					pExposureVx[i].position = GetDelayedPosition(i, &pfExpBase[nExp]);
+					exposure_vertex[i].position = GetDelayedPosition(i, &exp_base[exp]);
 				}
 			}
 
-			nExp++;
-			if(!(nExp < pfExpBase.GetLength())) break;
-
-			VertexTL *pNewExposureVx = pExposureVx + pVertex.GetLength();
-			for(i = 0; i < pVertex.GetLength(); i++)
+			exp++;
+			if (!(exp < exp_base.GetLength()))
 			{
-				pNewExposureVx[i].diffuse = pExposureVx[i].diffuse + wcExposureLightChange; 
-				pNewExposureVx[i].specular = pExposureVx[i].specular + wcExposureLightChange; 
-				pNewExposureVx[i].tex_coord[0] = pExposureVx[i].tex_coord[0];
+				break;
 			}
 
-			if(!m_bsFlag.test(F_DO_ROTATION_HISTORY))
+			VertexTL* new_exposure_vertex = exposure_vertex + vertices.GetLength();
+			for (i = 0; i < vertices.GetLength(); i++)
 			{
-				for(i = 0; i < pVertex.GetLength(); i++)
+				new_exposure_vertex[i].diffuse = exposure_vertex[i].diffuse + exposure_light_delta;
+				new_exposure_vertex[i].specular = exposure_vertex[i].specular + exposure_light_delta;
+				new_exposure_vertex[i].tex_coords[0] = exposure_vertex[i].tex_coords[0];
+			}
+
+			if (!flags.test(F_DO_ROTATION_HISTORY))
+			{
+				for (i = 0; i < vertices.GetLength(); i++)
 				{
-					pNewExposureVx[i].position = (ppFrame[pfExpBase[nExp].m_nFrame]->m_pvPosition[i] * (1 - pfExpBase[nExp].m_fPos)) + (ppFrame[pfExpBase[nExp].m_nFrame + 1]->m_pvPosition[i] * pfExpBase[nExp].m_fPos);
+					new_exposure_vertex[i].position = (frames[exp_base[exp].frame]->positions[i] * (1 - exp_base[exp].pos)) + (frames[exp_base[exp].frame + 1]->positions[i] * exp_base[exp].pos);
 				}
 			}
 			else
 			{
-				for(i = 0; i < pVertex.GetLength(); i++)
+				for (i = 0; i < vertices.GetLength(); i++)
 				{
-					pNewExposureVx[i].position = pVertex[i].position * pfExpBase[nExp].mTransform;
+					new_exposure_vertex[i].position = vertices[i].position * exp_base[exp].transform;
 				}
 			}
 
-			pExposureVx = pNewExposureVx;
+			exposure_vertex = new_exposure_vertex;
 		}
 	}
-	else if(ppFrame.GetLength() > 1)
+	else if (frames.GetLength() > 1)
 	{
-		_ASSERT(nExposure == 1);
-		pTransVertex.SetLength(0);
+		_ASSERT(exposure == 1);
+		transformed_vertices.SetLength(0);
 
-		for(int i = 0; i < pVertex.GetLength(); i++)
+		for (int i = 0; i < vertices.GetLength(); i++)
 		{
-			ppFrame[0]->m_pfDistance[i] = (ppFrame[1]->m_pvPosition[i] - ppFrame[0]->m_pvPosition[i]).Length();
+			frames[0]->distances[i] = (frames[1]->positions[i] - frames[0]->positions[i]).Length();
 
-			ColorRgb cDiffuse = cInitDiffuse;
-			ColorRgb cSpecular = cInitSpecular;
+			ColorRgb diffuse = init_diffuse;
+			ColorRgb specular = init_specular;
 
-			int nFrames = 0;
-			float fPosition = 0;
-			int nLength = 0;
-			for(int j = 0; j < ppFrame.GetLength() - 1; j++)
+			int num_frames = 0;
+			float position = 0;
+			int length = 0;
+			for (int j = 0; j < frames.GetLength() - 1; j++)
 			{
-				if(ppFrame[j]->m_pfDistance[i] > 0)
+				if (frames[j]->distances[i] > 0)
 				{
-					for(; fPosition < ppFrame[j]->m_pfDistance[i]; fPosition += fSpriteHistoryLength)
+					for (; position < frames[j]->distances[i]; position += sprite_history_length)
 					{
-						float fMult = fPosition / ppFrame[j]->m_pfDistance[i];
-						Vector3 vPos = (ppFrame[j]->m_pvPosition[i] * (1 - fMult)) + (ppFrame[j+1]->m_pvPosition[i] * fMult);
+						float fMult = position / frames[j]->distances[i];
+						Vector3 vPos = (frames[j]->positions[i] * (1 - fMult)) + (frames[j + 1]->positions[i] * fMult);
 
-						VertexTL *pVert = pTransVertex.AddEmptyPtr();
+						VertexTL* pVert = transformed_vertices.AddEmptyPtr();
 						pVert->position = vPos;
-						pVert->diffuse = cDiffuse;
-						pVert->specular = cSpecular;
-						pVert->tex_coord[0] = Point<float>(pSpriteTexU[0],pSpriteTexV[0]);//pSpriteTex[0];//pvSprite[0];
+						pVert->diffuse = diffuse;
+						pVert->specular = specular;
+						pVert->tex_coords[0] = sprite_tex_coords[0];
 
-//						AddSprite(pCamera, vPos, cDiffuse, cSpecular, pvSprite);
-						cDiffuse = cDiffuse + wcExposureLightChange;
-						cSpecular = cSpecular + wcExposureLightChange;
-						nLength++;
-						if(nLength > nMaxHistoryLength) break;
+						//						AddSprite(pCamera, vPos, cDiffuse, cSpecular, pvSprite);
+						diffuse = diffuse + exposure_light_delta;
+						specular = specular + exposure_light_delta;
+						length++;
+						if (length > max_history_length) break;
 					}
-					fPosition -= ppFrame[j]->m_pfDistance[i];
+					position -= frames[j]->distances[i];
 				}
-				if(nLength > nMaxHistoryLength) break;
+				if (length > max_history_length) break;
 			}
 		}
 	}
 
 	// projection stuff
-//	float fScreenX, fScreenY, fScale;
-	float fMultZ = 1 / m_fClipMaxZ;
-	if(pCamera->flags.test( Camera::F_SCREEN_TRANSFORM ) ) //Property(ZCamera::DoScreenTransform))
+	float mult_z = 1 / clip_max_z;
+	if (camera->flags.test(Camera::F_SCREEN_TRANSFORM))
 	{
-		pCamera->screen_x = (g_pD3D->GetWidth() / 2.0f) - 0.25f;
-		pCamera->screen_y = (g_pD3D->GetHeight() / 2.0f) - 0.25f;
-		pCamera->scale = std::min(g_pD3D->GetWidth() / 640.0f, g_pD3D->GetHeight() / 480.0f) * pCamera->perspective;
+		camera->screen_x = (g_pD3D->GetWidth() / 2.0f) - 0.25f;
+		camera->screen_y = (g_pD3D->GetHeight() / 2.0f) - 0.25f;
+		camera->scale = std::min(g_pD3D->GetWidth() / 640.0f, g_pD3D->GetHeight() / 480.0f) * camera->perspective;
 	}
 	else
 	{
-		pCamera->screen_x = 0;
-		pCamera->screen_y = 0;
-		pCamera->scale = pCamera->perspective;
+		camera->screen_x = 0;
+		camera->screen_y = 0;
+		camera->scale = camera->perspective;
 	}
 
-	pnEmptyVertex.Empty(); // can continue to use after first clip
+	clipped_faces.Empty();
 
-	ZArray<Face> pFaceBuffer;
-
-	if(m_bsFlag.test(F_DRAW_VERTEX_SPRITES))
+	if (flags.test(F_DRAW_VERTEX_SPRITES))
 	{
-		ZArray<VertexTL> pVertexBuffer;
-		pVertexBuffer.SetLength(0);
-//		(*ppVertexBuffer).SetLength(p.GetLength() * 4);
+		// Make a copy of the transformed vertices, and clear the array. The new sprite vertices will be written into it.
+		ZArray<VertexTL> input_vertices = transformed_vertices;
 
-		pFaceBuffer.SetLength(pVertexBuffer.GetLength() * 2);
+		// Resize the output buffers
+		clipped_faces.SetLength(input_vertices.GetLength() * 2);
+		transformed_vertices.SetLength(input_vertices.GetLength() * 4);
 
-		int nVertex = 0;
-		VertexTL *pVert = pTransVertex.GetBuffer();
-		for(i = 0; i < pTransVertex.GetLength(); i++)
+		// Generate sprites for each input vertex
+		int output_face_idx = 0;
+		int output_vertex_idx = 0;
+
+		float offsets_x[4] = { -sprite_size, +sprite_size, +sprite_size, -sprite_size };
+		float offsets_y[4] = { -sprite_size, -sprite_size, +sprite_size, +sprite_size };
+
+		for (int i = 0; i < input_vertices.GetLength(); i++)
 		{
-			VertexTL &v = pTransVertex[i];
-			pFaceBuffer.Add(Face(nVertex + 0, nVertex + 1, nVertex + 2));
-			pFaceBuffer.Add(Face(nVertex + 2, nVertex + 3, nVertex + 0));
+			const VertexTL& input_vertex = input_vertices[i];
 
-			float fRHW = 1.0f / v.position.z;
-			float fZ = v.position.z * fMultZ;
-			float fMult = pCamera->scale * fRHW;
-			VertexTL *pVert = pVertexBuffer.AddEmptyPtr(4);
-			for(int j = 0; j < 4; j++)
+			// Create two triangles
+			clipped_faces[output_face_idx++].Set(output_vertex_idx + 0, output_vertex_idx + 1, output_vertex_idx + 2);
+			clipped_faces[output_face_idx++].Set(output_vertex_idx + 2, output_vertex_idx + 3, output_vertex_idx + 0);
+
+			// Create four vertices
+			float fRHW = 1.0f / input_vertex.position.z;
+			float fZ = input_vertex.position.z * mult_z;
+			float fMult = camera->scale * fRHW;
+
+			for (int j = 0; j < 4; j++)
 			{
-				pVert->position.x = ((v.position.x + pvSprite[j].x) * fMult) + pCamera->screen_x;
-				pVert->position.y = ((v.position.y + pvSprite[j].y) * fMult) + pCamera->screen_y;
-				pVert->position.z = fZ;
-				pVert->rhw = fRHW;
-				pVert->diffuse = v.diffuse;
-				pVert->specular = v.specular;
-				pVert->tex_coord[0] = Point<float>(pSpriteTexU[j], pSpriteTexV[j] );
-				pVert++;
+				VertexTL& output_vertex = transformed_vertices[output_vertex_idx++];
+				output_vertex.position.x = ((input_vertex.position.x + offsets_x[j]) * fMult) + camera->screen_x;
+				output_vertex.position.y = ((input_vertex.position.y + offsets_y[j]) * fMult) + camera->screen_y;
+				output_vertex.position.z = fZ;
+				output_vertex.rhw = fRHW;
+				output_vertex.diffuse = input_vertex.diffuse;
+				output_vertex.specular = input_vertex.specular;
+				output_vertex.tex_coords[0] = sprite_tex_coords[j];
 			}
-
-			nVertex += 4;
 		}
-		pVertexBuffer.SwapBuffer(pTransVertex);
 	}
 	else
 	{
-		if(pfExpBase.GetLength() <= 1)
+		if (exp_base.GetLength() <= 1)
 		{
-			Clip(pFace, pFaceBuffer, wClipMask & (CLIP_FLAG_MIN_Z | CLIP_FLAG_MAX_Z));
+			clipped_faces = faces;
+			Clip(clipped_faces, clip_mask & (CLIP_PLANE_MIN_Z | CLIP_FLAG_MAX_Z));
 		}
 		else
 		{
-			ZArray<Face> pfExposureBuffer;
-
-			int nOfs = 0;
-			for(int j = 0; j < pfExpBase.GetLength(); j++)
+			int ofs = 0;
+			for (int j = 0; j < exp_base.GetLength(); j++)
 			{
-				Face *pExpFace = pfExposureBuffer.AddEmptyPtr(pFace.GetLength());
-				for(int i = 0; i < pFace.GetLength(); i++)
+				Face* pExpFace = clipped_faces.AddEmptyPtr(faces.GetLength());
+				for (int i = 0; i < faces.GetLength(); i++)
 				{
-					pExpFace[i][0] = pFace[i][0] + nOfs;
-					pExpFace[i][1] = pFace[i][1] + nOfs;
-					pExpFace[i][2] = pFace[i][2] + nOfs;
+					pExpFace[i][0] = faces[i][0] + ofs;
+					pExpFace[i][1] = faces[i][1] + ofs;
+					pExpFace[i][2] = faces[i][2] + ofs;
 				}
-				nOfs += pVertex.GetLength();
+				ofs += vertices.GetLength();
 			}
 
-			if(m_bsFlag.test(F_DO_MIX_EXPOSURE_FACES))
+			if (flags.test(F_DO_MIX_EXPOSURE_FACES))
 			{
-				ZArray<int> pnLookup;
-				pnLookup.SetLength(pTransVertex.GetLength());
-				for(int i = 0; i < pTransVertex.GetLength(); i++)
+				ZArray<int> lookup;
+				lookup.SetLength(transformed_vertices.GetLength());
+
+				for (int i = 0; i < transformed_vertices.GetLength(); i++)
 				{
-					uint16 wVertex = i % pVertex.GetLength();
-					uint16 wExposure = i / pVertex.GetLength();
-					int nOldIndex = (wVertex * pfExpBase.GetLength()) + wExposure;
-					pnLookup[nOldIndex] = i;
+					uint16 vertex = i % vertices.GetLength();
+					uint16 exposure = i / vertices.GetLength();
+					int old_index = (vertex * exp_base.GetLength()) + exposure;
+					lookup[old_index] = i;
 				}
-				int nOfs = 0;
-				for(int i = 0; i < pfExposureBuffer.GetLength(); i++)
+
+				for (int i = 0; i < clipped_faces.GetLength(); i++)
 				{
-					for(int j = 0; j < 3; j++)
+					for (int j = 0; j < 3; j++)
 					{
-						uint16 &wv = pfExposureBuffer[i][j];
-						wv = pnLookup[wv];
+						uint16& wv = clipped_faces[i][j];
+						wv = lookup[wv];
 					}
 				}
 			}
 
-			Clip(pfExposureBuffer, pFaceBuffer, wClipMask & (CLIP_FLAG_MIN_Z | CLIP_FLAG_MAX_Z));
+			Clip(clipped_faces, clip_mask & (CLIP_PLANE_MIN_Z | CLIP_FLAG_MAX_Z));
 		}
 
-		// to the camera transform
-//		float fMultZ = 1 / fClipMaxZ;
-		for(i = 0; i < pTransVertex.GetLength(); i++)
+		// Do the camera transform
+		for (i = 0; i < transformed_vertices.GetLength(); i++)
 		{
-			Vector3 &v = pTransVertex[i].position;
+			Vector3& v = transformed_vertices[i].position;
 
-			pTransVertex[i].rhw = 1 / v.z;
+			transformed_vertices[i].rhw = 1 / v.z;
 
-			float fMult = pCamera->scale * pTransVertex[i].rhw;
-			v.x = (v.x * fMult) + pCamera->screen_x;
-			v.y = (v.y * fMult) + pCamera->screen_y;
-			v.z = v.z * fMultZ;
+			float mult = camera->scale * transformed_vertices[i].rhw;
+			v.x = (v.x * mult) + camera->screen_x;
+			v.y = (v.y * mult) + camera->screen_y;
+			v.z = v.z * mult_z;
 		}
 	}
 
-	pClippedFace = pFaceBuffer;
-	// clip to the screen
-	Clip(pFaceBuffer, pClippedFace, wClipMask & ~(CLIP_FLAG_MIN_Z | CLIP_FLAG_MAX_Z));
+	// Clip to the screen boundaries
+	Clip(clipped_faces, clip_mask & ~(CLIP_PLANE_MIN_Z | CLIP_FLAG_MAX_Z));
 
-	m_bsFlag.set(F_VALID_TRANSFORMED_DATA);
+	flags.set(F_VALID_TRANSFORMED_DATA);
 }
 
-#define CLIP_PLANES 6
-
-bool Actor::IsClipRequired(const Face& f, uint16 plane_mask)
+Error* Actor::Render()
 {
-	for (int j = 0;; j++)
-	{
-		if (j >= 3) return false;
-		else if (pClip[f[j]].wClip & plane_mask) return true;
-	}
-}
-uint16 Actor::GetClipFlag(uint16 wClipMask, Vector3& v)
-{
-	uint16 wClip = 0;
-	if (wClipMask & CLIP_FLAG_MIN_X && v.x < m_fClipMinX) wClip |= CLIP_FLAG_MIN_X;
-	if (wClipMask & CLIP_FLAG_MAX_X && v.x > m_fClipMaxX) wClip |= CLIP_FLAG_MAX_X;
-
-	if (wClipMask & CLIP_FLAG_MIN_Y && v.y < m_fClipMinY) wClip |= CLIP_FLAG_MIN_Y;
-	if (wClipMask & CLIP_FLAG_MAX_Y && v.y > m_fClipMaxY) wClip |= CLIP_FLAG_MAX_Y;
-
-	if (wClipMask & CLIP_FLAG_MIN_Z && v.z < m_fClipMinZ) wClip |= CLIP_FLAG_MIN_Z;
-	if (wClipMask & CLIP_FLAG_MAX_Z && v.z > m_fClipMaxZ) wClip |= CLIP_FLAG_MAX_Z;
-	return wClip;
-}
-//WORD wClipRequired;
-int Actor::GetClippedIndex(Face* pf, int nIn, int nOut, uint16 wPlaneFlag, uint16 wClipRequired)
-{
-	ClipInfo* pci = &pClip[(*pf)[nIn]];
-	VertexTL& vIn = (pci->wClip != 0) ? pvOut[pci->wIndex] : pTransVertex[pci->wIndex];
-	VertexTL& vOut = pvOut[pClip[(*pf)[nOut]].wIndex];
-	//	ZVertexTL &vIn = pTransVertex[pClip[pf->v[nIn]].wIndex];
-	//	ZVertexTL &vOut = pvOut[pClip[pf->v[nOut]].wIndex];
-
-	float fPos;
-	switch (wPlaneFlag)
-	{
-	case CLIP_FLAG_MIN_X:
-		fPos = (vIn.position.x - m_fClipMinX) / (vIn.position.x - vOut.position.x);
-		break;
-	case CLIP_FLAG_MAX_X:
-		fPos = (m_fClipMaxX - vIn.position.x) / (vOut.position.x - vIn.position.x);
-		break;
-	case CLIP_FLAG_MIN_Y:
-		fPos = (vIn.position.y - m_fClipMinY) / (vIn.position.y - vOut.position.y);
-		break;
-	case CLIP_FLAG_MAX_Y:
-		fPos = (m_fClipMaxY - vIn.position.y) / (vOut.position.y - vIn.position.y);
-		break;
-	case CLIP_FLAG_MIN_Z:
-		fPos = (vIn.position.z - m_fClipMinZ) / (vIn.position.z - vOut.position.z);
-		break;
-	case CLIP_FLAG_MAX_Z:
-		fPos = (m_fClipMaxZ - vIn.position.z) / (vOut.position.z - vIn.position.z);
-		break;
-	default:
-		__assume(0);
-		break;
-	}
-
-	Vector3 vPos = (vIn.position * (1 - fPos)) + (vOut.position * fPos);
-
-	int nVertex;
-	VertexTL* pNewVertex;
-
-	uint16 wClip = GetClipFlag(wClipRequired & (wPlaneFlag - 1), vPos);
-	if (wClip == 0)
-	{
-		int nLength = pnEmptyVertex.GetLength();
-		if (nLength > 0)
-		{
-			nVertex = pnEmptyVertex[nLength - 1];
-			pnEmptyVertex.SetLength(nLength - 1);
-		}
-		else
-		{
-			nVertex = pTransVertex.AddEmpty();
-		}
-		pNewVertex = &pTransVertex[nVertex];
-	}
-	else
-	{
-		nVertex = pvOut.AddEmpty();
-		pNewVertex = &pvOut[nVertex];
-	}
-
-	int nIndex = pClip.AddEmpty();
-	pClip[nIndex].wIndex = nVertex;
-	pClip[nIndex].wClip = wClip;
-
-	pNewVertex->position = vPos;
-	pNewVertex->diffuse = (vIn.diffuse * (1 - fPos)) + (vOut.diffuse * fPos);
-	pNewVertex->specular = (vIn.specular * (1 - fPos)) + (vOut.specular * fPos);
-
-	if (wPlaneFlag & ~(CLIP_FLAG_MAX_Z | CLIP_FLAG_MIN_Z))
-	{
-		// work out texture position with texture perspective
-		pNewVertex->rhw = (vIn.rhw * (1 - fPos)) + (vOut.rhw * fPos);
-		pNewVertex->tex_coord[0].x = ((vIn.tex_coord[0].x * vIn.rhw * (1 - fPos)) + (vOut.tex_coord[0].x * vOut.rhw * fPos)) / pNewVertex->rhw;
-		pNewVertex->tex_coord[0].y = ((vIn.tex_coord[0].y * vIn.rhw * (1 - fPos)) + (vOut.tex_coord[0].y * vOut.rhw * fPos)) / pNewVertex->rhw;
-	}
-	else
-	{
-		pNewVertex->tex_coord[0].x = (vIn.tex_coord[0].x * (1 - fPos)) + (vOut.tex_coord[0].x * fPos);
-		pNewVertex->tex_coord[0].y = (vIn.tex_coord[0].y * (1 - fPos)) + (vOut.tex_coord[0].y * fPos);
-	}
-	return nIndex;
-}
-void Actor::AddClippedFace(Face& fNew, uint16 wPlaneMask, ZArray<Face>& pfDst)
-{
-	if (IsClipRequired(fNew, wPlaneMask))
-	{
-		int nLength = pnEmptyFace.GetLength();
-		if (nLength > 0)
-		{
-			int nIndex = pnEmptyFace[nLength - 1];
-			pnEmptyFace.SetLength(nLength - 1);
-			pfOut[nIndex] = fNew;
-		}
-		else
-		{
-			pfOut.Add(fNew);
-		}
-	}
-	else
-	{
-		pfDst.Add(fNew);
-	}
-}
-void Actor::Clip(ZArray<Face>& pfSrc, ZArray<Face>& pfDst, uint16 wClipMask)
-{
-	pfDst.Empty();
-	pvOut.Empty();
-
-	pfOut.Empty();
-	pnEmptyFace.Empty();
-
-	pClip.SetLength(pTransVertex.GetLength());
-	uint16 wClipRequired = 0;
-
-	// -0.25
-	// pD3D->dwWidth - 0.25
-
-	if (!wClipMask)
-	{
-		pfDst = pfSrc;
-		return;
-	}
-
-	if (!m_bsFlag.test(F_VALID_CLIP_PLANES))
-	{
-		m_fClipMinX = std::min(-0.25f, g_pD3D->g_Caps.GuardBandLeft);
-		m_fClipMaxX = std::max(g_pD3D->GetWidth() - 0.25f, g_pD3D->g_Caps.GuardBandRight);
-		m_fClipMinY = std::min(-0.25f, g_pD3D->g_Caps.GuardBandTop);
-		m_fClipMaxY = std::max(g_pD3D->GetHeight() - 0.25f, g_pD3D->g_Caps.GuardBandBottom);
-		m_fClipMinZ = 0.001f;
-		m_fClipMaxZ = 1500.0f;
-	}
-
-	for (int i = 0; i < pTransVertex.GetLength(); i++)
-	{
-		pClip[i].wClip = GetClipFlag(wClipMask, pTransVertex[i].position);
-		if (pClip[i].wClip != 0)
-		{
-			pClip[i].wIndex = (uint16)pvOut.Add(pTransVertex[i]);
-			pnEmptyVertex.Add(i);
-		}
-		else
-		{
-			pClip[i].wIndex = i;
-		}
-		wClipRequired |= pClip[i].wClip;
-	}
-
-	for (int i = 0; i < pfSrc.GetLength(); i++)
-	{
-		for (int j = 0;; j++)
-		{
-			if (j >= 3)
-			{
-				pfDst.Add(pfSrc[i]);
-				break;
-			}
-			else if (pClip[pfSrc[i][j]].wClip != 0)
-			{
-				pfOut.Add(pfSrc[i]);
-				break;
-			}
-		}
-	}
-
-	int nFirstClip = pfDst.GetLength();
-
-	Face fNew;
-	uint16 pwIndex[3];
-	bool pbOut[3];
-	for (int nPlane = CLIP_PLANES - 1; nPlane >= 0; nPlane--)
-	{
-		uint16 wPlaneFlag = (uint16)CLIP_FLAG(nPlane);
-		if (!(wClipRequired & wPlaneFlag)) continue;
-
-		for (int nFace = pfOut.GetLength() - 1; nFace >= 0; nFace--)
-		{
-			Face* pf = &pfOut[nFace];
-			if ((*pf)[0] == WORD_INVALID_INDEX) continue;
-
-			int nOut = 0;
-			for (int k = 0; k < 3; k++)
-			{
-				pwIndex[k] = k;
-				pbOut[k] = (pClip[(*pf)[k]].wClip & wPlaneFlag) != 0;
-				if (pbOut[k]) nOut++;
-			}
-
-			if (nOut == 0) continue;
-
-			if (nOut != 3)
-			{
-				// make sure that no realloc is required (changes pointers)
-				pTransVertex.MakeExtraSpace(100);
-				pvOut.MakeExtraSpace(100);
-				pfOut.MakeExtraSpace(100);
-
-				pf = &pfOut[nFace];
-
-				if (nOut == 1)
-				{
-					// 0 = out, 1, 2 = in
-					if (pbOut[1]) std::swap(pwIndex[0], pwIndex[1]);
-					else if (pbOut[2]) std::swap(pwIndex[0], pwIndex[2]);
-
-					fNew = *pf;
-					fNew[pwIndex[0]] = GetClippedIndex(pf, pwIndex[1], pwIndex[0], wPlaneFlag, wClipRequired);
-					AddClippedFace(fNew, wPlaneFlag - 1, pfDst);
-
-					fNew[pwIndex[1]] = fNew[pwIndex[0]];
-					fNew[pwIndex[0]] = GetClippedIndex(pf, pwIndex[2], pwIndex[0], wPlaneFlag, wClipRequired);
-					AddClippedFace(fNew, wPlaneFlag - 1, pfDst);
-				}
-				else // if(nOut == 2)
-				{
-					// 0 = in, 1, 2 = out
-					if (!pbOut[1]) std::swap(pwIndex[0], pwIndex[1]);
-					else if (!pbOut[2]) std::swap(pwIndex[0], pwIndex[2]);
-
-					fNew[pwIndex[0]] = (*pf)[pwIndex[0]];
-					fNew[pwIndex[1]] = GetClippedIndex(pf, pwIndex[0], pwIndex[1], wPlaneFlag, wClipRequired);
-					fNew[pwIndex[2]] = GetClippedIndex(pf, pwIndex[0], pwIndex[2], wPlaneFlag, wClipRequired);
-					AddClippedFace(fNew, wPlaneFlag - 1, pfDst);
-				}
-			}
-			(*pf)[0] = WORD_INVALID_INDEX;
-			pnEmptyFace.Add(nFace);
-		}
-	}
-
-	for (int i = nFirstClip; i < pfDst.GetLength(); i++)
-	{
-		for (int j = 0; j < 3; j++)
-		{
-			pfDst[i][j] = pClip[pfDst[i][j]].wIndex;
-		}
-	}
-}
-
-Error* Actor::Render( )
-{
-	if (!m_bsFlag.test(F_VALID_TRANSFORMED_DATA))
+	if (!flags.test(F_VALID_TRANSFORMED_DATA))
 	{
 		return nullptr;
 	}
 
 	ZDirect3D::TextureStage tsDefault;
-//	tsDisable.AddState(D3DTSS_COLOROP, D3DTOP_DISABLE);
+	//	tsDisable.AddState(D3DTSS_COLOROP, D3DTOP_DISABLE);
 
-//	assert(pTransVertex.GetLength() < 16384 * 3);
-	_ASSERT(pClippedFace.GetLength() * 3 < 0x0ffff);//D3DMAXNUMVERTICES);//16384);
-//	assert(pClippedEdge.GetLength() < 16384);
+	//	assert(pTransVertex.GetLength() < 16384 * 3);
+	_ASSERT(clipped_faces.GetLength() * 3 < 0x0ffff);//D3DMAXNUMVERTICES);//16384);
+	//	assert(pClippedEdge.GetLength() < 16384);
 
-	bool bStencilZ = m_bsFlag.test(F_DRAW_Z_BUFFER) && m_bsFlag.test(F_DRAW_TRANSPARENT);
-	for(int i = bStencilZ? -1 : 0; i < 1; i++)
+	bool stencil_z = flags.test(F_DRAW_Z_BUFFER) && flags.test(F_DRAW_TRANSPARENT);
+	for (int i = stencil_z ? -1 : 0; i < 1; i++)
 	{
 		g_pD3D->ResetRenderState();
-		for(std::map< D3DRENDERSTATETYPE, DWORD >::iterator it = mpState.begin(); it != mpState.end(); it++)
+		for (std::map< D3DRENDERSTATETYPE, DWORD >::iterator it = state.begin(); it != state.end(); it++)
 		{
 			g_pD3D->SetRenderState(it->first, it->second);
 		}
 
 		g_pD3D->ResetTextureState();
-		if(i == -1)
+		if (i == -1)
 		{
 			g_pD3D->SetRenderState(D3DRS_SPECULARENABLE, false);
 			g_pD3D->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ZERO);
 			g_pD3D->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
 			g_pD3D->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
 		}
-		else 
+		else
 		{
-			if(bStencilZ)
+			if (stencil_z)
 			{
 				g_pD3D->SetRenderState(D3DRS_ZFUNC, D3DCMP_EQUAL);
 				g_pD3D->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
 			}
 
-//			DWORD dwOperation;
-			//if(Property(UseDiffuse)) dwOperation = D3DTOP_MODULATE;
-			//else 
-//			dwOperation = D3DTOP_SELECTARG1;
+			//			DWORD dwOperation;
+						//if(Property(UseDiffuse)) dwOperation = D3DTOP_MODULATE;
+						//else 
+			//			dwOperation = D3DTOP_SELECTARG1;
 
-			g_pD3D->SetTexture(0, pTexture[0].m_pTexture);
-/*			pd3d->vpTextureStage[0]->SetState(D3DTSS_TEXCOORDINDEX, 0);
-			pd3d->vpTextureStage[0]->SetState(D3DTSS_COLOROP, D3DTOP_SELECTA);
-			pd3d->vpTextureStage[0]->SetState(D3DTSS_TEXCOORDINDEX, 0);
-*/
-			if(pTexture[0].m_nType == TextureEntry::T_ENVMAP || pTexture[0].m_nType == TextureEntry::T_LIGHTMAP)
+			g_pD3D->SetTexture(0, textures[0].texture);
+			/*			pd3d->vpTextureStage[0]->SetState(D3DTSS_TEXCOORDINDEX, 0);
+						pd3d->vpTextureStage[0]->SetState(D3DTSS_COLOROP, D3DTOP_SELECTA);
+						pd3d->vpTextureStage[0]->SetState(D3DTSS_TEXCOORDINDEX, 0);
+			*/
+			if (textures[0].type == TextureType::Envmap || textures[0].type == TextureType::Lightmap)
 			{
-//TODO				g_pD3D->SetTextureStageState(0, D3DTSS_ADDRESSU, D3DTADDRESS_CLAMP);
-//TODO				g_pD3D->SetTextureStageState(0, D3DTSS_ADDRESSV, D3DTADDRESS_CLAMP);
+				g_pD3D->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
+				g_pD3D->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
 			}
 		}
 
-		if(pClippedFace.GetLength() > 0)
+		if (clipped_faces.GetLength() > 0)
 		{
-			Error* error = g_pD3D->DrawIndexedPrimitive(pTransVertex, pClippedFace);
-			if(error) return TraceError(error);
+			Error* error = g_pD3D->DrawIndexedPrimitive(transformed_vertices, clipped_faces);
+			if (error) return TraceError(error);
 		}
 	}
 
 	return nullptr;
 }
 
-void Actor::CreateCube(float fSize)
+void Actor::Clip(ZArray<Face>& faces, uint16 plane_mask)
 {
-	pVertex.SetLength(8);
-	pVertex[0].position.Set(-fSize, fSize, -fSize);
-	pVertex[1].position.Set(fSize, fSize, -fSize);
-	pVertex[2].position.Set(fSize, -fSize, -fSize);
-	pVertex[3].position.Set(-fSize, -fSize, -fSize);
-	pVertex[4].position.Set(-fSize, fSize, fSize);
-	pVertex[5].position.Set(fSize, fSize, fSize);
-	pVertex[6].position.Set(fSize, -fSize, fSize);
-	pVertex[7].position.Set(-fSize, -fSize, fSize);
+	ZArray<Face> output_faces;
+	output_faces.Empty();
 
-	for (int i = 0; i < 8; i++)
+	ZArray<VertexTL> temp_vertices;
+	ZArray<Face> temp_faces;
+	ZArray<int> unused_faces;
+	ZArray<int> unused_vertices;
+
+	ZArray<VertexInfo> vertex_info;
+	vertex_info.SetLength(transformed_vertices.GetLength());
+
+	if (!plane_mask)
 	{
-		pVertex[i].normal = pVertex[i].position.Normal(fObjectNormal);
-	}
-	m_bsFlag.set(F_VALID_VERTEX_NORMALS);
-
-	pFace.SetLength(12);
-	pFace[0].Set(0, 3, 2);
-	pFace[1].Set(0, 2, 1);
-	pFace[2].Set(1, 2, 6);
-	pFace[3].Set(1, 6, 5);
-	pFace[4].Set(4, 5, 7);
-	pFace[5].Set(5, 6, 7);
-	pFace[6].Set(0, 4, 7);
-	pFace[7].Set(0, 7, 3);
-	pFace[8].Set(4, 0, 1);
-	pFace[9].Set(4, 1, 5);
-	pFace[10].Set(7, 6, 2);
-	pFace[11].Set(7, 2, 3);
-}
-void Actor::CreateTetrahedron(float fRadius)
-{
-	float fSqrt2 = sqrtf(2.0f);
-	float fSqrt3 = sqrtf(3.0f);
-	float fX = 2.0f * fSqrt2 * fRadius / 3.0f;
-	float fY = fRadius / 3.0f;
-	float fP = fSqrt2 * fRadius / 3.0f;
-	float fQ = fSqrt2 * fRadius / fSqrt3;
-
-	pVertex.SetLength(4);
-	pVertex[0].position = Vector3(0, fRadius, 0);
-	pVertex[1].position = Vector3(fX, -fY, 0);
-	pVertex[2].position = Vector3(-fP, -fY, fQ);
-	pVertex[3].position = Vector3(-fP, -fY, -fQ);
-	pFace.SetLength(4);
-	pFace[0] = Face(0, 1, 3);
-	pFace[1] = Face(0, 2, 1);
-	pFace[2] = Face(0, 3, 2);
-	pFace[3] = Face(3, 1, 2);
-	for (int i = 0; i < 4; i++)
-	{
-		pVertex[i].normal = pVertex[i].position.Normal(fObjectNormal);
+		return;
 	}
 
-	m_bsFlag.set(F_VALID_VERTEX_NORMALS);
-}
-void Actor::CreateGeosphere(float fRadius, int nVertices)
-{
-	struct GeoEdge : public Edge
+	if (!flags.test(F_VALID_CLIP_PLANES))
 	{
-		float fLength;
-		uint16 pwFace[2];
+		clip_min_x = std::min(-0.25f, g_pD3D->g_Caps.GuardBandLeft);
+		clip_max_x = std::max(g_pD3D->GetWidth() - 0.25f, g_pD3D->g_Caps.GuardBandRight);
+		clip_min_y = std::min(-0.25f, g_pD3D->g_Caps.GuardBandTop);
+		clip_max_y = std::max(g_pD3D->GetHeight() - 0.25f, g_pD3D->g_Caps.GuardBandBottom);
 
-		void FindLength(Actor* pObj) { fLength = (pObj->pVertex[(*this)[0]].position - pObj->pVertex[(*this)[1]].position).Length(); }
-	};
+		// clip_min_x = 100;
+		// clip_max_x = g_pD3D->GetWidth() - 100;
+		// clip_min_y = 100;
+		// clip_max_y = g_pD3D->GetHeight() - 100;
 
-	CreateCube(fRadius / sqrtf(3.0f));
-	ZArray<GeoEdge> pGeoEdge;
-	pVertex.SetSize(nVertices);
+		clip_min_z = 0.001f;
+		clip_max_z = 1500.0f;
+	}
 
-	for (int i = 0; i < pFace.GetLength(); i++)
+	uint16 required_clip_planes = 0;
+	for (int i = 0; i < transformed_vertices.GetLength(); i++)
+	{
+		vertex_info[i].clip_planes = GetRequiredClipPlanes(transformed_vertices[i].position) & plane_mask;
+		if (vertex_info[i].clip_planes != 0)
+		{
+			vertex_info[i].index = (uint16)temp_vertices.Add(transformed_vertices[i]);
+			unused_vertices.Add(i);
+		}
+		else
+		{
+			vertex_info[i].index = i;
+		}
+		required_clip_planes |= vertex_info[i].clip_planes;
+	}
+
+	for (int i = 0; i < faces.GetLength(); i++)
+	{
+		for (int j = 0;; j++)
+		{
+			if (j >= 3)
+			{
+				output_faces.Add(faces[i]);
+				break;
+			}
+			else if (vertex_info[faces[i][j]].clip_planes != 0)
+			{
+				temp_faces.Add(faces[i]);
+				break;
+			}
+		}
+	}
+
+	int nFirstClip = output_faces.GetLength();
+
+	uint16 face_vertex_index[3];
+	bool is_out[3];
+	for (int clip_plane_idx = CLIP_PLANES - 1; clip_plane_idx >= 0; clip_plane_idx--)
+	{
+		uint16 plane_flag = (uint16)(1 << clip_plane_idx);
+		if (!(required_clip_planes & plane_flag))
+		{
+			continue;
+		}
+
+		for (int face_idx = temp_faces.GetLength() - 1; face_idx >= 0; face_idx--)
+		{
+			Face* face_ptr = &temp_faces[face_idx];
+			if ((*face_ptr)[0] == WORD_INVALID_INDEX)
+			{
+				continue;
+			}
+
+			int num_verticies_out = 0;
+			for (int k = 0; k < 3; k++)
+			{
+				face_vertex_index[k] = k;
+				is_out[k] = (vertex_info[(*face_ptr)[k]].clip_planes & plane_flag) != 0;
+				if (is_out[k])
+				{
+					num_verticies_out++;
+				}
+			}
+
+			if (num_verticies_out == 0)
+			{
+				continue;
+			}
+
+			if (num_verticies_out != 3)
+			{
+				// make sure that no realloc is required (changes pointers)
+				transformed_vertices.MakeExtraSpace(100);
+				temp_vertices.MakeExtraSpace(100);
+				temp_faces.MakeExtraSpace(100);
+
+				face_ptr = &temp_faces[face_idx];
+
+				if (num_verticies_out == 1)
+				{
+					// Reorder the indices such that 0 is out, and 1 & 2 are in
+					if (is_out[1])
+					{
+						std::swap(face_vertex_index[0], face_vertex_index[1]);
+					}
+					else if (is_out[2])
+					{
+						std::swap(face_vertex_index[0], face_vertex_index[2]);
+					}
+
+					Face new_face = *face_ptr;
+					new_face[face_vertex_index[0]] = ClipEdge(*face_ptr, face_vertex_index[1], face_vertex_index[0], plane_flag, required_clip_planes, vertex_info, temp_vertices, unused_vertices);
+					AddClippedFace(new_face, plane_flag - 1, output_faces, vertex_info, temp_faces, unused_faces);
+
+					new_face[face_vertex_index[1]] = new_face[face_vertex_index[0]];
+					new_face[face_vertex_index[0]] = ClipEdge(*face_ptr, face_vertex_index[2], face_vertex_index[0], plane_flag, required_clip_planes, vertex_info, temp_vertices, unused_vertices);
+					AddClippedFace(new_face, plane_flag - 1, output_faces, vertex_info, temp_faces, unused_faces);
+				}
+				else // if(nOut == 2)
+				{
+					// 0 = in, 1, 2 = out
+					if (!is_out[1])
+					{
+						std::swap(face_vertex_index[0], face_vertex_index[1]);
+					}
+					else if (!is_out[2])
+					{
+						std::swap(face_vertex_index[0], face_vertex_index[2]);
+					}
+
+					Face new_face;
+					new_face[face_vertex_index[0]] = (*face_ptr)[face_vertex_index[0]];
+					new_face[face_vertex_index[1]] = ClipEdge(*face_ptr, face_vertex_index[0], face_vertex_index[1], plane_flag, required_clip_planes, vertex_info, temp_vertices, unused_vertices);
+					new_face[face_vertex_index[2]] = ClipEdge(*face_ptr, face_vertex_index[0], face_vertex_index[2], plane_flag, required_clip_planes, vertex_info, temp_vertices, unused_vertices);
+					AddClippedFace(new_face, plane_flag - 1, output_faces, vertex_info, temp_faces, unused_faces);
+				}
+			}
+			(*face_ptr)[0] = WORD_INVALID_INDEX;
+			unused_faces.Add(face_idx);
+		}
+	}
+
+	for (int i = nFirstClip; i < output_faces.GetLength(); i++)
 	{
 		for (int j = 0; j < 3; j++)
 		{
-			Edge e = pFace[i].GetEdge(j).Ordered();
+			uint16 index = vertex_info[output_faces[i][j]].index;
+			output_faces[i][j] = index;
+		}
+	}
+
+	faces.SwapBuffer(output_faces);
+}
+
+bool Actor::IsClipRequired(const Face& face, uint16 plane_mask, const ZArray<VertexInfo>& vertex_info) const
+{
+	for (int j = 0; j < 3; j++)
+	{
+		if (vertex_info[face[j]].clip_planes & plane_mask)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+uint16 Actor::GetRequiredClipPlanes(const Vector3& v) const
+{
+	uint16 clip_planes = 0;
+	if (v.x < clip_min_x)
+	{
+		clip_planes |= CLIP_PLANE_MIN_X;
+	}
+	if (v.x > clip_max_x)
+	{
+		clip_planes |= CLIP_PLANE_MAX_X;
+	}
+	if (v.y < clip_min_y)
+	{
+		clip_planes |= CLIP_PLANE_MIN_Y;
+	}
+	if (v.y > clip_max_y)
+	{
+		clip_planes |= CLIP_PLANE_MAX_Y;
+	}
+	if (v.z < clip_min_z)
+	{
+		clip_planes |= CLIP_PLANE_MIN_Z;
+	}
+	if (v.z > clip_max_z)
+	{
+		clip_planes |= CLIP_FLAG_MAX_Z;
+	}
+	return clip_planes;
+}
+
+int Actor::ClipEdge(const Face& face, int src_idx, int dst_idx, uint16 plane_flag, uint16 all_plane_flags, ZArray<VertexInfo>& vertex_info, ZArray<VertexTL>& temp_vertices, ZArray<int>& unused_vertices)
+{
+	VertexInfo* pci = &vertex_info[face[src_idx]];
+	VertexTL& src = (pci->clip_planes != 0) ? temp_vertices[pci->index] : transformed_vertices[pci->index];
+	VertexTL& dst = temp_vertices[vertex_info[face[dst_idx]].index];
+	//	ZVertexTL &vIn = pTransVertex[pClip[pf->v[nIn]].wIndex];
+	//	ZVertexTL &vOut = pvOut[pClip[pf->v[nOut]].wIndex];
+
+	float pos;
+	switch (plane_flag)
+	{
+	case CLIP_PLANE_MIN_X:
+		pos = (src.position.x - clip_min_x) / (src.position.x - dst.position.x);
+		break;
+	case CLIP_PLANE_MAX_X:
+		pos = (clip_max_x - src.position.x) / (dst.position.x - src.position.x);
+		break;
+	case CLIP_PLANE_MIN_Y:
+		pos = (src.position.y - clip_min_y) / (src.position.y - dst.position.y);
+		break;
+	case CLIP_PLANE_MAX_Y:
+		pos = (clip_max_y - src.position.y) / (dst.position.y - src.position.y);
+		break;
+	case CLIP_PLANE_MIN_Z:
+		pos = (src.position.z - clip_min_z) / (src.position.z - dst.position.z);
+		break;
+	case CLIP_FLAG_MAX_Z:
+		pos = (clip_max_z - src.position.z) / (dst.position.z - src.position.z);
+		break;
+	default:
+		__assume(0);
+		break;
+	}
+
+	Vector3 new_position = (src.position * (1 - pos)) + (dst.position * pos);
+
+	int new_vertex_index;
+	VertexTL* new_vertex;
+
+	uint16 required_clip_planes = GetRequiredClipPlanes(new_position) & (all_plane_flags & (plane_flag - 1));
+	if (required_clip_planes == 0)
+	{
+		int length = unused_vertices.GetLength();
+		if (length > 0)
+		{
+			new_vertex_index = unused_vertices[length - 1];
+			unused_vertices.SetLength(length - 1);
+		}
+		else
+		{
+			new_vertex_index = transformed_vertices.AddEmpty();
+		}
+		new_vertex = &transformed_vertices[new_vertex_index];
+	}
+	else
+	{
+		new_vertex_index = temp_vertices.AddEmpty();
+		new_vertex = &temp_vertices[new_vertex_index];
+	}
+
+	int new_info_index = vertex_info.AddEmpty();
+	vertex_info[new_info_index].index = new_vertex_index;
+	vertex_info[new_info_index].clip_planes = required_clip_planes;
+
+	new_vertex->position = new_position;
+	new_vertex->diffuse = (src.diffuse * (1 - pos)) + (dst.diffuse * pos);
+	new_vertex->specular = (src.specular * (1 - pos)) + (dst.specular * pos);
+
+	if (plane_flag & ~(CLIP_FLAG_MAX_Z | CLIP_PLANE_MIN_Z))
+	{
+		// work out texture position with texture perspective
+		new_vertex->rhw = (src.rhw * (1 - pos)) + (dst.rhw * pos);
+		new_vertex->tex_coords[0].x = ((src.tex_coords[0].x * src.rhw * (1 - pos)) + (dst.tex_coords[0].x * dst.rhw * pos)) / new_vertex->rhw;
+		new_vertex->tex_coords[0].y = ((src.tex_coords[0].y * src.rhw * (1 - pos)) + (dst.tex_coords[0].y * dst.rhw * pos)) / new_vertex->rhw;
+	}
+	else
+	{
+		new_vertex->tex_coords[0].x = (src.tex_coords[0].x * (1 - pos)) + (dst.tex_coords[0].x * pos);
+		new_vertex->tex_coords[0].y = (src.tex_coords[0].y * (1 - pos)) + (dst.tex_coords[0].y * pos);
+	}
+	return new_info_index;
+}
+
+void Actor::AddClippedFace(Face& face, uint16 plane_mask, ZArray<Face>& output_faces, const ZArray<VertexInfo>& vertex_info, ZArray<Face>& temp_faces, ZArray<int>& unused_faces)
+{
+	if (IsClipRequired(face, plane_mask, vertex_info))
+	{
+		int length = unused_faces.GetLength();
+		if (length > 0)
+		{
+			int new_index = unused_faces[length - 1];
+			unused_faces.SetLength(length - 1);
+			temp_faces[new_index] = face;
+		}
+		else
+		{
+			temp_faces.Add(face);
+		}
+	}
+	else
+	{
+		output_faces.Add(face);
+	}
+}
+
+void Actor::CreateCube(float size)
+{
+	vertices.SetLength(8);
+	vertices[0].position.Set(-size, size, -size);
+	vertices[1].position.Set(size, size, -size);
+	vertices[2].position.Set(size, -size, -size);
+	vertices[3].position.Set(-size, -size, -size);
+	vertices[4].position.Set(-size, size, size);
+	vertices[5].position.Set(size, size, size);
+	vertices[6].position.Set(size, -size, size);
+	vertices[7].position.Set(-size, -size, size);
+
+	for (int i = 0; i < 8; i++)
+	{
+		vertices[i].normal = vertices[i].position.Normal(OBJECT_NORMAL_LENGTH);
+	}
+	flags.set(F_VALID_VERTEX_NORMALS);
+
+	faces.SetLength(12);
+	faces[0].Set(0, 3, 2);
+	faces[1].Set(0, 2, 1);
+	faces[2].Set(1, 2, 6);
+	faces[3].Set(1, 6, 5);
+	faces[4].Set(4, 5, 7);
+	faces[5].Set(5, 6, 7);
+	faces[6].Set(0, 4, 7);
+	faces[7].Set(0, 7, 3);
+	faces[8].Set(4, 0, 1);
+	faces[9].Set(4, 1, 5);
+	faces[10].Set(7, 6, 2);
+	faces[11].Set(7, 2, 3);
+}
+void Actor::CreateTetrahedron(float radius)
+{
+	float sqrt2 = sqrtf(2.0f);
+	float sqrt3 = sqrtf(3.0f);
+	float x = 2.0f * sqrt2 * radius / 3.0f;
+	float y = radius / 3.0f;
+	float p = sqrt2 * radius / 3.0f;
+	float q = sqrt2 * radius / sqrt3;
+
+	vertices.SetLength(4);
+	vertices[0].position = Vector3(0, radius, 0);
+	vertices[1].position = Vector3(x, -y, 0);
+	vertices[2].position = Vector3(-p, -y, q);
+	vertices[3].position = Vector3(-p, -y, -q);
+	faces.SetLength(4);
+	faces[0] = Face(0, 1, 3);
+	faces[1] = Face(0, 2, 1);
+	faces[2] = Face(0, 3, 2);
+	faces[3] = Face(3, 1, 2);
+	for (int i = 0; i < 4; i++)
+	{
+		vertices[i].normal = vertices[i].position.Normal(OBJECT_NORMAL_LENGTH);
+	}
+
+	flags.set(F_VALID_VERTEX_NORMALS);
+}
+void Actor::CreateGeosphere(float radius, int num_vertices)
+{
+	struct GeoEdge : public Edge
+	{
+		float length;
+		uint16 faces[2];
+
+		void FindLength(Actor* pObj) { length = (pObj->vertices[(*this)[0]].position - pObj->vertices[(*this)[1]].position).Length(); }
+	};
+
+	CreateCube(radius / sqrtf(3.0f));
+	ZArray<GeoEdge> geo_edges;
+	vertices.SetSize(num_vertices);
+
+	for (int i = 0; i < faces.GetLength(); i++)
+	{
+		for (int j = 0; j < 3; j++)
+		{
+			Edge e = faces[i].GetEdge(j).Ordered();
 			for (int k = 0;; k++)
 			{
-				if (k < pGeoEdge.GetLength())
+				if (k < geo_edges.GetLength())
 				{
-					if (pGeoEdge[k] == e)
+					if (geo_edges[k] == e)
 					{
-						pGeoEdge[k].pwFace[1] = i;
+						geo_edges[k].faces[1] = i;
 						break;
 					}
 				}
 				else
 				{
-					k = pGeoEdge.AddEmpty();
-					pGeoEdge[k].Set(e);
-					pGeoEdge[k].FindLength(this);
-					pGeoEdge[k].pwFace[0] = i;
+					k = geo_edges.AddEmpty();
+					geo_edges[k].Set(e);
+					geo_edges[k].FindLength(this);
+					geo_edges[k].faces[0] = i;
 					break;
 				}
 			}
 		}
 	}
 
-	while (pVertex.GetLength() < nVertices)
+	while (vertices.GetLength() < num_vertices)
 	{
-		int nSplitEdge = 0;
-		float fLongestEdge = pGeoEdge[nSplitEdge].fLength;
-		for (int j = 1; j < pGeoEdge.GetLength(); j++)
+		int split_edge = 0;
+		float longest_edge = geo_edges[split_edge].length;
+		for (int j = 1; j < geo_edges.GetLength(); j++)
 		{
-			if (pGeoEdge[j].fLength > fLongestEdge)
+			if (geo_edges[j].length > longest_edge)
 			{
-				nSplitEdge = j;
-				fLongestEdge = pGeoEdge[j].fLength;
+				split_edge = j;
+				longest_edge = geo_edges[j].length;
 			}
 		}
 
-		GeoEdge te = pGeoEdge[nSplitEdge];
+		GeoEdge te = geo_edges[split_edge];
 
 		// and split it
-		float fScale = (0.5f * fRadius) / sqrtf((fRadius * fRadius) - (fLongestEdge * fLongestEdge / 4.0f));
-		int nNewVertex = pVertex.AddEmpty();
-		pVertex[nNewVertex].position = (pVertex[te[0]].position + pVertex[te[1]].position) * fScale;
+		float fScale = (0.5f * radius) / sqrtf((radius * radius) - (longest_edge * longest_edge / 4.0f));
+		int new_vertex = vertices.AddEmpty();
+		vertices[new_vertex].position = (vertices[te[0]].position + vertices[te[1]].position) * fScale;
 		////////////////////////////////////////////
-				// add the main edges
-		pGeoEdge[nSplitEdge][0] = te[0];
-		pGeoEdge[nSplitEdge][1] = nNewVertex;
-		pGeoEdge[nSplitEdge].fLength /= 2.0;
-		int nNewEdge = pGeoEdge.AddEmpty();
-		pGeoEdge[nNewEdge][0] = te[1];
-		pGeoEdge[nNewEdge][1] = nNewVertex;
-		pGeoEdge[nNewEdge].fLength = pGeoEdge[nSplitEdge].fLength;
+
+		// add the main edges
+		geo_edges[split_edge][0] = te[0];
+		geo_edges[split_edge][1] = new_vertex;
+		geo_edges[split_edge].length /= 2.0;
+
+		int new_edge = geo_edges.AddEmpty();
+		geo_edges[new_edge][0] = te[1];
+		geo_edges[new_edge][1] = new_vertex;
+		geo_edges[new_edge].length = geo_edges[split_edge].length;
 
 		// add two more edges (one may be the same)
 		for (int i = 0; i < 2; i++)
 		{
-			int nFace1 = te.pwFace[i];
-			int nFace2 = pFace.AddEmpty();
+			int face1 = te.faces[i];
+			int face2 = faces.AddEmpty();
 
-			pFace[nFace2] = pFace[nFace1];
-			int nVertex;
+			faces[face2] = faces[face1];
+
+			int vertex;
 			for (int k = 0; k < 3; k++)
 			{
-				if (pFace[nFace1][k] != te[0] && pFace[nFace1][k] != te[1])
+				if (faces[face1][k] != te[0] && faces[face1][k] != te[1])
 				{
-					nVertex = pFace[nFace1][k];
+					vertex = faces[face1][k];
 				}
 
-				if (pFace[nFace1][k] == te[1])
+				if (faces[face1][k] == te[1])
 				{
-					pFace[nFace1][k] = nNewVertex;
+					faces[face1][k] = new_vertex;
 				}
-				if (pFace[nFace2][k] == te[0])
+				if (faces[face2][k] == te[0])
 				{
-					pFace[nFace2][k] = nNewVertex;
+					faces[face2][k] = new_vertex;
 				}
 			}
-			pGeoEdge[nSplitEdge].pwFace[i] = nFace1;
-			pGeoEdge[nNewEdge].pwFace[i] = nFace2;
+			geo_edges[split_edge].faces[i] = face1;
+			geo_edges[new_edge].faces[i] = face2;
 
-			int nNewSplit = pGeoEdge.AddEmpty();
-			pGeoEdge[nNewSplit].Set(Edge(nVertex, nNewVertex).Ordered());
-			pGeoEdge[nNewSplit].FindLength(this);
-			pGeoEdge[nNewSplit].pwFace[0] = nFace1;
-			pGeoEdge[nNewSplit].pwFace[1] = nFace2;
+			int new_split = geo_edges.AddEmpty();
+			geo_edges[new_split].Set(Edge(vertex, new_vertex).Ordered());
+			geo_edges[new_split].FindLength(this);
+			geo_edges[new_split].faces[0] = face1;
+			geo_edges[new_split].faces[1] = face2;
 
-			Edge ce = Edge(te[1], nVertex).Ordered();
-			for (int k = 0; k < pGeoEdge.GetLength(); k++)
+			Edge ce = Edge(te[1], vertex).Ordered();
+			for (int k = 0; k < geo_edges.GetLength(); k++)
 			{
-				if (pGeoEdge[k] == ce)
+				if (geo_edges[k] == ce)
 				{
-					if (pGeoEdge[k].pwFace[0] == nFace1) pGeoEdge[k].pwFace[0] = nFace2;
-					if (pGeoEdge[k].pwFace[1] == nFace1) pGeoEdge[k].pwFace[1] = nFace2;
+					if (geo_edges[k].faces[0] == face1)
+					{
+						geo_edges[k].faces[0] = face2;
+					}
+					if (geo_edges[k].faces[1] == face1)
+					{
+						geo_edges[k].faces[1] = face2;
+					}
 				}
 			}
 		}
 	}
 
-	_ASSERT(pVertex.GetLength() == nVertices);
+	_ASSERT(vertices.GetLength() == num_vertices);
 
-	for (int i = 0; i < pVertex.GetLength(); i++)
+	for (int i = 0; i < vertices.GetLength(); i++)
 	{
-		pVertex[i].normal = pVertex[i].position.Normal(fObjectNormal);
+		vertices[i].normal = vertices[i].position.Normal(OBJECT_NORMAL_LENGTH);
 	}
-	m_bsFlag.set(F_VALID_VERTEX_NORMALS);
+	flags.set(F_VALID_VERTEX_NORMALS);
 }
 
-void Actor::CreateTorus(float fOuterRad, float fInnerRad, int nOuterPoints, int nInnerPoints)
+void Actor::CreateTorus(float outer_rad, float inner_rad, int outer_points, int inner_points)
 {
-	pVertex.Empty();
-	pFace.Empty();
+	vertices.Empty();
+	faces.Empty();
 
-	int nVertices = nOuterPoints * nInnerPoints;
-	for (int i = 0; i < nOuterPoints; i++)
+	int num_vertices = outer_points * inner_points;
+	for (int i = 0; i < outer_points; i++)
 	{
-		int nBase = pVertex.GetLength();
-		for (int j = 0; j < nInnerPoints; j++)
+		int base = vertices.GetLength();
+		for (int j = 0; j < inner_points; j++)
 		{
-			double dAngOuter = (i + 0.5) * PI2 / nOuterPoints;
-			double dAngInner = (j + 0.5) * PI2 / nInnerPoints;
+			double ang_outer = (i + 0.5) * PI2 / outer_points;
+			double ang_inner = (j + 0.5) * PI2 / inner_points;
 
-			Vertex* pv = pVertex.AddEmptyPtr();
-			pv->position.x = (float)(sin(dAngOuter) * (fOuterRad + (cos(dAngInner) * fInnerRad)));
-			pv->position.y = (float)(cos(dAngOuter) * (fOuterRad + (cos(dAngInner) * fInnerRad)));
-			pv->position.z = (float)(sin(dAngInner) * fInnerRad);
+			Vertex* pv = vertices.AddEmptyPtr();
+			pv->position.x = (float)(sin(ang_outer) * (outer_rad + (cos(ang_inner) * inner_rad)));
+			pv->position.y = (float)(cos(ang_outer) * (outer_rad + (cos(ang_inner) * inner_rad)));
+			pv->position.z = (float)(sin(ang_inner) * inner_rad);
 
-			Face f;
-			f[0] = nBase + j;
-			f[2] = nBase + ((j + 1) % nInnerPoints);
-			f[1] = (nBase + ((j + 1) % nInnerPoints) + nInnerPoints) % nVertices;
-			pFace.Add(f);
+			Face face;
+			face[0] = base + j;
+			face[2] = base + ((j + 1) % inner_points);
+			face[1] = (base + ((j + 1) % inner_points) + inner_points) % num_vertices;
+			faces.Add(face);
 
-			f[0] = nBase + j;
-			f[1] = (nBase + j + nInnerPoints) % nVertices;
-			f[2] = (nBase + ((j + 1) % nInnerPoints) + nInnerPoints) % nVertices;
-			pFace.Add(f);
+			face[0] = base + j;
+			face[1] = (base + j + inner_points) % num_vertices;
+			face[2] = (base + ((j + 1) % inner_points) + inner_points) % num_vertices;
+			faces.Add(face);
 		}
 	}
-	_ASSERT(pVertex.GetLength() == nVertices);
+	_ASSERT(vertices.GetLength() == num_vertices);
 }
-void Actor::CreateTetrahedronGeosphere(float fRadius, int nIterations)
+
+void Actor::CreateTetrahedronGeosphere(float radius, int num_iterations)
 {
 	struct TetraGeoEdge : public Edge
 	{
-		int nSplit;
+		int split;
 	};
 
-	ZArray<TetraGeoEdge> pGeoEdge;
-	ZArray<Face> pGeoFace;
+	ZArray<TetraGeoEdge> geo_edges;
+	ZArray<Face> geo_faces;
 
-	CreateTetrahedron(fRadius);
-	for (int n = 0; n < nIterations; n++)
+	CreateTetrahedron(radius);
+	for (int n = 0; n < num_iterations; n++)
 	{
-		pGeoEdge.SetLength(0);
-		pGeoFace.SetLength(pFace.GetLength());
-		for (int i = 0; i < pFace.GetLength(); i++)
+		geo_edges.SetLength(0);
+		geo_faces.SetLength(faces.GetLength());
+		for (int i = 0; i < faces.GetLength(); i++)
 		{
 			for (int j = 0; j < 3; j++)
 			{
 				TetraGeoEdge e;
 				ZeroMemory(&e, sizeof(e));
-				e[0] = pFace[i][j];
-				e[1] = pFace[i][(j + 1) % 3];
+				e[0] = faces[i][j];
+				e[1] = faces[i][(j + 1) % 3];
 				for (int k = 0;; k++)
 				{
-					if (k < pGeoEdge.GetLength())
+					if (k < geo_edges.GetLength())
 					{
-						if (pGeoEdge[k].Contains(e[0]) && pGeoEdge[k].Contains(e[1]))
+						if (geo_edges[k].Contains(e[0]) && geo_edges[k].Contains(e[1]))
 						{
-							pGeoFace[i][j] = k;
+							geo_faces[i][j] = k;
 							break;
 						}
 					}
 					else
 					{
-						int nIndex = pGeoEdge.Add(e);
-						pGeoFace[i][j] = k;
+						int index = geo_edges.Add(e);
+						geo_faces[i][j] = k;
 						break;
 					}
 				}
@@ -1323,29 +1431,31 @@ void Actor::CreateTetrahedronGeosphere(float fRadius, int nIterations)
 		}
 
 		//		ZFlexibleVertex fv(pVertex);
-		for (int i = 0; i < pGeoEdge.GetLength(); i++)
+		for (int i = 0; i < geo_edges.GetLength(); i++)
 		{
-			int nVertex = pVertex.AddEmpty();
-			pGeoEdge[i].nSplit = nVertex;//pv;//p.SetNewEmpty();
-			pVertex[nVertex].position = (pVertex[pGeoEdge[i][0]].position + pVertex[pGeoEdge[i][1]].position).Normal(fRadius);
+			int vertex = vertices.AddEmpty();
+			geo_edges[i].split = vertex;//pv;//p.SetNewEmpty();
+			vertices[vertex].position = (vertices[geo_edges[i][0]].position + vertices[geo_edges[i][1]].position).Normal(radius);
 		}
-		pFace.SetLength(0);
-		for (int i = 0; i < pGeoFace.GetLength(); i++)
+		faces.SetLength(0);
+		for (int i = 0; i < geo_faces.GetLength(); i++)
 		{
-			Face& f = pGeoFace[i];
-			TetraGeoEdge& e1 = pGeoEdge[f[0]];
-			TetraGeoEdge& e2 = pGeoEdge[f[1]];
-			TetraGeoEdge& e3 = pGeoEdge[f[2]];
-			pFace.Add(Face(e1.nSplit, e2.nSplit, e3.nSplit));
-			pFace.Add(Face(e1.nSplit, e2.nSplit, e1.CommonIndex(e2)));
-			pFace.Add(Face(e1.nSplit, e3.nSplit, e1.CommonIndex(e3)));
-			pFace.Add(Face(e2.nSplit, e3.nSplit, e2.CommonIndex(e3)));
+			Face& face = geo_faces[i];
+			TetraGeoEdge& edge1 = geo_edges[face[0]];
+			TetraGeoEdge& edge2 = geo_edges[face[1]];
+			TetraGeoEdge& edge3 = geo_edges[face[2]];
+			faces.Add(Face(edge1.split, edge2.split, edge3.split));
+			faces.Add(Face(edge1.split, edge2.split, edge1.CommonIndex(edge2)));
+			faces.Add(Face(edge1.split, edge3.split, edge1.CommonIndex(edge3)));
+			faces.Add(Face(edge2.split, edge3.split, edge2.CommonIndex(edge3)));
 		}
 	}
 	FindFaceOrder(Vector3::Origin());
-	for (int i = 0; i < pVertex.GetLength(); i++)
+
+	for (int i = 0; i < vertices.GetLength(); i++)
 	{
-		pVertex[i].normal = pVertex[i].position.Normal(fObjectNormal);
+		vertices[i].normal = vertices[i].position.Normal(OBJECT_NORMAL_LENGTH);
 	}
-	m_bsFlag.set(F_VALID_VERTEX_NORMALS);
+
+	flags.set(F_VALID_VERTEX_NORMALS);
 }

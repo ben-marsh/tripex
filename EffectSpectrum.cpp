@@ -48,31 +48,31 @@ public:
 
 		for(int i = 0; i < TRAIL_H; i++)
 		{
-			m_pObj[i].pVertex.SetLength(TRAIL_W * 4);
-			m_pObj[i].pFace.SetLength((TRAIL_W - 1) * 8);
-			m_pObj[i].m_bsFlag.set(Actor::F_DRAW_TRANSPARENT);
-			m_pObj[i].m_bsFlag.set( Actor::F_DRAW_Z_BUFFER, false );
+			m_pObj[i].vertices.SetLength(TRAIL_W * 4);
+			m_pObj[i].faces.SetLength((TRAIL_W - 1) * 8);
+			m_pObj[i].flags.set(Actor::F_DRAW_TRANSPARENT);
+			m_pObj[i].flags.set( Actor::F_DRAW_Z_BUFFER, false );
 			uint16 v = 0, f = 0;
 			for(int j = 0; j < TRAIL_W; j++)
 			{
 				int n = j * 4;
 				static const float s = 0.5f / sqrtf( 2.0f );
-				m_pObj[ i ].pVertex[ n + 0 ].normal = Vector3( 0.0f, -s, -s );
-				m_pObj[ i ].pVertex[ n + 1 ].normal = Vector3( 0.0f, +s, -s );
-				m_pObj[ i ].pVertex[ n + 2 ].normal = Vector3( 0.0f, +s, +s );
-				m_pObj[ i ].pVertex[ n + 3 ].normal = Vector3( 0.0f, -s, +s );
+				m_pObj[ i ].vertices[ n + 0 ].normal = Vector3( 0.0f, -s, -s );
+				m_pObj[ i ].vertices[ n + 1 ].normal = Vector3( 0.0f, +s, -s );
+				m_pObj[ i ].vertices[ n + 2 ].normal = Vector3( 0.0f, +s, +s );
+				m_pObj[ i ].vertices[ n + 3 ].normal = Vector3( 0.0f, -s, +s );
 
 				if(j < TRAIL_W - 1)
 				{
 					Face *pFace;
 					for(uint16 k = 0; k < 4; k++ )
 					{
-						pFace = &m_pObj[ i ].pFace[ f + k * 2 ];
+						pFace = &m_pObj[ i ].faces[ f + k * 2 ];
 						( *pFace )[ 0 ] = (uint16)( v + k );
 						( *pFace )[ 1 ] = (uint16)( v + k + 4 );
 						( *pFace )[ 2 ] = (uint16)( v + ( ( k + 1 ) % 4 ) );
 
-						pFace = &m_pObj[ i ].pFace[ f + k * 2 + 1 ];
+						pFace = &m_pObj[ i ].faces[ f + k * 2 + 1 ];
 						( *pFace )[ 0 ] = (uint16)( v + ( ( k + 1 ) % 4 ) );
 						( *pFace )[ 1 ] = (uint16)( v + k + 4 );
 						( *pFace )[ 2 ] = (uint16)( v + 4 + ( ( k + 1 ) % 4 ) );
@@ -84,17 +84,17 @@ public:
 		}
 		for(int i = 0; i < LIMITER_H; i++)
 		{
-			m_pLimit[i].pVertex.SetLength(TRAIL_W);
-			m_pLimit[i].m_bsFlag.set(Actor::F_DRAW_TRANSPARENT);
-			m_pLimit[i].m_bsFlag.set(Actor::F_DRAW_Z_BUFFER, false );
-			m_pLimit[i].m_bsFlag.set(Actor::F_DRAW_VERTEX_SPRITES);
-			m_pLimit[i].fSpriteSize = 9.0f;//fRenderAsLights(15.0);
+			m_pLimit[i].vertices.SetLength(TRAIL_W);
+			m_pLimit[i].flags.set(Actor::F_DRAW_TRANSPARENT);
+			m_pLimit[i].flags.set(Actor::F_DRAW_Z_BUFFER, false );
+			m_pLimit[i].flags.set(Actor::F_DRAW_VERTEX_SPRITES);
+			m_pLimit[i].sprite_size = 9.0f;//fRenderAsLights(15.0);
 
 //			float dMult = ((sin((CUBE_H + i + (dAng / TRAIL_ANGS)) * 3.14159 / TRAIL_H) * 0.7) + 0.8) * TRAIL_XS;
 			float fMult = ((sinf((CUBE_H + i) * PI / TRAIL_H) * 0.7f) + 0.8f) * TRAIL_XS;
 			for(int j = 0; j < TRAIL_W; j++)
 			{
-				m_pLimit[i].pVertex[j].position.x = (j - (TRAIL_W / 2.0f)) * fMult;
+				m_pLimit[i].vertices[j].position.x = (j - (TRAIL_W / 2.0f)) * fMult;
 				m_pfCubeTime[i][j] = 0;
 				m_pfCubeTop[i][j] = 0.0;
 				m_pfCubeHeight[i][j] = 0.0;
@@ -195,7 +195,7 @@ public:
 
 			fBr = fBrightness * std::min( fBr * 0.7f, 1.0f );
 			fBr = std::max( fBr, 0.0f );
-			m_pObj[ i ].wcAmbientLight = ColorRgb::Grey( ( int )( fBr * 255.0f ) );
+			m_pObj[ i ].ambient_light_color = ColorRgb::Grey( ( int )( fBr * 255.0f ) );
 
 			int n = 0;
 			float fMult = ((sinf((i + (m_fAng / TRAIL_ANGS)) * PI / TRAIL_H) * 0.9f) + 0.8f) * TRAIL_XS;
@@ -205,10 +205,10 @@ public:
 				float fY = fPosY - ( fCos * m_pfHeight[ i ][ j ] );
 				float fZ = fPosZ - ( fSin * m_pfHeight[ i ][ j ] );
 
-				m_pObj[ i ].pVertex[ n + 0 ].position = Vector3( fX, fY - BAR_SIZE, fZ - BAR_SIZE );
-				m_pObj[ i ].pVertex[ n + 1 ].position = Vector3( fX, fY + BAR_SIZE, fZ - BAR_SIZE );
-				m_pObj[ i ].pVertex[ n + 2 ].position = Vector3( fX, fY + BAR_SIZE, fZ + BAR_SIZE );
-				m_pObj[ i ].pVertex[ n + 3 ].position = Vector3( fX, fY - BAR_SIZE, fZ + BAR_SIZE );
+				m_pObj[ i ].vertices[ n + 0 ].position = Vector3( fX, fY - BAR_SIZE, fZ - BAR_SIZE );
+				m_pObj[ i ].vertices[ n + 1 ].position = Vector3( fX, fY + BAR_SIZE, fZ - BAR_SIZE );
+				m_pObj[ i ].vertices[ n + 2 ].position = Vector3( fX, fY + BAR_SIZE, fZ + BAR_SIZE );
+				m_pObj[ i ].vertices[ n + 3 ].position = Vector3( fX, fY - BAR_SIZE, fZ + BAR_SIZE );
 
 				n += 4;
 			}
@@ -225,12 +225,12 @@ public:
 			float dCubePosZ = (CYLINDER_RADIUS * dCubeSin);//sin(dThisAng));
 			for(int j = 0; j < TRAIL_W; j++)
 			{
-				m_pLimit[i].pVertex[j].position.y = dCubePosY - (dCubeCos * m_pfCubeHeight[i][j]);
-				m_pLimit[i].pVertex[j].position.z = dCubePosZ - (dCubeSin * m_pfCubeHeight[i][j]);
+				m_pLimit[i].vertices[j].position.y = dCubePosY - (dCubeCos * m_pfCubeHeight[i][j]);
+				m_pLimit[i].vertices[j].position.z = dCubePosZ - (dCubeSin * m_pfCubeHeight[i][j]);
 			}
 			
 			float fBr = Bound< float >( 0.9f - ( ( float )i ) / LIMITER_H, 0.0f, 1.0f );
-			m_pLimit[ i ].wcAmbientLight = ColorRgb::Grey( ( int )( 255.0f * fBr * fBrightness ) );
+			m_pLimit[ i ].ambient_light_color = ColorRgb::Grey( ( int )( 255.0f * fBr * fBrightness ) );
 			m_pLimit[ i ].Calculate( &m_cCamera, fElapsed );
 		}
 
@@ -248,11 +248,11 @@ public:
 		pTexture = g_pD3D->Find(TC_EMANALYSER);
 		for(int i = 0; i < TRAIL_H; i++)
 		{
-			m_pObj[i].pTexture[0].Set(Actor::TextureEntry::T_ENVMAP, pTexture);
+			m_pObj[i].textures[0].Set(Actor::TextureType::Envmap, pTexture);
 		}
 		for(int i = 0; i < LIMITER_H; i++)
 		{
-			m_pLimit[i].pTexture[0].Set(Actor::TextureEntry::T_SPRITE, pTexture);
+			m_pLimit[i].textures[0].Set(Actor::TextureType::Sprite, pTexture);
 		}
 		return nullptr;
 	}

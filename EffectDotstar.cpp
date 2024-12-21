@@ -83,26 +83,26 @@ public:
 		}
 
 		int nIndex = 0;
-		obj.pVertex.SetLength(nStarVertices);
+		obj.vertices.SetLength(nStarVertices);
 		for(int i = 0; i < nStarVertices; i++)
 		{
-			obj.pVertex[i].position = Vector3(pfStarVertex[nIndex], pfStarVertex[nIndex + 1], pfStarVertex[nIndex + 2]);
+			obj.vertices[i].position = Vector3(pfStarVertex[nIndex], pfStarVertex[nIndex + 1], pfStarVertex[nIndex + 2]);
 			nIndex += 3;
 		}
 		nIndex = 0;
-		obj.pFace.SetLength(nStarFaces);
+		obj.faces.SetLength(nStarFaces);
 		for(int i = 0; i < nStarFaces; i++)
 		{
-			obj.pFace[i] = Face(pwStarFace[nIndex], pwStarFace[nIndex + 1], pwStarFace[nIndex + 2]);
+			obj.faces[i] = Face(pwStarFace[nIndex], pwStarFace[nIndex + 1], pwStarFace[nIndex + 2]);
 			nIndex += 3;
 		}
 
-		obj.m_bsFlag.set( Actor::F_DO_POSITION_DELAY );
+		obj.flags.set( Actor::F_DO_POSITION_DELAY );
 
-		obj.fFrameHistory = 10.0f;
-		obj.fDelayHistory = 10.0f;
+		obj.frame_history = 10.0f;
+		obj.delay_history = 10.0f;
 		obj.FindDelayValues();
-		obj.fFrameTime = 0.5;
+		obj.frame_time = 0.5;
 	}
 	void DrawTriangle(Vector3 *pv1, Vector3 *pv2, Vector3 *pv3)
 	{
@@ -199,26 +199,26 @@ public:
 	//	pTarget.Fill(0);
 //	ZeroMemory(pBuffer, 256 * 256 * sizeof(unsigned char));
 //	ZeroMemory(pTarget, 64 * 64 * sizeof(unsigned char));
-		obj.fRoll += pAudio->GetIntensity( ) * elapsed * 4.0 * 3.14159 / 180.0;//(average + 0.05) * elapsed;// * rs;
-		obj.fPitch += pAudio->GetIntensity( ) * elapsed * 5.0 * 3.14159 / 180.0;//(average + 0.05) * elapsed;// * rs;
-		obj.fYaw += pAudio->GetIntensity( ) * elapsed * 6.0 * 3.14159 / 180.0;//(average + 0.05) * elapsed;// * rs;
+		obj.roll += pAudio->GetIntensity( ) * elapsed * 4.0 * 3.14159 / 180.0;//(average + 0.05) * elapsed;// * rs;
+		obj.pitch += pAudio->GetIntensity( ) * elapsed * 5.0 * 3.14159 / 180.0;//(average + 0.05) * elapsed;// * rs;
+		obj.yaw += pAudio->GetIntensity( ) * elapsed * 6.0 * 3.14159 / 180.0;//(average + 0.05) * elapsed;// * rs;
 //	obj.fPitch += average * elapsed * ps;
 //	obj.fYaw += 0.5 * elapsed * ys * 3.14159 / 180.0;
 
-		obj.wClipMask = 0;
+		obj.clip_mask = 0;
 		obj.Calculate(&camera, elapsed);
 //	ZFlexibleVertex fvVertex = obj.pTransVertex[0];
-		for(int i = 0; i < obj.pTransVertex.GetLength(); i++)
+		for(int i = 0; i < obj.transformed_vertices.GetLength(); i++)
 		{
-			obj.pTransVertex[i].position.x += 256.0;
-			obj.pTransVertex[i].position.y += 128.0;// - (4 * fPos);
+			obj.transformed_vertices[i].position.x += 256.0;
+			obj.transformed_vertices[i].position.y += 128.0;// - (4 * fPos);
 //		fvVertex++;
 		}
 
-		for(int i = 0; i < obj.pClippedFace.GetLength(); i++)
+		for(int i = 0; i < obj.clipped_faces.GetLength(); i++)
 		{
-			Face *pf = &obj.pClippedFace[i];
-			DrawTriangle(&obj.pTransVertex[(*pf)[0]].position, &obj.pTransVertex[(*pf)[1]].position, &obj.pTransVertex[(*pf)[2]].position);
+			Face *pf = &obj.clipped_faces[i];
+			DrawTriangle(&obj.transformed_vertices[(*pf)[0]].position, &obj.transformed_vertices[(*pf)[1]].position, &obj.transformed_vertices[(*pf)[2]].position);
 		}
  
 		int nSrc = 0, nBase = 0, nDst= 0;
@@ -315,17 +315,17 @@ public:
 							pVertex[k].rhw = 1.0f;//vPosition.z = 1.0f;
 							pVertex[k].diffuse = pcColour[nColour];
 						}
-						pVertex[0].tex_coord[0].x = 0;
-						pVertex[0].tex_coord[0].y = 0;
+						pVertex[0].tex_coords[0].x = 0;
+						pVertex[0].tex_coords[0].y = 0;
 		
-						pVertex[1].tex_coord[0].x = 1;
-						pVertex[1].tex_coord[0].y = 0;
+						pVertex[1].tex_coords[0].x = 1;
+						pVertex[1].tex_coords[0].y = 0;
 
-						pVertex[2].tex_coord[0].x = 1;
-						pVertex[2].tex_coord[0].y = 1;
+						pVertex[2].tex_coords[0].x = 1;
+						pVertex[2].tex_coords[0].y = 1;
 
-						pVertex[3].tex_coord[0].x = 0;
-						pVertex[3].tex_coord[0].y = 1;
+						pVertex[3].tex_coords[0].x = 0;
+						pVertex[3].tex_coords[0].y = 1;
 
 						Face *pFace = pTargetFace.AddEmptyPtr(2);
 						pFace[0] = Face(nV + 0, nV + 1, nV + 3);

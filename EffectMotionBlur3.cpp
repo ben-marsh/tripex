@@ -58,12 +58,12 @@ public:
 		{
 //		pObj[i].pVertex.SetFormat(D3DFVF_NORMAL | D3DFVF_TEX1);
 			pObj[i].CreateTorus(30, 5.0, 20, 5);
-			pObj[i].m_bsFlag.set( Actor::F_DRAW_TRANSPARENT );
-			if(bAltBlur) pObj[i].m_bsFlag.set( Actor::F_DO_MIX_EXPOSURE_FACES );
-			pObj[i].pTexture[0].m_nType = Actor::TextureEntry::T_LIGHTMAP;
-			pObj[i].nExposure = 9;
-			pObj[i].fFrameHistory = 4.0f;
-			if(!bAltBlur) pObj[i].wcExposureLightChange = WideColorRgb(-3,-3,-0);
+			pObj[i].flags.set( Actor::F_DRAW_TRANSPARENT );
+			if(bAltBlur) pObj[i].flags.set( Actor::F_DO_MIX_EXPOSURE_FACES );
+			pObj[i].textures[0].type = Actor::TextureType::Lightmap;
+			pObj[i].exposure = 9;
+			pObj[i].frame_history = 4.0f;
+			if(!bAltBlur) pObj[i].exposure_light_delta = WideColorRgb(-3,-3,-0);
 			pObj[i].FindVertexNormals();
 		}
 	}
@@ -125,9 +125,9 @@ public:
 
 		cam.position.z = -80;
 
-		obj.fRoll += elapsed * 3.14159 / 180.0f;
-		obj.fPitch += elapsed * 2.0f * 3.14159 / 180.0f;
-		obj.fYaw += elapsed * 3.0f * 3.14159 / 180.0f;
+		obj.roll += elapsed * 3.14159 / 180.0f;
+		obj.pitch += elapsed * 2.0f * 3.14159 / 180.0f;
+		obj.yaw += elapsed * 3.0f * 3.14159 / 180.0f;
 		obj.Calculate(&cam, elapsed);
 
 		if(fAvTotal > 6 || bReset)
@@ -174,18 +174,18 @@ public:
 		{
 			if(nNewEffect != -1)
 			{
-				pObj[i].vPosition = (GetPos(nEffect, i) * (1 - fChange)) + (GetPos(nNewEffect, i) * fChange);
+				pObj[i].position = (GetPos(nEffect, i) * (1 - fChange)) + (GetPos(nNewEffect, i) * fChange);
 			}
 			else
 			{
-				pObj[i].vPosition = GetPos(nEffect, i);
+				pObj[i].position = GetPos(nEffect, i);
 			}	
 
 			float fSpeed = pAudio->GetDampenedBand( pEffectPtr->fSensitivity, i / 10.0, (i + 1) / 10.0);
-			pObj[i].fRoll += elapsed * 4.0 * 3.14159 / 180.0;
-			pObj[i].fPitch += pAudio->GetIntensity( ) * elapsed * 10.0 * 3.14159 / 180.0;
-			pObj[i].fYaw += (pAudio->GetIntensity( ) + pAudio->GetBeat( ) ) * elapsed * 7 * 3.14159 / 180.0;
-			pObj[i].wcAmbientLight = ColorRgb::Grey(brightness * 48.0f);// / pObj[i].nExposure);
+			pObj[i].roll += elapsed * 4.0 * 3.14159 / 180.0;
+			pObj[i].pitch += pAudio->GetIntensity( ) * elapsed * 10.0 * 3.14159 / 180.0;
+			pObj[i].yaw += (pAudio->GetIntensity( ) + pAudio->GetBeat( ) ) * elapsed * 7 * 3.14159 / 180.0;
+			pObj[i].ambient_light_color = ColorRgb::Grey(brightness * 48.0f);// / pObj[i].nExposure);
 			pObj[i].Calculate(&camera, elapsed);
 		}
 
@@ -206,7 +206,7 @@ public:
 		fAvTotal = pAudio->GetIntensity( ) * fAvTime;
 		bReset = true;
 		Texture *t = g_pD3D->Find(bAltBlur? TC_EMMOTIONBLUR3ALT : TC_EMMOTIONBLUR3);
-		for(int i = 0; i < 9; i++) pObj[i].pTexture[0].m_pTexture = t;
+		for(int i = 0; i < 9; i++) pObj[i].textures[0].texture = t;
 		bFirstCalc = true;
 		return nullptr;
 	}

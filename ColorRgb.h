@@ -69,11 +69,11 @@ public:
 	template < class U > BaseColorRgb<T> &operator=(const BaseColorRgb<U> &c){ SetCastedColourData<T, U>(*this, c); return *this; }
 
 	// other
-	BaseColorRgb<T> Reverse(){ return BaseColorRgb<T>(b, g, r); }
-	BaseColorRgb<T> Inverse(){ return BaseColorRgb<T>(255 - r, 255 - g, 255 - b); }
+	BaseColorRgb<T> Reverse() const { return BaseColorRgb<T>(b, g, r); }
+	BaseColorRgb<T> Inverse() const { return BaseColorRgb<T>(255 - r, 255 - g, 255 - b); }
 	void Invert(){ operator=(Inverse()); }
-	int GetMaxComponent(){ return std::max(r, std::max(g, b)); }
-	int GetMinComponent(){ return std::min(r, std::min(g, b)); }
+	int GetMaxComponent() const { return std::max(r, std::max(g, b)); }
+	int GetMinComponent() const { return std::min(r, std::min(g, b)); }
 	static BaseColorRgb<T> Blend(const BaseColorRgb<T> &c1, const BaseColorRgb<T> &c2, float fBlend){ return (BaseColorRgb<T>)((c1 * (1.0f - fBlend)) + (c2 * fBlend)); }
 };
 template < class T, class U > inline BaseColorRgb<T> operator*(U n, const BaseColorRgb<T> &c)

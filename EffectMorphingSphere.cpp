@@ -23,10 +23,10 @@ public:
 		fBezPos = 0;
 		pObj[NOBJ].CreateTetrahedronGeosphere(1.0, 4);
 		pObj[NOBJ].FindFaceOrder(Vector3::Origin());
-		pfAng.SetLength(pObj[NOBJ].pVertex.GetLength());
-		for(int i = 0; i < pObj[NOBJ].pVertex.GetLength(); i++)
+		pfAng.SetLength(pObj[NOBJ].vertices.GetLength());
+		for(int i = 0; i < pObj[NOBJ].vertices.GetLength(); i++)
 		{
-			pfAng[i] = pObj[NOBJ].pVertex[i].position.z * PI * 2;
+			pfAng[i] = pObj[NOBJ].vertices[i].position.z * PI * 2;
 		}
 		for(int i = 0; i < LANDSCAPEITER; i++)
 		{
@@ -36,9 +36,9 @@ public:
 			v.z = 0.5 - (float(rand()) / RAND_MAX);
 			v.Normalize();
 
-			for(int j = 0; j < pObj[NOBJ].pVertex.GetLength(); j++)
+			for(int j = 0; j < pObj[NOBJ].vertices.GetLength(); j++)
 			{
-				if(pObj[NOBJ].pVertex[j].position.Dot(v) < 0)
+				if(pObj[NOBJ].vertices[j].position.Dot(v) < 0)
 				{
 					pfAng[j] += 2.0f * g_fDegToRad;
 				}
@@ -51,10 +51,10 @@ public:
 
 		for(int i = 0; i < NOBJ; i++)
 		{
-			pObj[i].pFace = pObj[NOBJ].pFace;
-			pObj[i].pVertex.SetLength(pObj[NOBJ].pVertex.GetLength());
-			pObj[i].m_bsFlag.set( Actor::F_DRAW_TRANSPARENT );
-			pObj[i].m_bsFlag.set( Actor::F_NO_CULL );
+			pObj[i].faces = pObj[NOBJ].faces;
+			pObj[i].vertices.SetLength(pObj[NOBJ].vertices.GetLength());
+			pObj[i].flags.set( Actor::F_DRAW_TRANSPARENT );
+			pObj[i].flags.set( Actor::F_NO_CULL );
 		}
 
 		camera.position.z = -320;
@@ -68,7 +68,7 @@ public:
 //	camera.vPosition = ZVector(0, sin(fPos), cos(fPos)) * 200.0f;
 //	camera.PointAt(ZVector::Origin());
 
-		for(int i = 0; i < pObj[NOBJ].pVertex.GetLength(); i++)
+		for(int i = 0; i < pObj[NOBJ].vertices.GetLength(); i++)
 		{
 			pfAng[i] += pAudio->GetIntensity( ) * elapsed * 8.0 * 3.14159 / 180.0;
 		}
@@ -76,16 +76,16 @@ public:
 		{
 			float fOfs = i * 60.0 * 3.14159 / 180.0;
 			float fMult = 1.0 + (i * 1.0 / NOBJ);
-			for(int j = 0; j < pObj[i].pVertex.GetLength(); j++)
+			for(int j = 0; j < pObj[i].vertices.GetLength(); j++)
 			{
-				pObj[i].pVertex[j].position = pObj[NOBJ].pVertex[j].position * 200.0f * fMult * (1.0f + ((float)HILLSZ * (float)sin(pfAng[j] + fOfs)));
+				pObj[i].vertices[j].position = pObj[NOBJ].vertices[j].position * 200.0f * fMult * (1.0f + ((float)HILLSZ * (float)sin(pfAng[j] + fOfs)));
 			}
-			pObj[i].fPitch += elapsed * 2.0 * PI / 180.0;
-			pObj[i].fYaw += elapsed * 2.0 * PI / 180.0;
-			pObj[i].m_bsFlag.set( Actor::F_VALID_VERTEX_NORMALS, false );
+			pObj[i].pitch += elapsed * 2.0 * PI / 180.0;
+			pObj[i].yaw += elapsed * 2.0 * PI / 180.0;
+			pObj[i].flags.set( Actor::F_VALID_VERTEX_NORMALS, false );
 			float fBlend = float(i) / NOBJ;
 			float fMult2 = (i == 0)? 1.0f : std::min(1.0, pAudio->GetIntensity( ) * 1.5);//(averagefloat(i) / NOBJ);
-			pObj[i].wcAmbientLight = br * (ColorRgb::Grey(96 * fMult2 * (1 - (0.4 * float(i) / NOBJ))) - ColorRgb(fBlend * 40.0, fBlend * 40.0, fBlend * 5.0));
+			pObj[i].ambient_light_color = br * (ColorRgb::Grey(96 * fMult2 * (1 - (0.4 * float(i) / NOBJ))) - ColorRgb(fBlend * 40.0, fBlend * 40.0, fBlend * 5.0));
 			pObj[i].Calculate(&camera, elapsed);
 		}
 		return nullptr;
@@ -95,7 +95,7 @@ public:
 		Texture *tx = g_pD3D->Find(TC_EMMORPHINGSPHERE);
 		for(int i = 0; i < NOBJ; i++)
 		{
-			pObj[i].pTexture[0].Set(Actor::TextureEntry::T_ENVMAP, tx);
+			pObj[i].textures[0].Set(Actor::TextureType::Envmap, tx);
 		}
 		return nullptr;
 	}

@@ -126,23 +126,23 @@ Error* Canvas::Render( )
 		{
 			v[0].position.x = xc + (hi * 254 * s);
 			v[0].position.y = yc + (vi * 254 * s);
-			v[0].tex_coord[0].x = (1 / 256.0);
-			v[0].tex_coord[0].y = (1 / 256.0);
+			v[0].tex_coords[0].x = (1 / 256.0);
+			v[0].tex_coords[0].y = (1 / 256.0);
 
 			v[1].position.x = xc + ((hi+1) * 254 * s);
 			v[1].position.y = v[0].position.y;//yc + (vi * 254 * s);
-			v[1].tex_coord[0].x = (255 / 256.0);
-			v[1].tex_coord[0].y = (1 / 256.0);
+			v[1].tex_coords[0].x = (255 / 256.0);
+			v[1].tex_coords[0].y = (1 / 256.0);
 
 			v[2].position.x = xc + ((hi + 1) * 254 * s);
 			v[2].position.y = yc + ((vi + 1) * 254 * s);
-			v[2].tex_coord[0].x = (255 / 256.0);//1 - (0.5 / 256.0);
-			v[2].tex_coord[0].y = (255 / 256.0);//1;// - (1 / 256.0);
+			v[2].tex_coords[0].x = (255 / 256.0);//1 - (0.5 / 256.0);
+			v[2].tex_coords[0].y = (255 / 256.0);//1;// - (1 / 256.0);
 
 			v[3].position.x = xc + (hi * 254 * s);
 			v[3].position.y = v[2].position.y;//yc + ((vi + 1) * 254 * s);
-			v[3].tex_coord[0].x = (1 / 256.0);
-			v[3].tex_coord[0].y = (255 / 256.0);//1;// - (1 / 256.0);
+			v[3].tex_coords[0].x = (1 / 256.0);
+			v[3].tex_coords[0].y = (255 / 256.0);//1;// - (1 / 256.0);
 
 			if(v[0].position.y < 0)
 			{
@@ -150,23 +150,23 @@ Error* Canvas::Render( )
 				float fPos = (0 - v[0].position.y) / (v[2].position.y - v[0].position.y);
 
 				v[0].position.y = 0;
-				v[0].tex_coord[0].x = (v[0].tex_coord[0].x * (1 - fPos)) + (v[3].tex_coord[0].x * fPos);
-				v[0].tex_coord[0].y = (v[0].tex_coord[0].y * (1 - fPos)) + (v[3].tex_coord[0].y * fPos);
+				v[0].tex_coords[0].x = (v[0].tex_coords[0].x * (1 - fPos)) + (v[3].tex_coords[0].x * fPos);
+				v[0].tex_coords[0].y = (v[0].tex_coords[0].y * (1 - fPos)) + (v[3].tex_coords[0].y * fPos);
 
 				v[1].position.y = 0;
-				v[1].tex_coord[0].x = (v[1].tex_coord[0].x * (1 - fPos)) + (v[2].tex_coord[0].x * fPos);
-				v[1].tex_coord[0].y = (v[1].tex_coord[0].y * (1 - fPos)) + (v[2].tex_coord[0].y * fPos);
+				v[1].tex_coords[0].x = (v[1].tex_coords[0].x * (1 - fPos)) + (v[2].tex_coords[0].x * fPos);
+				v[1].tex_coords[0].y = (v[1].tex_coords[0].y * (1 - fPos)) + (v[2].tex_coords[0].y * fPos);
 			}
 			if(v[3].position.y > g_pD3D->GetHeight())
 			{
 				if(v[0].position.y > g_pD3D->GetHeight()) continue;
 
 				float fPos = (g_pD3D->GetHeight() - v[0].position.y) / (v[3].position.y - v[0].position.y);
-				v[2].tex_coord[0].x = (v[1].tex_coord[0].x * (1 - fPos)) + (v[2].tex_coord[0].x * fPos);
-				v[2].tex_coord[0].y = (v[1].tex_coord[0].y * (1 - fPos)) + (v[2].tex_coord[0].y * fPos);
+				v[2].tex_coords[0].x = (v[1].tex_coords[0].x * (1 - fPos)) + (v[2].tex_coords[0].x * fPos);
+				v[2].tex_coords[0].y = (v[1].tex_coords[0].y * (1 - fPos)) + (v[2].tex_coords[0].y * fPos);
 
-				v[3].tex_coord[0].x = (v[0].tex_coord[0].x * (1 - fPos)) + (v[3].tex_coord[0].x * fPos);
-				v[3].tex_coord[0].y = (v[0].tex_coord[0].y * (1 - fPos)) + (v[3].tex_coord[0].y * fPos);
+				v[3].tex_coords[0].x = (v[0].tex_coords[0].x * (1 - fPos)) + (v[3].tex_coords[0].x * fPos);
+				v[3].tex_coords[0].y = (v[0].tex_coords[0].y * (1 - fPos)) + (v[3].tex_coords[0].y * fPos);
 
 				v[2].position.y = v[3].position.y = (float)g_pD3D->GetHeight();
 			}

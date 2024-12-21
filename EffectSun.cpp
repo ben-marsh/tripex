@@ -52,8 +52,8 @@ public:
 //			obj[o]->Create(TRI * 2 * ((LAYERS * 2) + 1), TRI * ((LAYERS * 2) + 1));
 //			obj[o]->Create((LAYERS*2+1)*TRI*2, TRI * 2 * (LAYERS*2+1));
 	//		pObj[o].pVertex.SetFormat(D3DFVF_DIFFUSE);
-			pObj[o].pVertex.SetLength((LAYERS * 2 + 1) * TRI * 2);
-			pObj[o].pFace.SetLength(TRI * 2 * (LAYERS * 2 + 1));
+			pObj[o].vertices.SetLength((LAYERS * 2 + 1) * TRI * 2);
+			pObj[o].faces.SetLength(TRI * 2 * (LAYERS * 2 + 1));
 //			obj[o]->x = 400.0 * cos(o * 2.0 * 3.14159 / RINGS);
 //			obj[o]->y = 400.0 * sin(o * 2.0 * 3.14159 / RINGS);
 //				(TRI * 2 * ((LAYERS * 2) + 1)) + 1, TRI * 2 * ((LAYERS * 2) + 1));
@@ -64,31 +64,31 @@ public:
 				float ang = 10 * PI * a / (180 * LAYERS);
 				for(int i = 0; i < TRI; i++)
 				{
-					pObj[o].pVertex[base + i].position.x = sin(i * PI2 / TRI) * INNER * cos(ang);
-					pObj[o].pVertex[base + i].position.y = cos(i * PI2 / TRI) * INNER * cos(ang);
-					pObj[o].pVertex[base + i].position.z = INNER * sin(ang);
+					pObj[o].vertices[base + i].position.x = sin(i * PI2 / TRI) * INNER * cos(ang);
+					pObj[o].vertices[base + i].position.y = cos(i * PI2 / TRI) * INNER * cos(ang);
+					pObj[o].vertices[base + i].position.z = INNER * sin(ang);
 //					pObj[o].pVertex[base + i].GetDiffuse() = ZColour(128.0 / EXPDIV, 77.0 / EXPDIV, 243.0 / EXPDIV); //0.6 / 25, 0.5 / 25);
 
-					pObj[o].pVertex[base + i + TRI].position.x = sin((i * PI2 / TRI) + (PI / TRI)) * OUTER * cos(ang);
-					pObj[o].pVertex[base + i + TRI].position.y = cos((i * PI2 / TRI) + (PI / TRI)) * OUTER * cos(ang);
-					pObj[o].pVertex[base + i + TRI].position.z = OUTER * sin(ang);
+					pObj[o].vertices[base + i + TRI].position.x = sin((i * PI2 / TRI) + (PI / TRI)) * OUTER * cos(ang);
+					pObj[o].vertices[base + i + TRI].position.y = cos((i * PI2 / TRI) + (PI / TRI)) * OUTER * cos(ang);
+					pObj[o].vertices[base + i + TRI].position.z = OUTER * sin(ang);
 //					pObj[o].pVertex[base + i + TRI].GetDiffuse() = ZColour(0, 64.0 / EXPDIV, 0);
 
-					pObj[o].pFace[base + i][0] = base + i;
-					pObj[o].pFace[base + i][1] = base + ((i + 1) % TRI);
-					pObj[o].pFace[base + i][2] = base + i + TRI;
+					pObj[o].faces[base + i][0] = base + i;
+					pObj[o].faces[base + i][1] = base + ((i + 1) % TRI);
+					pObj[o].faces[base + i][2] = base + i + TRI;
 
-					pObj[o].pFace[base + i + TRI][0] = base + i;
-					pObj[o].pFace[base + i + TRI][2] = base + ((i + 1) % TRI);
-					pObj[o].pFace[base + i + TRI][1] = base + i + TRI;
+					pObj[o].faces[base + i + TRI][0] = base + i;
+					pObj[o].faces[base + i + TRI][2] = base + ((i + 1) % TRI);
+					pObj[o].faces[base + i + TRI][1] = base + i + TRI;
 				}
 				base += TRI * 2;
 			}
 
-			pObj[o].m_bsFlag.set(Actor::F_DRAW_TRANSPARENT);
-			pObj[o].m_bsFlag.set(Actor::F_DRAW_Z_BUFFER, false);
-			pObj[o].nExposure = EXPOSURE;
-			pObj[o].fFrameHistory = EXPFRAMES;
+			pObj[o].flags.set(Actor::F_DRAW_TRANSPARENT);
+			pObj[o].flags.set(Actor::F_DRAW_Z_BUFFER, false);
+			pObj[o].exposure = EXPOSURE;
+			pObj[o].frame_history = EXPFRAMES;
 
 		
 		//		obj[o]->property(objTransparent | /*objDecal | */objVertexColoured, true);
@@ -142,23 +142,23 @@ public:
  
 				if((i % 3) == 0)
 				{
-					pObj[i].fRoll += 0.1f * as[i][0][0];
-					pObj[i].fPitch += pAudio->GetDampenedBand( pEffectPtr->fSensitivity, 3.0f/16.0f, 4.0f/16.0f) * as[i][1][0];
-					pObj[i].fYaw += pAudio->GetDampenedBand( pEffectPtr->fSensitivity, 4.0f/16.0f, 5.0f/16.0f) * as[i][2][0];
-					pObj[i].fPitch = Bound<float>(pObj[i].fPitch, -ANGSZ, ANGSZ);
-					pObj[i].fYaw = Bound<float>(pObj[i].fYaw, -ANGSZ, ANGSZ);
+					pObj[i].roll += 0.1f * as[i][0][0];
+					pObj[i].pitch += pAudio->GetDampenedBand( pEffectPtr->fSensitivity, 3.0f/16.0f, 4.0f/16.0f) * as[i][1][0];
+					pObj[i].yaw += pAudio->GetDampenedBand( pEffectPtr->fSensitivity, 4.0f/16.0f, 5.0f/16.0f) * as[i][2][0];
+					pObj[i].pitch = Bound<float>(pObj[i].pitch, -ANGSZ, ANGSZ);
+					pObj[i].yaw = Bound<float>(pObj[i].yaw, -ANGSZ, ANGSZ);
 				}
 				if((i % 3) == 1)
 				{
-					pObj[i].fRoll += pAudio->GetDampenedBand(pEffectPtr->fSensitivity, 2.0f/16.0f, 3.0f/16.0f) * as[i][0][0];
-					pObj[i].fPitch += 0.1f * as[i][1][0];
-					pObj[i].fYaw += 1.5f * pAudio->GetDampenedBand(pEffectPtr->fSensitivity, 2.0f/16.0f, 4.0f/16.0f) * as[i][2][0];
+					pObj[i].roll += pAudio->GetDampenedBand(pEffectPtr->fSensitivity, 2.0f/16.0f, 3.0f/16.0f) * as[i][0][0];
+					pObj[i].pitch += 0.1f * as[i][1][0];
+					pObj[i].yaw += 1.5f * pAudio->GetDampenedBand(pEffectPtr->fSensitivity, 2.0f/16.0f, 4.0f/16.0f) * as[i][2][0];
 				}
 				if((i % 3) == 2) 
 				{
-					pObj[i].fRoll += pAudio->GetDampenedBand(pEffectPtr->fSensitivity, 1/16.0f, 2/16.0f) * as[i][0][0];
-					pObj[i].fPitch += pAudio->GetIntensity( ) * as[i][1][0];
-					pObj[i].fYaw += 0.1f * as[i][2][0];
+					pObj[i].roll += pAudio->GetDampenedBand(pEffectPtr->fSensitivity, 1/16.0f, 2/16.0f) * as[i][0][0];
+					pObj[i].pitch += pAudio->GetIntensity( ) * as[i][1][0];
+					pObj[i].yaw += 0.1f * as[i][2][0];
 				}
 	//for(int o = 0; o < RINGS; o++)
 	//{
@@ -167,12 +167,12 @@ public:
 				{
 					for(int j = 0; j < TRI; j++)
 					{
-						pObj[i].pVertex[base + j].diffuse = ColorRgb((uint8)(brightness * 128.0f / EXPDIV), (uint8)(brightness * 77.0f / EXPDIV), (uint8)(brightness * 243.0f / EXPDIV)); //0.6 / 25, 0.5 / 25);
-						pObj[i].pVertex[base + j + TRI].diffuse = ColorRgb(0, (uint8)(brightness * 64.0f / EXPDIV), 0);
+						pObj[i].vertices[base + j].diffuse = ColorRgb((uint8)(brightness * 128.0f / EXPDIV), (uint8)(brightness * 77.0f / EXPDIV), (uint8)(brightness * 243.0f / EXPDIV)); //0.6 / 25, 0.5 / 25);
+						pObj[i].vertices[base + j + TRI].diffuse = ColorRgb(0, (uint8)(brightness * 64.0f / EXPDIV), 0);
 					}
 					base += 2 * TRI;
 				}
-				pObj[i].m_bsFlag.set(Actor::F_VALID_VERTEX_DIFFUSE);
+				pObj[i].flags.set(Actor::F_VALID_VERTEX_DIFFUSE);
 	//}
 //			obj[i]->ExposureCapture();
 				pObj[i].Calculate(&cCamera, 1.0);

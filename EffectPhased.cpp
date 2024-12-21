@@ -28,14 +28,14 @@ public:
 		fFirstCalc = false;
 		accum = 0;
 
-		obj.pVertex.SetLength(DEPTH*DEPTH*DEPTH);
-		obj.fFrameHistory = 5.0f;
-		obj.m_bsFlag.set( Actor::F_DRAW_TRANSPARENT );
-		obj.m_bsFlag.set( Actor::F_DRAW_VERTEX_SPRITES );
+		obj.vertices.SetLength(DEPTH*DEPTH*DEPTH);
+		obj.frame_history = 5.0f;
+		obj.flags.set( Actor::F_DRAW_TRANSPARENT );
+		obj.flags.set( Actor::F_DRAW_VERTEX_SPRITES );
 //		obj.Set(ZObject::DoRotationHistory);
 //		obj.Set(ZObject::DoFrameHistory);// = (1 << 24L),
 
-		obj.nExposure = 6;//3;//4;//6;
+		obj.exposure = 6;//3;//4;//6;
 //		obj.wcAmbientLight = ZColour::Grey(64);
 
 		int index = 0;
@@ -45,9 +45,9 @@ public:
 			{
 				for(int z = 0; z < DEPTH; z++)
 				{
-					obj.pVertex[index].position.x = (x - (DEPTH/2)) * MAG;
-					obj.pVertex[index].position.y = (y - (DEPTH/2)) * MAG;
-					obj.pVertex[index].position.z = (z - (DEPTH/2)) * MAG;
+					obj.vertices[index].position.x = (x - (DEPTH/2)) * MAG;
+					obj.vertices[index].position.y = (y - (DEPTH/2)) * MAG;
+					obj.vertices[index].position.z = (z - (DEPTH/2)) * MAG;
 					index++;
 				}
 			}
@@ -60,16 +60,16 @@ public:
 		float fMult = elapsed;//10.0 / FRAMEFAC;
 
 		a += fMult * (pAudio->GetIntensity( ) + 0.1) * 3.14159 / 180.0;
-		obj.fRoll += fMult * (pAudio->GetIntensity( ) + (pAudio->GetBeat( ) * 2.0)) * 2/*5*//*7*/ * 3.14159 / 180.0;
-		obj.fPitch += fMult * (pAudio->GetIntensity( ) + 0.1) * 4/*4*/ /*8*/ * 3.14159 / 180;
-		obj.fYaw += fMult * pAudio->GetBeat( ) * 3/*3*//*5*/ * 3.14159 / 180.0;
+		obj.roll += fMult * (pAudio->GetIntensity( ) + (pAudio->GetBeat( ) * 2.0)) * 2/*5*//*7*/ * 3.14159 / 180.0;
+		obj.pitch += fMult * (pAudio->GetIntensity( ) + 0.1) * 4/*4*/ /*8*/ * 3.14159 / 180;
+		obj.yaw += fMult * pAudio->GetBeat( ) * 3/*3*//*5*/ * 3.14159 / 180.0;
 
-		obj.wcAmbientLight = ColorRgb::Grey(2 * 0.15 * brightness * 255.0);//color = D3DRGB(0.15 * brightness, 0.15 * brightness, 0.15 * brightness);
+		obj.ambient_light_color = ColorRgb::Grey(2 * 0.15 * brightness * 255.0);//color = D3DRGB(0.15 * brightness, 0.15 * brightness, 0.15 * brightness);
 
 //		FILE *file = fopen("c:\\elapsed.txt", "at");
 //		fprintf(file, "elapsed: %f\n", elapsed);
 //		fclose(file);
-		obj.wcExposureLightChange = WideColorRgb(-2, -2, 0);
+		obj.exposure_light_delta = WideColorRgb(-2, -2, 0);
 
 		obj.Calculate(&camera, elapsed);
 
@@ -79,7 +79,7 @@ public:
 	Error* Reconfigure(AudioData* pAudio) override
 	{
 		Texture *tx = g_pD3D->Find(TC_LBPHASED);
-		obj.pTexture[0].Set(Actor::TextureEntry::T_SPRITE, tx);
+		obj.textures[0].Set(Actor::TextureType::Sprite, tx);
 		return nullptr;
 	}
 	Error* Render() override

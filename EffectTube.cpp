@@ -28,59 +28,59 @@ public:
 	EffectTube()
 	{
 		int i, j;
-		coil.pVertex.SetLength(CLENGTH * 4);
-		coil.pFace.SetLength((CLENGTH - 1) * 8);
-		coil.m_bsFlag.set(Actor::F_DRAW_TRANSPARENT);
-		coil.m_bsFlag.set(Actor::F_DRAW_Z_BUFFER);
-		coil.m_bsFlag.set(Actor::F_NO_CULL);
+		coil.vertices.SetLength(CLENGTH * 4);
+		coil.faces.SetLength((CLENGTH - 1) * 8);
+		coil.flags.set(Actor::F_DRAW_TRANSPARENT);
+		coil.flags.set(Actor::F_DRAW_Z_BUFFER);
+		coil.flags.set(Actor::F_NO_CULL);
 
 		int v = 0, f = 0;
 		for(i = 0; i < CLENGTH; i++)
 		{
 			float angle = i * 4.0f * PI2 / CLENGTH;
 
-			coil.pVertex[v].position.x = (i - (CLENGTH * 0.5f)) * CDIFF;
-			coil.pVertex[v].position.y = CORADIUS * sinf(angle - CANGDIFF);
-			coil.pVertex[v].position.z = CORADIUS * cosf(angle - CANGDIFF);
+			coil.vertices[v].position.x = (i - (CLENGTH * 0.5f)) * CDIFF;
+			coil.vertices[v].position.y = CORADIUS * sinf(angle - CANGDIFF);
+			coil.vertices[v].position.z = CORADIUS * cosf(angle - CANGDIFF);
 			v++;
 
-			coil.pVertex[v].position.x = (i - (CLENGTH * 0.5f)) * CDIFF;
-			coil.pVertex[v].position.y = CORADIUS * sinf(angle + CANGDIFF);
-			coil.pVertex[v].position.z = CORADIUS * cosf(angle + CANGDIFF);
+			coil.vertices[v].position.x = (i - (CLENGTH * 0.5f)) * CDIFF;
+			coil.vertices[v].position.y = CORADIUS * sinf(angle + CANGDIFF);
+			coil.vertices[v].position.z = CORADIUS * cosf(angle + CANGDIFF);
 			v++;
 
-			coil.pVertex[v].position.x = (i - (CLENGTH * 0.5f)) * CDIFF;
-			coil.pVertex[v].position.y = CIRADIUS * sinf(angle + CANGDIFF);
-			coil.pVertex[v].position.z = CIRADIUS * cosf(angle + CANGDIFF);
+			coil.vertices[v].position.x = (i - (CLENGTH * 0.5f)) * CDIFF;
+			coil.vertices[v].position.y = CIRADIUS * sinf(angle + CANGDIFF);
+			coil.vertices[v].position.z = CIRADIUS * cosf(angle + CANGDIFF);
 			v++;
 
-			coil.pVertex[v].position.x = (i - (CLENGTH * 0.5f)) * CDIFF;
-			coil.pVertex[v].position.y = CIRADIUS * sinf(angle - CANGDIFF);
-			coil.pVertex[v].position.z = CIRADIUS * cosf(angle - CANGDIFF);
+			coil.vertices[v].position.x = (i - (CLENGTH * 0.5f)) * CDIFF;
+			coil.vertices[v].position.y = CIRADIUS * sinf(angle - CANGDIFF);
+			coil.vertices[v].position.z = CIRADIUS * cosf(angle - CANGDIFF);
 			v++;
 		}
 		for(i = 0; i < CLENGTH - 1; i++)
 		{
 			for(j = 0; j < 4; j++)
 			{
-				coil.pFace[f][0] = (i * 4) + j;
-				coil.pFace[f][2] = ((i + 1) * 4) + j;
-				coil.pFace[f][1] = (i * 4) + ((j + 1) % 4);
+				coil.faces[f][0] = (i * 4) + j;
+				coil.faces[f][2] = ((i + 1) * 4) + j;
+				coil.faces[f][1] = (i * 4) + ((j + 1) % 4);
 				f++;
 
-				coil.pFace[f][0] = ((i + 1) * 4) + j;
-				coil.pFace[f][2] = ((i + 1) * 4) + ((j + 1) % 4);
-				coil.pFace[f][1] = (i * 4) + ((j + 1) % 4);
+				coil.faces[f][0] = ((i + 1) * 4) + j;
+				coil.faces[f][2] = ((i + 1) * 4) + ((j + 1) % 4);
+				coil.faces[f][1] = (i * 4) + ((j + 1) % 4);
 				f++;
 			}
 		}
-		_ASSERT(f == coil.pFace.GetLength());
+		_ASSERT(f == coil.faces.GetLength());
 //	coil.FindVertexNormals();
 
-		obj.pVertex.SetLength(PTCIRCUM * PTLENGTH);
-		obj.pFace.SetLength((PTCIRCUM * 2) * (PTLENGTH - 1));
-		obj.m_bsFlag.set( Actor::F_DRAW_Z_BUFFER );
-		obj.m_bsFlag.set( Actor::F_DRAW_TRANSPARENT );
+		obj.vertices.SetLength(PTCIRCUM * PTLENGTH);
+		obj.faces.SetLength((PTCIRCUM * 2) * (PTLENGTH - 1));
+		obj.flags.set( Actor::F_DRAW_Z_BUFFER );
+		obj.flags.set( Actor::F_DRAW_TRANSPARENT );
 
 		f = 0;
 		for(i = 0; i < PTLENGTH - 1; i++)
@@ -98,14 +98,14 @@ public:
 				obj->face[f].v[2] = (i * PTCIRCUM) + ((j + 1) % PTCIRCUM);
 				f++;
 */
-				obj.pFace[f][0] = (i * PTCIRCUM) + j;
-				obj.pFace[f][2] = ((i + 1) * PTCIRCUM) + j;//(i + 1) * PTCIRCUM) + j;
-				obj.pFace[f][1] = (i * PTCIRCUM) + ((j + 1) % PTCIRCUM);
+				obj.faces[f][0] = (i * PTCIRCUM) + j;
+				obj.faces[f][2] = ((i + 1) * PTCIRCUM) + j;//(i + 1) * PTCIRCUM) + j;
+				obj.faces[f][1] = (i * PTCIRCUM) + ((j + 1) % PTCIRCUM);
 				f++;
 
-				obj.pFace[f][0] = ((i + 1) * PTCIRCUM) + j;
-				obj.pFace[f][2] = ((i + 1) * PTCIRCUM) + ((j + 1) % PTCIRCUM);
-				obj.pFace[f][1] = (i * PTCIRCUM) + ((j + 1) % PTCIRCUM);
+				obj.faces[f][0] = ((i + 1) * PTCIRCUM) + j;
+				obj.faces[f][2] = ((i + 1) * PTCIRCUM) + ((j + 1) % PTCIRCUM);
+				obj.faces[f][1] = (i * PTCIRCUM) + ((j + 1) % PTCIRCUM);
 				f++;
 			}
 		}
@@ -115,12 +115,12 @@ public:
 
 			for(j = 0; j < PTCIRCUM; j++)
 			{
-				obj.pVertex[(i * PTCIRCUM) + j].diffuse = ColorRgb::Grey((int)(br * 255.0f));
+				obj.vertices[(i * PTCIRCUM) + j].diffuse = ColorRgb::Grey((int)(br * 255.0f));
 			}
 		}
-		obj.m_bsFlag.set(Actor::F_VALID_VERTEX_DIFFUSE);
-		coil.m_bsFlag.set(Actor::F_VALID_VERTEX_DIFFUSE);
-		_ASSERT(f == obj.pFace.GetLength());
+		obj.flags.set(Actor::F_VALID_VERTEX_DIFFUSE);
+		coil.flags.set(Actor::F_VALID_VERTEX_DIFFUSE);
+		_ASSERT(f == obj.faces.GetLength());
 
 //	scene = new World();
 //	scene->vpObject.Add(obj);
@@ -147,7 +147,7 @@ public:
 				double br = std::min(1.0, sin(i * 3.14159 / CLENGTH) * 5) * brightness;
 				for(j = 0; j < 4; j++)
 				{
-					coil.pVertex[(i * 4) + j].diffuse = ColorRgb::Grey((int)(255.0f * br));
+					coil.vertices[(i * 4) + j].diffuse = ColorRgb::Grey((int)(255.0f * br));
 				}
 			}
 			for(i = 0; i < PTLENGTH; i++)
@@ -156,7 +156,7 @@ public:
 	
 				for(j = 0; j < PTCIRCUM; j++)
 				{
-					obj.pVertex[(i * PTCIRCUM) + j].diffuse = ColorRgb::Grey((int)(255.0f * br));
+					obj.vertices[(i * PTCIRCUM) + j].diffuse = ColorRgb::Grey((int)(255.0f * br));
 				}
 			}
 
@@ -176,21 +176,21 @@ public:
 				{
 					float angle = j * PI2 / PTCIRCUM;
 
-					obj.pVertex[k].position.x = (i - (PTLENGTH*0.5f)) * PTDIST;
-					obj.pVertex[k].position.y = height[i][j] * fLenMult * sinf(angle);	
-					obj.pVertex[k].position.z = height[i][j] * fLenMult * cosf(angle);
+					obj.vertices[k].position.x = (i - (PTLENGTH*0.5f)) * PTDIST;
+					obj.vertices[k].position.y = height[i][j] * fLenMult * sinf(angle);	
+					obj.vertices[k].position.z = height[i][j] * fLenMult * cosf(angle);
 
 					k++;
 				}
 			}	
 
-			obj.fPitch += 2.0f * g_fDegToRad;//2 * 3.14159 / 180.0;
-			obj.fYaw += 1.5f * g_fDegToRad;//1.5 * 3.14159 / 180.0;
-			coil.fPitch += 2.0f * g_fDegToRad;//2 * 3.14159 / 180.0;
-			coil.fYaw += 1.5f * g_fDegToRad;//1.5 * 3.14159 / 180.0;
+			obj.pitch += 2.0f * g_fDegToRad;//2 * 3.14159 / 180.0;
+			obj.yaw += 1.5f * g_fDegToRad;//1.5 * 3.14159 / 180.0;
+			coil.pitch += 2.0f * g_fDegToRad;//2 * 3.14159 / 180.0;
+			coil.yaw += 1.5f * g_fDegToRad;//1.5 * 3.14159 / 180.0;
 
 			accum--;
-			obj.m_bsFlag.set(Actor::F_VALID_VERTEX_NORMALS, false);
+			obj.flags.set(Actor::F_VALID_VERTEX_NORMALS, false);
 //			fChanged = true;
 		}
 //	if(fChanged)
@@ -227,8 +227,8 @@ public:
 	Error* Reconfigure(AudioData* pAudio) override
 	{
 		Texture *tx = g_pD3D->Find(TC_EMTUBE);
-		coil.pTexture[0].Set(Actor::TextureEntry::T_ENVMAP, tx);
-		obj.pTexture[0].Set(Actor::TextureEntry::T_ENVMAP, tx);
+		coil.textures[0].Set(Actor::TextureType::Envmap, tx);
+		obj.textures[0].Set(Actor::TextureType::Envmap, tx);
 
 //	coil->SetTexture(tx);
 //	obj->SetTexture(tx);

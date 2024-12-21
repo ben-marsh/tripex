@@ -49,14 +49,14 @@ public:
 		dTilt = 0;
 
 		nStage = 0;
-		obj.pVertex.SetLength(SOURCES);
+		obj.vertices.SetLength(SOURCES);
 	//	pObj->Create(SOURCES, 1);
-		obj.m_bsFlag.set( Actor::F_DRAW_TRANSPARENT );
-		obj.m_bsFlag.set( Actor::F_DRAW_VERTEX_SPRITES );
-		obj.wcExposureLightChange = WideColorRgb(-60, -60, -60);
-		obj.nExposure = 3;
-		obj.fSpriteSize = 7.0;
-		obj.fFrameHistory = 2.0;
+		obj.flags.set( Actor::F_DRAW_TRANSPARENT );
+		obj.flags.set( Actor::F_DRAW_VERTEX_SPRITES );
+		obj.exposure_light_delta = WideColorRgb(-60, -60, -60);
+		obj.exposure = 3;
+		obj.sprite_size = 7.0;
+		obj.frame_history = 2.0;
 		camera.position.z = -240;
 
 		for(int i = 0; i < SOURCES; i++)
@@ -86,7 +86,7 @@ public:
 		float fTwistMult = sin(dTilt);// * 3.14159 / 128.0);
 		float multp = (/*fac*/dTilt * pAudio->GetIntensity( )) + (1 - dTilt/*fac*/) + 0.1;
 
-		obj.pVertex.SetLength(SOURCES);
+		obj.vertices.SetLength(SOURCES);
 		for(int i = 0; i < SOURCES; i++)
 		{
 			float x = cos(pdAng[i]) * pdRadius[i];
@@ -96,9 +96,9 @@ public:
 			float sin_t = sin(pdTilt[i] * fTwistMult);
 			float cos_t = cos(pdTilt[i] * fTwistMult);
 
-			obj.pVertex[i].position.x = (y * cos_t) + (x * sin_t);
-			obj.pVertex[i].position.y = (y * sin_t) + (x * cos_t);
-			obj.pVertex[i].position.z = z;
+			obj.vertices[i].position.x = (y * cos_t) + (x * sin_t);
+			obj.vertices[i].position.y = (y * sin_t) + (x * cos_t);
+			obj.vertices[i].position.z = z;
 
 			pdAng[i] += elapsed * multp * (pAudio->GetIntensity( ) + 0.1) * pdSpeed[i] * 3.14159 / 180.0;
 			pdTilt[i] += (pAudio->GetIntensity( ) + 0.1) * elapsed * multp * 1 * 3.14159 / 180.0;
@@ -106,11 +106,11 @@ public:
 			float fTransMult = FOREGROUNDBR + ((z / -100.0) * (1 - FOREGROUNDBR));
 			float fBr = brightness * fTransMult / 2.0;
 
-			obj.pVertex[i].diffuse = ColorRgb::Grey(0.6 * fBr * 255.0);
+			obj.vertices[i].diffuse = ColorRgb::Grey(0.6 * fBr * 255.0);
 	//		alObject[i]->alpha = 128*brightness*transMult;
 	//		fvVertex++;
 		}
-		obj.m_bsFlag.set( Actor::F_VALID_VERTEX_DIFFUSE );
+		obj.flags.set( Actor::F_VALID_VERTEX_DIFFUSE );
 		obj.Calculate(&camera, elapsed);
 		return nullptr;
 	}
@@ -136,7 +136,7 @@ public:
 	}
 	Error* Reconfigure(AudioData* pAudio) override
 	{
-		obj.pTexture[0].Set(Actor::TextureEntry::T_SPRITE, g_pD3D->Find(TC_LBCOLLAPSINGSPHERE));
+		obj.textures[0].Set(Actor::TextureType::Sprite, g_pD3D->Find(TC_LBCOLLAPSINGSPHERE));
 		pTint = g_pD3D->Find(TC_WTCOLLAPSINGSPHERE);
 		return nullptr;
 	}

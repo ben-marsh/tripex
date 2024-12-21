@@ -65,11 +65,11 @@ public:
 		dMult = 0;
 
 		fAng = 0.0f;
-		obj.pTexture[0].m_nType = Actor::TextureEntry::T_SPRITE;
-		obj.m_bsFlag.set( Actor::F_DRAW_VERTEX_SPRITES );
-		obj.m_bsFlag.set( Actor::F_DRAW_TRANSPARENT);
-		obj.fFrameHistory = 8.0f;
-		obj.fSpriteHistoryLength = 0.3f;
+		obj.textures[0].type = Actor::TextureType::Sprite;
+		obj.flags.set( Actor::F_DRAW_VERTEX_SPRITES );
+		obj.flags.set( Actor::F_DRAW_TRANSPARENT);
+		obj.frame_history = 8.0f;
+		obj.sprite_history_length = 0.3f;
 		//pObjPlane[i].pVertex.SetFormat(D3DFVF_TEX1);
 
 		for(int i = 0; i < TWISTPLANES; i++)
@@ -77,13 +77,13 @@ public:
 			pfPos[i] = 2;
 			pfSpeed[i] = 0;
 
-			pObjPlane[i].m_bsFlag.set( Actor::F_DRAW_TRANSPARENT );
-			pObjPlane[i].m_bsFlag.set( Actor::F_DRAW_VERTEX_SPRITES );
+			pObjPlane[i].flags.set( Actor::F_DRAW_TRANSPARENT );
+			pObjPlane[i].flags.set( Actor::F_DRAW_VERTEX_SPRITES );
 //		pObjPlane[i].Clear(ZObject::DoScreenTransform);
-			pObjPlane[i].fSpriteSize = 5.0f;//fRenderAsLights(10.0);
-			pObjPlane[i].m_bsFlag.set( Actor::F_DO_FRAME_HISTORY );
+			pObjPlane[i].sprite_size = 5.0f;//fRenderAsLights(10.0);
+			pObjPlane[i].flags.set( Actor::F_DO_FRAME_HISTORY );
 
-			pObjPlane[i].pVertex.SetLength(TWISTPLANECORNERS);
+			pObjPlane[i].vertices.SetLength(TWISTPLANECORNERS);
 			Vector3 vCorner[BEZIERS];
 			for(int j = 0; j < BEZIERS; j++)
 			{
@@ -100,10 +100,10 @@ public:
 				Vector3 &v1 = vCorner[j / TWISTPLANEEDGE];
 				Vector3 &v2 = vCorner[((j / TWISTPLANEEDGE) + 1) % BEZIERS];
 
-				pObjPlane[i].pVertex[j].position = (v1 * (1 - fPos)) + (v2 * fPos);
+				pObjPlane[i].vertices[j].position = (v1 * (1 - fPos)) + (v2 * fPos);
 			}
 
-			pObjPlane[i].pTexture[0].m_nType = Actor::TextureEntry::T_SPRITE;
+			pObjPlane[i].textures[0].type = Actor::TextureType::Sprite;
 
 //		if(i == 0 || i == TWISTPLANES - 1)
 //		{
@@ -116,20 +116,20 @@ public:
 		}
 		for(int i = 0; i < BEZIERS; i++)
 		{
-			pObj[i].pVertex.SetLength(BEZIERPOINTS);
-			pObj[i].m_bsFlag.set( Actor::F_DRAW_TRANSPARENT );
-			pObj[i].m_bsFlag.set( Actor::F_DRAW_VERTEX_SPRITES );
+			pObj[i].vertices.SetLength(BEZIERPOINTS);
+			pObj[i].flags.set( Actor::F_DRAW_TRANSPARENT );
+			pObj[i].flags.set( Actor::F_DRAW_VERTEX_SPRITES );
 			for(int j = 0; j < BEZIERPOINTS; j++)
 			{
 //				pObj[i].pVertex[j].GetDiffuse() = ZColour::Grey(255.0 * (0.4 + (0.6 * fabs(cos(j * 3.14159 / BEZIERPOINTS)))));
 			}
 //			pObj[i]->Clear(ZObject::DoScreenTransform);
-			pObj[i].m_bsFlag.set( Actor::F_NO_TRANSFORM );
-			pObj[i].fSpriteSize = 5.0;
-			pObj[i].fFrameHistory = 1.0f;
-			pObj[i].fSpriteHistoryLength = 60.0f;
+			pObj[i].flags.set( Actor::F_NO_TRANSFORM );
+			pObj[i].sprite_size = 5.0;
+			pObj[i].frame_history = 1.0f;
+			pObj[i].sprite_history_length = 60.0f;
 //			pObj[i].Set(ZObject::DrawVertexSpriteHistory);
-			pObj[i].pTexture[0].m_nType = Actor::TextureEntry::T_SPRITE;
+			pObj[i].textures[0].type = Actor::TextureType::Sprite;
 		}
 	}
 	Error* Calculate(float brightness, float elapsed, AudioData* pAudio) override
@@ -158,14 +158,14 @@ public:
 				pfPos[i] = pfPos[i] - (int)pfPos[i];
 			}
 
-			pObjPlane[i].fRoll += pfRS[i] * (pAudio->GetIntensity( ) + 0.1);
-			pObjPlane[i].fYaw += pfYS[i] * (pAudio->GetIntensity( ) + 0.1);
-			pObjPlane[i].fPitch += pfPS[i] * pAudio->GetIntensity( );
+			pObjPlane[i].roll += pfRS[i] * (pAudio->GetIntensity( ) + 0.1);
+			pObjPlane[i].yaw += pfYS[i] * (pAudio->GetIntensity( ) + 0.1);
+			pObjPlane[i].pitch += pfPS[i] * pAudio->GetIntensity( );
 
-			pObjPlane[i].vPosition.x = -(BEZIERHEIGHT / 2) + (i * BEZIERHEIGHT / (TWISTPLANES - 1.0));
-			pObjPlane[i].vPosition.z = -60;
+			pObjPlane[i].position.x = -(BEZIERHEIGHT / 2) + (i * BEZIERHEIGHT / (TWISTPLANES - 1.0));
+			pObjPlane[i].position.z = -60;
 			double dBr = brightness * 0.2 * (0.1 + (0.9 * fabs((i / dCentre) - 1)));
-			pObjPlane[i].wcAmbientLight = ColorRgb::Grey(255.0 * dBr);
+			pObjPlane[i].ambient_light_color = ColorRgb::Grey(255.0 * dBr);
 			pObjPlane[i].Calculate(&camera, elapsed);
 		}
 
@@ -173,17 +173,17 @@ public:
 		{
 			for(int j = 0; j < TWISTPLANES; j++)
 			{
-				bcEdge[j] = pObjPlane[j].ppFrame[0]->m_pvPosition[nCornerIndex[i]];
+				bcEdge[j] = pObjPlane[j].frames[0]->positions[nCornerIndex[i]];
 				// - ZVector(d3d->GetWidth() / 2.0, d3d->GetHeight() / 2.0, 0);
 					//rvertex[nCornerIndex[i]].sx, pObjPlane[j]->rvertex[nCornerIndex[i]].sy, pObjPlane[j]->rvertex[nCornerIndex[i]].sz);
 			}
 			for(int j = 0; j < BEZIERPOINTS; j++)	
 			{
-				pObj[i].pVertex[j].position = bcEdge.Calculate(double(j) / BEZIERPOINTS);
+				pObj[i].vertices[j].position = bcEdge.Calculate(double(j) / BEZIERPOINTS);
 			//	, &pObj[i]->vertex[j].x, &pObj[i]->vertex[j].y, &pObj[i]->vertex[j].z);
 			}
 			double dBr = brightness * 0.2;
-			pObj[i].wcAmbientLight = ColorRgb::Grey(255.0 * dBr);//(255D3DRGB(dBr, dBr, dBr);
+			pObj[i].ambient_light_color = ColorRgb::Grey(255.0 * dBr);//(255D3DRGB(dBr, dBr, dBr);
 			pObj[i].Calculate(&camera, elapsed);
 		}
 		
@@ -192,10 +192,10 @@ public:
 		for(; fel > 1.0; fel--)
 		{
 			fAng += 8.0f * g_fDegToRad;
-			obj.pVertex.SetLength(1);
-			obj.pVertex[0].position.x = 5 * cos(fAng);//pObj[0].pVertex[0].GetPosition();
-			obj.pVertex[0].position.y = 5 * sin(fAng);//pObj[0].pVertex[0].GetPosition();
-			obj.pVertex[0].position.z = -100;//pObj[0].pVertex[0].GetPosition();
+			obj.vertices.SetLength(1);
+			obj.vertices[0].position.x = 5 * cos(fAng);//pObj[0].pVertex[0].GetPosition();
+			obj.vertices[0].position.y = 5 * sin(fAng);//pObj[0].pVertex[0].GetPosition();
+			obj.vertices[0].position.z = -100;//pObj[0].pVertex[0].GetPosition();
 		}
 		obj.Calculate(&camera, elapsed);
 
@@ -253,15 +253,15 @@ public:
 	Error* Reconfigure(AudioData* pAudio) override
 	{
 		pTexture = g_pD3D->Find(TC_LBBEZIERCUBE);
-		testobj.pTexture[0].m_pTexture = pTexture;
-		obj.pTexture[0].m_pTexture = pTexture;
+		testobj.textures[0].texture = pTexture;
+		obj.textures[0].texture = pTexture;
 		for(int i = 0; i < TWISTPLANES; i++)
 		{
-			pObjPlane[i].pTexture[0].m_pTexture = pTexture;
+			pObjPlane[i].textures[0].texture = pTexture;
 		}
 		for(int i = 0; i < BEZIERS; i++)
 		{
-			pObj[i].pTexture[0].m_pTexture = pTexture;
+			pObj[i].textures[0].texture = pTexture;
 		}
 		pTint = g_pD3D->Find(TC_WTBEZIERCUBE);
 		return nullptr;

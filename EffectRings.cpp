@@ -48,10 +48,10 @@ public:
 		for(int i = 0; i < RINGS; i++)
 		{
 			pObj[i].CreateTorus(RINGSTART + (i*RINGSEP), 2.0f, 20 + i, 4);//5 + i, 4);
-			pObj[i].m_bsFlag.set(Actor::F_DRAW_TRANSPARENT);//property(objTransparent, true);
-			pObj[i].nExposure = std::max(1, 5 - (i / 3));
-			pObj[i].fFrameHistory = 2.0f;
-			pObj[i].wcExposureLightChange = WideColorRgb(-8, -8, 0);
+			pObj[i].flags.set(Actor::F_DRAW_TRANSPARENT);//property(objTransparent, true);
+			pObj[i].exposure = std::max(1, 5 - (i / 3));
+			pObj[i].frame_history = 2.0f;
+			pObj[i].exposure_light_delta = WideColorRgb(-8, -8, 0);
 		}
 
 		camera.position.z = -120;
@@ -89,14 +89,14 @@ public:
 
 			for(int i = 0; i < RINGS; i++)
 			{
-				pObj[i].fRoll += 1.0f * g_fDegToRad;//3.14159 / 180.0;//= roll[i * ringDelay];
-				pObj[i].fPitch = pitch[i * RINGDELAY];
-				pObj[i].fYaw = yaw[i * RINGDELAY];
+				pObj[i].roll += 1.0f * g_fDegToRad;//3.14159 / 180.0;//= roll[i * ringDelay];
+				pObj[i].pitch = pitch[i * RINGDELAY];
+				pObj[i].yaw = yaw[i * RINGDELAY];
 	
 				double b = std::max(std::min(1.0f, br * brightness[i]), 0.0f);
 
-				pObj[i].wcAmbientLight = ColorRgb::Grey((int)(b * 255.0f));//->color = D3DRGB(b,b,b);
-				pObj[i].vPosition.z = 50;
+				pObj[i].ambient_light_color = ColorRgb::Grey((int)(b * 255.0f));//->color = D3DRGB(b,b,b);
+				pObj[i].position.z = 50;
 			}
 			bChanged = true;
 			accum--;
@@ -116,7 +116,7 @@ public:
 		Texture *tx = g_pD3D->Find(TC_EMRINGS);
 		for (int i = 0; i < RINGS; i++)
 		{
-			pObj[i].pTexture[0].Set(Actor::TextureEntry::T_ENVMAP, tx);
+			pObj[i].textures[0].Set(Actor::TextureType::Envmap, tx);
 		}
 		return nullptr;
 	}

@@ -67,8 +67,8 @@ public:
 
 				double len = 0.75 + (av * 0.25 * cos(precalc_atan[i] + t));//);
 
-				grid.pVertex[i].tex_coord[0].x = (len * fx) + xp;
-				grid.pVertex[i].tex_coord[0].y = (len * fy) + yp;
+				grid.pVertex[i].tex_coords[0].x = (len * fx) + xp;
+				grid.pVertex[i].tex_coords[0].y = (len * fy) + yp;
 				grid.pVertex[i].diffuse = cColour;
 				i++;
 			}

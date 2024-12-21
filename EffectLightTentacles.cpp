@@ -27,16 +27,16 @@ public:
 		Actor sphere;
 		sphere.CreateGeosphere(1.0, NMPOINTS);
 
-		obj.m_bsFlag.set( Actor::F_DRAW_VERTEX_SPRITES );
-		obj.m_bsFlag.set( Actor::F_DO_POSITION_DELAY );
-		obj.m_bsFlag.set( Actor::F_DRAW_TRANSPARENT );
+		obj.flags.set( Actor::F_DRAW_VERTEX_SPRITES );
+		obj.flags.set( Actor::F_DO_POSITION_DELAY );
+		obj.flags.set( Actor::F_DRAW_TRANSPARENT );
 //		obj.Set(ZObject::ValidVertexColours);
-		obj.m_bsFlag.set( Actor::F_VALID_VERTEX_DIFFUSE );
+		obj.flags.set( Actor::F_VALID_VERTEX_DIFFUSE );
 //		obj.pVertex.SetFormat(D3DFVF_DIFFUSE);
-		obj.pVertex.SetLength(LENGTH * NMPOINTS);
-		obj.fSpriteSize = 5;//6;
-		obj.nExposure = 1;
-		obj.fFrameHistory = 3.0f;
+		obj.vertices.SetLength(LENGTH * NMPOINTS);
+		obj.sprite_size = 5;//6;
+		obj.exposure = 1;
+		obj.frame_history = 3.0f;
 
 		ColorRgb cEdge = ColorRgb(255, 225, 200);//222, 211);
 
@@ -44,14 +44,14 @@ public:
 		{
 			for(int j = 0; j < LENGTH; j++)
 			{
-				obj.pVertex[(i * LENGTH) + j].position = sphere.pVertex[i].position * (50 + (j * STEPSIZE));
+				obj.vertices[(i * LENGTH) + j].position = sphere.vertices[i].position * (50 + (j * STEPSIZE));
 				double dBr = (double(j) / LENGTH);
 				dBr = 1.0 - (dBr * dBr);
-				obj.pVertex[(i * LENGTH) + j].diffuse = ColorRgb::Blend(ColorRgb::White(), cEdge, (float)j / LENGTH) * dBr;//Grey(255.0 * dBr);
+				obj.vertices[(i * LENGTH) + j].diffuse = ColorRgb::Blend(ColorRgb::White(), cEdge, (float)j / LENGTH) * dBr;//Grey(255.0 * dBr);
 			}
 		}
-		obj.fFrameHistory = 11;
-		obj.fDelayHistory = 10.0f;
+		obj.frame_history = 11;
+		obj.delay_history = 10.0f;
 		obj.FindDelayValues();
 		camera.position.z = -120;
 	}
@@ -64,14 +64,14 @@ public:
 
 		if(pAudio->GetIntensity( ) > 0.5)
 		{
-			obj.fRoll += ((pAudio->GetIntensity( ) - 0.5) / 0.5) * elapsed * 2.0 * 3 * 3.14159 / 180.0;
+			obj.roll += ((pAudio->GetIntensity( ) - 0.5) / 0.5) * elapsed * 2.0 * 3 * 3.14159 / 180.0;
 		}
 		if(pAudio->GetIntensity( ) > 0.3)
 		{
-			obj.fPitch += ((pAudio->GetIntensity( ) - 0.3) / 0.7) * elapsed * 1.7 * 1.5 * 6.0 * 3.14159 / 180.0;
+			obj.pitch += ((pAudio->GetIntensity( ) - 0.3) / 0.7) * elapsed * 1.7 * 1.5 * 6.0 * 3.14159 / 180.0;
 		}
-		obj.fYaw += pAudio->GetIntensity( ) * elapsed * 4.0 * 3.14159 / 180.0;
-		obj.wcAmbientLight = ColorRgb::Grey(brightness * 255.0);
+		obj.yaw += pAudio->GetIntensity( ) * elapsed * 4.0 * 3.14159 / 180.0;
+		obj.ambient_light_color = ColorRgb::Grey(brightness * 255.0);
 //		obj.cAmbientLight = ZWideColour(255, 255, 255);
 		obj.Calculate(&camera, elapsed);
 
@@ -112,8 +112,8 @@ public:
 	}
 	Error* Reconfigure(AudioData* pAudio) override
 	{
-		obj.pTexture[0].m_nType = Actor::TextureEntry::T_SPRITE;
-		obj.pTexture[0].m_pTexture = g_pD3D->Find(TC_LBLIGHTTENTACLES);
+		obj.textures[0].type = Actor::TextureType::Sprite;
+		obj.textures[0].texture = g_pD3D->Find(TC_LBLIGHTTENTACLES);
 		ptTint = g_pD3D->Find(TC_WTLIGHTTENTACLES);
 		return nullptr;
 	}

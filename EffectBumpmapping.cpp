@@ -38,7 +38,7 @@ void MakeTentacles(Actor &obj, int segs, float l, float r)
 
 	float u[TTEMP] = { r,-r,-r, r }, v[TTEMP] = { r, r,-r,-r };
 
-	obj.pVertex.SetLength(TARMS * (((segs - 1) * TTEMP) + 1));
+	obj.vertices.SetLength(TARMS * (((segs - 1) * TTEMP) + 1));
 
 	int vn = 0, fn = 0;
 	for(int i = 0; i < 6; i++) // each arm
@@ -56,24 +56,24 @@ void MakeTentacles(Actor &obj, int segs, float l, float r)
 				{
 					if(j == segs - 2)
 					{
-						obj.pFace.Add(Face(vn + k, vn + ((k + 1) % TTEMP), vn + TTEMP));
+						obj.faces.Add(Face(vn + k, vn + ((k + 1) % TTEMP), vn + TTEMP));
 					}
 					else
 					{
-						obj.pFace.Add(Face(vn + k, vn + k + TTEMP, vn + ((k + 1) % TTEMP)));
-						obj.pFace.Add(Face(vn + ((k + 1) % TTEMP), vn + k + TTEMP, vn + TTEMP + ((k + 1) % TTEMP)));
+						obj.faces.Add(Face(vn + k, vn + k + TTEMP, vn + ((k + 1) % TTEMP)));
+						obj.faces.Add(Face(vn + ((k + 1) % TTEMP), vn + k + TTEMP, vn + TTEMP + ((k + 1) % TTEMP)));
 					}
 				}
 				for(int k = 0; k < TTEMP; k++)
 				{
 					Vector3 vDir = Vector3((mu[i].x * u[k]) + (mv[i].x * v[k]), (mu[i].y * u[k]) + (mv[i].y * v[k]), (mu[i].z * u[k]) + (mv[i].z * v[k]));
-					obj.pVertex[vn].position = center + (vDir * ((segs - 1.0f - j) / (segs - 1.0f)));
+					obj.vertices[vn].position = center + (vDir * ((segs - 1.0f - j) / (segs - 1.0f)));
 					vn++;
 				}
 			}
 			else 
 			{
-				obj.pVertex[vn].position = center;
+				obj.vertices[vn].position = center;
 				vn++;
 			}
 		}
@@ -148,11 +148,11 @@ public:
 		if(bMeshHQ) MakeTentacles(obj, /*25*/ 160, 200, 8);
 		else MakeTentacles(obj, /*25*/ 80, 200, 8);
 		obj.FindFaceOrder(Vector3::Origin());
-		obj.m_bsFlag.set( Actor::F_DO_POSITION_DELAY );
-		obj.m_bsFlag.set( Actor::F_DRAW_Z_BUFFER );
-		obj.fFrameHistory = 12.0f;
-		obj.fDelayHistory = 12.0f;
-		obj.fFrameTime = MIN_FRAME_TIME;//0.2;
+		obj.flags.set( Actor::F_DO_POSITION_DELAY );
+		obj.flags.set( Actor::F_DRAW_Z_BUFFER );
+		obj.frame_history = 12.0f;
+		obj.delay_history = 12.0f;
+		obj.frame_time = MIN_FRAME_TIME;//0.2;
 		obj.FindDelayValues();
 //	obj->fDelay(96, 8);
 
@@ -294,8 +294,8 @@ public:
 			{
 				for(y = 0; y <= grid.nHeight; y++)
 				{
-					grid.pVertex[i].tex_coord[0].x = gridbm.pVertex[i].tex_coord[0].x = precalc_u[x][y] + (tx / 256.0f);
-					grid.pVertex[i].tex_coord[0].y = gridbm.pVertex[i].tex_coord[0].y = precalc_v[x][y] + (ty / 256.0f);
+					grid.pVertex[i].tex_coords[0].x = gridbm.pVertex[i].tex_coords[0].x = precalc_u[x][y] + (tx / 256.0f);
+					grid.pVertex[i].tex_coords[0].y = gridbm.pVertex[i].tex_coords[0].y = precalc_v[x][y] + (ty / 256.0f);
 
 					float brav = precalc_c[x][y] * br * pAudio->GetIntensity( );//min(average, 1);
 					brav *= 1.6f;
@@ -369,7 +369,7 @@ public:
 //	if(FAILED(hRes)) return hRes;
 
 		/** TENTACLES **********/
-		obj.wcAmbientLight = ColorRgb::Grey((int)(brightness * 205.0f));
+		obj.ambient_light_color = ColorRgb::Grey((int)(brightness * 205.0f));
 		if( pAudio->IsBeat( ) && pAudio->GetBeat( ) > 0.9f) fTentacleDir = -fTentacleDir;
 		for(float fPos = 0;;)
 		{
@@ -377,15 +377,15 @@ public:
 			bool bLast = fNext > elapsed;
 
 			float fThis = std::min(MIN_FRAME_TIME, elapsed - fPos);
-			obj.fRoll += fThis * fTentacleDir * g_fDegToRad * 5.0f * (pAudio->GetIntensity( ) + 0.1f);
-			obj.fPitch += fThis * fTentacleDir * g_fDegToRad * 20.0f * pAudio->GetIntensity( );
-			obj.fYaw += fThis * fTentacleDir * g_fDegToRad * 10.0f * (pAudio->GetIntensity( ) + 0.1f);
+			obj.roll += fThis * fTentacleDir * g_fDegToRad * 5.0f * (pAudio->GetIntensity( ) + 0.1f);
+			obj.pitch += fThis * fTentacleDir * g_fDegToRad * 20.0f * pAudio->GetIntensity( );
+			obj.yaw += fThis * fTentacleDir * g_fDegToRad * 10.0f * (pAudio->GetIntensity( ) + 0.1f);
 			angle += pAudio->GetIntensity( ) * fMoveSpeed * fThis * g_fDegToRad;
-			obj.vPosition.x = 200.0f * cosf(angle) * sinf(angle * 1.3f) * cosf(angle * 2.3f) * sinf(angle * 0.6f);
-			obj.vPosition.y = 100.0f * cosf(angle * 0.2f) * sinf(angle * 1.1f) * cosf(angle * 1.6f) * sinf(angle * 1.2f);
-			obj.vPosition.z = 150.0f * cosf(angle * 1.6f) * sinf(angle * 0.5f) * cosf(angle * 1.1f) * sinf(angle * 1.2f);
-			if(texture == pBlankTexture) obj.vPosition.z = (obj.vPosition.z / 2) - 50;
-			obj.nExposure = bLast? 1 : 0;
+			obj.position.x = 200.0f * cosf(angle) * sinf(angle * 1.3f) * cosf(angle * 2.3f) * sinf(angle * 0.6f);
+			obj.position.y = 100.0f * cosf(angle * 0.2f) * sinf(angle * 1.1f) * cosf(angle * 1.6f) * sinf(angle * 1.2f);
+			obj.position.z = 150.0f * cosf(angle * 1.6f) * sinf(angle * 0.5f) * cosf(angle * 1.1f) * sinf(angle * 1.2f);
+			if(texture == pBlankTexture) obj.position.z = (obj.position.z / 2) - 50;
+			obj.exposure = bLast? 1 : 0;
 			obj.Calculate(&camera, fThis);
 
 			if(bLast) break;
@@ -448,8 +448,8 @@ public:
 	}
 	Error* Reconfigure(AudioData* pAudio) override
 	{
-		obj.pTexture[0].m_nType = Actor::TextureEntry::T_ENVMAP;
-		obj.pTexture[0].m_pTexture = g_pD3D->Find(TC_EMBUMPMAPTENTACLES);//ENVIRONMENTMAP));
+		obj.textures[0].type = Actor::TextureType::Envmap;
+		obj.textures[0].texture = g_pD3D->Find(TC_EMBUMPMAPTENTACLES);//ENVIRONMENTMAP));
 		fMoveSpeed = 1.0f + (rand() * 4.0f / RAND_MAX);
 
 //		if(pBump.GetLength() == 0) texture = pBlankTexture;
