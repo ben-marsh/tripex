@@ -1,66 +1,41 @@
 #pragma once
 
-/*---------------------------------------------
-* Includes
----------------------------------------------*/
-
-//#include <complex>
-
-/*---------------------------------------------
-* ZFft
----------------------------------------------*/
+#include <memory>
 
 class Fourier
 {
-protected:
+public:
+	const int num_samples;
+	const int log_num_samples;
+
+	Fourier(int num_samples);
+	~Fourier();
+
+	void Update(const short int* samples);
+	float GetAmplitude(int index) const;
+
+private:
 	struct Complex
 	{
 	public:
-		float m_fReal;
-		float m_fImag;
+		float real;
+		float imag;
 
-		// Constructor:
-		Complex() = default;
-		Complex( float fReal, float fImag );
+		Complex();
+		Complex(float real, float imag);
 
-		// operator*( ):
-		Complex operator*( const Complex &c ) const;
+		Complex operator*(const Complex& c) const;
+		Complex operator+(const Complex& c) const;
+		Complex operator-(const Complex& c) const;
 
-		// operator+( ):
-		Complex operator+( const Complex &c ) const;
-
-		// operator-( ):
-		Complex operator-( const Complex &c ) const;
-
-		// Length( ):
-		float Length( ) const;
+		float Length() const;
 	};
 
-	const int m_nSamples;
-	const int m_nLogSamples;
-	float *m_afScale;
-	unsigned short int *m_anIndex;
-	Complex *m_acTransform;
-	Complex *m_acCoeff;
-	float m_fDecay;
-
-public:
-	float *m_afAmplitude;
-
-	// Constructor:
-	Fourier( int nSamples );
-
-	// Destructor:
-	~Fourier( );
-
-	// SetDecay( ):
-	void SetDecay( float fDecay );
-
-	// Update( ):
-	void Update( const short int *anSample );
-
-	// GetAmplitude( ):
-	float GetAmplitude( int nIdx ) const;
+	std::unique_ptr<float[]> scales;
+	std::unique_ptr<uint16[]> lookup;
+	std::unique_ptr<Complex[]> transforms;
+	std::unique_ptr<Complex[]> coeffs;
+	std::unique_ptr<float[]> amplitudes;
 };
 
 #include "Fourier.inl"

@@ -1,57 +1,40 @@
 #include "Fourier.h"
 #include <math.h>
 
-/*---------------------------------
-* ZFft::Complex
------------------------------------*/
 
-/*---------------------------------
-* Constructor:
------------------------------------*/
-
-inline Fourier::Complex::Complex( float fReal, float fImag )
+inline Fourier::Complex::Complex()
 {
-	m_fReal = fReal;
-	m_fImag = fImag;
+	real = 0.0f;
+	imag = 0.0f;
 }
 
-/*---------------------------------
-* operator*( ):
------------------------------------*/
-
-inline Fourier::Complex Fourier::Complex::operator*( const Complex &c ) const
+inline Fourier::Complex::Complex(float real, float imag)
 {
-	Complex cRes;
-	cRes.m_fReal = m_fReal * c.m_fReal - m_fImag * c.m_fImag;
-	cRes.m_fImag = m_fReal * c.m_fImag + m_fImag * c.m_fReal;
-	return cRes;
+	this->real = real;
+	this->imag = imag;
 }
 
-/*---------------------------------
-* operator+( ):
------------------------------------*/
-
-inline Fourier::Complex Fourier::Complex::operator+( const Complex &c ) const
+inline Fourier::Complex Fourier::Complex::operator*(const Complex& other) const
 {
-	return Complex( m_fReal + c.m_fReal, m_fImag + c.m_fImag );
+	Complex result;
+	result.real = (real * other.real) - (imag * other.imag);
+	result.imag = (real * other.imag) + (imag * other.real);
+	return result;
 }
 
-/*---------------------------------
-* operator-( ):
------------------------------------*/
-
-inline Fourier::Complex Fourier::Complex::operator-( const Complex &c ) const
+inline Fourier::Complex Fourier::Complex::operator+(const Complex& c) const
 {
-	return Complex( m_fReal - c.m_fReal, m_fImag - c.m_fImag );
+	return Complex(real + c.real, imag + c.imag);
 }
 
-/*---------------------------------
-* Length( ):
------------------------------------*/
-
-inline float Fourier::Complex::Length( ) const
+inline Fourier::Complex Fourier::Complex::operator-(const Complex& c) const
 {
-	return sqrtf( m_fReal * m_fReal + m_fImag * m_fImag );
+	return Complex(real - c.real, imag - c.imag);
+}
+
+inline float Fourier::Complex::Length() const
+{
+	return sqrtf(real * real + imag * imag);
 }
 
 

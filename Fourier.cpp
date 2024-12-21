@@ -10,114 +10,86 @@
 * Constructor:
 ---------------------------------------------*/
 
-Fourier::Fourier( int nSamples ) : m_nSamples( nSamples ), m_nLogSamples( IntegerLog2( nSamples ) )
+Fourier::Fourier(int num_samples)
+	: num_samples(num_samples)
+	, log_num_samples(IntegerLog2(num_samples))
 {
-	_ASSERT( nSamples == ( 1 << m_nLogSamples ) );
+	_ASSERT(num_samples == (1 << log_num_samples));
 
 	// precalc apodization function
-	m_afScale = new float[ nSamples ];
+	scales = std::make_unique<float[]>(num_samples);
 	float fX = -1.0f;
-	float fStepX = 2.0f / ( m_nSamples - 1.0f );
-	for( int i = 0; i < m_nSamples; i++ )
+	float fStepX = 2.0f / (num_samples - 1.0f);
+	for (int i = 0; i < num_samples; i++)
 	{
-		m_afScale[ i ] = 1.0f - ( fX * fX );
-		m_afScale[ i ] *= m_afScale[ i ];
-		m_afScale[ i ] *= 1.0f / ( 1 << 16 );
+		scales[i] = 1.0f - (fX * fX);
+		scales[i] *= scales[i];
+		scales[i] *= 1.0f / (1 << 16);
 		fX += fStepX;
 	}
 
-	m_afAmplitude = new float[ nSamples ];
+	amplitudes = std::make_unique<float[]>(num_samples);
 
-	m_acTransform = new Complex[ nSamples ];
+	transforms = std::make_unique<Complex[]>(num_samples);
 
-	m_acCoeff = new Complex[ m_nSamples + 1 ];
-	for( int i = 0; i < m_nSamples; i++ )
+	coeffs = std::make_unique<Complex[]>(num_samples + 1);
+	for (int i = 0; i < num_samples; i++)
 	{
-		float fAng = ( 2.0f * PI * i ) / m_nSamples;
-		m_acCoeff[ i ] = Complex( cosf( fAng ), -sinf( fAng ) );
+		float fAng = (2.0f * PI * i) / num_samples;
+		coeffs[i] = Complex(cosf(fAng), -sinf(fAng));
 	}
 
-	m_anIndex = new unsigned short[ nSamples ];
-	for( int i = 0; i < nSamples; i++ )
+	lookup = std::make_unique<uint16[]>(num_samples);
+	for (int i = 0; i < num_samples; i++)
 	{
-		m_anIndex[ i ] = ReverseBitOrder< short int >( i );
-		m_anIndex[ i ] >>= ( ( sizeof( short int ) * 8 ) - m_nLogSamples );
-	}
-}
-
-/*---------------------------------------------
-* Destructor:
----------------------------------------------*/
-
-Fourier::~Fourier( )
-{
-	if( m_afScale != NULL )
-	{
-		delete m_afScale;
+		lookup[i] = ReverseBitOrder< short int >(i);
+		lookup[i] >>= ((sizeof(short int) * 8) - log_num_samples);
 	}
 }
 
-/*---------------------------------------------
-* SetDecay( ):
----------------------------------------------*/
-
-void Fourier::SetDecay( float fDecay )
+Fourier::~Fourier()
 {
-	m_fDecay = fDecay;
 }
 
-/*---------------------------------------------
-* Update( ):
----------------------------------------------*/
-
-void Fourier::Update( const short int *anSample )
+void Fourier::Update(const short int* anSample)
 {
-	for (int i = 0; i < m_nSamples; i++)
+	for (int i = 0; i < num_samples; i++)
 	{
-		m_acTransform[ m_anIndex[ i ] ] = Complex( anSample[ i ] * m_afScale[ i ], 0.0f );
+		transforms[lookup[i]] = Complex(anSample[i] * scales[i], 0.0f);
 	}
 
-	int nCoeffStep = m_nSamples >> 1;
-	for( int nLevel = 0; nLevel < m_nLogSamples; nLevel++ )
+	int coeff_step = num_samples >> 1;
+	for (int level = 0; level < log_num_samples; level++)
 	{
-		int nStep = 1 << nLevel;
-		int nInc = nStep << 1;
+		int step = 1 << level;
+		int inc = step << 1;
 
-		const Complex *pcCoeff = &m_acCoeff[ 0 ];
-		for( int j = 0; j < nStep; j++ )
+		const Complex* coeff = coeffs.get();
+		for (int j = 0; j < step; j++)
 		{
-			for( int i = j; i < m_nSamples; i += nInc )
+			for (int i = j; i < num_samples; i += inc)
 			{
-				Complex cDelta = ( *pcCoeff ) * m_acTransform[ i + nStep ];
-				m_acTransform[ i + nStep ] = m_acTransform[ i ] - cDelta;
-				m_acTransform[ i ] = m_acTransform[ i ] + cDelta;
+				Complex delta = (*coeff) * transforms[i + step];
+				transforms[i + step] = transforms[i] - delta;
+				transforms[i] = transforms[i] + delta;
 			}
 
-			pcCoeff += nCoeffStep;
+			coeff += coeff_step;
 		}
 
-		nStep <<= 1;
-		nCoeffStep >>= 1;
+		step <<= 1;
+		coeff_step >>= 1;
 	}
 
-	m_fDecay = 0.8f;
-
-	const Complex *pc = &m_acTransform[ 0 ];
-	for( int i = 0; i < m_nSamples; i++ )
+	for (int i = 0; i < num_samples; i++)
 	{
-		float fValue = pc->Length( );
-		m_afAmplitude[ i ] *= m_fDecay;
-		m_afAmplitude[ i ] = std::max( m_afAmplitude[ i ], fValue / sqrtf( 256.0f ) );
-		pc++;
+		amplitudes[i] = transforms[i].Length() / sqrtf(256.0f);
 	}
 }
 
-/*---------------------------------------------
-* GetAmplitude( ):
----------------------------------------------*/
 
-float Fourier::GetAmplitude( int nIdx ) const
+float Fourier::GetAmplitude(int index) const
 {
-	_ASSERT( nIdx >= 0 && nIdx < m_nSamples );
-	return m_afAmplitude[ nIdx ];
+	_ASSERT(index >= 0 && index < num_samples);
+	return amplitudes[index];
 }
