@@ -56,9 +56,9 @@ public:
 	{
 		for(int i = 0; i < RINGS; i++)
 		{
-			pObj[i].roll += rs[i] * params.audio_data->GetIntensity( ) * params.elapsed;
-			pObj[i].pitch += ps[i] * params.audio_data->GetIntensity( ) * params.elapsed;
-			pObj[i].yaw += ys[i] * std::max(0.1f, params.audio_data->GetIntensity( )) * params.elapsed;
+			pObj[i].roll += rs[i] * params.audio_data.GetIntensity( ) * params.elapsed;
+			pObj[i].pitch += ps[i] * params.audio_data.GetIntensity( ) * params.elapsed;
+			pObj[i].yaw += ys[i] * std::max(0.1f, params.audio_data.GetIntensity( )) * params.elapsed;
 			pObj[i].ambient_light_color = ColorRgb::Grey(params.brightness * 20.0f);// / pObj[i].nExposure);
 			pObj[i].Calculate(&camera, params.elapsed);
 		}

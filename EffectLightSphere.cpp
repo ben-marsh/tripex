@@ -76,8 +76,8 @@ public:
 			br = params.brightness;
 			for(int i = 0; i < nSources; i++)
 			{
-				position[i] += speed[i] * params.audio_data->GetIntensity( ) * 0.3 * elapsed;
-				double linearity = std::max(0.0f, 1 - params.audio_data->GetBeat( ) );//);//(bigbeat / 2.0));
+				position[i] += speed[i] * params.audio_data.GetIntensity( ) * 0.3 * elapsed;
+				double linearity = std::max(0.0f, 1 - params.audio_data.GetBeat( ) );//);//(bigbeat / 2.0));
 			
 				while(position[i] > 1.0 || position[i] < 0.0)
 				{
@@ -88,7 +88,7 @@ public:
 					pvPosition[3][i].y = (rand() * 70.0 / RAND_MAX) - 35.0;
 					pvPosition[3][i].z = (rand() * 70.0 / RAND_MAX) - 35.0;
 
-					float c = params.audio_data->GetRandomSample( );
+					float c = params.audio_data.GetRandomSample( );
 					pvPosition[2][i].x = (pvPosition[3][i].x * (1 - c)) + ((c * rand() * 70.0 / RAND_MAX) - 35.0);
 					pvPosition[2][i].y = (pvPosition[3][i].y * (1 - c)) + ((c * rand() * 70.0 / RAND_MAX) - 35.0);
 					pvPosition[2][i].z = (pvPosition[3][i].z * (1 - c)) + ((c * rand() * 70.0 / RAND_MAX) - 35.0);
@@ -98,7 +98,7 @@ public:
 
 					if(position[i] > 1.0) position[i] -= 1.0;
 					if(position[i] < 0.0) position[i] += 1.0;
-					speed[i] = (params.audio_data->GetRandomSample( ) * 0.15) + 0.01;
+					speed[i] = (params.audio_data.GetRandomSample( ) * 0.15) + 0.01;
 				}
 
 				for(int j = 0; j < 4; j++)
@@ -108,8 +108,8 @@ public:
 				obj.vertices[i].position = b.Calculate(position[i]);
 			}
 
-			obj.roll += elapsed * params.audio_data->GetIntensity( ) * 4.0 * 3.14159 / 180.0;
-			obj.pitch += elapsed * params.audio_data->GetIntensity( ) * 3.0 * 3.14159 / 180.0;
+			obj.roll += elapsed * params.audio_data.GetIntensity( ) * 4.0 * 3.14159 / 180.0;
+			obj.pitch += elapsed * params.audio_data.GetIntensity( ) * 3.0 * 3.14159 / 180.0;
 			obj.yaw += elapsed * 2.0 * 3.14159 / 180.0;
 			obj.Calculate(&camera, 1.0);
 			obj.ambient_light_color = ColorRgb::Grey(64.0 * params.brightness);

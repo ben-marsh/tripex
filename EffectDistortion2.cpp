@@ -55,9 +55,9 @@ public:
 		float elapsed = params.elapsed * 1.5;
 
 		br = params.brightness;
-		xp += 0.008 * std::max(0.1f, params.audio_data->GetDampenedBand( pEffectPtr->fSensitivity, 0, 0.2f ) ) * elapsed;
-		yp += 0.008 * std::max(0.1f, params.audio_data->GetDampenedBand(pEffectPtr->fSensitivity, 0.15f, 0.5f ) + params.audio_data->GetBeat( ) ) * elapsed;
-		t += elapsed * std::max(0.5f, params.audio_data->GetDampenedBand(pEffectPtr->fSensitivity, 0, 1.0f)) * 20 * 3.14159 / 180.0;
+		xp += 0.008 * std::max(0.1f, params.audio_data.GetDampenedBand( pEffectPtr->fSensitivity, 0, 0.2f ) ) * elapsed;
+		yp += 0.008 * std::max(0.1f, params.audio_data.GetDampenedBand(pEffectPtr->fSensitivity, 0.15f, 0.5f ) + params.audio_data.GetBeat( ) ) * elapsed;
+		t += elapsed * std::max(0.5f, params.audio_data.GetDampenedBand(pEffectPtr->fSensitivity, 0, 1.0f)) * 20 * 3.14159 / 180.0;
 
 		angle += 1 * elapsed;
 		fac = 0.5 + (0.15 * cos(angle * 3.14159 / 256.0));
@@ -66,18 +66,18 @@ public:
 		for(i = 0; i < NCENTRES; i++)
 		{
 			Vector3 v1, v2;
-			for(pdPos[i] += 0.02 * elapsed * (0.3 + (0.7 * params.audio_data->GetIntensity( ))); pdPos[i] >= 1.0; pdPos[i] -= 1.0)
+			for(pdPos[i] += 0.02 * elapsed * (0.3 + (0.7 * params.audio_data.GetIntensity( ))); pdPos[i] >= 1.0; pdPos[i] -= 1.0)
 			{
 				pb[i][0] = pb[i][3];
 				pb[i][1] = pb[i][3] + (pb[i][3] - pb[i][2]);
 				pb[i][2] = Vector3(rand() * GRW / RAND_MAX, rand() * GRH / RAND_MAX, 0);
 				pb[i][3] = Vector3(rand() * GRW / RAND_MAX, rand() * GRH / RAND_MAX, 0);
 			}
-			pdA[i] += (params.audio_data->GetIntensity( ) /*+ 0.001*/) * pdAS[i] * elapsed;
+			pdA[i] += (params.audio_data.GetIntensity( ) /*+ 0.001*/) * pdAS[i] * elapsed;
 			pvPos[i] = pb[i].Calculate(pdPos[i]);
 		}
 
-		double av = params.audio_data->GetIntensity( );//((average * average) + average) / 2;
+		double av = params.audio_data.GetIntensity( );//((average * average) + average) / 2;
 		double w2 = grid.width / 2.0, h2 = grid.height / 2.0;
 		double rw = 1.0 / grid.width, rh = 1.0 / grid.height;
 

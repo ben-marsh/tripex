@@ -52,16 +52,24 @@ public:
 	{
 		float brightness;
 		float elapsed;
-		AudioData* audio_data;
+		const AudioData& audio_data;
+
+		CalculateParams(float brightness, float elapsed, const AudioData& audio_data)
+			: brightness(brightness)
+			, elapsed(elapsed)
+			, audio_data(audio_data)
+		{
+		}
 	};
 
 	struct ReconfigureParams
 	{
-		AudioData* audio_data;
+		const AudioData& audio_data;
 		const TextureLibrary& texture_library;
 
-		ReconfigureParams(const TextureLibrary& texture_library)
-			: texture_library(texture_library)
+		ReconfigureParams(const AudioData& audio_data, const TextureLibrary& texture_library)
+			: audio_data(audio_data)
+			, texture_library(texture_library)
 		{
 		}
 	};

@@ -32,9 +32,6 @@ protected:
 	int m_nDataSampleSize;
 	int m_nDataFreqShift;
 
-	// AddConvertedData( ):
-	void AddConvertedData( const short *pnSrc, int nSamples );
-
 public:
 	const int m_nSamples;
 
@@ -79,5 +76,5 @@ public:
 	float GetSample( int nChannel, int nIdx ) const;
 
 	// GetBand( ):
-	float GetBand( int nIdx );
+	float GetBand( int nIdx ) const;
 };

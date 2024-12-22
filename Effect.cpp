@@ -46,12 +46,9 @@ Error* EffectHandler::Calculate(float fElapsed, AudioData* pAudio)
 
 	pAudio->SetIntensityBeatScale( fSensitivity * 3.0f );
 
-	EffectBase::CalculateParams params;
-	params.brightness = fBr;
-	params.elapsed = GetElapsed(fElapsed);
-	params.audio_data = pAudio;
-
+	EffectBase::CalculateParams params(fBr, GetElapsed(fElapsed), *pAudio);
 	Error* error = pEffect->Calculate(params);
+
 	pAudio->SetIntensityBeatScale( 0.0f );
 	return error;
 }
@@ -59,9 +56,7 @@ Error* EffectHandler::Reconfigure(AudioData* audio_data, const TextureLibrary& t
 {
 	_ASSERT(pEffect != NULL);
 
-	EffectBase::ReconfigureParams params(texture_library);
-	params.audio_data = audio_data;
-
+	EffectBase::ReconfigureParams params(*audio_data, texture_library);
 	return pEffect->Reconfigure(params);
 }
 Error* EffectHandler::Render()

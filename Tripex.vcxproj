@@ -191,6 +191,7 @@
     <ClCompile Include="ConfigItem.cpp" />
     <ClCompile Include="config-defaults.cpp" />
     <ClCompile Include="Config.cpp" />
+    <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="StarModel.cpp" />
     <ClCompile Include="TextureLibrary.cpp" />
     <ClCompile Include="TextureSource.cpp" />
@@ -245,6 +246,7 @@
     <ClInclude Include="ConfigItem.h" />
     <ClInclude Include="config-defaults.h" />
     <ClInclude Include="Config.h" />
+    <ClInclude Include="Renderer.h" />
     <ClInclude Include="TextureLibrary.h" />
     <ClInclude Include="TextureSource.h" />
     <ClInclude Include="Effect.h" />

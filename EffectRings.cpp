@@ -72,14 +72,14 @@ public:
 			{
 				brightness[i] = brightness[i-1] * 0.9f;//min(brightness[i-1], 1.5 * double(i) / (nRings * 0.7));
 			}
-			roll[0] += (0.8f + params.audio_data->GetIntensity( )) * fSpeedR * g_fDegToRad;
-			pitch[0] += (0.8f + params.audio_data->GetIntensity( )) * fSpeedP * g_fDegToRad;
-			yaw[0] += (0.8f + params.audio_data->GetIntensity( )) * fSpeedY * g_fDegToRad;
+			roll[0] += (0.8f + params.audio_data.GetIntensity( )) * fSpeedR * g_fDegToRad;
+			pitch[0] += (0.8f + params.audio_data.GetIntensity( )) * fSpeedP * g_fDegToRad;
+			yaw[0] += (0.8f + params.audio_data.GetIntensity( )) * fSpeedY * g_fDegToRad;
 
-			brightness[0] = 0.6f + (0.3f * ((params.audio_data->GetIntensity( ) * 1.4f) + params.audio_data->GetBeat( )));
+			brightness[0] = 0.6f + (0.3f * ((params.audio_data.GetIntensity( ) * 1.4f) + params.audio_data.GetBeat( )));
 
-			pos += params.audio_data->GetIntensity( );
-			if(params.audio_data->IsBeat( ) || pos > 4)
+			pos += params.audio_data.GetIntensity( );
+			if(params.audio_data.IsBeat( ) || pos > 4)
 			{
 				if(pos > 4) pos -= 4;
 				fSpeedR = (rand() * 10.0f / RAND_MAX) - 5.0f;

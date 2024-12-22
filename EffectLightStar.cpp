@@ -48,14 +48,14 @@ public:
 	Error* Calculate(const CalculateParams& params) override
 	{
 		brt = params.brightness;
-		dRadAng += (1.0 + (params.elapsed * (6.0 * params.audio_data->GetIntensity( )))) * 3.14159 / 128.0;
+		dRadAng += (1.0 + (params.elapsed * (6.0 * params.audio_data.GetIntensity( )))) * 3.14159 / 128.0;
 		if(dRadAng > 3.14159 * 2.0)
 		{
-			if(params.audio_data->GetIntensity( ) < 0.2) nSpikes = 0;
-			else if(params.audio_data->GetIntensity( ) < 0.45) nSpikes = 1;
-			else if(params.audio_data->GetIntensity( ) < 0.6) nSpikes = 2;
-			else if(params.audio_data->GetIntensity( ) < 0.75) nSpikes = 3;
-			else if(params.audio_data->GetIntensity( ) < 0.9) nSpikes = 4;
+			if(params.audio_data.GetIntensity( ) < 0.2) nSpikes = 0;
+			else if(params.audio_data.GetIntensity( ) < 0.45) nSpikes = 1;
+			else if(params.audio_data.GetIntensity( ) < 0.6) nSpikes = 2;
+			else if(params.audio_data.GetIntensity( ) < 0.75) nSpikes = 3;
+			else if(params.audio_data.GetIntensity( ) < 0.9) nSpikes = 4;
 			else nSpikes = 5;
 
 			while(dRadAng > 3.14159 * 2.0) dRadAng -= 3.14159 * 2.0;

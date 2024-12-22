@@ -86,7 +86,7 @@ public:
 	{
 		camera.position = b.Calculate(fBezPos);
 		camera.SetTarget(Vector3::Origin());
-		fBezPos += 0.02 * params.audio_data->GetIntensity( ) * params.elapsed;
+		fBezPos += 0.02 * params.audio_data.GetIntensity( ) * params.elapsed;
 
 		fTime += params.elapsed;
 		fChange = std::min(1.0f, fChange + (params.elapsed / 3.0f));
@@ -109,9 +109,9 @@ public:
 		for(int i = 0; i < 3; i++)
 		{
 			pObj[i].ambient_light_color = ColorRgb::Grey(60.0 * params.brightness);
-			pObj[i].roll += pfa[0] * params.elapsed * (params.audio_data->GetIntensity( ) + 0.1);
-			pObj[i].pitch += pfa[1] * params.elapsed * params.audio_data->GetIntensity( ) ;
-			pObj[i].yaw += pfa[2] * params.elapsed * (params.audio_data->GetIntensity( ) + 0.2);
+			pObj[i].roll += pfa[0] * params.elapsed * (params.audio_data.GetIntensity( ) + 0.1);
+			pObj[i].pitch += pfa[1] * params.elapsed * params.audio_data.GetIntensity( ) ;
+			pObj[i].yaw += pfa[2] * params.elapsed * (params.audio_data.GetIntensity( ) + 0.2);
 			pObj[i].Calculate(&camera, params.elapsed);
 		}
 		return nullptr;

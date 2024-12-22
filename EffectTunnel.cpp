@@ -108,17 +108,17 @@ public:
 	Error* Calculate(const CalculateParams& params) override
 	{
 		Vector3 pvPos[4];
-		float fPosChange = 0.015f * params.audio_data->GetIntensity() * params.elapsed;
+		float fPosChange = 0.015f * params.audio_data.GetIntensity() * params.elapsed;
 		static float fTexVOfs = 3;//0.99;1.5;//0.99;
 		fTexVOfs += 0.003f * fTBr * params.elapsed;
 		while(fTexVOfs > 0) fTexVOfs--;
-		if (params.audio_data->GetIntensity() > fTBr)
+		if (params.audio_data.GetIntensity() > fTBr)
 		{
-			fTBr += std::min(params.audio_data->GetIntensity() - fTBr, 0.05f) * params.elapsed;
+			fTBr += std::min(params.audio_data.GetIntensity() - fTBr, 0.05f) * params.elapsed;
 		}
-		if (params.audio_data->GetIntensity() < fTBr)
+		if (params.audio_data.GetIntensity() < fTBr)
 		{
-			fTBr += std::max(params.audio_data->GetIntensity() - fTBr, -0.05f) * params.elapsed;
+			fTBr += std::max(params.audio_data.GetIntensity() - fTBr, -0.05f) * params.elapsed;
 		}
 
 		int nOldStart = (int)(fPos * nTunnelL);
@@ -132,8 +132,8 @@ public:
 
 		for(; fPos >= 1.0; fPos -= 1)
 		{
-			float fAng1 = fPrevAng + GetRand(RANDCH_A1 * params.audio_data->GetIntensity( ));
-			float fAng2 = fAng1 + GetRand(RANDCH_A2 * params.audio_data->GetIntensity( ));
+			float fAng1 = fPrevAng + GetRand(RANDCH_A1 * params.audio_data.GetIntensity( ));
+			float fAng2 = fAng1 + GetRand(RANDCH_A2 * params.audio_data.GetIntensity( ));
 			fPrevAng = fAng2;// + 3.14159;
 			for(int j = 0; j < 2; j++)
 			{

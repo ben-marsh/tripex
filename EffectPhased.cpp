@@ -59,10 +59,10 @@ public:
 
 		float fMult = elapsed;//10.0 / FRAMEFAC;
 
-		a += fMult * (params.audio_data->GetIntensity( ) + 0.1) * 3.14159 / 180.0;
-		obj.roll += fMult * (params.audio_data->GetIntensity( ) + (params.audio_data->GetBeat( ) * 2.0)) * 2/*5*//*7*/ * 3.14159 / 180.0;
-		obj.pitch += fMult * (params.audio_data->GetIntensity( ) + 0.1) * 4/*4*/ /*8*/ * 3.14159 / 180;
-		obj.yaw += fMult * params.audio_data->GetBeat( ) * 3/*3*//*5*/ * 3.14159 / 180.0;
+		a += fMult * (params.audio_data.GetIntensity( ) + 0.1) * 3.14159 / 180.0;
+		obj.roll += fMult * (params.audio_data.GetIntensity( ) + (params.audio_data.GetBeat( ) * 2.0)) * 2/*5*//*7*/ * 3.14159 / 180.0;
+		obj.pitch += fMult * (params.audio_data.GetIntensity( ) + 0.1) * 4/*4*/ /*8*/ * 3.14159 / 180;
+		obj.yaw += fMult * params.audio_data.GetBeat( ) * 3/*3*//*5*/ * 3.14159 / 180.0;
 
 		obj.ambient_light_color = ColorRgb::Grey(2 * 0.15 * params.brightness * 255.0);//color = D3DRGB(0.15 * brightness, 0.15 * brightness, 0.15 * brightness);
 

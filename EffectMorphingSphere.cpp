@@ -61,7 +61,7 @@ public:
 	}
 	Error* Calculate(const CalculateParams& params) override
 	{
-		fBezPos += params.elapsed * params.audio_data->GetIntensity( ) * 0.04;
+		fBezPos += params.elapsed * params.audio_data.GetIntensity( ) * 0.04;
 		camera.position = b.Calculate(fBezPos);
 //	float fPos = 0;
 //	fPos += elapsed * 3.14159 / 180.0;
@@ -70,7 +70,7 @@ public:
 
 		for(int i = 0; i < pObj[NOBJ].vertices.GetLength(); i++)
 		{
-			pfAng[i] += params.audio_data->GetIntensity( ) * params.elapsed * 8.0 * 3.14159 / 180.0;
+			pfAng[i] += params.audio_data.GetIntensity( ) * params.elapsed * 8.0 * 3.14159 / 180.0;
 		}
 		for(int i = 0; i < NOBJ; i++)
 		{
@@ -84,7 +84,7 @@ public:
 			pObj[i].yaw += params.elapsed * 2.0 * PI / 180.0;
 			pObj[i].flags.set( Actor::F_VALID_VERTEX_NORMALS, false );
 			float fBlend = float(i) / NOBJ;
-			float fMult2 = (i == 0)? 1.0f : std::min(1.0, params.audio_data->GetIntensity( ) * 1.5);//(averagefloat(i) / NOBJ);
+			float fMult2 = (i == 0)? 1.0f : std::min(1.0, params.audio_data.GetIntensity( ) * 1.5);//(averagefloat(i) / NOBJ);
 			pObj[i].ambient_light_color = params.brightness * (ColorRgb::Grey(96 * fMult2 * (1 - (0.4 * float(i) / NOBJ))) - ColorRgb(fBlend * 40.0, fBlend * 40.0, fBlend * 5.0));
 			pObj[i].Calculate(&camera, params.elapsed);
 		}

@@ -152,7 +152,7 @@ public:
 		fBezPos2 += 0.02 * fSpeed * params.elapsed;
 
 		fChange += params.elapsed;
-		fTotal += params.audio_data->GetIntensity( ) * params.elapsed;
+		fTotal += params.audio_data.GetIntensity( ) * params.elapsed;
 		if(fChange > 20)
 		{
 			fTarget = fTotal / fChange;
@@ -170,9 +170,9 @@ public:
 		dPos += params.elapsed;
 		while(dPos > 60)
 		{
-			rs = ((params.audio_data->GetIntensity( ) * 2.0) + 1.0 + (rand() * 5.0 / RAND_MAX)) * 3.14159 / 180.0;
-			ps = ((params.audio_data->GetIntensity( ) * 2.0) + 1.0 + (rand() * 5.0 / RAND_MAX)) * 3.14159 / 180.0;
-			ys = ((params.audio_data->GetIntensity( ) * 2.0) + 1.0 + (rand() * 5.0 / RAND_MAX)) * 3.14159 / 180.0;
+			rs = ((params.audio_data.GetIntensity( ) * 2.0) + 1.0 + (rand() * 5.0 / RAND_MAX)) * 3.14159 / 180.0;
+			ps = ((params.audio_data.GetIntensity( ) * 2.0) + 1.0 + (rand() * 5.0 / RAND_MAX)) * 3.14159 / 180.0;
+			ys = ((params.audio_data.GetIntensity( ) * 2.0) + 1.0 + (rand() * 5.0 / RAND_MAX)) * 3.14159 / 180.0;
 //		if(rand() > (RAND_MAX * 0.7)) rs = -rs;
 //		if(rand() > (RAND_MAX * 0.8)) ps = -ps;
 //		if(rand() > (RAND_MAX * 0.6)) ys = -ys;
@@ -199,9 +199,9 @@ public:
 	//	pTarget.Fill(0);
 //	ZeroMemory(pBuffer, 256 * 256 * sizeof(unsigned char));
 //	ZeroMemory(pTarget, 64 * 64 * sizeof(unsigned char));
-		obj.roll += params.audio_data->GetIntensity( ) * params.elapsed * 4.0 * 3.14159 / 180.0;//(average + 0.05) * elapsed;// * rs;
-		obj.pitch += params.audio_data->GetIntensity( ) * params.elapsed * 5.0 * 3.14159 / 180.0;//(average + 0.05) * elapsed;// * rs;
-		obj.yaw += params.audio_data->GetIntensity( ) * params.elapsed * 6.0 * 3.14159 / 180.0;//(average + 0.05) * elapsed;// * rs;
+		obj.roll += params.audio_data.GetIntensity( ) * params.elapsed * 4.0 * 3.14159 / 180.0;//(average + 0.05) * elapsed;// * rs;
+		obj.pitch += params.audio_data.GetIntensity( ) * params.elapsed * 5.0 * 3.14159 / 180.0;//(average + 0.05) * elapsed;// * rs;
+		obj.yaw += params.audio_data.GetIntensity( ) * params.elapsed * 6.0 * 3.14159 / 180.0;//(average + 0.05) * elapsed;// * rs;
 //	obj.fPitch += average * elapsed * ps;
 //	obj.fYaw += 0.5 * elapsed * ys * 3.14159 / 180.0;
 
@@ -250,7 +250,7 @@ public:
 	}
 	Error* Reconfigure(const ReconfigureParams& params) override
 	{
-		fSpeed = params.audio_data->GetIntensity( );
+		fSpeed = params.audio_data.GetIntensity( );
 		pTexture = params.texture_library.Find(TextureClass::DotStarSprite);
 		pTint = params.texture_library.Find(TextureClass::DotStarBackground);
 		return nullptr;

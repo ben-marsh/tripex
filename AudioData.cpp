@@ -343,7 +343,7 @@ float AudioData::GetSample( int nChannel, int nIdx ) const
 * GetBand( ):
 ---------------------------------------------*/
 
-float AudioData::GetBand( int nIdx )
+float AudioData::GetBand( int nIdx ) const
 {
 	_ASSERT( nIdx >= 0 && nIdx < m_nSamples );
 	return m_afBand[ nIdx ];

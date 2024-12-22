@@ -132,7 +132,7 @@ public:
 		int i, j;
 		for(i = 0; i < 128; i++)
 		{
-			accwf[i * PTCIRCUM / 128] += params.audio_data->GetSample(i*4) * 128.0f * 4.0f * params.elapsed * (PTCIRCUM / 128.0f);
+			accwf[i * PTCIRCUM / 128] += params.audio_data.GetSample(i*4) * 128.0f * 4.0f * params.elapsed * (PTCIRCUM / 128.0f);
 		}
 
 		static double accum = 1;

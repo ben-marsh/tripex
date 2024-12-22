@@ -108,8 +108,8 @@ public:
 	}
 	Error* Calculate(const CalculateParams& params) override
 	{
-		fBezPos += params.elapsed * params.audio_data->GetIntensity( ) * 0.01f;
-		fBezPos2 += params.elapsed * params.audio_data->GetIntensity( ) * 0.02f;
+		fBezPos += params.elapsed * params.audio_data.GetIntensity( ) * 0.01f;
+		fBezPos2 += params.elapsed * params.audio_data.GetIntensity( ) * 0.02f;
 		cCamera.position = Vector3(0, 0, -70);//bez.Calculate(fBezPos);
 		cCamera.SetTarget(bez2.Calculate(fBezPos2));
 
@@ -143,21 +143,21 @@ public:
 				if((i % 3) == 0)
 				{
 					pObj[i].roll += 0.1f * as[i][0][0];
-					pObj[i].pitch += params.audio_data->GetDampenedBand( pEffectPtr->fSensitivity, 3.0f/16.0f, 4.0f/16.0f) * as[i][1][0];
-					pObj[i].yaw += params.audio_data->GetDampenedBand( pEffectPtr->fSensitivity, 4.0f/16.0f, 5.0f/16.0f) * as[i][2][0];
+					pObj[i].pitch += params.audio_data.GetDampenedBand( pEffectPtr->fSensitivity, 3.0f/16.0f, 4.0f/16.0f) * as[i][1][0];
+					pObj[i].yaw += params.audio_data.GetDampenedBand( pEffectPtr->fSensitivity, 4.0f/16.0f, 5.0f/16.0f) * as[i][2][0];
 					pObj[i].pitch = Bound<float>(pObj[i].pitch, -ANGSZ, ANGSZ);
 					pObj[i].yaw = Bound<float>(pObj[i].yaw, -ANGSZ, ANGSZ);
 				}
 				if((i % 3) == 1)
 				{
-					pObj[i].roll += params.audio_data->GetDampenedBand(pEffectPtr->fSensitivity, 2.0f/16.0f, 3.0f/16.0f) * as[i][0][0];
+					pObj[i].roll += params.audio_data.GetDampenedBand(pEffectPtr->fSensitivity, 2.0f/16.0f, 3.0f/16.0f) * as[i][0][0];
 					pObj[i].pitch += 0.1f * as[i][1][0];
-					pObj[i].yaw += 1.5f * params.audio_data->GetDampenedBand(pEffectPtr->fSensitivity, 2.0f/16.0f, 4.0f/16.0f) * as[i][2][0];
+					pObj[i].yaw += 1.5f * params.audio_data.GetDampenedBand(pEffectPtr->fSensitivity, 2.0f/16.0f, 4.0f/16.0f) * as[i][2][0];
 				}
 				if((i % 3) == 2) 
 				{
-					pObj[i].roll += params.audio_data->GetDampenedBand(pEffectPtr->fSensitivity, 1/16.0f, 2/16.0f) * as[i][0][0];
-					pObj[i].pitch += params.audio_data->GetIntensity( ) * as[i][1][0];
+					pObj[i].roll += params.audio_data.GetDampenedBand(pEffectPtr->fSensitivity, 1/16.0f, 2/16.0f) * as[i][0][0];
+					pObj[i].pitch += params.audio_data.GetIntensity( ) * as[i][1][0];
 					pObj[i].yaw += 0.1f * as[i][2][0];
 				}
 	//for(int o = 0; o < RINGS; o++)

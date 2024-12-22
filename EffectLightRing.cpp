@@ -81,8 +81,8 @@ public:
 			float elapsed = 1.0f;
 			for(int i = 0; i < SOURCES; i++)
 			{
-				position[i] += 0.25 * speed[i] * params.audio_data->GetIntensity( ) * elapsed;
-				ehp[i] += 0.25 * ehps[i] * (0.4 + 2 * (params.audio_data->GetIntensity( ) + params.audio_data->GetBeat( ))) * elapsed;
+				position[i] += 0.25 * speed[i] * params.audio_data.GetIntensity( ) * elapsed;
+				ehp[i] += 0.25 * ehps[i] * (0.4 + 2 * (params.audio_data.GetIntensity( ) + params.audio_data.GetBeat( ))) * elapsed;
 
 				double r = 2.0 * er[i] * cos(ehp[i]);
 
@@ -92,10 +92,10 @@ public:
 			}
 	
 			static double a2 = 0;
-			a2 += elapsed * (params.audio_data->GetIntensity( ) + params.audio_data->GetBeat( )) * 3.14159 / 180.0;
+			a2 += elapsed * (params.audio_data.GetIntensity( ) + params.audio_data.GetBeat( )) * 3.14159 / 180.0;
 
-			obj.roll += elapsed * 0.25 * params.audio_data->GetIntensity( ) * 4.0 * 3.14159 / 180.0;
-			obj.pitch += elapsed * 0.25 * params.audio_data->GetIntensity( ) * 3.0 * 3.14159 / 180.0;
+			obj.roll += elapsed * 0.25 * params.audio_data.GetIntensity( ) * 4.0 * 3.14159 / 180.0;
+			obj.pitch += elapsed * 0.25 * params.audio_data.GetIntensity( ) * 3.0 * 3.14159 / 180.0;
 			obj.yaw += elapsed * 0.25 * 2.0 * 3.14159 / 180.0;
 
 			obj.textures[0].Set(Actor::TextureType::Sprite, tx);

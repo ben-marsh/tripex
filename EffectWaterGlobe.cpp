@@ -162,7 +162,7 @@ public:
 //			angle += 20;
 			obj.fDamping = 0.98f;//95
 
-			obj.fAverage = params.audio_data->GetIntensity( );
+			obj.fAverage = params.audio_data.GetIntensity( );
 /*			float fDamping = 0.9 - (average * average);
 			float fAverage = pObj->AverageHeight();
 			float fHeight = 0.1 * average * average;
@@ -172,11 +172,11 @@ public:
 */
 // 			float fHeight = average * pObj->AverageHeight();
 
-			double bh = params.audio_data->GetIntensity( );// * 50;
+			double bh = params.audio_data.GetIntensity( );// * 50;
 
 //			float fAverage = pObj->AverageHeight();
 //			pObj->pfPos[0] = bh * sin(angle * 3.14159 / 128.0);
-			float fMult = std::min(1.0f, params.audio_data->GetIntensity( ) * 2) - std::min(1.f, params.audio_data->GetIntensity( ) * 3) - (obj.AverageHeight() / 0.5f); //0.95 - average; //9; //0.95;
+			float fMult = std::min(1.0f, params.audio_data.GetIntensity( ) * 2) - std::min(1.f, params.audio_data.GetIntensity( ) * 3) - (obj.AverageHeight() / 0.5f); //0.95 - average; //9; //0.95;
 			obj.Update();
 //			pObj->fDamping = average / pObj->;//min(0.96, average * 2.0) * Bound<float>(1 - avHeight, 0, 1); /**/ //(AVSZ / avHeight); //0.95 - average; //9; //0.95;
 

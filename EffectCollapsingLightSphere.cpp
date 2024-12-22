@@ -71,12 +71,12 @@ public:
 	Error* Calculate(const CalculateParams& params) override
 	{
 		brt = params.brightness;
-		if(nStage == 0) dWaitTime += params.elapsed * params.audio_data->GetDampenedBand( pEffectPtr->fSensitivity, 0.0f, 1.0f);
+		if(nStage == 0) dWaitTime += params.elapsed * params.audio_data.GetDampenedBand( pEffectPtr->fSensitivity, 0.0f, 1.0f);
 		else if(nStage == 1) dTilt += params.elapsed * 1.5 * g_fDegToRad;
-		else if(nStage == 2) dWaitTime += params.elapsed * params.audio_data->GetDampenedBand(pEffectPtr->fSensitivity, 0.0f, 1.0f);
+		else if(nStage == 2) dWaitTime += params.elapsed * params.audio_data.GetDampenedBand(pEffectPtr->fSensitivity, 0.0f, 1.0f);
 		else if(nStage == 3) dTilt -= params.elapsed * 1.5 * g_fDegToRad;
 
-		if((dTilt < 0) || (dTilt > 3.141592 / 2.0) || (dWaitTime > 40.0 && params.audio_data->GetIntensity( ) > 0.6))
+		if((dTilt < 0) || (dTilt > 3.141592 / 2.0) || (dWaitTime > 40.0 && params.audio_data.GetIntensity( ) > 0.6))
 		{
 			nStage = (nStage + 1) & 3;
 			dWaitTime = 0.0;
@@ -84,7 +84,7 @@ public:
 		}
 
 		float fTwistMult = sin(dTilt);// * 3.14159 / 128.0);
-		float multp = (/*fac*/dTilt * params.audio_data->GetIntensity( )) + (1 - dTilt/*fac*/) + 0.1;
+		float multp = (/*fac*/dTilt * params.audio_data.GetIntensity( )) + (1 - dTilt/*fac*/) + 0.1;
 
 		obj.vertices.SetLength(SOURCES);
 		for(int i = 0; i < SOURCES; i++)
@@ -100,8 +100,8 @@ public:
 			obj.vertices[i].position.y = (y * sin_t) + (x * cos_t);
 			obj.vertices[i].position.z = z;
 
-			pdAng[i] += params.elapsed * multp * (params.audio_data->GetIntensity( ) + 0.1) * pdSpeed[i] * 3.14159 / 180.0;
-			pdTilt[i] += (params.audio_data->GetIntensity( ) + 0.1) * params.elapsed * multp * 1 * 3.14159 / 180.0;
+			pdAng[i] += params.elapsed * multp * (params.audio_data.GetIntensity( ) + 0.1) * pdSpeed[i] * 3.14159 / 180.0;
+			pdTilt[i] += (params.audio_data.GetIntensity( ) + 0.1) * params.elapsed * multp * 1 * 3.14159 / 180.0;
 
 			float fTransMult = FOREGROUNDBR + ((z / -100.0) * (1 - FOREGROUNDBR));
 			float fBr = params.brightness * fTransMult / 2.0;

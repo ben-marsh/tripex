@@ -120,7 +120,7 @@ public:
 	}
 	Error* Calculate(const CalculateParams& params) override
 	{
-		fAvTotal += params.elapsed * params.audio_data->GetIntensity( );
+		fAvTotal += params.elapsed * params.audio_data.GetIntensity( );
 		fAvTime += params.elapsed;
 
 		cam.position.z = -80;
@@ -145,7 +145,7 @@ public:
 
 		camera.position.z = StepTo<float>(camera.position.z, fCamTarget, fSpeed * params.elapsed);// * 2.0 * (-camera.vPosition.k / 250.0));//2);
 
-		fCamPos += params.audio_data->GetIntensity( ) * params.elapsed * 0.02;
+		fCamPos += params.audio_data.GetIntensity( ) * params.elapsed * 0.02;
 		camera.SetTarget(bz.Calculate(fCamPos));
 
 		if(nNewEffect != -1)
@@ -168,7 +168,7 @@ public:
 			}
 		}
 
-		camera.roll += params.audio_data->GetIntensity( ) * 3.14159 * 2.0 * params.elapsed / 180.0;
+		camera.roll += params.audio_data.GetIntensity( ) * 3.14159 * 2.0 * params.elapsed / 180.0;
 
 		for(int i = 0; i < 9; i++)
 		{
@@ -181,10 +181,10 @@ public:
 				pObj[i].position = GetPos(nEffect, i);
 			}	
 
-			float fSpeed = params.audio_data->GetDampenedBand( pEffectPtr->fSensitivity, i / 10.0, (i + 1) / 10.0);
+			float fSpeed = params.audio_data.GetDampenedBand( pEffectPtr->fSensitivity, i / 10.0, (i + 1) / 10.0);
 			pObj[i].roll += params.elapsed * 4.0 * 3.14159 / 180.0;
-			pObj[i].pitch += params.audio_data->GetIntensity( ) * params.elapsed * 10.0 * 3.14159 / 180.0;
-			pObj[i].yaw += (params.audio_data->GetIntensity( ) + params.audio_data->GetBeat( ) ) * params.elapsed * 7 * 3.14159 / 180.0;
+			pObj[i].pitch += params.audio_data.GetIntensity( ) * params.elapsed * 10.0 * 3.14159 / 180.0;
+			pObj[i].yaw += (params.audio_data.GetIntensity( ) + params.audio_data.GetBeat( ) ) * params.elapsed * 7 * 3.14159 / 180.0;
 			pObj[i].ambient_light_color = ColorRgb::Grey(params.brightness * 48.0f);// / pObj[i].nExposure);
 			pObj[i].Calculate(&camera, params.elapsed);
 		}
@@ -203,7 +203,7 @@ public:
 	Error* Reconfigure(const ReconfigureParams& params) override
 	{
 		fAvTime = 16;
-		fAvTotal = params.audio_data->GetIntensity( ) * fAvTime;
+		fAvTotal = params.audio_data.GetIntensity( ) * fAvTime;
 		bReset = true;
 		Texture *t = params.texture_library.Find(bAltBlur? TextureClass::MotionBlur3AltEnvMap : TextureClass::MotionBlur3EnvMap);
 		for(int i = 0; i < 9; i++) pObj[i].textures[0].texture = t;

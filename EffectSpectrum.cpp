@@ -145,7 +145,7 @@ public:
 			for( i = 0; i < 256; i++ )
 			{
 				int nTarget = i * TRAIL_W / 256;
-				m_pfHeight[ 0 ][ nTarget ] = std::max( m_pfHeight[ 0 ][ nTarget ], params.audio_data->GetBand( i ) );
+				m_pfHeight[ 0 ][ nTarget ] = std::max( m_pfHeight[ 0 ][ nTarget ], params.audio_data.GetBand( i ) );
 			}
 			for( i = 0; i < TRAIL_W; i++ )
 			{
