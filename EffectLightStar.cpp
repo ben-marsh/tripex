@@ -45,17 +45,17 @@ public:
 			pdHeight[i] = -10.0 + (rand() * 20.0 / RAND_MAX);
 		}
 	}
-	Error* Calculate(float brightness, float elapsed, AudioData* pAudio) override
+	Error* Calculate(const CalculateParams& params) override
 	{
-		brt = brightness;
-		dRadAng += (1.0 + (elapsed * (6.0 * pAudio->GetIntensity( )))) * 3.14159 / 128.0;
+		brt = params.brightness;
+		dRadAng += (1.0 + (params.elapsed * (6.0 * params.audio_data->GetIntensity( )))) * 3.14159 / 128.0;
 		if(dRadAng > 3.14159 * 2.0)
 		{
-			if(pAudio->GetIntensity( ) < 0.2) nSpikes = 0;
-			else if(pAudio->GetIntensity( ) < 0.45) nSpikes = 1;
-			else if(pAudio->GetIntensity( ) < 0.6) nSpikes = 2;
-			else if(pAudio->GetIntensity( ) < 0.75) nSpikes = 3;
-			else if(pAudio->GetIntensity( ) < 0.9) nSpikes = 4;
+			if(params.audio_data->GetIntensity( ) < 0.2) nSpikes = 0;
+			else if(params.audio_data->GetIntensity( ) < 0.45) nSpikes = 1;
+			else if(params.audio_data->GetIntensity( ) < 0.6) nSpikes = 2;
+			else if(params.audio_data->GetIntensity( ) < 0.75) nSpikes = 3;
+			else if(params.audio_data->GetIntensity( ) < 0.9) nSpikes = 4;
 			else nSpikes = 5;
 
 			while(dRadAng > 3.14159 * 2.0) dRadAng -= 3.14159 * 2.0;
@@ -73,19 +73,19 @@ public:
 		double dRadMult = 50.0 * sin(dRadAng);
 		for(int i = 0; i < SOURCES; i++)
 		{
-			pdAng[i] += pdSpeed[i] * elapsed;
+			pdAng[i] += pdSpeed[i] * params.elapsed;
 			pdRadius[i] = 100 + (dRadMult * sin(pdAng[i] * nSpikes));
 
 			obj.vertices[i].position.x = sin(pdAng[i]) * pdRadius[i];
 			obj.vertices[i].position.y = pdHeight[i];
 			obj.vertices[i].position.z = cos(pdAng[i]) * pdRadius[i];
 		}
-		obj.ambient_light_color = ColorRgb::Grey(128.0 * brightness);//->color = D3DRGB(dBr, dBr, dBr);
-		obj.Calculate(&camera, elapsed);
+		obj.ambient_light_color = ColorRgb::Grey(128.0 * params.brightness);//->color = D3DRGB(dBr, dBr, dBr);
+		obj.Calculate(&camera, params.elapsed);
 
 		return nullptr;
 	}
-	Error* Render( )
+	Error* Render(const RenderParams& params) override
 	{
 		Error* error = obj.Render( );
 		if(error) return TraceError(error);
@@ -103,7 +103,7 @@ public:
 
 		return nullptr;
 	}
-	Error* Reconfigure(AudioData* pAudio) override
+	Error* Reconfigure(const ReconfigureParams& params) override
 	{
 		obj.textures[0].texture = g_pD3D->Find(TextureClass::LightStarSprite);
 		pTint = g_pD3D->Find(TextureClass::LightStarBackground);

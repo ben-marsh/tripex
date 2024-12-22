@@ -55,25 +55,25 @@ public:
 		obj.FindDelayValues();
 		camera.position.z = -120;
 	}
-	Error* Calculate(float brightness, float elapsed, AudioData* pAudio) override
+	Error* Calculate(const CalculateParams& params) override
 	{
-		brt = brightness;
+		brt = params.brightness;
 
 		static double pos = 2;
-		pos += 0.02 * pAudio->GetIntensity( );
+		pos += 0.02 * params.audio_data->GetIntensity( );
 
-		if(pAudio->GetIntensity( ) > 0.5)
+		if(params.audio_data->GetIntensity( ) > 0.5)
 		{
-			obj.roll += ((pAudio->GetIntensity( ) - 0.5) / 0.5) * elapsed * 2.0 * 3 * 3.14159 / 180.0;
+			obj.roll += ((params.audio_data->GetIntensity( ) - 0.5) / 0.5) * params.elapsed * 2.0 * 3 * 3.14159 / 180.0;
 		}
-		if(pAudio->GetIntensity( ) > 0.3)
+		if(params.audio_data->GetIntensity( ) > 0.3)
 		{
-			obj.pitch += ((pAudio->GetIntensity( ) - 0.3) / 0.7) * elapsed * 1.7 * 1.5 * 6.0 * 3.14159 / 180.0;
+			obj.pitch += ((params.audio_data->GetIntensity( ) - 0.3) / 0.7) * params.elapsed * 1.7 * 1.5 * 6.0 * 3.14159 / 180.0;
 		}
-		obj.yaw += pAudio->GetIntensity( ) * elapsed * 4.0 * 3.14159 / 180.0;
-		obj.ambient_light_color = ColorRgb::Grey(brightness * 255.0);
+		obj.yaw += params.audio_data->GetIntensity( ) * params.elapsed * 4.0 * 3.14159 / 180.0;
+		obj.ambient_light_color = ColorRgb::Grey(params.brightness * 255.0);
 //		obj.cAmbientLight = ZWideColour(255, 255, 255);
-		obj.Calculate(&camera, elapsed);
+		obj.Calculate(&camera, params.elapsed);
 
 		while(pos > 1)
 		{
@@ -103,14 +103,14 @@ public:
 		camera.yaw = (v - camera.position).GetYaw();
 		return nullptr;
 	}
-	Error* Render( ) override
+	Error* Render(const RenderParams& params) override
 	{
 		Error* error = obj.Render( );
 		if(error) return TraceError(error);
 
 		return nullptr;
 	}
-	Error* Reconfigure(AudioData* pAudio) override
+	Error* Reconfigure(const ReconfigureParams& params) override
 	{
 		obj.textures[0].type = Actor::TextureType::Sprite;
 		obj.textures[0].texture = g_pD3D->Find(TextureClass::LightTentaclesSprite);

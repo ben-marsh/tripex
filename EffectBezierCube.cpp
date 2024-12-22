@@ -132,19 +132,19 @@ public:
 			pObj[i].textures[0].type = Actor::TextureType::Sprite;
 		}
 	}
-	Error* Calculate(float brightness, float elapsed, AudioData* pAudio) override
+	Error* Calculate(const CalculateParams& params) override
 	{
-		double dMultDest = 1 - pAudio->GetDampenedBand(pEffectPtr->fSensitivity, 0.0f, 1.0f);//average;
+		double dMultDest = 1 - params.audio_data->GetDampenedBand(pEffectPtr->fSensitivity, 0.0f, 1.0f);//average;
 		camera.position.z = -110;//pScene->camera.z = -110;//60;
-		double sm = 1.3 * elapsed;
+		double sm = 1.3 * params.elapsed;
 
-		brt = brightness;
+		brt = params.brightness;
 	
 		if(dMultDest < dMult) dMult = std::max(dMultDest, dMult - 0.01);
 		if(dMultDest > dMult) dMult = std::min(dMultDest, dMult + 0.01);
 
 		double dTwistAng = PI * sin(dAng) / 2.0;
-		dAng += sm * pAudio->GetDampenedBand(pEffectPtr->fSensitivity, 0, 0.5f) * 0.25 * 4 * g_fDegToRad;
+		dAng += sm * params.audio_data->GetDampenedBand(pEffectPtr->fSensitivity, 0, 0.5f) * 0.25 * 4 * g_fDegToRad;
 
 		double dCentre = (TWISTPLANES - 1.0) / 2.0;
 		for(int i = 0; i < TWISTPLANES; i++)
@@ -158,15 +158,15 @@ public:
 				pfPos[i] = pfPos[i] - (int)pfPos[i];
 			}
 
-			pObjPlane[i].roll += pfRS[i] * (pAudio->GetIntensity( ) + 0.1);
-			pObjPlane[i].yaw += pfYS[i] * (pAudio->GetIntensity( ) + 0.1);
-			pObjPlane[i].pitch += pfPS[i] * pAudio->GetIntensity( );
+			pObjPlane[i].roll += pfRS[i] * (params.audio_data->GetIntensity( ) + 0.1);
+			pObjPlane[i].yaw += pfYS[i] * (params.audio_data->GetIntensity( ) + 0.1);
+			pObjPlane[i].pitch += pfPS[i] * params.audio_data->GetIntensity( );
 
 			pObjPlane[i].position.x = -(BEZIERHEIGHT / 2) + (i * BEZIERHEIGHT / (TWISTPLANES - 1.0));
 			pObjPlane[i].position.z = -60;
-			double dBr = brightness * 0.2 * (0.1 + (0.9 * fabs((i / dCentre) - 1)));
+			double dBr = params.brightness * 0.2 * (0.1 + (0.9 * fabs((i / dCentre) - 1)));
 			pObjPlane[i].ambient_light_color = ColorRgb::Grey(255.0 * dBr);
-			pObjPlane[i].Calculate(&camera, elapsed);
+			pObjPlane[i].Calculate(&camera, params.elapsed);
 		}
 
 		for(int i = 0; i < BEZIERS; i++)
@@ -182,13 +182,13 @@ public:
 				pObj[i].vertices[j].position = bcEdge.Calculate(double(j) / BEZIERPOINTS);
 			//	, &pObj[i]->vertex[j].x, &pObj[i]->vertex[j].y, &pObj[i]->vertex[j].z);
 			}
-			double dBr = brightness * 0.2;
+			double dBr = params.brightness * 0.2;
 			pObj[i].ambient_light_color = ColorRgb::Grey(255.0 * dBr);//(255D3DRGB(dBr, dBr, dBr);
-			pObj[i].Calculate(&camera, elapsed);
+			pObj[i].Calculate(&camera, params.elapsed);
 		}
 		
 		static float fel = 0.0f;
-		fel += elapsed;
+		fel += params.elapsed;
 		for(; fel > 1.0; fel--)
 		{
 			fAng += 8.0f * g_fDegToRad;
@@ -197,22 +197,22 @@ public:
 			obj.vertices[0].position.y = 5 * sin(fAng);//pObj[0].pVertex[0].GetPosition();
 			obj.vertices[0].position.z = -100;//pObj[0].pVertex[0].GetPosition();
 		}
-		obj.Calculate(&camera, elapsed);
+		obj.Calculate(&camera, params.elapsed);
 
-		dMult = pAudio->GetDampenedBand(pEffectPtr->fSensitivity, 0, 1.0f);//average;
+		dMult = params.audio_data->GetDampenedBand(pEffectPtr->fSensitivity, 0, 1.0f);//average;
 		dAngX += sm * dMult * 9 * g_fDegToRad;
 
-		dAngY += sm * pAudio->GetDampenedBand(pEffectPtr->fSensitivity, 0/16.0f, 3/16.0f) * 3.4 * g_fDegToRad;
-		dAngZ += sm * pAudio->GetDampenedBand(pEffectPtr->fSensitivity, 3/16.0f, 9/16.0f) * 4.2 * g_fDegToRad;
+		dAngY += sm * params.audio_data->GetDampenedBand(pEffectPtr->fSensitivity, 0/16.0f, 3/16.0f) * 3.4 * g_fDegToRad;
+		dAngZ += sm * params.audio_data->GetDampenedBand(pEffectPtr->fSensitivity, 3/16.0f, 9/16.0f) * 4.2 * g_fDegToRad;
 		while(dAngX > PI2) dAngX -= PI2;
 		while(dAngY > PI2) dAngY -= PI2;
 		while(dAngZ > PI2) dAngZ -= PI2;
 
-		camera.roll += sm * pAudio->GetIntensity( ) * 4 * g_fDegToRad;
+		camera.roll += sm * params.audio_data->GetIntensity( ) * 4 * g_fDegToRad;
 	//	pScene->camera.turn(sm * average * 4 * 3.14159 / 180.0, 0, 0);
 		return nullptr;
 	}
-	Error* Render( )
+	Error* Render(const RenderParams& params) override
 	{
 		Error* error;
 	//	hRes = obj.Render(d3d);
@@ -250,7 +250,7 @@ public:
 		}
 		return nullptr;
 	}
-	Error* Reconfigure(AudioData* pAudio) override
+	Error* Reconfigure(const ReconfigureParams& params) override
 	{
 		pTexture = g_pD3D->Find(TextureClass::BezierCubeSprite);
 		testobj.textures[0].texture = pTexture;

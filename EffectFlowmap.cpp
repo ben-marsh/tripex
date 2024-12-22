@@ -618,12 +618,12 @@ public:
 			break;
 		}
 	}
-	Error* Calculate(float brightness, float elapsed, AudioData* pAudio) override
+	Error* Calculate(const CalculateParams& params) override
 	{
 		Error* error;
 		int i, j;
 	
-		dFrames += elapsed;
+		dFrames += params.elapsed;
 	
 		dSpin += ( 3.0f * PI / 180.0f ) * dFrames;
 
@@ -638,11 +638,11 @@ public:
 			fFirstRender = false;
 			accum = 1.1;
 		}
-		else accum = elapsed;
+		else accum = params.elapsed;
 		
 		DWORD dwStartTime = timeGetTime( );
 		
-		dOscFade += 0.1 * elapsed;
+		dOscFade += 0.1 * params.elapsed;
 		
 		float fMult = float(width * height) / (256 * 512);
 		if(bMeasureTime)
@@ -653,7 +653,7 @@ public:
 			pSrc.x = -255.5f;//(width - 1.0f) / 2.0f;
 			pSrc.y = fStartY;//(height - 1.0f) / 2.0f;
 		}
-		Calculate(tflowmap ^ 1, std::max<int>(1, 512 * 3 * fMult * elapsed), std::max<int>(2, 512 * 3 * fMult * elapsed), elapsed * MAX_CALC_TIME);
+		Calculate(tflowmap ^ 1, std::max<int>(1, 512 * 3 * fMult * params.elapsed), std::max<int>(2, 512 * 3 * fMult * params.elapsed), params.elapsed * MAX_CALC_TIME);
 		if(bSetColours || ((bMeasureTime && nSamples > 5) || nCalcY >= height))
 		{
 			if(bSetColours || !bMeasureTime)
@@ -750,25 +750,25 @@ public:
 //					colour[i] = ZColour::Blend(srccolour[i], dstcolour[i], fadecolour);
 				}
 //				pc.SetPalette(colour);
-				fadecolour += elapsed * 0.05;
+				fadecolour += params.elapsed * 0.05;
 			}
 		}
 		
-		br = brightness;
+		br = params.brightness;
 		
 		ZArray<unsigned char> &src = fOddFrame? bf1 : bf2;
 		ZArray<unsigned char> &dst = fOddFrame? bf2 : bf1;
 		
 		//	int index[128];
-		double r = pAudio->GetIntensity( );
-		ang += elapsed * std::min(r / 200.0, 2.0) * 4.0 * 3.14159 / 180.0;
+		double r = params.audio_data->GetIntensity( );
+		ang += params.elapsed * std::min(r / 200.0, 2.0) * 4.0 * 3.14159 / 180.0;
 		
-		int brt = pAudio->GetIntensity( ) * 30.0; //min(max(average * 10.0, 8), 50);
+		int brt = params.audio_data->GetIntensity( ) * 30.0; //min(max(average * 10.0, 8), 50);
 		
 		r = (r / 20) + 10;
 		
 		j = 0;
-		double mlt = std::min(0.85, (pAudio->GetIntensity( ) * 1.6)) / 4.0;
+		double mlt = std::min(0.85, (params.audio_data->GetIntensity( ) * 1.6)) / 4.0;
 		//(0.7 + (average * 0.5))) / 4.0;
 		
 		//	ZeroMemory(dst, sizeof(char) * 256 * 512);
@@ -783,21 +783,30 @@ public:
 		//ml * ((50 - brt) / 9.0) * 3.14159 / 180.0, ml * ((50 - brt) / 8.0) * 3.14159 / 180.0, ((50 - brt) / 7.0) * 3.14159 / 180.0); //2 * 3.14159 / 180.0, 3 * 3.14159 / 180.0);
 		//	obj->Rotate();
 		
-		static double amplitude = pAudio->GetIntensity( ); 
-		double target = std::max<int>(20, (1 - pAudio->GetIntensity( )) * 70.0); //average * 70.0;
+		static double amplitude = params.audio_data->GetIntensity( ); 
+		double target = std::max<int>(20, (1 - params.audio_data->GetIntensity( )) * 70.0); //average * 70.0;
 		
 		amplitude = target;
 		
 		static double angle = 0;
-		angle += elapsed * pAudio->GetIntensity( )* 2.0 * 3.14159 / 180.0;
+		angle += params.elapsed * params.audio_data->GetIntensity( )* 2.0 * 3.14159 / 180.0;
 		
 		static double fa = 0;
-		fa += elapsed * pAudio->GetIntensity( )* 3.14159 / 180.0;
+		fa += params.elapsed * params.audio_data->GetIntensity( )* 3.14159 / 180.0;
 		//	double brm = average((1 - cos(average * 3.14159))  / 2) + 0.5;
 		
-		if(fabs(target - amplitude) < 4 * elapsed) amplitude = target;
-		else if(target < amplitude) amplitude -= 4 * elapsed;
-		else amplitude += 4 * elapsed;
+		if (fabs(target - amplitude) < 4 * params.elapsed)
+		{
+			amplitude = target;
+		}
+		else if (target < amplitude)
+		{
+			amplitude -= 4 * params.elapsed;
+		}
+		else
+		{
+			amplitude += 4 * params.elapsed;
+		}
 		
 		amplitude = 70;
 		
@@ -824,7 +833,7 @@ public:
 				dOscFade = 0;
 			}
 		}
-		double dBr = std::min(1.0, pAudio->GetIntensity( )* 3.0);
+		double dBr = std::min(1.0, params.audio_data->GetIntensity( )* 3.0);
 		if(nOsc2 != -1 && dOscFade >= 1.0)
 		{
 			nOsc1 = nOsc2;
@@ -833,12 +842,15 @@ public:
 		
 		if(nOsc2 != -1)
 		{
-			DrawOscilloscope(elapsed, nOsc1, dBr * (1 - dOscFade), pAudio, dst);
-			DrawOscilloscope(elapsed, nOsc2, dBr * dOscFade, pAudio, dst);
+			DrawOscilloscope(params.elapsed, nOsc1, dBr * (1 - dOscFade), params.audio_data, dst);
+			DrawOscilloscope(params.elapsed, nOsc2, dBr * dOscFade, params.audio_data, dst);
 		}
-		else DrawOscilloscope(elapsed, nOsc1, dBr, pAudio, dst);
+		else
+		{
+			DrawOscilloscope(params.elapsed, nOsc1, dBr, params.audio_data, dst);
+		}
 
-		pCanvas->color = ColorRgb::Grey(255.0 * brightness);//D3DRGB(brightness, brightness, brightness);
+		pCanvas->color = ColorRgb::Grey(255.0 * params.brightness);//D3DRGB(brightness, brightness, brightness);
 
 		memcpy( pCanvas->GetDataPtr( ), (fOddFrame? bf2 : bf1).GetBuffer( ), bf1.GetSize());
 		error = pCanvas->UploadTextures( );
@@ -853,7 +865,7 @@ public:
 		}
 		return nullptr;
 	}
-	Error* Render( ) override
+	Error* Render(const RenderParams& params) override
 	{
 		g_pD3D->SetState(ZDirect3D::Transparent);
 		

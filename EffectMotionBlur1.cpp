@@ -52,19 +52,19 @@ public:
 	{
 		return (fElapsed > 0.5);
 	}
-	Error* Calculate(float brightness, float elapsed, AudioData* pAudio) override
+	Error* Calculate(const CalculateParams& params) override
 	{
 		for(int i = 0; i < RINGS; i++)
 		{
-			pObj[i].roll += rs[i] * pAudio->GetIntensity( )* elapsed;
-			pObj[i].pitch += ps[i] * pAudio->GetIntensity( )* elapsed;
-			pObj[i].yaw += ys[i] * std::max(0.1f, pAudio->GetIntensity( )) * elapsed;
-			pObj[i].ambient_light_color = ColorRgb::Grey(brightness * 20.0f);// / pObj[i].nExposure);
-			pObj[i].Calculate(&camera, elapsed);
+			pObj[i].roll += rs[i] * params.audio_data->GetIntensity( ) * params.elapsed;
+			pObj[i].pitch += ps[i] * params.audio_data->GetIntensity( ) * params.elapsed;
+			pObj[i].yaw += ys[i] * std::max(0.1f, params.audio_data->GetIntensity( )) * params.elapsed;
+			pObj[i].ambient_light_color = ColorRgb::Grey(params.brightness * 20.0f);// / pObj[i].nExposure);
+			pObj[i].Calculate(&camera, params.elapsed);
 		}
 		return nullptr;
 	}
-	Error* Render( ) override
+	Error* Render(const RenderParams& params) override
 	{
 		Error* error;
 		for(int i = 0; i < RINGS; i++)
@@ -74,7 +74,7 @@ public:
 		}
 		return nullptr;
 	}
-	Error* Reconfigure(AudioData* pAudio) override
+	Error* Reconfigure(const ReconfigureParams& params) override
 	{
 		Texture *t = g_pD3D->Find(TextureClass::MotionBlurEnvMap);
 		for (int i = 0; i < RINGS; i++)

@@ -10,7 +10,7 @@ EffectBase::EffectBase()
 EffectBase::~EffectBase()
 {
 }
-Error* EffectBase::Reconfigure(AudioData*)
+Error* EffectBase::Reconfigure(const ReconfigureParams& params)
 {
 	return nullptr;
 }
@@ -45,19 +45,32 @@ Error* EffectHandler::Calculate(float fElapsed, AudioData* pAudio)
 	_ASSERT(pEffect != NULL);
 
 	pAudio->SetIntensityBeatScale( fSensitivity * 3.0f );
-	Error* error = pEffect->Calculate(fBr, GetElapsed(fElapsed), pAudio);
+
+	EffectBase::CalculateParams params;
+	params.brightness = fBr;
+	params.elapsed = GetElapsed(fElapsed);
+	params.audio_data = pAudio;
+
+	Error* error = pEffect->Calculate(params);
 	pAudio->SetIntensityBeatScale( 0.0f );
 	return error;
 }
 Error* EffectHandler::Reconfigure(AudioData* pAudio)
 {
 	_ASSERT(pEffect != NULL);
-	return pEffect->Reconfigure(pAudio);
+
+	EffectBase::ReconfigureParams params;
+	params.audio_data = pAudio;
+
+	return pEffect->Reconfigure(params);
 }
 Error* EffectHandler::Render()
 {
 	_ASSERT(pEffect != NULL);
-	return pEffect->Render();
+
+	EffectBase::RenderParams params;
+
+	return pEffect->Render(params);
 }
 bool EffectHandler::CanRender(float fFrames)
 {

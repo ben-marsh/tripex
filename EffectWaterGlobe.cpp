@@ -150,19 +150,19 @@ public:
 
 		camera.position = Vector3(0, 0, -320);
 	}
-	Error* Calculate(float brightness, float elapsed, AudioData* pAudio) override
+	Error* Calculate(const CalculateParams& params) override
 	{
 		static int done = 0;
 
 		static double accum = 2;
-		accum += elapsed;
+		accum += params.elapsed;
 
 		while(accum >= 1)
 		{
 //			angle += 20;
 			obj.fDamping = 0.98f;//95
 
-			obj.fAverage = pAudio->GetIntensity( );
+			obj.fAverage = params.audio_data->GetIntensity( );
 /*			float fDamping = 0.9 - (average * average);
 			float fAverage = pObj->AverageHeight();
 			float fHeight = 0.1 * average * average;
@@ -172,11 +172,11 @@ public:
 */
 // 			float fHeight = average * pObj->AverageHeight();
 
-			double bh = pAudio->GetIntensity( );// * 50;
+			double bh = params.audio_data->GetIntensity( );// * 50;
 
 //			float fAverage = pObj->AverageHeight();
 //			pObj->pfPos[0] = bh * sin(angle * 3.14159 / 128.0);
-			float fMult = std::min(1.0f, pAudio->GetIntensity( ) * 2) - std::min(1.f, pAudio->GetIntensity( ) * 3) - (obj.AverageHeight() / 0.5f); //0.95 - average; //9; //0.95;
+			float fMult = std::min(1.0f, params.audio_data->GetIntensity( ) * 2) - std::min(1.f, params.audio_data->GetIntensity( ) * 3) - (obj.AverageHeight() / 0.5f); //0.95 - average; //9; //0.95;
 			obj.Update();
 //			pObj->fDamping = average / pObj->;//min(0.96, average * 2.0) * Bound<float>(1 - avHeight, 0, 1); /**/ //(AVSZ / avHeight); //0.95 - average; //9; //0.95;
 
@@ -191,7 +191,7 @@ public:
 	
 			obj.pitch += 2.0f * g_fDegToRad;
 			obj.yaw += 1.5f * g_fDegToRad;
-			obj.ambient_light_color = ColorRgb::Grey((int)(255.0f * brightness));
+			obj.ambient_light_color = ColorRgb::Grey((int)(255.0f * params.brightness));
 
 //			angle += average;
 			accum--;
@@ -201,15 +201,15 @@ public:
 		obj.flags.reset(Actor::F_VALID_VERTEX_NORMALS);
 
 		obj.Create();
-		obj.Calculate(&camera, elapsed);
+		obj.Calculate(&camera, params.elapsed);
 		return nullptr;
 	}
-	Error* Reconfigure(AudioData* pAudio) override
+	Error* Reconfigure(const ReconfigureParams& params) override
 	{
 		obj.textures[0].Set(Actor::TextureType::Envmap, g_pD3D->Find(TextureClass::WaterGlobeEnvMap));
 		return nullptr;
 	}
-	Error* Render()
+	Error* Render(const RenderParams& params) override
 	{
 		Error* error;
 		obj.flags.set(Actor::F_DRAW_TRANSPARENT);

@@ -47,14 +47,30 @@ enum
 class EffectBase
 {
 public:
+	struct CalculateParams
+	{
+		float brightness;
+		float elapsed;
+		AudioData* audio_data;
+	};
+
+	struct ReconfigureParams
+	{
+		AudioData* audio_data;
+	};
+
+	struct RenderParams
+	{
+	};
+
 	class EffectHandler* pEffectPtr;
 
 	EffectBase();
 	virtual ~EffectBase();
 
-	virtual Error* Calculate(float fBr, float fElapsed, AudioData* pAudio) = 0;
-	virtual Error* Reconfigure(AudioData* pAudio);
-	virtual Error* Render() = 0;
+	virtual Error* Calculate(const CalculateParams& params) = 0;
+	virtual Error* Reconfigure(const ReconfigureParams& params);
+	virtual Error* Render(const RenderParams& params) = 0;
 	virtual bool CanRender(float fElapsed);
 };
 

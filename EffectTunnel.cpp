@@ -105,15 +105,21 @@ public:
 			}
 		}
 	}
-	Error* Calculate(float fBr, float fElapsed, AudioData* pAudio) override
+	Error* Calculate(const CalculateParams& params) override
 	{
 		Vector3 pvPos[4];
-		float fPosChange = 0.015f * pAudio->GetIntensity( ) * fElapsed;
+		float fPosChange = 0.015f * params.audio_data->GetIntensity() * params.elapsed;
 		static float fTexVOfs = 3;//0.99;1.5;//0.99;
-		fTexVOfs += 0.003f * fTBr * fElapsed;
+		fTexVOfs += 0.003f * fTBr * params.elapsed;
 		while(fTexVOfs > 0) fTexVOfs--;
-		if(pAudio->GetIntensity( ) > fTBr) fTBr += std::min(pAudio->GetIntensity( ) - fTBr, 0.05f) * fElapsed;
-		if(pAudio->GetIntensity( ) < fTBr) fTBr += std::max(pAudio->GetIntensity( ) - fTBr, -0.05f) * fElapsed;
+		if (params.audio_data->GetIntensity() > fTBr)
+		{
+			fTBr += std::min(params.audio_data->GetIntensity() - fTBr, 0.05f) * params.elapsed;
+		}
+		if (params.audio_data->GetIntensity() < fTBr)
+		{
+			fTBr += std::max(params.audio_data->GetIntensity() - fTBr, -0.05f) * params.elapsed;
+		}
 
 		int nOldStart = (int)(fPos * nTunnelL);
 		bool fReset = false;
@@ -126,8 +132,8 @@ public:
 
 		for(; fPos >= 1.0; fPos -= 1)
 		{
-			float fAng1 = fPrevAng + GetRand(RANDCH_A1 * pAudio->GetIntensity( ));
-			float fAng2 = fAng1 + GetRand(RANDCH_A2 * pAudio->GetIntensity( ));
+			float fAng1 = fPrevAng + GetRand(RANDCH_A1 * params.audio_data->GetIntensity( ));
+			float fAng2 = fAng1 + GetRand(RANDCH_A2 * params.audio_data->GetIntensity( ));
 			fPrevAng = fAng2;// + 3.14159;
 			for(int j = 0; j < 2; j++)
 			{
@@ -190,8 +196,8 @@ public:
 
 			fThisBr = 1.0f;
 
-			ColorRgb c = ColorRgb::Grey((int)(255.0f * fThisBr * fBr));
-			ColorRgb c2 = ColorRgb::Grey((int)(255.0f * fThisBr * fBr));
+			ColorRgb c = ColorRgb::Grey((int)(255.0f * fThisBr * params.brightness));
+			ColorRgb c2 = ColorRgb::Grey((int)(255.0f * fThisBr * params.brightness));
 
 			float fTexV = float(nStart + i) / float(nTunnelL);
 			int nIndex = i * nCrossSection;
@@ -255,18 +261,18 @@ public:
 
 		for(int i = 0; i < 2; i++)
 		{
-			pObj[i].Calculate(&camera, fElapsed);
+			pObj[i].Calculate(&camera, params.elapsed);
 		}
 		return nullptr;
 	}
-	Error* Reconfigure(AudioData* pAudio) override
+	Error* Reconfigure(const ReconfigureParams& params) override
 	{
 		tx = g_pD3D->Find(TextureClass::TunnelBackground);
 		pObj[0].textures[0].Set(Actor::TextureType::Normal, tx);//SetTexture(tx);
 		pObj[1].textures[0].Set(Actor::TextureType::Normal, tx);///.pTexture = tx;//SetTexture(tx);
 		return nullptr;
 	}
-	Error* Render() override
+	Error* Render(const RenderParams& params) override
 	{
 		for(int i = 0; i < 2; i++)
 		{

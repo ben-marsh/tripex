@@ -40,24 +40,24 @@ public:
 			}
 		}
 	}
-	Error* Calculate(float brightness, float elapsed, AudioData* pAudio) override
+	Error* Calculate(const CalculateParams& params) override
 	{
-		br = brightness;
-		xp += 0.015/*08*/ * pAudio->GetDampenedBand(pEffectPtr->fSensitivity, 0, 0.25f) * elapsed;
-		yp += 0.02/*08*/ * pAudio->GetDampenedBand(pEffectPtr->fSensitivity, 0.25f, 0.5f) * elapsed;
-		t += elapsed * std::max(0.5, pAudio->GetDampenedBand(pEffectPtr->fSensitivity, 2/16.0f, 5/16.0f) + (3.0 * pAudio->GetDampenedBand(pEffectPtr->fSensitivity, 7/16.0f, 12/16.0f))) * 20 * 3.14159 / 180.0;
+		br = params.brightness;
+		xp += 0.015/*08*/ * params.audio_data->GetDampenedBand(pEffectPtr->fSensitivity, 0, 0.25f) * params.elapsed;
+		yp += 0.02/*08*/ * params.audio_data->GetDampenedBand(pEffectPtr->fSensitivity, 0.25f, 0.5f) * params.elapsed;
+		t += params.elapsed * std::max(0.5, params.audio_data->GetDampenedBand(pEffectPtr->fSensitivity, 2/16.0f, 5/16.0f) + (3.0 * params.audio_data->GetDampenedBand(pEffectPtr->fSensitivity, 7/16.0f, 12/16.0f))) * 20 * 3.14159 / 180.0;
 
-		angle += 1 * elapsed;
+		angle += 1 * params.elapsed;
 		fac = 0.5 + (0.15 * cos(angle * 3.14159 / 256.0));
 
 		int x, y, i = 0;
-		double av = std::max(0.4f, pAudio->GetDampenedBand(pEffectPtr->fSensitivity, 0, 1.0f));
+		double av = std::max(0.4f, params.audio_data->GetDampenedBand(pEffectPtr->fSensitivity, 0, 1.0f));
 		double fx, fy;
 		double w2 = grid.width / 2.0, h2 = grid.height / 2.0;
 		double rw = 1.0 / grid.width, rh = 1.0 / grid.height;
 
 		i = 0;
-		ColorRgb cColour = ColorRgb::Grey(255.0 * brightness);
+		ColorRgb cColour = ColorRgb::Grey(255.0 * params.brightness);
 		for(x = 0; x <= grid.width; x++)
 		{
 			for(y = 0; y <= grid.height; y++)
@@ -77,7 +77,7 @@ public:
 		grid.update_edges = true;
 		return nullptr;
 	}
-	Error* Render() override
+	Error* Render(const RenderParams& params) override
 	{
 		Error* error;
 		g_pD3D->SetTexture(0, tx);
@@ -88,7 +88,7 @@ public:
 
 		return nullptr;
 	}
-	Error* Reconfigure(AudioData* pAudio) override
+	Error* Reconfigure(const ReconfigureParams& params) override
 	{
 		tx = g_pD3D->Find(TextureClass::DistortionBackground);
 //	grid->SetTexture(d3d->Select(TC_WRAPTEXTURE));//TC_ENVIRONMENTMAP));

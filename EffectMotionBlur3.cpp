@@ -118,17 +118,17 @@ public:
 		}
 		return Vector3(0, 0, 0);
 	}
-	Error* Calculate(float brightness, float elapsed, AudioData* pAudio) override
+	Error* Calculate(const CalculateParams& params) override
 	{
-		fAvTotal += elapsed * pAudio->GetIntensity( );
-		fAvTime += elapsed;
+		fAvTotal += params.elapsed * params.audio_data->GetIntensity( );
+		fAvTime += params.elapsed;
 
 		cam.position.z = -80;
 
-		obj.roll += elapsed * 3.14159 / 180.0f;
-		obj.pitch += elapsed * 2.0f * 3.14159 / 180.0f;
-		obj.yaw += elapsed * 3.0f * 3.14159 / 180.0f;
-		obj.Calculate(&cam, elapsed);
+		obj.roll += params.elapsed * 3.14159 / 180.0f;
+		obj.pitch += params.elapsed * 2.0f * 3.14159 / 180.0f;
+		obj.yaw += params.elapsed * 3.0f * 3.14159 / 180.0f;
+		obj.Calculate(&cam, params.elapsed);
 
 		if(fAvTotal > 6 || bReset)
 		{
@@ -143,14 +143,14 @@ public:
 			fSpeed = fabs(camera.position.z - fCamTarget) / 32.0;
 		}
 
-		camera.position.z = StepTo<float>(camera.position.z, fCamTarget, fSpeed * elapsed);// * 2.0 * (-camera.vPosition.k / 250.0));//2);
+		camera.position.z = StepTo<float>(camera.position.z, fCamTarget, fSpeed * params.elapsed);// * 2.0 * (-camera.vPosition.k / 250.0));//2);
 
-		fCamPos += pAudio->GetIntensity( ) * elapsed * 0.02;
+		fCamPos += params.audio_data->GetIntensity( ) * params.elapsed * 0.02;
 		camera.SetTarget(bz.Calculate(fCamPos));
 
 		if(nNewEffect != -1)
 		{
-			fChange += elapsed / 20.0;
+			fChange += params.elapsed / 20.0;
 			if(fChange > 1)
 			{
 				nEffect = nNewEffect;
@@ -159,7 +159,7 @@ public:
 		}
 		else
 		{
-			fShown += elapsed;
+			fShown += params.elapsed;
 			if(fShown > 50)
 			{
 				nNewEffect = rand() % 5;
@@ -168,7 +168,7 @@ public:
 			}
 		}
 
-		camera.roll += pAudio->GetIntensity( ) * 3.14159 * 2.0 * elapsed / 180.0;
+		camera.roll += params.audio_data->GetIntensity( ) * 3.14159 * 2.0 * params.elapsed / 180.0;
 
 		for(int i = 0; i < 9; i++)
 		{
@@ -181,17 +181,17 @@ public:
 				pObj[i].position = GetPos(nEffect, i);
 			}	
 
-			float fSpeed = pAudio->GetDampenedBand( pEffectPtr->fSensitivity, i / 10.0, (i + 1) / 10.0);
-			pObj[i].roll += elapsed * 4.0 * 3.14159 / 180.0;
-			pObj[i].pitch += pAudio->GetIntensity( ) * elapsed * 10.0 * 3.14159 / 180.0;
-			pObj[i].yaw += (pAudio->GetIntensity( ) + pAudio->GetBeat( ) ) * elapsed * 7 * 3.14159 / 180.0;
-			pObj[i].ambient_light_color = ColorRgb::Grey(brightness * 48.0f);// / pObj[i].nExposure);
-			pObj[i].Calculate(&camera, elapsed);
+			float fSpeed = params.audio_data->GetDampenedBand( pEffectPtr->fSensitivity, i / 10.0, (i + 1) / 10.0);
+			pObj[i].roll += params.elapsed * 4.0 * 3.14159 / 180.0;
+			pObj[i].pitch += params.audio_data->GetIntensity( ) * params.elapsed * 10.0 * 3.14159 / 180.0;
+			pObj[i].yaw += (params.audio_data->GetIntensity( ) + params.audio_data->GetBeat( ) ) * params.elapsed * 7 * 3.14159 / 180.0;
+			pObj[i].ambient_light_color = ColorRgb::Grey(params.brightness * 48.0f);// / pObj[i].nExposure);
+			pObj[i].Calculate(&camera, params.elapsed);
 		}
 
 		return nullptr;
 	}
-	Error* Render() override
+	Error* Render(const RenderParams& params) override
 	{
 		for(int i = 0; i < 9; i++)
 		{
@@ -200,10 +200,10 @@ public:
 		}
 		return nullptr;
 	}
-	Error* Reconfigure(AudioData* pAudio) override
+	Error* Reconfigure(const ReconfigureParams& params) override
 	{
 		fAvTime = 16;
-		fAvTotal = pAudio->GetIntensity( ) * fAvTime;
+		fAvTotal = params.audio_data->GetIntensity( ) * fAvTime;
 		bReset = true;
 		Texture *t = g_pD3D->Find(bAltBlur? TextureClass::MotionBlur3AltEnvMap : TextureClass::MotionBlur3EnvMap);
 		for(int i = 0; i < 9; i++) pObj[i].textures[0].texture = t;

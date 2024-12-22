@@ -50,14 +50,14 @@ public:
 			else pc[i] = ColorRgb(0, 255, 255);
 		}
 	}
-	Error* Calculate(float brightness, float elapsed, AudioData* g_pAudio) override
+	Error* Calculate(const CalculateParams& params) override
 	{
-		elapsed *= 1.5;
+		float elapsed = params.elapsed * 1.5;
 
-		br = brightness;
-		xp += 0.008 * std::max(0.1f, g_pAudio->GetDampenedBand( pEffectPtr->fSensitivity, 0, 0.2f ) ) * elapsed;
-		yp += 0.008 * std::max(0.1f, g_pAudio->GetDampenedBand(pEffectPtr->fSensitivity, 0.15f, 0.5f ) + g_pAudio->GetBeat( ) ) * elapsed;
-		t += elapsed * std::max(0.5f, g_pAudio->GetDampenedBand(pEffectPtr->fSensitivity, 0, 1.0f)) * 20 * 3.14159 / 180.0;
+		br = params.brightness;
+		xp += 0.008 * std::max(0.1f, params.audio_data->GetDampenedBand( pEffectPtr->fSensitivity, 0, 0.2f ) ) * elapsed;
+		yp += 0.008 * std::max(0.1f, params.audio_data->GetDampenedBand(pEffectPtr->fSensitivity, 0.15f, 0.5f ) + params.audio_data->GetBeat( ) ) * elapsed;
+		t += elapsed * std::max(0.5f, params.audio_data->GetDampenedBand(pEffectPtr->fSensitivity, 0, 1.0f)) * 20 * 3.14159 / 180.0;
 
 		angle += 1 * elapsed;
 		fac = 0.5 + (0.15 * cos(angle * 3.14159 / 256.0));
@@ -66,18 +66,18 @@ public:
 		for(i = 0; i < NCENTRES; i++)
 		{
 			Vector3 v1, v2;
-			for(pdPos[i] += 0.02 * elapsed * (0.3 + (0.7 * g_pAudio->GetIntensity( ))); pdPos[i] >= 1.0; pdPos[i] -= 1.0)
+			for(pdPos[i] += 0.02 * elapsed * (0.3 + (0.7 * params.audio_data->GetIntensity( ))); pdPos[i] >= 1.0; pdPos[i] -= 1.0)
 			{
 				pb[i][0] = pb[i][3];
 				pb[i][1] = pb[i][3] + (pb[i][3] - pb[i][2]);
 				pb[i][2] = Vector3(rand() * GRW / RAND_MAX, rand() * GRH / RAND_MAX, 0);
 				pb[i][3] = Vector3(rand() * GRW / RAND_MAX, rand() * GRH / RAND_MAX, 0);
 			}
-			pdA[i] += (g_pAudio->GetIntensity( ) /*+ 0.001*/) * pdAS[i] * elapsed;
+			pdA[i] += (params.audio_data->GetIntensity( ) /*+ 0.001*/) * pdAS[i] * elapsed;
 			pvPos[i] = pb[i].Calculate(pdPos[i]);
 		}
 
-		double av = g_pAudio->GetIntensity( );//((average * average) + average) / 2;
+		double av = params.audio_data->GetIntensity( );//((average * average) + average) / 2;
 		double w2 = grid.width / 2.0, h2 = grid.height / 2.0;
 		double rw = 1.0 / grid.width, rh = 1.0 / grid.height;
 
@@ -116,7 +116,7 @@ public:
 					fX += fLen * fNormX;
 					fY += fLen * fNormY;
 
-					float fColMult = brightness * 0.5 * std::max(0.0f, 1.0f - (sqrtf(fPosX * fPosX + fPosY * fPosY) / 30.0f));
+					float fColMult = params.brightness * 0.5 * std::max(0.0f, 1.0f - (sqrtf(fPosX * fPosX + fPosY * fPosY) / 30.0f));
 					cCol.r += pc[j].r * fColMult;
 					cCol.g += pc[j].g * fColMult;
 					cCol.b += pc[j].b * fColMult;
@@ -124,10 +124,10 @@ public:
 
 				grid.vertices[i].tex_coords[0].x = fX;
 				grid.vertices[i].tex_coords[0].y = fY;
-				ColorRgb cGrey = ColorRgb::Grey(std::min(1.0f, brightness * fBr) * 255.0);
+				ColorRgb cGrey = ColorRgb::Grey(std::min(1.0f, params.brightness * fBr) * 255.0);
 				if(bLight) 
 				{
-					grid.vertices[i].specular = cCol * brightness * fBr * 0.5;
+					grid.vertices[i].specular = cCol * params.brightness * fBr * 0.5;
 					grid.vertices[i].diffuse =  ColorRgb::Blend(cGrey, (ColorRgb)cCol, 0.2f);//ZColour::Grey(255);
 				}
 				else 
@@ -141,7 +141,7 @@ public:
 		
 		return nullptr;
 	}
-	Error* Render( )
+	Error* Render(const RenderParams& params) override
 	{
 		Error* error;
 
@@ -155,7 +155,7 @@ public:
 
 		return nullptr;
 	}
-	Error* Reconfigure(AudioData* pAudio) override
+	Error* Reconfigure(const ReconfigureParams& params) override
 	{
 		tx = g_pD3D->Find(bLight? TextureClass::Distortion2ColBackground : TextureClass::Distortion2Background);
 		return nullptr;

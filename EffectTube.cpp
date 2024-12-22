@@ -127,16 +127,16 @@ public:
 //	scene->vpObject.Add(coil);
 		cCamera.position.z = -120;//120;
 	}
-	Error* Calculate(float brightness, float elapsed, AudioData* pAudio) override
+	Error* Calculate(const CalculateParams& params) override
 	{
 		int i, j;
 		for(i = 0; i < 128; i++)
 		{
-			accwf[i * PTCIRCUM / 128] += pAudio->GetSample(i*4) * 128.0f * 4.0f * elapsed * (PTCIRCUM / 128.0f);
+			accwf[i * PTCIRCUM / 128] += params.audio_data->GetSample(i*4) * 128.0f * 4.0f * params.elapsed * (PTCIRCUM / 128.0f);
 		}
 
 		static double accum = 1;
-		accum += elapsed;
+		accum += params.elapsed;
 		double dChange = accum;
 
 		bool fChanged = false;
@@ -144,7 +144,7 @@ public:
 		{
 			for(i = 0; i < CLENGTH; i++)
 			{
-				double br = std::min(1.0, sin(i * 3.14159 / CLENGTH) * 5) * brightness;
+				double br = std::min(1.0, sin(i * 3.14159 / CLENGTH) * 5) * params.brightness;
 				for(j = 0; j < 4; j++)
 				{
 					coil.vertices[(i * 4) + j].diffuse = ColorRgb::Grey((int)(255.0f * br));
@@ -152,7 +152,7 @@ public:
 			}
 			for(i = 0; i < PTLENGTH; i++)
 			{
-				double br = std::min(1.0, sin(i * 3.14159 / PTLENGTH) * 1) * brightness;
+				double br = std::min(1.0, sin(i * 3.14159 / PTLENGTH) * 1) * params.brightness;
 	
 				for(j = 0; j < PTCIRCUM; j++)
 				{
@@ -203,11 +203,11 @@ public:
 //	obj->x = accum * PTDIST;
 		for(i = 0; i < PTCIRCUM; i++) accwf[i] = 0;
 
-		obj.Calculate(&cCamera, elapsed);
-		coil.Calculate(&cCamera, elapsed);
+		obj.Calculate(&cCamera, params.elapsed);
+		coil.Calculate(&cCamera, params.elapsed);
 		return nullptr;
 	}
-	Error* Render() override
+	Error* Render(const RenderParams& params) override
 	{
 		Error* error;
 
@@ -224,7 +224,7 @@ public:
 
 		return nullptr;
 	}
-	Error* Reconfigure(AudioData* pAudio) override
+	Error* Reconfigure(const ReconfigureParams& params) override
 	{
 		Texture *tx = g_pD3D->Find(TextureClass::TubeEnvMap);
 		coil.textures[0].Set(Actor::TextureType::Envmap, tx);

@@ -82,14 +82,14 @@ public:
 		}
 		camera.position.z = -130;
 	}
-	Error* Calculate(float brightness, float elapsed, AudioData* pAudio)
+	Error* Calculate(const CalculateParams& params) override
 	{
 		camera.position = b.Calculate(fBezPos);
 		camera.SetTarget(Vector3::Origin());
-		fBezPos += 0.02 * pAudio->GetIntensity( ) * elapsed;
+		fBezPos += 0.02 * params.audio_data->GetIntensity( ) * params.elapsed;
 
-		fTime += elapsed;
-		fChange = std::min(1.0f, fChange + (elapsed / 3.0f));
+		fTime += params.elapsed;
+		fChange = std::min(1.0f, fChange + (params.elapsed / 3.0f));
 
 		if(fTime > UPDATETIME)
 		{
@@ -108,15 +108,15 @@ public:
 
 		for(int i = 0; i < 3; i++)
 		{
-			pObj[i].ambient_light_color = ColorRgb::Grey(60.0 * brightness);
-			pObj[i].roll += pfa[0] * elapsed * (pAudio->GetIntensity( ) + 0.1);
-			pObj[i].pitch += pfa[1] * elapsed * pAudio->GetIntensity( ) ;
-			pObj[i].yaw += pfa[2] * elapsed * (pAudio->GetIntensity( ) + 0.2);
-			pObj[i].Calculate(&camera, elapsed);
+			pObj[i].ambient_light_color = ColorRgb::Grey(60.0 * params.brightness);
+			pObj[i].roll += pfa[0] * params.elapsed * (params.audio_data->GetIntensity( ) + 0.1);
+			pObj[i].pitch += pfa[1] * params.elapsed * params.audio_data->GetIntensity( ) ;
+			pObj[i].yaw += pfa[2] * params.elapsed * (params.audio_data->GetIntensity( ) + 0.2);
+			pObj[i].Calculate(&camera, params.elapsed);
 		}
 		return nullptr;
 	}
-	Error* Reconfigure(AudioData* pAudio) override
+	Error* Reconfigure(const ReconfigureParams& params) override
 	{
 		Texture *pTexture = g_pD3D->Find(TextureClass::MotionBlur2EnvMap);//2);
 		for(int i = 0; i < PIPES; i++)
@@ -126,7 +126,7 @@ public:
 		}
 		return nullptr;
 	}
-	Error* Render() override
+	Error* Render(const RenderParams& params) override
 	{
 		for(int i = 0; i < PIPES; i++)
 		{

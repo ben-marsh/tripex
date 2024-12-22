@@ -270,15 +270,15 @@ public:
 			mpBumpIndex[vpBumpmap[i]] = pb;
 		}
 */	}
-	Error* Calculate( float brightness, float elapsed, AudioData* pAudio ) override
+	Error* Calculate(const CalculateParams& params) override
 	{
 		Error* error;
-		br = brightness;
+		br = params.brightness;
 
-		tx += /*4*/1 * elapsed;//average * 20.0;
-		ty += elapsed * sinf(ya) * cosf(ya * 1.2f) * sinf(ya * 1.5f) * 0.4f;
+		tx += /*4*/1 * params.elapsed;//average * 20.0;
+		ty += params.elapsed * sinf(ya) * cosf(ya * 1.2f) * sinf(ya * 1.5f) * 0.4f;
 
-		ya += elapsed * g_fDegToRad;
+		ya += params.elapsed * g_fDegToRad;
 
 		if(texture != pBlankTexture)
 		{
@@ -297,7 +297,7 @@ public:
 					grid.vertices[i].tex_coords[0].x = gridbm.vertices[i].tex_coords[0].x = precalc_u[x][y] + (tx / 256.0f);
 					grid.vertices[i].tex_coords[0].y = gridbm.vertices[i].tex_coords[0].y = precalc_v[x][y] + (ty / 256.0f);
 
-					float brav = precalc_c[x][y] * br * pAudio->GetIntensity( );//min(average, 1);
+					float brav = precalc_c[x][y] * br * params.audio_data->GetIntensity( );//min(average, 1);
 					brav *= 1.6f;
 					gridbm.vertices[i].diffuse = ColorRgb::Grey((int)(255.0f * br));//max(0.2, min(brav, 1)) * 255.0);//gridbm->vertex[i].color = D3DRGB(brav, brav, brav);
 					grid.vertices[i].diffuse = ColorRgb::Grey((int)(br * precalc_c[(int)(x + tx) % GRIDW][y % GRIDH] * 255.0f));
@@ -369,18 +369,18 @@ public:
 //	if(FAILED(hRes)) return hRes;
 
 		/** TENTACLES **********/
-		obj.ambient_light_color = ColorRgb::Grey((int)(brightness * 205.0f));
-		if( pAudio->IsBeat( ) && pAudio->GetBeat( ) > 0.9f) fTentacleDir = -fTentacleDir;
+		obj.ambient_light_color = ColorRgb::Grey((int)(params.brightness * 205.0f));
+		if( params.audio_data->IsBeat( ) && params.audio_data->GetBeat( ) > 0.9f) fTentacleDir = -fTentacleDir;
 		for(float fPos = 0;;)
 		{
 			float fNext = fPos + MIN_FRAME_TIME;
-			bool bLast = fNext > elapsed;
+			bool bLast = fNext > params.elapsed;
 
-			float fThis = std::min(MIN_FRAME_TIME, elapsed - fPos);
-			obj.roll += fThis * fTentacleDir * g_fDegToRad * 5.0f * (pAudio->GetIntensity( ) + 0.1f);
-			obj.pitch += fThis * fTentacleDir * g_fDegToRad * 20.0f * pAudio->GetIntensity( );
-			obj.yaw += fThis * fTentacleDir * g_fDegToRad * 10.0f * (pAudio->GetIntensity( ) + 0.1f);
-			angle += pAudio->GetIntensity( ) * fMoveSpeed * fThis * g_fDegToRad;
+			float fThis = std::min(MIN_FRAME_TIME, params.elapsed - fPos);
+			obj.roll += fThis * fTentacleDir * g_fDegToRad * 5.0f * (params.audio_data->GetIntensity( ) + 0.1f);
+			obj.pitch += fThis * fTentacleDir * g_fDegToRad * 20.0f * params.audio_data->GetIntensity( );
+			obj.yaw += fThis * fTentacleDir * g_fDegToRad * 10.0f * (params.audio_data->GetIntensity( ) + 0.1f);
+			angle += params.audio_data->GetIntensity( ) * fMoveSpeed * fThis * g_fDegToRad;
 			obj.position.x = 200.0f * cosf(angle) * sinf(angle * 1.3f) * cosf(angle * 2.3f) * sinf(angle * 0.6f);
 			obj.position.y = 100.0f * cosf(angle * 0.2f) * sinf(angle * 1.1f) * cosf(angle * 1.6f) * sinf(angle * 1.2f);
 			obj.position.z = 150.0f * cosf(angle * 1.6f) * sinf(angle * 0.5f) * cosf(angle * 1.1f) * sinf(angle * 1.2f);
@@ -393,7 +393,7 @@ public:
 		}
 		return nullptr;
 	}
-	Error* Render( ) override
+	Error* Render(const RenderParams& params) override
 	{
 		Error* error;
 		static double angle = 0;
@@ -446,7 +446,7 @@ public:
 
 		return nullptr;
 	}
-	Error* Reconfigure(AudioData* pAudio) override
+	Error* Reconfigure(const ReconfigureParams& params) override
 	{
 		obj.textures[0].type = Actor::TextureType::Envmap;
 		obj.textures[0].texture = g_pD3D->Find(TextureClass::BumpMapTentaclesEnvMap);//ENVIRONMENTMAP));

@@ -53,18 +53,18 @@ public:
 			}
 		}
 	}
-	Error* Calculate(float brightness, float elapsed, AudioData* pAudio) override
+	Error* Calculate(const CalculateParams& params) override
 	{
-		elapsed *= 1.5;
+		float elapsed = params.elapsed * 1.5;
 
 		float fMult = elapsed;//10.0 / FRAMEFAC;
 
-		a += fMult * (pAudio->GetIntensity( ) + 0.1) * 3.14159 / 180.0;
-		obj.roll += fMult * (pAudio->GetIntensity( ) + (pAudio->GetBeat( ) * 2.0)) * 2/*5*//*7*/ * 3.14159 / 180.0;
-		obj.pitch += fMult * (pAudio->GetIntensity( ) + 0.1) * 4/*4*/ /*8*/ * 3.14159 / 180;
-		obj.yaw += fMult * pAudio->GetBeat( ) * 3/*3*//*5*/ * 3.14159 / 180.0;
+		a += fMult * (params.audio_data->GetIntensity( ) + 0.1) * 3.14159 / 180.0;
+		obj.roll += fMult * (params.audio_data->GetIntensity( ) + (params.audio_data->GetBeat( ) * 2.0)) * 2/*5*//*7*/ * 3.14159 / 180.0;
+		obj.pitch += fMult * (params.audio_data->GetIntensity( ) + 0.1) * 4/*4*/ /*8*/ * 3.14159 / 180;
+		obj.yaw += fMult * params.audio_data->GetBeat( ) * 3/*3*//*5*/ * 3.14159 / 180.0;
 
-		obj.ambient_light_color = ColorRgb::Grey(2 * 0.15 * brightness * 255.0);//color = D3DRGB(0.15 * brightness, 0.15 * brightness, 0.15 * brightness);
+		obj.ambient_light_color = ColorRgb::Grey(2 * 0.15 * params.brightness * 255.0);//color = D3DRGB(0.15 * brightness, 0.15 * brightness, 0.15 * brightness);
 
 //		FILE *file = fopen("c:\\elapsed.txt", "at");
 //		fprintf(file, "elapsed: %f\n", elapsed);
@@ -76,13 +76,13 @@ public:
 		camera.position = Vector3(40 * sin(a) * cos(a * 1.2), 40 * cos(a * 0.7) * sin(a * 0.9), 40 * cos(a * 1.4) * sin(0.7));
 		return nullptr;
 	}
-	Error* Reconfigure(AudioData* pAudio) override
+	Error* Reconfigure(const ReconfigureParams& params) override
 	{
 		Texture *tx = g_pD3D->Find(TextureClass::PhasedSprite);
 		obj.textures[0].Set(Actor::TextureType::Sprite, tx);
 		return nullptr;
 	}
-	Error* Render() override
+	Error* Render(const RenderParams& params) override
 	{
 		Error* error = obj.Render();
 		if(error) return TraceError(error);

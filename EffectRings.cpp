@@ -56,9 +56,9 @@ public:
 
 		camera.position.z = -120;
 	}
-	Error* Calculate(float br, float elapsed, AudioData* pAudio) override
+	Error* Calculate(const CalculateParams& params) override
 	{
-		accum += elapsed * 1.3;
+		accum += params.elapsed * 1.3;
 		bool bChanged = false;
 		while(accum >= 1)
 		{
@@ -72,14 +72,14 @@ public:
 			{
 				brightness[i] = brightness[i-1] * 0.9f;//min(brightness[i-1], 1.5 * double(i) / (nRings * 0.7));
 			}
-			roll[0] += (0.8f + pAudio->GetIntensity( )) * fSpeedR * g_fDegToRad;
-			pitch[0] += (0.8f + pAudio->GetIntensity( )) * fSpeedP * g_fDegToRad;
-			yaw[0] += (0.8f + pAudio->GetIntensity( )) * fSpeedY * g_fDegToRad;
+			roll[0] += (0.8f + params.audio_data->GetIntensity( )) * fSpeedR * g_fDegToRad;
+			pitch[0] += (0.8f + params.audio_data->GetIntensity( )) * fSpeedP * g_fDegToRad;
+			yaw[0] += (0.8f + params.audio_data->GetIntensity( )) * fSpeedY * g_fDegToRad;
 
-			brightness[0] = 0.6f + (0.3f * ((pAudio->GetIntensity( ) * 1.4f) + pAudio->GetBeat( )));
+			brightness[0] = 0.6f + (0.3f * ((params.audio_data->GetIntensity( ) * 1.4f) + params.audio_data->GetBeat( )));
 
-			pos += pAudio->GetIntensity( );
-			if(pAudio->IsBeat( ) || pos > 4)
+			pos += params.audio_data->GetIntensity( );
+			if(params.audio_data->IsBeat( ) || pos > 4)
 			{
 				if(pos > 4) pos -= 4;
 				fSpeedR = (rand() * 10.0f / RAND_MAX) - 5.0f;
@@ -93,7 +93,7 @@ public:
 				pObj[i].pitch = pitch[i * RINGDELAY];
 				pObj[i].yaw = yaw[i * RINGDELAY];
 	
-				double b = std::max(std::min(1.0f, br * brightness[i]), 0.0f);
+				double b = std::max(std::min(1.0f, params.brightness * brightness[i]), 0.0f);
 
 				pObj[i].ambient_light_color = ColorRgb::Grey((int)(b * 255.0f));//->color = D3DRGB(b,b,b);
 				pObj[i].position.z = 50;
@@ -106,12 +106,12 @@ public:
 		{
 			for(int i = 0; i < RINGS; i++)
 			{
-				pObj[i].Calculate(&camera, elapsed);
+				pObj[i].Calculate(&camera, params.elapsed);
 			}
 		}
 		return nullptr;
 	}
-	Error* Reconfigure(AudioData* pAudio) override
+	Error* Reconfigure(const ReconfigureParams& params) override
 	{
 		Texture *tx = g_pD3D->Find(TextureClass::RingsEnvMap);
 		for (int i = 0; i < RINGS; i++)
@@ -120,7 +120,7 @@ public:
 		}
 		return nullptr;
 	}
-	Error* Render() override
+	Error* Render(const RenderParams& params) override
 	{
 		Error* error;
 		for(int i = 0; i < RINGS; i++)

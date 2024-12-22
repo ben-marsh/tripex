@@ -114,13 +114,13 @@ public:
 	* Calculate( ):
 	---------------------------------------------*/
 
-	Error* Calculate( float fBrightness, float fElapsed, AudioData* pAudio) override
+	Error* Calculate( const CalculateParams& params ) override
 	{
 		int i, j;
-		m_fRotAng += fElapsed * ( 2.0f * g_fDegToRad );
-		m_fBrAng += fElapsed * ( 2.0f * g_fDegToRad );
+		m_fRotAng += params.elapsed * ( 2.0f * g_fDegToRad );
+		m_fBrAng += params.elapsed * ( 2.0f * g_fDegToRad );
 
-		m_fAng += fElapsed * ( 1.0f * g_fDegToRad );
+		m_fAng += params.elapsed * ( 1.0f * g_fDegToRad );
 		m_cCamera.position.x = -30 + ( SPIN_RADIUS * cosf( m_fRotAng ) );
 		m_cCamera.position.y = SPIN_HEIGHT;
 		m_cCamera.position.z = SPIN_RADIUS * sinf( m_fRotAng );
@@ -145,7 +145,7 @@ public:
 			for( i = 0; i < 256; i++ )
 			{
 				int nTarget = i * TRAIL_W / 256;
-				m_pfHeight[ 0 ][ nTarget ] = std::max( m_pfHeight[ 0 ][ nTarget ], pAudio->GetBand( i ) );
+				m_pfHeight[ 0 ][ nTarget ] = std::max( m_pfHeight[ 0 ][ nTarget ], params.audio_data->GetBand( i ) );
 			}
 			for( i = 0; i < TRAIL_W; i++ )
 			{
@@ -158,7 +158,7 @@ public:
 		{
 			for( i = 0; i < TRAIL_W; i++ )
 			{
-				m_pfCubeTime[ j ][ i ] += fElapsed;
+				m_pfCubeTime[ j ][ i ] += params.elapsed;
 				m_pfCubeHeight[ j ][ i ] = m_pfCubeTop[ j ][ i ] - ( ACCELER * ( m_pfCubeTime[ j ][ i ] * m_pfCubeTime[ j ][ i ] ) / 2.0f );
 				if(m_pfHeight[ CUBE_H + j ][ i ] > m_pfCubeHeight[ j ][ i ])
 				{
@@ -193,7 +193,7 @@ public:
 				fBr = 1.0f;
 			}
 
-			fBr = fBrightness * std::min( fBr * 0.7f, 1.0f );
+			fBr = params.brightness * std::min( fBr * 0.7f, 1.0f );
 			fBr = std::max( fBr, 0.0f );
 			m_pObj[ i ].ambient_light_color = ColorRgb::Grey( ( int )( fBr * 255.0f ) );
 
@@ -213,7 +213,7 @@ public:
 				n += 4;
 			}
 
-			m_pObj[ i ].Calculate( &m_cCamera, fElapsed );
+			m_pObj[ i ].Calculate( &m_cCamera, params.elapsed );
 		}
 
 		for( i = 0; i < LIMITER_H; i++ )
@@ -230,8 +230,8 @@ public:
 			}
 			
 			float fBr = Bound< float >( 0.9f - ( ( float )i ) / LIMITER_H, 0.0f, 1.0f );
-			m_pLimit[ i ].ambient_light_color = ColorRgb::Grey( ( int )( 255.0f * fBr * fBrightness ) );
-			m_pLimit[ i ].Calculate( &m_cCamera, fElapsed );
+			m_pLimit[ i ].ambient_light_color = ColorRgb::Grey( ( int )( 255.0f * fBr * params.brightness ) );
+			m_pLimit[ i ].Calculate( &m_cCamera, params.elapsed);
 		}
 
 		return nullptr;
@@ -242,7 +242,7 @@ public:
 	* Reconfigure( ):
 	---------------------------------------------*/
 
-	Error* Reconfigure(AudioData* pAudio) override
+	Error* Reconfigure(const ReconfigureParams& params) override
 	{
 		static Texture *pTexture;
 		pTexture = g_pD3D->Find(TextureClass::AnalyzerEnvMap);
@@ -261,7 +261,7 @@ public:
 	* Render( ):
 	---------------------------------------------*/
 
-	Error* Render( ) override
+	Error* Render(const RenderParams& params) override
 	{
 		Error* error;
 		for( int i = 0; i < TRAIL_H; i++ )

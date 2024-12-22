@@ -5,14 +5,14 @@
 class EffectBlank : public EffectBase
 {
 public:
-	Error* Calculate( float, float, AudioData* )
+	Error* Calculate(const CalculateParams& params) override
 	{
 		return nullptr;
 	};
-	Error* Render( )
+	Error* Render(const RenderParams& params) override
 	{
 		return nullptr;
 	}
 };
 
-EXPORT_EFFECT( Blank, EffectBlank )
+EXPORT_EFFECT(Blank, EffectBlank)

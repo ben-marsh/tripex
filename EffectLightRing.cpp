@@ -71,18 +71,18 @@ public:
 	
 		obj.vertices.SetLength(SOURCES);
 	}
-	Error* Calculate(float brightness, float elapsed, AudioData* pAudio) override
+	Error* Calculate(const CalculateParams& params) override
 	{
-		brt = brightness;
-		accum += elapsed * 3.0;
-		obj.ambient_light_color = ColorRgb::Grey(brightness * 255.0);
+		brt = params.brightness;
+		accum += params.elapsed * 3.0;
+		obj.ambient_light_color = ColorRgb::Grey(params.brightness * 255.0);
 		for(; accum > 1.0f; accum--)
 		{
 			float elapsed = 1.0f;
 			for(int i = 0; i < SOURCES; i++)
 			{
-				position[i] += 0.25 * speed[i] * pAudio->GetIntensity( ) * elapsed;
-				ehp[i] += 0.25 * ehps[i] * (0.4 + 2 * (pAudio->GetIntensity( )+ pAudio->GetBeat( ))) * elapsed;
+				position[i] += 0.25 * speed[i] * params.audio_data->GetIntensity( ) * elapsed;
+				ehp[i] += 0.25 * ehps[i] * (0.4 + 2 * (params.audio_data->GetIntensity( ) + params.audio_data->GetBeat( ))) * elapsed;
 
 				double r = 2.0 * er[i] * cos(ehp[i]);
 
@@ -92,10 +92,10 @@ public:
 			}
 	
 			static double a2 = 0;
-			a2 += elapsed * (pAudio->GetIntensity( ) + pAudio->GetBeat( )) * 3.14159 / 180.0;
+			a2 += elapsed * (params.audio_data->GetIntensity( ) + params.audio_data->GetBeat( )) * 3.14159 / 180.0;
 
-			obj.roll += elapsed * 0.25 * pAudio->GetIntensity( ) * 4.0 * 3.14159 / 180.0;
-			obj.pitch += elapsed * 0.25 * pAudio->GetIntensity( ) * 3.0 * 3.14159 / 180.0;
+			obj.roll += elapsed * 0.25 * params.audio_data->GetIntensity( ) * 4.0 * 3.14159 / 180.0;
+			obj.pitch += elapsed * 0.25 * params.audio_data->GetIntensity( ) * 3.0 * 3.14159 / 180.0;
 			obj.yaw += elapsed * 0.25 * 2.0 * 3.14159 / 180.0;
 
 			obj.textures[0].Set(Actor::TextureType::Sprite, tx);
@@ -103,13 +103,13 @@ public:
 		}
 		return nullptr;
 	}
-	Error* Reconfigure(AudioData* pAudio) override
+	Error* Reconfigure(const ReconfigureParams& params) override
 	{
 		tx = g_pD3D->Find(TextureClass::LightRingSprite);
 		ptTint = g_pD3D->Find(TextureClass::LightRingBackground);
 		return nullptr;
 	}
-	Error* Render( ) override
+	Error* Render(const RenderParams& params) override
 	{
 		Error* error;
 

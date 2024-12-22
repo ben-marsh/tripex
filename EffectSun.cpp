@@ -106,17 +106,17 @@ public:
 			}
 		}
 	}
-	Error* Calculate(float brightness, float elapsed, AudioData* pAudio) override
+	Error* Calculate(const CalculateParams& params) override
 	{
-		fBezPos += elapsed * pAudio->GetIntensity( ) * 0.01f;
-		fBezPos2 += elapsed * pAudio->GetIntensity( ) * 0.02f;
+		fBezPos += params.elapsed * params.audio_data->GetIntensity( ) * 0.01f;
+		fBezPos2 += params.elapsed * params.audio_data->GetIntensity( ) * 0.02f;
 		cCamera.position = Vector3(0, 0, -70);//bez.Calculate(fBezPos);
 		cCamera.SetTarget(bez2.Calculate(fBezPos2));
 
 		static double accum = 0;
-		accum += elapsed * 1.5;
+		accum += params.elapsed * 1.5;
 		static float fMove = 21;
-		fMove += elapsed;
+		fMove += params.elapsed;
 		if(fMove > 20)
 		{
 			for(int i = 0; i < RINGS; i++)
@@ -143,21 +143,21 @@ public:
 				if((i % 3) == 0)
 				{
 					pObj[i].roll += 0.1f * as[i][0][0];
-					pObj[i].pitch += pAudio->GetDampenedBand( pEffectPtr->fSensitivity, 3.0f/16.0f, 4.0f/16.0f) * as[i][1][0];
-					pObj[i].yaw += pAudio->GetDampenedBand( pEffectPtr->fSensitivity, 4.0f/16.0f, 5.0f/16.0f) * as[i][2][0];
+					pObj[i].pitch += params.audio_data->GetDampenedBand( pEffectPtr->fSensitivity, 3.0f/16.0f, 4.0f/16.0f) * as[i][1][0];
+					pObj[i].yaw += params.audio_data->GetDampenedBand( pEffectPtr->fSensitivity, 4.0f/16.0f, 5.0f/16.0f) * as[i][2][0];
 					pObj[i].pitch = Bound<float>(pObj[i].pitch, -ANGSZ, ANGSZ);
 					pObj[i].yaw = Bound<float>(pObj[i].yaw, -ANGSZ, ANGSZ);
 				}
 				if((i % 3) == 1)
 				{
-					pObj[i].roll += pAudio->GetDampenedBand(pEffectPtr->fSensitivity, 2.0f/16.0f, 3.0f/16.0f) * as[i][0][0];
+					pObj[i].roll += params.audio_data->GetDampenedBand(pEffectPtr->fSensitivity, 2.0f/16.0f, 3.0f/16.0f) * as[i][0][0];
 					pObj[i].pitch += 0.1f * as[i][1][0];
-					pObj[i].yaw += 1.5f * pAudio->GetDampenedBand(pEffectPtr->fSensitivity, 2.0f/16.0f, 4.0f/16.0f) * as[i][2][0];
+					pObj[i].yaw += 1.5f * params.audio_data->GetDampenedBand(pEffectPtr->fSensitivity, 2.0f/16.0f, 4.0f/16.0f) * as[i][2][0];
 				}
 				if((i % 3) == 2) 
 				{
-					pObj[i].roll += pAudio->GetDampenedBand(pEffectPtr->fSensitivity, 1/16.0f, 2/16.0f) * as[i][0][0];
-					pObj[i].pitch += pAudio->GetIntensity( ) * as[i][1][0];
+					pObj[i].roll += params.audio_data->GetDampenedBand(pEffectPtr->fSensitivity, 1/16.0f, 2/16.0f) * as[i][0][0];
+					pObj[i].pitch += params.audio_data->GetIntensity( ) * as[i][1][0];
 					pObj[i].yaw += 0.1f * as[i][2][0];
 				}
 	//for(int o = 0; o < RINGS; o++)
@@ -167,8 +167,8 @@ public:
 				{
 					for(int j = 0; j < TRI; j++)
 					{
-						pObj[i].vertices[base + j].diffuse = ColorRgb((uint8)(brightness * 128.0f / EXPDIV), (uint8)(brightness * 77.0f / EXPDIV), (uint8)(brightness * 243.0f / EXPDIV)); //0.6 / 25, 0.5 / 25);
-						pObj[i].vertices[base + j + TRI].diffuse = ColorRgb(0, (uint8)(brightness * 64.0f / EXPDIV), 0);
+						pObj[i].vertices[base + j].diffuse = ColorRgb((uint8)(params.brightness * 128.0f / EXPDIV), (uint8)(params.brightness * 77.0f / EXPDIV), (uint8)(params.brightness * 243.0f / EXPDIV)); //0.6 / 25, 0.5 / 25);
+						pObj[i].vertices[base + j + TRI].diffuse = ColorRgb(0, (uint8)(params.brightness * 64.0f / EXPDIV), 0);
 					}
 					base += 2 * TRI;
 				}
@@ -181,7 +181,7 @@ public:
 		}
 		return nullptr;
 	}
-	Error* Render()
+	Error* Render(const RenderParams& params) override
 	{
 		Error* error;
 		for(int i = 0; i < RINGS; i++)

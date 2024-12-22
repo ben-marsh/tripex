@@ -144,15 +144,15 @@ public:
 		}
 	}
 //Object *makeTentacles(int segs, float l, float r);
-	Error* Calculate(float brightness, float elapsed, AudioData* pAudio) override
+	Error* Calculate(const CalculateParams& params) override
 	{
 		camera.position = b.Calculate(fBezPos);
 		camera.SetTarget(b2.Calculate(fBezPos2));//ZVector::Origin());
-		fBezPos += 0.02 * fSpeed * elapsed;
-		fBezPos2 += 0.02 * fSpeed * elapsed;
+		fBezPos += 0.02 * fSpeed * params.elapsed;
+		fBezPos2 += 0.02 * fSpeed * params.elapsed;
 
-		fChange += elapsed;
-		fTotal += pAudio->GetIntensity( ) * elapsed;
+		fChange += params.elapsed;
+		fTotal += params.audio_data->GetIntensity( ) * params.elapsed;
 		if(fChange > 20)
 		{
 			fTarget = fTotal / fChange;
@@ -160,19 +160,19 @@ public:
 			fChange = 0;
 		}
 
-		fTotalElapsed += elapsed * 2;
+		fTotalElapsed += params.elapsed * 2;
 		if(fTotalElapsed < 1) return nullptr;
 
 //	fSpeed = 0;
-		fSpeed = StepTo<float>(fSpeed, fTarget, 0.02 * elapsed);
+		fSpeed = StepTo<float>(fSpeed, fTarget, 0.02 * params.elapsed);
 
-		brt = brightness;
-		dPos += elapsed;
+		brt = params.brightness;
+		dPos += params.elapsed;
 		while(dPos > 60)
 		{
-			rs = ((pAudio->GetIntensity( ) * 2.0) + 1.0 + (rand() * 5.0 / RAND_MAX)) * 3.14159 / 180.0;
-			ps = ((pAudio->GetIntensity( ) * 2.0) + 1.0 + (rand() * 5.0 / RAND_MAX)) * 3.14159 / 180.0;
-			ys = ((pAudio->GetIntensity( ) * 2.0) + 1.0 + (rand() * 5.0 / RAND_MAX)) * 3.14159 / 180.0;
+			rs = ((params.audio_data->GetIntensity( ) * 2.0) + 1.0 + (rand() * 5.0 / RAND_MAX)) * 3.14159 / 180.0;
+			ps = ((params.audio_data->GetIntensity( ) * 2.0) + 1.0 + (rand() * 5.0 / RAND_MAX)) * 3.14159 / 180.0;
+			ys = ((params.audio_data->GetIntensity( ) * 2.0) + 1.0 + (rand() * 5.0 / RAND_MAX)) * 3.14159 / 180.0;
 //		if(rand() > (RAND_MAX * 0.7)) rs = -rs;
 //		if(rand() > (RAND_MAX * 0.8)) ps = -ps;
 //		if(rand() > (RAND_MAX * 0.6)) ys = -ys;
@@ -185,7 +185,7 @@ public:
 			dPos -= 15;
 		}
 
-		fPos += elapsed * 0.1;
+		fPos += params.elapsed * 0.1;
 		while(fPos >= 1.0f) fPos -= 1.0f;
 
 		pBuffer.Fill(0);
@@ -199,14 +199,14 @@ public:
 	//	pTarget.Fill(0);
 //	ZeroMemory(pBuffer, 256 * 256 * sizeof(unsigned char));
 //	ZeroMemory(pTarget, 64 * 64 * sizeof(unsigned char));
-		obj.roll += pAudio->GetIntensity( ) * elapsed * 4.0 * 3.14159 / 180.0;//(average + 0.05) * elapsed;// * rs;
-		obj.pitch += pAudio->GetIntensity( ) * elapsed * 5.0 * 3.14159 / 180.0;//(average + 0.05) * elapsed;// * rs;
-		obj.yaw += pAudio->GetIntensity( ) * elapsed * 6.0 * 3.14159 / 180.0;//(average + 0.05) * elapsed;// * rs;
+		obj.roll += params.audio_data->GetIntensity( ) * params.elapsed * 4.0 * 3.14159 / 180.0;//(average + 0.05) * elapsed;// * rs;
+		obj.pitch += params.audio_data->GetIntensity( ) * params.elapsed * 5.0 * 3.14159 / 180.0;//(average + 0.05) * elapsed;// * rs;
+		obj.yaw += params.audio_data->GetIntensity( ) * params.elapsed * 6.0 * 3.14159 / 180.0;//(average + 0.05) * elapsed;// * rs;
 //	obj.fPitch += average * elapsed * ps;
 //	obj.fYaw += 0.5 * elapsed * ys * 3.14159 / 180.0;
 
 		obj.clip_mask = 0;
-		obj.Calculate(&camera, elapsed);
+		obj.Calculate(&camera, params.elapsed);
 //	ZFlexibleVertex fvVertex = obj.pTransVertex[0];
 		for(int i = 0; i < obj.transformed_vertices.GetLength(); i++)
 		{
@@ -248,14 +248,14 @@ public:
 		}
 		return nullptr;
 	}
-	Error* Reconfigure(AudioData* pAudio) override
+	Error* Reconfigure(const ReconfigureParams& params) override
 	{
-		fSpeed = pAudio->GetIntensity( );
+		fSpeed = params.audio_data->GetIntensity( );
 		pTexture = g_pD3D->Find(TextureClass::DotStarSprite);
 		pTint = g_pD3D->Find(TextureClass::DotStarBackground);
 		return nullptr;
 	}
-	Error* Render( ) override
+	Error* Render(const RenderParams& params) override
 	{
 		Error* error;
 

@@ -65,19 +65,19 @@ public:
 		obj.max_history_length = 25;
 		obj.exposure_light_delta = WideColorRgb(-2, -2, -2);
 	}
-	Error* Calculate(float brightness, float elapsed, AudioData* pAudio) override
+	Error* Calculate(const CalculateParams& params) override
 	{
-		brt = brightness;
-		accum += elapsed * 2.0f;
+		brt = params.brightness;
+		accum += params.elapsed * 2.0f;
 		for(; accum > 1.0f; accum--)
 		{
 			float elapsed = 1.0f;
 
-			br = brightness;
+			br = params.brightness;
 			for(int i = 0; i < nSources; i++)
 			{
-				position[i] += speed[i] * pAudio->GetIntensity( ) * 0.3 * elapsed;
-				double linearity = std::max(0.0f, 1 - pAudio->GetBeat( ) );//);//(bigbeat / 2.0));
+				position[i] += speed[i] * params.audio_data->GetIntensity( ) * 0.3 * elapsed;
+				double linearity = std::max(0.0f, 1 - params.audio_data->GetBeat( ) );//);//(bigbeat / 2.0));
 			
 				while(position[i] > 1.0 || position[i] < 0.0)
 				{
@@ -88,7 +88,7 @@ public:
 					pvPosition[3][i].y = (rand() * 70.0 / RAND_MAX) - 35.0;
 					pvPosition[3][i].z = (rand() * 70.0 / RAND_MAX) - 35.0;
 
-					float c = pAudio->GetRandomSample( );
+					float c = params.audio_data->GetRandomSample( );
 					pvPosition[2][i].x = (pvPosition[3][i].x * (1 - c)) + ((c * rand() * 70.0 / RAND_MAX) - 35.0);
 					pvPosition[2][i].y = (pvPosition[3][i].y * (1 - c)) + ((c * rand() * 70.0 / RAND_MAX) - 35.0);
 					pvPosition[2][i].z = (pvPosition[3][i].z * (1 - c)) + ((c * rand() * 70.0 / RAND_MAX) - 35.0);
@@ -98,7 +98,7 @@ public:
 
 					if(position[i] > 1.0) position[i] -= 1.0;
 					if(position[i] < 0.0) position[i] += 1.0;
-					speed[i] = (pAudio->GetRandomSample( ) * 0.15) + 0.01;
+					speed[i] = (params.audio_data->GetRandomSample( ) * 0.15) + 0.01;
 				}
 
 				for(int j = 0; j < 4; j++)
@@ -108,15 +108,15 @@ public:
 				obj.vertices[i].position = b.Calculate(position[i]);
 			}
 
-			obj.roll += elapsed * pAudio->GetIntensity( ) * 4.0 * 3.14159 / 180.0;
-			obj.pitch += elapsed * pAudio->GetIntensity( ) * 3.0 * 3.14159 / 180.0;
+			obj.roll += elapsed * params.audio_data->GetIntensity( ) * 4.0 * 3.14159 / 180.0;
+			obj.pitch += elapsed * params.audio_data->GetIntensity( ) * 3.0 * 3.14159 / 180.0;
 			obj.yaw += elapsed * 2.0 * 3.14159 / 180.0;
 			obj.Calculate(&camera, 1.0);
-			obj.ambient_light_color = ColorRgb::Grey(64.0 * brightness);
+			obj.ambient_light_color = ColorRgb::Grey(64.0 * params.brightness);
 		}
 		return nullptr;
 	}
-	virtual Error* Reconfigure(AudioData* pAudio) override
+	virtual Error* Reconfigure(const ReconfigureParams& params) override
 	{
 		dBrBack = 1;
 		if(fNotRendered)// || (rand() <= (RAND_MAX * 0.3)))
@@ -142,7 +142,7 @@ public:
 		pTint = g_pD3D->Find(TextureClass::LightSphereBackground);
 		return nullptr;
 	}
-	Error* Render( ) override
+	Error* Render(const RenderParams& params) override
 	{
 		Error* error = obj.Render( );
 		if(error) return TraceError(error);
