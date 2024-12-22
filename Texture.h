@@ -1,7 +1,6 @@
 #pragma once
 
 #include <d3d9.h>
-#include "ZDirect3D.h"
 
 class Texture
 {
@@ -21,8 +20,6 @@ public:
 	uint32 data_stride;
 	const void* data;
 	const PALETTEENTRY* palette;
-
-	std::set<TextureClass> classes;
 
 	Texture();
 	~Texture();

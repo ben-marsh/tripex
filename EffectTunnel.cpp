@@ -267,7 +267,7 @@ public:
 	}
 	Error* Reconfigure(const ReconfigureParams& params) override
 	{
-		tx = g_pD3D->Find(TextureClass::TunnelBackground);
+		tx = params.texture_library.Find(TextureClass::TunnelBackground);
 		pObj[0].textures[0].Set(Actor::TextureType::Normal, tx);//SetTexture(tx);
 		pObj[1].textures[0].Set(Actor::TextureType::Normal, tx);///.pTexture = tx;//SetTexture(tx);
 		return nullptr;

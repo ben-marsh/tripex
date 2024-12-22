@@ -192,6 +192,7 @@
     <ClCompile Include="config-defaults.cpp" />
     <ClCompile Include="Config.cpp" />
     <ClCompile Include="StarModel.cpp" />
+    <ClCompile Include="TextureLibrary.cpp" />
     <ClCompile Include="TextureSource.cpp" />
     <ClCompile Include="EffectBezierCube.cpp" />
     <ClCompile Include="EffectBlank.cpp" />
@@ -244,6 +245,7 @@
     <ClInclude Include="ConfigItem.h" />
     <ClInclude Include="config-defaults.h" />
     <ClInclude Include="Config.h" />
+    <ClInclude Include="TextureLibrary.h" />
     <ClInclude Include="TextureSource.h" />
     <ClInclude Include="Effect.h" />
     <ClInclude Include="Error.h" />

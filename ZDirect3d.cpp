@@ -35,7 +35,7 @@ ZDirect3D::ZDirect3D()
 
 Error* ZDirect3D::Close()
 {
-	for (std::set< Texture* >::iterator it = g_spTexture.begin(); it != g_spTexture.end(); it++)
+	for (std::set< Texture* >::iterator it = created_textures.begin(); it != created_textures.end(); it++)
 	{
 		DestroyTexture(*it);
 	}
@@ -73,35 +73,12 @@ Error* ZDirect3D::Open()
 	hRes = g_pDevice->GetDeviceCaps(&g_Caps);
 	if (FAILED(hRes)) return TraceError(hRes);
 
-	for (std::set< Texture* >::iterator it = g_spTexture.begin(); it != g_spTexture.end(); it++)
+	for (std::set< Texture* >::iterator it = created_textures.begin(); it != created_textures.end(); it++)
 	{
 		Error* error = CreateTexture(*it);
 		if (error) return TraceError(error);
 	}
 	return nullptr;
-}
-Texture* ZDirect3D::Find(TextureClass nType)
-{
-	int mt = 0;
-
-	std::set< Texture* >::iterator it;
-	for (it = g_spTexture.begin(); it != g_spTexture.end(); it++)
-	{
-		if ((*it)->classes.count(nType) > 0) mt++;
-	}
-
-	int ct = rand() * mt / (RAND_MAX + 1);
-
-	for (it = g_spTexture.begin(); it != g_spTexture.end(); it++)
-	{
-		if ((*it)->classes.count(nType) > 0)
-		{
-			if (ct == 0) return *it;
-			ct--;
-		}
-
-	}
-	return NULL;
 }
 
 Error* ZDirect3D::DrawIndexedPrimitive(ZArray<VertexTL>& vertices, ZArray<Face>& faces)
@@ -374,7 +351,7 @@ void ZDirect3D::SetTexture(DWORD dwStage, Texture* pTexture, DWORD dwOp, DWORD d
 
 Error* ZDirect3D::AddTexture(Texture* pTexture)
 {
-	std::pair< std::set< Texture* >::iterator, bool > itb = g_spTexture.insert(pTexture);
+	std::pair< std::set< Texture* >::iterator, bool > itb = created_textures.insert(pTexture);
 	if (itb.second && g_pDevice != NULL)
 	{
 		Error* error = CreateTexture(pTexture);
@@ -385,7 +362,10 @@ Error* ZDirect3D::AddTexture(Texture* pTexture)
 
 Error* ZDirect3D::UploadTexture(Texture* pTexture)
 {
-	if (pTexture->data == NULL) return nullptr;
+	if (pTexture->data == NULL)
+	{
+		return nullptr;
+	}
 
 	const Rect< int > rSrc(0, 0, 256, 256);
 

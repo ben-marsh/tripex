@@ -157,7 +157,7 @@ public:
 	}
 	Error* Reconfigure(const ReconfigureParams& params) override
 	{
-		tx = g_pD3D->Find(bLight? TextureClass::Distortion2ColBackground : TextureClass::Distortion2Background);
+		tx = params.texture_library.Find(bLight? TextureClass::Distortion2ColBackground : TextureClass::Distortion2Background);
 		return nullptr;
 	}
 };

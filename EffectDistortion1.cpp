@@ -90,7 +90,7 @@ public:
 	}
 	Error* Reconfigure(const ReconfigureParams& params) override
 	{
-		tx = g_pD3D->Find(TextureClass::DistortionBackground);
+		tx = params.texture_library.Find(TextureClass::DistortionBackground);
 //	grid->SetTexture(d3d->Select(TC_WRAPTEXTURE));//TC_ENVIRONMENTMAP));
 		return nullptr;
 	}

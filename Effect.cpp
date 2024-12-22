@@ -55,12 +55,12 @@ Error* EffectHandler::Calculate(float fElapsed, AudioData* pAudio)
 	pAudio->SetIntensityBeatScale( 0.0f );
 	return error;
 }
-Error* EffectHandler::Reconfigure(AudioData* pAudio)
+Error* EffectHandler::Reconfigure(AudioData* audio_data, const TextureLibrary& texture_library)
 {
 	_ASSERT(pEffect != NULL);
 
-	EffectBase::ReconfigureParams params;
-	params.audio_data = pAudio;
+	EffectBase::ReconfigureParams params(texture_library);
+	params.audio_data = audio_data;
 
 	return pEffect->Reconfigure(params);
 }

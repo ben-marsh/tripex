@@ -206,7 +206,7 @@ public:
 	}
 	Error* Reconfigure(const ReconfigureParams& params) override
 	{
-		obj.textures[0].Set(Actor::TextureType::Envmap, g_pD3D->Find(TextureClass::WaterGlobeEnvMap));
+		obj.textures[0].Set(Actor::TextureType::Envmap, params.texture_library.Find(TextureClass::WaterGlobeEnvMap));
 		return nullptr;
 	}
 	Error* Render(const RenderParams& params) override

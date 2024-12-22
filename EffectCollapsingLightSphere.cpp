@@ -136,8 +136,8 @@ public:
 	}
 	Error* Reconfigure(const ReconfigureParams& params) override
 	{
-		obj.textures[0].Set(Actor::TextureType::Sprite, g_pD3D->Find(TextureClass::CollapsingSphereSprite));
-		pTint = g_pD3D->Find(TextureClass::CollapsingSphereBackground);
+		obj.textures[0].Set(Actor::TextureType::Sprite, params.texture_library.Find(TextureClass::CollapsingSphereSprite));
+		pTint = params.texture_library.Find(TextureClass::CollapsingSphereBackground);
 		return nullptr;
 	}
 };

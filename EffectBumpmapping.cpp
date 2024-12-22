@@ -449,13 +449,13 @@ public:
 	Error* Reconfigure(const ReconfigureParams& params) override
 	{
 		obj.textures[0].type = Actor::TextureType::Envmap;
-		obj.textures[0].texture = g_pD3D->Find(TextureClass::BumpMapTentaclesEnvMap);//ENVIRONMENTMAP));
+		obj.textures[0].texture = params.texture_library.Find(TextureClass::BumpMapTentaclesEnvMap);//ENVIRONMENTMAP));
 		fMoveSpeed = 1.0f + (rand() * 4.0f / RAND_MAX);
 
 //		if(pBump.GetLength() == 0) texture = pBlankTexture;
 //		else
 //		{
-			texture = g_pD3D->Find(TextureClass::BumpMapBackground);
+			texture = params.texture_library.Find(TextureClass::BumpMapBackground);
 			if(texture != pBlankTexture)
 			{	
 				std::map< Texture*, std::unique_ptr< unsigned short[] > >::iterator it = mpBumpIndex.find(texture);

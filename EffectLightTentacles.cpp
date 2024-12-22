@@ -113,8 +113,8 @@ public:
 	Error* Reconfigure(const ReconfigureParams& params) override
 	{
 		obj.textures[0].type = Actor::TextureType::Sprite;
-		obj.textures[0].texture = g_pD3D->Find(TextureClass::LightTentaclesSprite);
-		ptTint = g_pD3D->Find(TextureClass::LightTentaclesBackground);
+		obj.textures[0].texture = params.texture_library.Find(TextureClass::LightTentaclesSprite);
+		ptTint = params.texture_library.Find(TextureClass::LightTentaclesBackground);
 		return nullptr;
 	}
 };

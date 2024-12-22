@@ -105,8 +105,8 @@ public:
 	}
 	Error* Reconfigure(const ReconfigureParams& params) override
 	{
-		tx = g_pD3D->Find(TextureClass::LightRingSprite);
-		ptTint = g_pD3D->Find(TextureClass::LightRingBackground);
+		tx = params.texture_library.Find(TextureClass::LightRingSprite);
+		ptTint = params.texture_library.Find(TextureClass::LightRingBackground);
 		return nullptr;
 	}
 	Error* Render(const RenderParams& params) override

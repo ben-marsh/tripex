@@ -1,6 +1,8 @@
 #include "Platform.h"
 #include "TextureSource.h"
 #include "config-defaults.h"
+#include <vector>
+#include <map>
 
 bool bMeshHQ;
 

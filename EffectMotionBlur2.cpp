@@ -118,7 +118,7 @@ public:
 	}
 	Error* Reconfigure(const ReconfigureParams& params) override
 	{
-		Texture *pTexture = g_pD3D->Find(TextureClass::MotionBlur2EnvMap);//2);
+		Texture *pTexture = params.texture_library.Find(TextureClass::MotionBlur2EnvMap);//2);
 		for(int i = 0; i < PIPES; i++)
 		{
 			pObj[i].textures[0].type = Actor::TextureType::Lightmap;

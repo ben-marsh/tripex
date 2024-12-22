@@ -1,7 +1,9 @@
 #pragma once
 
 #include "Texture.h"
+#include "TextureLibrary.h"
 #include <string>
+#include <set>
 
 class TextureSource
 {

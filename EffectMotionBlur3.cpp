@@ -205,7 +205,7 @@ public:
 		fAvTime = 16;
 		fAvTotal = params.audio_data->GetIntensity( ) * fAvTime;
 		bReset = true;
-		Texture *t = g_pD3D->Find(bAltBlur? TextureClass::MotionBlur3AltEnvMap : TextureClass::MotionBlur3EnvMap);
+		Texture *t = params.texture_library.Find(bAltBlur? TextureClass::MotionBlur3AltEnvMap : TextureClass::MotionBlur3EnvMap);
 		for(int i = 0; i < 9; i++) pObj[i].textures[0].texture = t;
 		bFirstCalc = true;
 		return nullptr;

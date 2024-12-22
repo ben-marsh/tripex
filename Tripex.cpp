@@ -38,8 +38,8 @@ void Tripex::ShowStatusMsg(const char *sFormat, ...)
 
 DWORD WINAPI Tripex::InitialiseThread(void *pParam)
 {
-	std::vector< TextureSource* > ppItem;
-	LoadTextureSettings(ppItem);
+	std::vector< TextureSource* > texture_sources;
+	LoadTextureSettings(texture_sources);
 
 	for(int i = 1; i < (int)effects.size(); i++)
 	{
@@ -56,100 +56,34 @@ DWORD WINAPI Tripex::InitialiseThread(void *pParam)
 	_ASSERT(num_internal_textures >= 1);
 
 	int nTexture = 0;
-	for(int i = 0; i < (int)ppItem.size(); i++ )//nIntTextures + nDiskTextures; i++)
+	for(int i = 0; i < (int)texture_sources.size(); i++ )//nIntTextures + nDiskTextures; i++)
 	{
-		const uint32 *pnTexData = internal_textures[ ppItem[ i ]->internal_id ];
+		const uint32 *pnTexData = internal_textures[ texture_sources[ i ]->internal_id ];
 
 		Texture *pTexture = new Texture( );
 		pTexture->SetFlags( Texture::F_FILTERING | Texture::F_MIP_CHAIN );
 		pTexture->SetSource( pnTexData + 1, *pnTexData );
-//		auto_ptr< ZTexture > pTexture( new ZTexture( ) );
-//		pTexture->m_nFlags.set( ZTexture::F_SOURCE_FILE );
-//		pTexture->m_nFlags.set( ZTexture::F_FILTERING );
-//		pTexture->m_nFlags.set( ZTexture::F_MIP_CHAIN );
-//		pTexture->m_pnData = ( BYTE* )( pnTexData + 1 );
-//		pTexture->m_nDataSize = *pnTexData;
 
-		ppItem[ i ]->texture = pTexture;
+		texture_sources[ i ]->texture = pTexture;
 
-/*
-		uint32 *pnTex = UnpackJpeg( ( const uint8* )( pnTexData + 1 ), pnTexData[ 0 ] );
-		if( pnTex == NULL )
-		{
-			ppItem.erase(ppItem.begin() + i);
-		}
-		else 
-		{
-			ppItem[i]->pTexture = auto_ptr<ZTexture>(new ZTexture((ZColour*)pnTex));
-			ppItem[i]->pTexture->m_nFlags.set(ZTexture::F_CREATE_MIPMAPS);
-			i++;
-		}
-*/
-/*
-
-		HBITMAP hbmTexture = NULL;
-		try
-		{
-			if(ppItem[i]->bInternal)//i < nIntTextures)//fInternal)
-			{
-				hbmTexture = LoadJPEG(hAppInstance, psIntTexture[ppItem[i]->nInternalID]);
-				assert(hbmTexture != NULL);
-			}
-			else
-			{
-				int nIndex = ppItem[i]->sFilename.find_last_of('.');
-				if(nIndex != -1)
-				{
-					string sExtension = ppItem[i]->sFilename.substr(nIndex);//Mid(nIndex);
-					if(!_stricmp(sExtension.c_str(), ".jpeg") || !_stricmp(sExtension.c_str(), ".jpg") || !_stricmp(sExtension.c_str(), ".jif"))
-					{
-						hbmTexture = LoadJPEG(ppItem[i]->sFilename.c_str());
-					}
-					else if(!_stricmp(sExtension.c_str(), ".gif"))
-					{
-						hbmTexture = LoadGIF(ppItem[i]->sFilename.c_str());
-					}
-					else if(!_stricmp(sExtension.c_str(), ".bmp"))
-					{
-						hbmTexture = (HBITMAP)LoadImage(NULL, ppItem[i]->sFilename.c_str(), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_DEFAULTSIZE | LR_LOADFROMFILE);
-					}
-				}
-			}
-		}
-		catch(...)
-		{
-			hbmTexture = NULL;
-		}
-
-		if(hbmTexture == NULL)
-		{
-			ppItem.erase(ppItem.begin() + i);
-		}
-		else 
-		{
-			cTexture.Copy(hbmTexture);
-
-			ppItem[i]->pTexture = auto_ptr<ZTexture>(new ZTexture(cTexture.GetPtr()));
-			ppItem[i]->pTexture->nFlags.set(ZTexture::TF_CREATE_MIPMAPS);
-			i++;
-		}
-*/		nTexture++;
+		nTexture++;
 	}
 
 	pBlankTexture = NULL;
-	for(int i = 0; i < (int)ppItem.size(); i++)
+	for(int i = 0; i < (int)texture_sources.size(); i++)
 	{
-		if(ppItem[i]->internal && ppItem[i]->internal_id == 1)
+		Texture* texture = texture_sources[i]->texture;
+
+		if(texture_sources[i]->internal && texture_sources[i]->internal_id == 1)
 		{
-			pBlankTexture = ppItem[i]->texture;//.release();
+			pBlankTexture = texture;
 		}
-		for(std::set<TextureClass>::iterator it = ppItem[i]->classes.begin(); it != ppItem[i]->classes.end(); it++)
+		for(std::set<TextureClass>::iterator it = texture_sources[i]->classes.begin(); it != texture_sources[i]->classes.end(); it++)
 		{
-			ppItem[i]->texture->classes.insert(*it);
+			texture_library.Add(*it, texture);
 		}
 
-		g_pD3D->AddTexture( ppItem[ i ]->texture );
-//		vpTexture.push_back(ppItem[i]->pTexture);
+		g_pD3D->AddTexture(texture);
 	}
 
 	for(int i = 0; i < enabled_effects.size(); i++)
@@ -301,7 +235,7 @@ Error* Tripex::Render()
 //				bInFade = false;
 			fEffectFrames = 0;
 
-			Error* error = enabled_effects[nEffect]->Reconfigure(pAudio.get());
+			Error* error = enabled_effects[nEffect]->Reconfigure(pAudio.get(), texture_library);
 			if(error) return TraceError(error); 
 		}
 	}
@@ -373,7 +307,7 @@ Error* Tripex::Render()
 	}
 	if(txs[TXS_RECONFIGURE])//bReconfigure)
 	{
-		Error* error = enabled_effects[nEffect]->Reconfigure(pAudio.get());
+		Error* error = enabled_effects[nEffect]->Reconfigure(pAudio.get(), texture_library);
 		if(error) return TraceError(error);
 
 		txs.reset(TXS_IN_FADE);
@@ -399,7 +333,7 @@ Error* Tripex::Render()
 
 	if(ppDrawEffect[1]->fBr > FLOAT_ZERO && !txs[TXS_RESET_TARGET])
 	{
-		Error* error = ppDrawEffect[1]->Reconfigure(pAudio.get());
+		Error* error = ppDrawEffect[1]->Reconfigure(pAudio.get(), texture_library);
 		if(error) return TraceError(error);
 
 		txs[TXS_RESET_TARGET] = true;

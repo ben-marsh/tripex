@@ -5,6 +5,7 @@
 #include <memory>
 #include "error.h"
 #include "AudioData.h"
+#include "TextureLibrary.h"
 
 #define EFFECT_MAX_TEXTURES 2
 
@@ -57,6 +58,12 @@ public:
 	struct ReconfigureParams
 	{
 		AudioData* audio_data;
+		const TextureLibrary& texture_library;
+
+		ReconfigureParams(const TextureLibrary& texture_library)
+			: texture_library(texture_library)
+		{
+		}
 	};
 
 	struct RenderParams
@@ -108,8 +115,8 @@ public:
 	virtual void Create() = 0;
 	virtual void Destroy();
 
-	Error* Calculate(float fElapsed, AudioData* pAudio);
-	Error* Reconfigure(AudioData* pAudio);
+	Error* Calculate(float elapsed, AudioData* audio_data);
+	Error* Reconfigure(AudioData* audio_data, const TextureLibrary& texture_library);
 	Error* Render();
 	bool CanRender(float fElapsed);
 

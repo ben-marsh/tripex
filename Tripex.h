@@ -4,6 +4,7 @@
 #include "ConfigItem.h"
 #include "TextureFont.h"
 #include "AudioData.h"
+#include "TextureLibrary.h"
 #include <bitset>
 
 class Tripex
@@ -26,6 +27,8 @@ public:
 
 	std::vector<std::shared_ptr<EffectHandler>> effects;
 	std::vector<std::shared_ptr<EffectHandler>> enabled_effects;
+
+	TextureLibrary texture_library;
 
 	Tripex();
 	void ShowStatusMsg( const char *sFormat, ... );

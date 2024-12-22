@@ -105,8 +105,8 @@ public:
 	}
 	Error* Reconfigure(const ReconfigureParams& params) override
 	{
-		obj.textures[0].texture = g_pD3D->Find(TextureClass::LightStarSprite);
-		pTint = g_pD3D->Find(TextureClass::LightStarBackground);
+		obj.textures[0].texture = params.texture_library.Find(TextureClass::LightStarSprite);
+		pTint = params.texture_library.Find(TextureClass::LightStarBackground);
 		return nullptr;
 	}
 };

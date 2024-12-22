@@ -113,7 +113,7 @@ public:
 	}
 	Error* Reconfigure(const ReconfigureParams& params) override
 	{
-		Texture *tx = g_pD3D->Find(TextureClass::RingsEnvMap);
+		Texture *tx = params.texture_library.Find(TextureClass::RingsEnvMap);
 		for (int i = 0; i < RINGS; i++)
 		{
 			pObj[i].textures[0].Set(Actor::TextureType::Envmap, tx);

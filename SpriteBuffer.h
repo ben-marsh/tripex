@@ -3,9 +3,11 @@
 #include "ColorRgb.h"
 #include "Point.h"
 #include "Rect.h"
+#include "Face.h"
 #include "error.h"
 #include "Texture.h"
 #include <vector>
+#include "Vertex.h"
 
 class SpriteBuffer
 {

@@ -251,8 +251,8 @@ public:
 	Error* Reconfigure(const ReconfigureParams& params) override
 	{
 		fSpeed = params.audio_data->GetIntensity( );
-		pTexture = g_pD3D->Find(TextureClass::DotStarSprite);
-		pTint = g_pD3D->Find(TextureClass::DotStarBackground);
+		pTexture = params.texture_library.Find(TextureClass::DotStarSprite);
+		pTint = params.texture_library.Find(TextureClass::DotStarBackground);
 		return nullptr;
 	}
 	Error* Render(const RenderParams& params) override

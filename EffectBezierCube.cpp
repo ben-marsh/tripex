@@ -252,7 +252,7 @@ public:
 	}
 	Error* Reconfigure(const ReconfigureParams& params) override
 	{
-		pTexture = g_pD3D->Find(TextureClass::BezierCubeSprite);
+		pTexture = params.texture_library.Find(TextureClass::BezierCubeSprite);
 		testobj.textures[0].texture = pTexture;
 		obj.textures[0].texture = pTexture;
 		for(int i = 0; i < TWISTPLANES; i++)
@@ -263,7 +263,7 @@ public:
 		{
 			pObj[i].textures[0].texture = pTexture;
 		}
-		pTint = g_pD3D->Find(TextureClass::BezierCubeBackground);
+		pTint = params.texture_library.Find(TextureClass::BezierCubeBackground);
 		return nullptr;
 	}
 };

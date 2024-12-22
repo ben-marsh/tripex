@@ -76,7 +76,7 @@ public:
 	}
 	Error* Reconfigure(const ReconfigureParams& params) override
 	{
-		Texture *t = g_pD3D->Find(TextureClass::MotionBlurEnvMap);
+		Texture *t = params.texture_library.Find(TextureClass::MotionBlurEnvMap);
 		for (int i = 0; i < RINGS; i++)
 		{
 			pObj[i].textures[0].texture = t;

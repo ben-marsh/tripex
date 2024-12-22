@@ -92,7 +92,7 @@ public:
 	}
 	Error* Reconfigure(const ReconfigureParams& params) override
 	{
-		Texture *tx = g_pD3D->Find(TextureClass::MorphingSphereEnvMap);
+		Texture *tx = params.texture_library.Find(TextureClass::MorphingSphereEnvMap);
 		for(int i = 0; i < NOBJ; i++)
 		{
 			pObj[i].textures[0].Set(Actor::TextureType::Envmap, tx);
