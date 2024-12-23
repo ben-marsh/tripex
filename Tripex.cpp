@@ -368,14 +368,8 @@ Error* Tripex::Render()
 //	static unsigned int nc = 0x0000ffff;
 //	nc ^= 0x00005553;
 
-	HRESULT hRes = g_pD3D->g_pDevice->Clear( 0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x00000000, 1.0f, 0 );
-	if(FAILED(hRes)) return TraceError(hRes);
-
-	hRes = g_pD3D->g_pDevice->BeginScene( );
-	if( FAILED( hRes ) ) return TraceError( hRes );
-
-	hRes = g_pD3D->g_pDevice->SetFVF( D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_SPECULAR | D3DFVF_TEX1 );
-	if( FAILED( hRes ) ) return TraceError( hRes );
+	Error* error = g_pD3D->BeginFrame();
+	if (error) return TraceError(error);
 
 //	g_pD3D->SetTexture(0, gui.get());
 /*
@@ -397,8 +391,8 @@ Error* Tripex::Render()
 	{
 		DWORD dwStartTick = timeGetTime( );
 
-		ppDrawEffect[i]->Render( );
-		if(FAILED(hRes)) return TraceError(hRes);
+		error = ppDrawEffect[i]->Render( );
+		if(error) return TraceError(error);
 	}
 
 	overlay_background.Clear();
@@ -474,11 +468,8 @@ Error* Tripex::Render()
 		if (error) return TraceError(error);
 	}
 
-	hRes = g_pD3D->g_pDevice->EndScene( );
-	if( FAILED( hRes ) ) return TraceError( hRes );
-
-	hRes = g_pD3D->g_pDevice->Present(NULL, NULL, NULL, NULL);
-	if( FAILED( hRes ) ) return TraceError( hRes );
+	error = g_pD3D->EndFrame();
+	if (error) return TraceError(error);
 
 //	AddFrameTime(true, clock() - dwRenderStartClock);
 

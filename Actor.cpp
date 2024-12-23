@@ -859,16 +859,12 @@ void Actor::Clip(ZArray<Face>& faces, uint16 plane_mask)
 
 	if (!flags.test(F_VALID_CLIP_PLANES))
 	{
-		clip_min_x = std::min(-0.25f, g_pD3D->g_Caps.GuardBandLeft);
-		clip_max_x = std::max(g_pD3D->GetWidth() - 0.25f, g_pD3D->g_Caps.GuardBandRight);
-		clip_min_y = std::min(-0.25f, g_pD3D->g_Caps.GuardBandTop);
-		clip_max_y = std::max(g_pD3D->GetHeight() - 0.25f, g_pD3D->g_Caps.GuardBandBottom);
+		Rect<float> clip_rect = g_pD3D->GetClipRect();
 
-		// clip_min_x = 100;
-		// clip_max_x = g_pD3D->GetWidth() - 100;
-		// clip_min_y = 100;
-		// clip_max_y = g_pD3D->GetHeight() - 100;
-
+		clip_min_x = clip_rect.left;
+		clip_max_x = clip_rect.right;
+		clip_min_y = clip_rect.top;
+		clip_max_y = clip_rect.bottom;
 		clip_min_z = 0.001f;
 		clip_max_z = 1500.0f;
 	}
