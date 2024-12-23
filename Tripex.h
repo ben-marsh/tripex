@@ -5,6 +5,7 @@
 #include "TextureFont.h"
 #include "AudioData.h"
 #include "TextureLibrary.h"
+#include "GeometryBuffer.h"
 #include <bitset>
 
 class Tripex
@@ -29,6 +30,10 @@ public:
 	std::vector<std::shared_ptr<EffectHandler>> enabled_effects;
 
 	TextureLibrary texture_library;
+
+	GeometryBuffer overlay_background;
+	GeometryBuffer overlay_text;
+	GeometryBuffer overlay_foreground;
 
 	Tripex();
 	void ShowStatusMsg( const char *sFormat, ... );
@@ -56,8 +61,8 @@ private:
 	// TODO: make sure these CfgItems are free'd
 	std::map< std::string, std::vector< ConfigItem* >, CI_STR_CMP >* pmpCfgItem = NULL;
 
-	void DrawMessage(SpriteBuffer& sb, TextureFont* pFont, int y, const char* sText, float fBr, float fBackBr);
-	int GetClippedLineLength(TextureFont* pFont, const char* sText, int nClipWidth);
+	void DrawMessage(const TextureFont& font, int y, const char* sText, float fBr, float fBackBr);
+	int GetClippedLineLength(const TextureFont& pFont, const char* sText, int nClipWidth);
 
 	void AddEffect(std::shared_ptr<EffectHandler> (*fn)(), const char* sName, int nDrawOrder, float fStartupWeight, TextureClass nTex, ...);
 	void CreateEffectList();

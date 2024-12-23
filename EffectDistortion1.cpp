@@ -79,11 +79,12 @@ public:
 	}
 	Error* Render(const RenderParams& params) override
 	{
-		Error* error;
-		g_pD3D->SetTexture(0, tx);
-		g_pD3D->SetState(ZDirect3D::Transparent);//D3DRS_TRANSPARENT);
+		RenderState render_state;
+		render_state.dst_blend = D3DBLEND_ONE;
+		render_state.enable_zbuffer = false;
+		render_state.texture_stages[0].texture = tx;
 
-		error = grid.Render( );
+		Error* error = grid.Render(render_state);
 		if(error) return TraceError(error);
 
 		return nullptr;

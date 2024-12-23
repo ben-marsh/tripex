@@ -4,7 +4,6 @@
 #include "Texture.h"
 #include "TextureFont.h"
 #include "config.h"
-#include "SpriteBuffer.h"
 #include "TextureSource.h"
 #include "config.h"
 #include "TextureData.h"
@@ -378,7 +377,7 @@ Error* Tripex::Render()
 	hRes = g_pD3D->g_pDevice->SetFVF( D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_SPECULAR | D3DFVF_TEX1 );
 	if( FAILED( hRes ) ) return TraceError( hRes );
 
-	g_pD3D->SetTexture(0, gui.get());
+//	g_pD3D->SetTexture(0, gui.get());
 /*
 	Transparent = (1 << 0L),
 	Multiply = (1 << 1L),
@@ -394,20 +393,23 @@ Error* Tripex::Render()
 	//g_pD3D->SetRenderState(D3DRS_CLIPPING, false);
 	// ... Forza.
 
-		for(int i = 0; i < 2; i++)
-		{
-			DWORD dwStartTick = timeGetTime( );
+	for(int i = 0; i < 2; i++)
+	{
+		DWORD dwStartTick = timeGetTime( );
 
-			ppDrawEffect[i]->Render( );
-			if(FAILED(hRes)) return TraceError(hRes);
-		}
+		ppDrawEffect[i]->Render( );
+		if(FAILED(hRes)) return TraceError(hRes);
+	}
 
-	SpriteBuffer sb;
+	overlay_background.Clear();
+	overlay_text.Clear();
+	overlay_foreground.Clear();
 
 //	int nX = d3d->GetWidth() * 0.06;
 //	int nY = d3d->GetHeight() - 63;
 
-	g_pD3D->SetTexture(0, gui.get());
+//	DebugBreak();
+//	g_pD3D->SetTexture(0, gui.get());
 
 	std::string sMsg;
 	float fMsgBr = 0.0f;
@@ -426,20 +428,51 @@ Error* Tripex::Render()
 	}
 	if(sMsg.size() > 0 && bShowMessages)
 	{
-		DrawMessage(sb, &tef, 38, sMsg.c_str(), fMsgBr, 1 - fHUDTransparency);
+		DrawMessage(tef, 38, sMsg.c_str(), fMsgBr, 1 - fHUDTransparency);
 	}
 
 	if(txs.test(TXS_VISIBLE_BEATS))
 	{
-		pAudio->Render( sb );
+		pAudio->Render(overlay_background, overlay_foreground);
 	}
 
 //		ZSpriteBuffer sb;
 //		sb.AddSprite(ZPoint<int>(10, 30), d3d->vpTexture[3], g_pD3D->Shade, ZRect<int>(0, 0, 600, 400), 1.0f );
 //		sb.Flush( d3d.get( ) );
 
-	Error* error = sb.Flush( );
-	if(error) return TraceError(error);
+	// Draw the overlay background
+	{
+		RenderState render_state;
+		render_state.src_blend = D3DBLEND_ZERO;
+		render_state.dst_blend = D3DBLEND_INVSRCCOLOR;
+		render_state.enable_zbuffer = false;
+
+		Error* error = g_pD3D->DrawIndexedPrimitive(render_state, overlay_background);
+		if (error) return TraceError(error);
+	}
+
+	// Draw the overlay text
+	{
+		RenderState render_state;
+		render_state.src_blend = D3DBLEND_ONE;
+		render_state.dst_blend = D3DBLEND_INVSRCCOLOR;
+		render_state.enable_zbuffer = false;
+		render_state.texture_stages[0].texture = tef.texture.get();
+
+		Error* error = g_pD3D->DrawIndexedPrimitive(render_state, overlay_text);
+		if (error) return TraceError(error);
+	}
+
+	// Draw the overlay foreground
+	{
+		RenderState render_state;
+		render_state.src_blend = D3DBLEND_ONE;
+		render_state.dst_blend = D3DBLEND_INVSRCCOLOR;
+		render_state.enable_zbuffer = false;
+
+		Error* error = g_pD3D->DrawIndexedPrimitive(render_state, overlay_foreground);
+		if (error) return TraceError(error);
+	}
 
 	hRes = g_pD3D->g_pDevice->EndScene( );
 	if( FAILED( hRes ) ) return TraceError( hRes );
@@ -472,7 +505,7 @@ void Tripex::Shutdown( )
 	SaveCfgItems();
 }
 
-int Tripex::GetClippedLineLength(TextureFont* pFont, const char* sText, int nClipWidth)
+int Tripex::GetClippedLineLength(const TextureFont& pFont, const char* sText, int nClipWidth)
 {
 	bool bFirstWord = true;
 	int nLastEnd = 0;
@@ -484,8 +517,14 @@ int Tripex::GetClippedLineLength(TextureFont* pFont, const char* sText, int nCli
 			if (bSpace) bFirstWord = false;
 
 			std::string sLine = std::string(sText, i);
-			if (pFont->GetWidth(sLine.c_str()) > nClipWidth) return nLastEnd;
-			else if (sText[i] == 0) return i;
+			if (pFont.GetWidth(sLine.c_str()) > nClipWidth)
+			{
+				return nLastEnd;
+			}
+			else if (sText[i] == 0)
+			{
+				return i;
+			}
 
 			nLastEnd = i;
 
@@ -499,44 +538,48 @@ int Tripex::GetClippedLineLength(TextureFont* pFont, const char* sText, int nCli
 	}
 }
 
-void Tripex::DrawMessage(SpriteBuffer& sb, TextureFont* pFont, int y, const char* sText, float fBr, float fBackBr)
+void Tripex::DrawMessage(const TextureFont& font, int y, const char* text, float brightness, float back_brightness)
 {
-	//	static ZArray<ZVertexTL> pVertex;
-	//	static ZArray<ZFace> face;
+	const int clip_width = g_pD3D->GetWidth() - 40;
+	const int line_height = 20;
 
-	const int nClipWidth = g_pD3D->GetWidth() - 40;
-	const int nLineHeight = 20;
-
-	std::vector<std::string> vsLine;
-	int nWidth = 0;
+	std::vector<std::string> lines;
+	int width = 0;
 	for (;;)
 	{
-		while (isspace(*sText)) sText++;
-		if (*sText == 0) break;
-		int nLength = GetClippedLineLength(pFont, sText, nClipWidth);
-		if (nLength > 0)
+		while (isspace(*text))
 		{
-			std::string sLine(sText, nLength);
-			vsLine.push_back(sLine);
-			nWidth = std::max(nWidth, pFont->GetWidth(sLine.c_str()));
-			sText += nLength;
+			text++;
+		}
+		if (*text == 0)
+		{
+			break;
+		}
+
+		int length = GetClippedLineLength(font, text, clip_width);
+		if (length > 0)
+		{
+			std::string line(text, length);
+			lines.push_back(line);
+			width = std::max(width, font.GetWidth(line.c_str()));
+			text += length;
 		}
 	}
 
-	int nCentreX = g_pD3D->GetWidth() / 2;
+	int centre_x = g_pD3D->GetWidth() / 2;
 
-	if (fBackBr > FLOAT_ZERO)
+	if (back_brightness > FLOAT_ZERO)
 	{
-		float fDarkBr = (fBackBr * fBr);
-		const Point<int> p(nCentreX - (nWidth / 2) - 15, y);
-		const Rect<int> r(0, 0, nWidth + 30, 25 + ((int)vsLine.size() - 1) * nLineHeight);
-		sb.AddSprite(p, NULL, g_pD3D->InverseMultiply, r, fDarkBr);
+		float dark_brightness = (back_brightness * brightness);
+		const Point<int> p(centre_x - (width / 2) - 15, y);
+		const Rect<int> r(0, 0, width + 30, 25 + ((int)lines.size() - 1) * line_height);
+		overlay_background.AddSprite(p, r, dark_brightness);
 	}
 
-	for (int i = 0; i < (int)vsLine.size(); i++)
+	for (int i = 0; i < (int)lines.size(); i++)
 	{
-		int nLineWidth = pFont->GetWidth(vsLine[i].c_str());
-		pFont->Draw(&sb, vsLine[i].c_str(), Point<int>(nCentreX - (nLineWidth / 2), y + 5 + (i * nLineHeight)), ColorRgb::Grey((int)(fBr * 255.0f)));
+		int line_width = font.GetWidth(lines[i].c_str());
+		font.Draw(overlay_text, lines[i].c_str(), Point<int>(centre_x - (line_width / 2), y + 5 + (i * line_height)), ColorRgb::Grey((int)(brightness * 255.0f)));
 	}
 }
 
@@ -546,6 +589,7 @@ IMPORT_EFFECT(CollapsingLightSphere);
 IMPORT_EFFECT(Distortion1);
 IMPORT_EFFECT(Distortion2);
 IMPORT_EFFECT(Distortion2Col);
+IMPORT_EFFECT(DotStar);
 IMPORT_EFFECT(Flowmap);
 IMPORT_EFFECT(Tunnel);
 IMPORT_EFFECT(WaterGlobe);
@@ -565,34 +609,6 @@ IMPORT_EFFECT(LightTentacles);
 IMPORT_EFFECT(LightStar);
 IMPORT_EFFECT(LightSphere);
 IMPORT_EFFECT(LightRing);
-IMPORT_EFFECT(SuperSampling);
-/*
-extern ZEffectPtr *pEffectBezierCube;
-extern ZEffectPtr *pEffectCollapsingLightSphere;
-extern ZEffectPtr *pEffectDistortion1;
-extern ZEffectPtr *pEffectDistortion2;
-extern ZEffectPtr *pEffectDistortion2Col;
-extern ZEffectPtr *pEffectFlowmap;
-extern ZEffectPtr *pEffectTunnel;
-extern ZEffectPtr *pEffectWaterGlobe;
-extern ZEffectPtr *pEffectTube;
-extern ZEffectPtr *pEffectSun;
-extern ZEffectPtr *pEffectBumpmapping;
-extern ZEffectPtr *pEffectSpectrum;
-extern ZEffectPtr *pEffectRings;
-extern ZEffectPtr *pEffectPhased;
-extern ZEffectPtr *pEffectMotionBlur1;
-extern ZEffectPtr *pEffectMotionBlur2;
-extern ZEffectPtr *pEffectMotionBlur3;
-extern ZEffectPtr *pEffectMotionBlur3Alt;
-extern ZEffectPtr *pEffectMorphingSphere;
-extern ZEffectPtr *pEffectMetaballs;
-extern ZEffectPtr *pEffectLightTentacles;
-extern ZEffectPtr *pEffectLightStar;
-extern ZEffectPtr *pEffectLightSphere;
-extern ZEffectPtr *pEffectLightRing;
-extern ZEffectPtr *pEffectSuperSampling;
-*/
 
 void Tripex::AddEffect(std::shared_ptr<EffectHandler> (*fn)(), const char* sName, int nDrawOrder, float fStartupWeight, TextureClass nTex, ...)
 {
@@ -651,7 +667,7 @@ void Tripex::CreateEffectList()
 	AddEffect(&CreateEffect_LightSphere, "LightSphere", ZORDER_LIGHTSPHERE, 1.0f, TextureClass::LightSphereSprite, TextureClass::LightSphereBackground, TextureClass::Invalid);
 	AddEffect(&CreateEffect_LightRing, "LightRing", ZORDER_LIGHTRING, 1.0f, TextureClass::LightRingSprite, TextureClass::LightRingBackground, TextureClass::Invalid);
 	AddEffect(&CreateEffect_Flowmap, "Flowmap", ZORDER_FLOWMAP, 10.0f, TextureClass::Invalid);
-	AddEffect(&CreateEffect_SuperSampling, "SuperSampling", ZORDER_DOTSTAR, 1.0f, TextureClass::DotStarSprite, TextureClass::DotStarBackground, TextureClass::Invalid);
+	AddEffect(&CreateEffect_DotStar, "DotStar", ZORDER_DOTSTAR, 1.0f, TextureClass::DotStarSprite, TextureClass::DotStarBackground, TextureClass::Invalid);
 	AddEffect(&CreateEffect_Distortion2, "Distortion2", ZORDER_DISTORTION2, 1.0f, TextureClass::Distortion2Background, TextureClass::Invalid);
 	AddEffect(&CreateEffect_Distortion2Col, "Distortion2(Lit)", ZORDER_DISTORTION2COL, 1.0f, TextureClass::Distortion2ColBackground, TextureClass::Invalid);
 	AddEffect(&CreateEffect_CollapsingLightSphere, "CollapsingLightSphere", ZORDER_COLLAPSINGSPHERE, 1.0f, TextureClass::CollapsingSphereSprite, TextureClass::CollapsingSphereBackground, TextureClass::Invalid);

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Fourier.h"
-#include "SpriteBuffer.h"
+#include "GeometryBuffer.h"
 
 #define FREQ_HISTORY_SIZE 20
 #define FREQ_BANDS 256
@@ -51,7 +51,7 @@ public:
 	void Update( float fElapsed, float fSensitivity);
 	
 	// Render( ):
-	void Render( SpriteBuffer &sb ) const;
+	void Render(GeometryBuffer& overlay_back, GeometryBuffer& overlay) const;
 
 	// GetIntensity( ):
 	float GetIntensity( ) const;

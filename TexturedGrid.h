@@ -16,5 +16,5 @@ public:
 	bool update_edges;
 
 	TexturedGrid(int width, int height);
-	Error* Render();
+	Error* Render(const RenderState& render_state);
 };

@@ -137,8 +137,6 @@ public:
 
 	uint16 clip_mask;
 
-	std::map<D3DRENDERSTATETYPE, DWORD> state;
-
 	int exposure;
 	float delay_history, frame_history, rotation_history, frame_time;
 	float sprite_size;

@@ -1,8 +1,7 @@
 #pragma once
 
 #include "ZArray.h"
-#include "SpriteBuffer.h"
-#include "EFFECT.h"
+#include "Effect.h"
 #include "AudioData.h"
 
 enum

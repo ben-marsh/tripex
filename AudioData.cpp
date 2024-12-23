@@ -10,18 +10,18 @@
 
 extern float fHUDTransparency;
 
-void DrawLineBar(SpriteBuffer &sb, int x, int y, int h, float p)
+void DrawLineBar(GeometryBuffer &geom, int x, int y, int h, float p)
 {
 	int n = (int)(h * Bound<float>(p, 0.0f, 1.0f));
-	sb.AddSprite(Point<int>(x, y), NULL, g_pD3D->LuminanceOpacity, Rect<int>(0, 0, 1, n), 0.1f);
-	sb.AddSprite(Point<int>(x, y + n), NULL, g_pD3D->LuminanceOpacity, Rect<int>(0, 0, 1, h - n), 1.0f);
+	geom.AddSprite(Point<int>(x, y), Rect<int>(0, 0, 1, n), 0.1f);
+	geom.AddSprite(Point<int>(x, y + n), Rect<int>(0, 0, 1, h - n), 1.0f);
 }
 
-void DrawHorizontalBar(SpriteBuffer &sb, int x, int y, int w, int h, float p)
+void DrawHorizontalBar(GeometryBuffer &geom, int x, int y, int w, int h, float p)
 {
 	p = std::min(1.0f, std::max(0.0f, p));
-	sb.AddSprite(Point<int>(x, y), NULL, 0, Rect<int>(0, 0, w, h), ColorRgb::Grey(20));
-	sb.AddSprite(Point<int>(x, y), NULL, 0, Rect<int>(0, 0, (int)(w * p), h), ColorRgb::White());
+	geom.AddSprite(Point<int>(x, y), Rect<int>(0, 0, w, h), ColorRgb::Grey(20));
+	geom.AddSprite(Point<int>(x, y), Rect<int>(0, 0, (int)(w * p), h), ColorRgb::White());
 }
 
 
@@ -233,21 +233,21 @@ void AudioData::Update( float fElapsed, float fSensitivity )
 * Render( ):
 ---------------------------------------------*/
 
-void AudioData::Render( SpriteBuffer &sb ) const
+void AudioData::Render(GeometryBuffer& overlay_back, GeometryBuffer& overlay) const
 {
-	sb.AddSprite(Point<int>(10, 30), NULL, g_pD3D->InverseMultiply, Rect<int>(0, 0, 600, 400), 1.0f - fHUDTransparency);
+	overlay_back.AddSprite(Point<int>(10, 30), Rect<int>(0, 0, 600, 400), 1.0f - fHUDTransparency);
 
-	DrawHorizontalBar( sb, 20, 40, 256, 10, m_fIntensity );
-	DrawHorizontalBar( sb, 20, 60, 256, 10, m_fBeat );
+	DrawHorizontalBar(overlay, 20, 40, 256, 10, m_fIntensity );
+	DrawHorizontalBar(overlay, 20, 60, 256, 10, m_fBeat );
 
 	for(int i = 0; i < 256; i++)
 	{
-		DrawLineBar( sb, 20 + i, 140, 200, 1 - m_afBand[ i ] );
+		DrawLineBar(overlay, 20 + i, 140, 200, 1 - m_afBand[ i ] );
 	}
 
 	for( int i = 0; i < 16; i++ )
 	{
-		DrawHorizontalBar( sb, 300, 280 + (i * 5), 256, 5, GetDampenedBand( 1.0f, i / 16.0f, ( i + 1.0f ) / 16.0f ) );
+		DrawHorizontalBar(overlay, 300, 280 + (i * 5), 256, 5, GetDampenedBand( 1.0f, i / 16.0f, ( i + 1.0f ) / 16.0f ) );
 	}
 }
 

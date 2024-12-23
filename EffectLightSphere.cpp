@@ -149,13 +149,13 @@ public:
 
 		if(pTint != pBlankTexture)
 		{
-			g_pD3D->SetTexture(0, pTint);
-			g_pD3D->ResetRenderState();
-			g_pD3D->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_DESTCOLOR);
-			g_pD3D->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
-			g_pD3D->SetRenderState(D3DRS_ZENABLE, FALSE);
-			g_pD3D->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
-			g_pD3D->DrawSprite(Point<int>(0, 0), Rect<int>(0, 0, g_pD3D->GetWidth(), g_pD3D->GetHeight()), ColorRgb::Grey(brt * 255.0));
+			RenderState render_state;
+			render_state.src_blend = D3DBLEND_DESTCOLOR;
+			render_state.dst_blend = D3DBLEND_ONE;
+			render_state.enable_zbuffer = false;
+			render_state.texture_stages[0].texture = pTint;
+
+			g_pD3D->DrawSprite(render_state, Point<int>(0, 0), Rect<int>(0, 0, g_pD3D->GetWidth(), g_pD3D->GetHeight()), ColorRgb::Grey(brt * 255.0));
 		}
 		return nullptr;
 	}

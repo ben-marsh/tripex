@@ -191,6 +191,7 @@
     <ClCompile Include="ConfigItem.cpp" />
     <ClCompile Include="config-defaults.cpp" />
     <ClCompile Include="Config.cpp" />
+    <ClCompile Include="GeometryBuffer.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="StarModel.cpp" />
     <ClCompile Include="TextureLibrary.cpp" />
@@ -237,7 +238,6 @@
     <ClCompile Include="Matrix44.cpp" />
     <ClCompile Include="Actor.cpp" />
     <ClCompile Include="Canvas.cpp" />
-    <ClCompile Include="SpriteBuffer.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TextureFont.cpp" />
     <ClCompile Include="Tripex.cpp" />
@@ -246,6 +246,7 @@
     <ClInclude Include="ConfigItem.h" />
     <ClInclude Include="config-defaults.h" />
     <ClInclude Include="Config.h" />
+    <ClInclude Include="GeometryBuffer.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="TextureLibrary.h" />
     <ClInclude Include="TextureSource.h" />
@@ -275,7 +276,6 @@
     <ClInclude Include="Canvas.h" />
     <ClInclude Include="Point.h" />
     <ClInclude Include="Rect.h" />
-    <ClInclude Include="SpriteBuffer.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="TextureFont.h" />
     <ClInclude Include="Tripex.h" />

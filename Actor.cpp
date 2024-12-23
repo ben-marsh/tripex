@@ -378,34 +378,6 @@ void Actor::Calculate(Camera* camera, float elapsed)
 		}
 	}
 
-	// calculate the target vertex format
-	if (exposure > 0)
-	{
-		// build the state list
-		state.clear();
-		if (!flags.test(F_DRAW_Z_BUFFER))
-		{
-			state[D3DRS_ZENABLE] = D3DZB_FALSE;
-		}
-		if (flags.test(F_DRAW_TRANSPARENT))
-		{
-			state[D3DRS_DESTBLEND] = D3DBLEND_ONE;
-			state[D3DRS_ALPHABLENDENABLE] = TRUE;
-		}
-		if (flags.test(F_NO_CULL))
-		{
-			state[D3DRS_CULLMODE] = D3DCULL_NONE;
-		}
-		if (lights.size() == 0 && !flags.test(F_VALID_VERTEX_DIFFUSE) && !flags.test(F_VALID_VERTEX_SPECULAR))
-		{
-			state[D3DRS_SHADEMODE] = D3DSHADE_FLAT;
-		}
-		if (flags.test(F_USE_SPECULAR))
-		{
-			state[D3DRS_SPECULARENABLE] = TRUE;
-		}
-	}
-
 	// create 
 //	pnClipped.SetLength(nExposure * pVertex.GetLength());
 //	pClippedEdge.SetLength(0);
@@ -788,7 +760,7 @@ Error* Actor::Render()
 		return nullptr;
 	}
 
-	ZDirect3D::TextureStage tsDefault;
+//	ZDirect3D::TextureStage tsDefault;
 	//	tsDisable.AddState(D3DTSS_COLOROP, D3DTOP_DISABLE);
 
 	//	assert(pTransVertex.GetLength() < 16384 * 3);
@@ -798,48 +770,68 @@ Error* Actor::Render()
 	bool stencil_z = flags.test(F_DRAW_Z_BUFFER) && flags.test(F_DRAW_TRANSPARENT);
 	for (int i = stencil_z ? -1 : 0; i < 1; i++)
 	{
-		g_pD3D->ResetRenderState();
-		for (std::map< D3DRENDERSTATETYPE, DWORD >::iterator it = state.begin(); it != state.end(); it++)
+		RenderState render_state;
+
+		// calculate the target vertex format
+		if (exposure > 0)
 		{
-			g_pD3D->SetRenderState(it->first, it->second);
+			// build the state list
+			if (!flags.test(F_DRAW_Z_BUFFER))
+			{
+				render_state.enable_zbuffer = false;
+			}
+			if (flags.test(F_DRAW_TRANSPARENT))
+			{
+				render_state.dst_blend = D3DBLEND_ONE;
+			}
+			if (flags.test(F_NO_CULL))
+			{
+				render_state.enable_culling = false;
+			}
+			if (lights.size() == 0 && !flags.test(F_VALID_VERTEX_DIFFUSE) && !flags.test(F_VALID_VERTEX_SPECULAR))
+			{
+				render_state.enable_shading = false;
+			}
+			if (flags.test(F_USE_SPECULAR))
+			{
+				render_state.enable_specular = true;
+			}
 		}
 
-		g_pD3D->ResetTextureState();
+
+//		g_pD3D->ResetRenderState();
+//		for (std::map< D3DRENDERSTATETYPE, DWORD >::iterator it = state.begin(); it != state.end(); it++)
+//		{
+//			g_pD3D->SetRenderState(it->first, it->second);
+//		}
+
+//		g_pD3D->ResetTextureState();
 		if (i == -1)
 		{
-			g_pD3D->SetRenderState(D3DRS_SPECULARENABLE, false);
-			g_pD3D->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ZERO);
-			g_pD3D->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
-			g_pD3D->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
+			render_state.enable_specular = false;
+			render_state.src_blend = D3DBLEND_ZERO;
+			render_state.dst_blend = D3DBLEND_ONE;
 		}
 		else
 		{
 			if (stencil_z)
 			{
-				g_pD3D->SetRenderState(D3DRS_ZFUNC, D3DCMP_EQUAL);
-				g_pD3D->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
+				render_state.zfunc = D3DCMP_EQUAL;
+				render_state.enable_zbuffer_write = false;
 			}
 
-			//			DWORD dwOperation;
-						//if(Property(UseDiffuse)) dwOperation = D3DTOP_MODULATE;
-						//else 
-			//			dwOperation = D3DTOP_SELECTARG1;
+			render_state.texture_stages[0].texture = textures[0].texture;
 
-			g_pD3D->SetTexture(0, textures[0].texture);
-			/*			pd3d->vpTextureStage[0]->SetState(D3DTSS_TEXCOORDINDEX, 0);
-						pd3d->vpTextureStage[0]->SetState(D3DTSS_COLOROP, D3DTOP_SELECTA);
-						pd3d->vpTextureStage[0]->SetState(D3DTSS_TEXCOORDINDEX, 0);
-			*/
 			if (textures[0].type == TextureType::Envmap || textures[0].type == TextureType::Lightmap)
 			{
-				g_pD3D->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
-				g_pD3D->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
+				render_state.texture_stages[0].address_u = D3DTADDRESS_CLAMP;
+				render_state.texture_stages[0].address_v = D3DTADDRESS_CLAMP;
 			}
 		}
 
 		if (clipped_faces.GetLength() > 0)
 		{
-			Error* error = g_pD3D->DrawIndexedPrimitive(transformed_vertices, clipped_faces);
+			Error* error = g_pD3D->DrawIndexedPrimitive(render_state, transformed_vertices, clipped_faces);
 			if (error) return TraceError(error);
 		}
 	}

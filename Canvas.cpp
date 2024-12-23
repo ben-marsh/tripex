@@ -62,7 +62,7 @@ Texture* Canvas::GetTexture(int x, int y)
 	return &textures[(y * num_textures_x) + x];
 }
 
-Error* Canvas::Render()
+Error* Canvas::Render(const RenderState& render_state)
 {
 	Error* error;
 	ZArray<Face> faces;
@@ -147,9 +147,10 @@ Error* Canvas::Render()
 				v[2].position.y = v[3].position.y = (float)g_pD3D->GetHeight();
 			}
 
-			g_pD3D->SetTexture(0, GetTexture(hi, vi));
+			RenderState temp_render_state = render_state;
+			temp_render_state.texture_stages[0].texture = GetTexture(hi, vi);
 
-			error = g_pD3D->DrawIndexedPrimitive(v, faces);
+			error = g_pD3D->DrawIndexedPrimitive(temp_render_state, v, faces);
 			if (error) return TraceError(error);
 		}
 	}

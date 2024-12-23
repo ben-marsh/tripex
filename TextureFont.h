@@ -3,7 +3,6 @@
 #include "ZDirect3D.h"
 #include "Texture.h"
 #include "ColorRgb.h"
-#include "SpriteBuffer.h"
 #include <memory>
 
 #define TF_FADE_IN_START 8
@@ -39,11 +38,12 @@ public:
 	void Add(const uint8 *source_data);
 	ColorRgb *GetBitmap();
 	Texture* GetTexture();
-	Glyph *FindGlyph(char character);
-	int GetWidth(char c);
-	int GetWidth(const char *text);
-	void Draw(SpriteBuffer &sb, Glyph *glyph, const Point<int> &p, ColorRgb c);
-	void Draw(SpriteBuffer* psb, const char* text, Point<int> p, ColorRgb c, int frame_in, int frame_out, int frame, int flags = 0);
-	void Draw(SpriteBuffer *psb, const char *text, const Point<int> &p, ColorRgb c = ColorRgb::White(), int flags = 0);
+	Glyph* FindGlyph(char character);
+	const Glyph* FindGlyph(char character) const;
+	int GetWidth(char c) const;
+	int GetWidth(const char *text) const;
+	void Draw(GeometryBuffer& geom, const Glyph &glyph, const Point<int> &p, ColorRgb c) const;
+	void Draw(GeometryBuffer& geom, const char* text, Point<int> p, ColorRgb c, int frame_in, int frame_out, int frame, int flags = 0) const;
+	void Draw(GeometryBuffer& geom, const char *text, const Point<int> &p, ColorRgb c = ColorRgb::White(), int flags = 0) const;
 };
 

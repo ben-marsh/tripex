@@ -867,9 +867,11 @@ public:
 	}
 	Error* Render(const RenderParams& params) override
 	{
-		g_pD3D->SetState(ZDirect3D::Transparent);
+		RenderState render_state;
+		render_state.dst_blend = D3DBLEND_ONE;
+		render_state.enable_zbuffer = false;
 		
-		Error* error = pCanvas->Render( );
+		Error* error = pCanvas->Render(render_state);
 		if(error) return TraceError(error);
 
 		return nullptr;

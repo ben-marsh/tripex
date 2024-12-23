@@ -2,31 +2,11 @@
 #include "ZDirect3d.h"
 #include <d3dx9.h>
 #include "Texture.h"
-#include "SpriteBuffer.h"
 #include "error.h"
-
-/*
-// D3DXCreateTextureFromFileInMemory( ):
-	extern "C" __declspec(dllimport) HRESULT __cdecl D3DXCreateTextureFromFileInMemory( LPDIRECT3DDEVICE8 pDevice, LPCVOID pSrcData, UINT SrcData, LPDIRECT3DTEXTURE8* ppTexture );
-
-	// D3DXCreateTexture( ):
-	extern "C" __declspec(dllimport) HRESULT __cdecl D3DXCreateTexture( LPDIRECT3DDEVICE8 pDevice, UINT Width, UINT Height, UINT MipLevels, DWORD Usage, D3DFORMAT Format, D3DPOOL Pool, LPDIRECT3DTEXTURE8* ppTexture );
-};
-*/
 
 extern IDirect3DDevice9* g_pd3dDevice;
 
 ZDirect3D* g_pD3D = NULL;
-
-/*---------------------------------
-* Methods
------------------------------------*/
-
-ZDirect3D::TextureStage::TextureStage()
-{
-	pTexture = (Texture*)-1;
-	pNewTexture = (Texture*)-1;
-}
 
 ZDirect3D::ZDirect3D()
 {
@@ -81,256 +61,86 @@ Error* ZDirect3D::Open()
 	return nullptr;
 }
 
-Error* ZDirect3D::DrawIndexedPrimitive(ZArray<VertexTL>& vertices, ZArray<Face>& faces)
+Error* ZDirect3D::DrawIndexedPrimitive(const RenderState& render_state, uint32_t num_vertices, const VertexTL* vertices, uint32_t num_faces, const Face* faces)
 {
-	Error* error = DrawIndexedPrimitive(vertices.GetLength(), vertices.GetBuffer(), faces.GetLength(), faces.GetBuffer());
-	return TraceError(error);
-}
+	g_pDevice->SetRenderState(D3DRS_CULLMODE, render_state.enable_culling? D3DCULL_CCW : D3DCULL_NONE);
+	g_pDevice->SetRenderState(D3DRS_SHADEMODE, render_state.enable_shading ? D3DSHADE_GOURAUD : D3DSHADE_FLAT);
+	g_pDevice->SetRenderState(D3DRS_SPECULARENABLE, render_state.enable_specular ? TRUE : FALSE);
+	g_pDevice->SetRenderState(D3DRS_ZENABLE, render_state.enable_zbuffer? TRUE : FALSE);
+	g_pDevice->SetRenderState(D3DRS_ZWRITEENABLE, render_state.enable_zbuffer_write? TRUE : FALSE);
 
-Error* ZDirect3D::DrawIndexedPrimitive(const std::vector<VertexTL>& vertices, const std::vector<Face>& faces)
-{
-	Error* error = DrawIndexedPrimitive((uint32_t)vertices.size(), vertices.data(), (uint32_t)faces.size(), faces.data());
-	return TraceError(error);
-}
+	if (render_state.dst_blend == D3DBLEND_ZERO && render_state.src_blend == D3DBLEND_ONE)
+	{
+		g_pDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
+	}
+	else
+	{
+		g_pDevice->SetRenderState(D3DRS_SRCBLEND, render_state.src_blend);
+		g_pDevice->SetRenderState(D3DRS_DESTBLEND, render_state.dst_blend);
+		g_pDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
+	}
 
-Error* ZDirect3D::DrawIndexedPrimitive(uint32_t num_vertices, const VertexTL* vertices, uint32_t num_faces, const Face* faces)
-{
-	Error* error;
+	for (int stage = 0; stage < RenderState::NUM_TEXTURE_STAGES; stage++)
+	{
+		Texture* texture = render_state.texture_stages[stage].texture;
+		if (texture == nullptr)
+		{
+			g_pDevice->SetTexture(stage, nullptr);
+		}
+		else
+		{
+			g_pDevice->SetTexture(stage, texture->d3d_texture);
 
-	error = FlushRenderState();
-	if (error) return TraceError(error);
+			if ((texture->flags & Texture::F_MIP_CHAIN) == 0)
+			{
+				if (g_Caps.TextureFilterCaps & D3DPTFILTERCAPS_MIPFPOINT)
+				{
+					g_pDevice->SetSamplerState(stage, D3DSAMP_MIPFILTER, D3DTEXF_POINT);
+				}
+				else if (g_Caps.TextureFilterCaps & D3DPTFILTERCAPS_MIPFLINEAR)
+				{
+					g_pDevice->SetSamplerState(stage, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
+				}
+			}
+			else
+			{
+				g_pDevice->SetSamplerState(stage, D3DSAMP_MIPFILTER, D3DTEXF_NONE);
+			}
 
-	error = FlushTextureState();
-	if (error) return TraceError(error);
+			if (texture->flags & Texture::F_FILTERING)
+			{
+				if (g_Caps.TextureFilterCaps & D3DPTFILTERCAPS_MINFLINEAR)
+				{
+					g_pDevice->SetSamplerState(stage, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
+				}
+				if (g_Caps.TextureFilterCaps & D3DPTFILTERCAPS_MAGFLINEAR)
+				{
+					g_pDevice->SetSamplerState(stage, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
+				}
+			}
+			else
+			{
+				if (g_Caps.TextureFilterCaps & D3DPTFILTERCAPS_MINFPOINT)
+				{
+					g_pDevice->SetSamplerState(stage, D3DSAMP_MINFILTER, D3DTEXF_POINT);
+				}
+				if (g_Caps.TextureFilterCaps & D3DPTFILTERCAPS_MAGFPOINT)
+				{
+					g_pDevice->SetSamplerState(stage, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
+				}
+			}
+		}
+
+		g_pDevice->SetSamplerState(stage, D3DSAMP_ADDRESSU, render_state.texture_stages[stage].address_u);
+		g_pDevice->SetSamplerState(stage, D3DSAMP_ADDRESSV, render_state.texture_stages[stage].address_v);
+	}
 
 	HRESULT hRes = g_pDevice->DrawIndexedPrimitiveUP(D3DPT_TRIANGLELIST, 0, num_vertices, num_faces, faces, D3DFMT_INDEX16, vertices, sizeof(VertexTL));
 	if (FAILED(hRes)) return TraceError(hRes);
 
 	return nullptr;
 }
-void ZDirect3D::SetState(int nFlags)
-{
-	ResetRenderState();
-	if (!(nFlags & Shade))
-	{
-		SetRenderState(D3DRS_SHADEMODE, D3DSHADE_FLAT);
-	}
-	if (nFlags & Multiply)
-	{
-		SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ZERO);
-		SetRenderState(D3DRS_DESTBLEND, D3DBLEND_SRCCOLOR);
-		SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
-	}
-	else if (nFlags & InverseMultiply)
-	{
-		SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ZERO);
-		SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCCOLOR);
-		SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
-	}
-	else if (nFlags & LuminanceOpacity)
-	{
-		// dpcTriCaps.dwDestBlendCaps & D3DPBLENDCAPS_INVSRCCOLOR
-		SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCCOLOR);
-		SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
-	}
-	else if (nFlags & Transparent)
-	{
-		SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
-		SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
-	}
-	//	if(!(nFlags & PerspectiveCorrect))
-	//	{
-	//		mpNewRender[D3DRS_TEXTUREPERSPECTIVE] = FALSE;
-	//	}
-	if (!(nFlags & ZBuffer))
-	{
-		SetRenderState(D3DRS_ZENABLE, FALSE);
-		SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
-	}
-}
-void ZDirect3D::ResetRenderState()
-{
-	mpNewRender.clear();
-	for (StateBuffer::iterator it = mpRender.begin(); it != mpRender.end(); it++)
-	{
-		SetRenderState(it->first, it->second.second);
-	}
-}
-void ZDirect3D::SetRenderState(DWORD dwKey, DWORD dwValue)
-{
-	mpNewRender[dwKey] = dwValue;
-}
-void ZDirect3D::GetStateChanges(NewStateBuffer& mp_new, StateBuffer& mp_current, std::vector< StateBufferChange >& vc)
-{
-	// all those which have to be inserted
-	StateBuffer::iterator it_current = mp_current.begin();
-
-	for (NewStateBuffer::iterator it_new = mp_new.begin(); it_new != mp_new.end(); it_new++)
-	{
-		for (;;)
-		{
-			if (it_current == mp_current.end() || it_current->first > it_new->first)
-			{
-				// don't know what the current state is, so need to get it all
-				std::pair<DWORD, DWORD> pn = std::pair< DWORD, DWORD >(it_new->second, 0);
-				it_current = mp_current.insert(it_current, StateBuffer::value_type(it_new->first, pn));
-				vc.push_back(StateBufferChange(it_current, true));
-				it_current++;
-				break;
-			}
-			else if (it_current->first == it_new->first)
-			{
-				if (it_new->second != it_current->second.first)
-				{
-					it_current->second.first = it_new->second;
-					vc.push_back(StateBufferChange(it_current, false));
-				}
-				it_current++;
-				break;
-			}
-			else
-			{
-				if (it_current->second.second != it_current->second.first)
-				{
-					it_current->second.first = it_current->second.second;
-					vc.push_back(StateBufferChange(it_current, false));
-				}
-				it_current++;
-			}
-		}
-	}
-}
-Error* ZDirect3D::FlushRenderState()
-{
-	HRESULT hRes;
-	std::vector<StateBufferChange> vc;
-	GetStateChanges(mpNewRender, mpRender, vc);
-
-	for (int i = 0; i < (int)vc.size(); i++)
-	{
-		StateBuffer::iterator it = vc[i].first;
-
-		if (vc[i].second)
-		{
-			hRes = g_pDevice->GetRenderState((D3DRENDERSTATETYPE)it->first, &it->second.second);
-			if (FAILED(hRes)) return TraceError(hRes);
-		}
-
-		hRes = g_pDevice->SetRenderState((D3DRENDERSTATETYPE)it->first, it->second.first);
-		if (FAILED(hRes)) return TraceError(hRes);
-	}
-
-	mpNewRender.clear();
-
-	return nullptr;
-}
-
-Error* ZDirect3D::FlushTextureState()
-{
-	HRESULT hRes;
-	for (DWORD dwStage = 0; dwStage < 8; dwStage++)
-	{
-		if (pTextureStage[dwStage].pTexture != pTextureStage[dwStage].pNewTexture && pTextureStage[dwStage].pNewTexture != (Texture*)-1)
-		{
-			IDirect3DTexture9* pTex = NULL;
-			if (pTextureStage[dwStage].pNewTexture != NULL)
-			{
-				pTex = pTextureStage[dwStage].pNewTexture->d3d_texture;
-			}
-
-			hRes = g_pDevice->SetTexture(dwStage, pTex);
-			if (FAILED(hRes)) return TraceError(hRes);
-
-			pTextureStage[dwStage].pTexture = pTextureStage[dwStage].pNewTexture;
-
-			Texture* pTexture = pTextureStage[dwStage].pTexture;
-			if (pTexture != NULL)
-			{
-				if (pTexture->flags & Texture::F_MIP_CHAIN)
-				{
-					if (g_Caps.TextureFilterCaps & D3DPTFILTERCAPS_MIPFPOINT)
-					{
-						SetSamplerState(dwStage, D3DSAMP_MIPFILTER, D3DTEXF_POINT);
-					}
-					else if (g_Caps.TextureFilterCaps & D3DPTFILTERCAPS_MIPFLINEAR)
-					{
-						SetSamplerState(dwStage, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
-					}
-				}
-				else
-				{
-					SetSamplerState(dwStage, D3DSAMP_MIPFILTER, D3DTEXF_NONE);
-				}
-
-				if (pTexture->flags & Texture::F_FILTERING)
-				{
-					if (g_Caps.TextureFilterCaps & D3DPTFILTERCAPS_MINFLINEAR)
-					{
-						SetSamplerState(dwStage, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
-					}
-					if (g_Caps.TextureFilterCaps & D3DPTFILTERCAPS_MAGFLINEAR)
-					{
-						SetSamplerState(dwStage, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
-					}
-				}
-				else
-				{
-					if (g_Caps.TextureFilterCaps & D3DPTFILTERCAPS_MINFPOINT)
-					{
-						SetSamplerState(dwStage, D3DSAMP_MINFILTER, D3DTEXF_POINT);
-					}
-					if (g_Caps.TextureFilterCaps & D3DPTFILTERCAPS_MAGFPOINT)
-					{
-						SetSamplerState(dwStage, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
-					}
-				}
-			}
-		}
-
-		{
-			std::vector< StateBufferChange > vc;
-			GetStateChanges(pTextureStage[dwStage].mpNewState, pTextureStage[dwStage].mpState, vc);
-
-			for (int i = 0; i < (int)vc.size(); i++)
-			{
-				StateBuffer::iterator it = vc[i].first;
-
-				if (vc[i].second)
-				{
-					hRes = g_pDevice->GetTextureStageState(dwStage, (D3DTEXTURESTAGESTATETYPE)it->first, &it->second.second);
-					if (FAILED(hRes)) return TraceError(hRes);
-				}
-
-				hRes = g_pDevice->SetTextureStageState(dwStage, (D3DTEXTURESTAGESTATETYPE)it->first, it->second.first);
-				if (FAILED(hRes)) return TraceError(hRes);
-			}
-
-			pTextureStage[dwStage].mpNewState.clear();
-		}
-
-		{
-			std::vector< StateBufferChange > vc;
-			GetStateChanges(pTextureStage[dwStage].mpNewSamplerState, pTextureStage[dwStage].mpSamplerState, vc);
-
-			for (int i = 0; i < (int)vc.size(); i++)
-			{
-				StateBuffer::iterator it = vc[i].first;
-
-				if (vc[i].second)
-				{
-					hRes = g_pDevice->GetSamplerState(dwStage, (D3DSAMPLERSTATETYPE)it->first, &it->second.second);
-					if (FAILED(hRes)) return TraceError(hRes);
-				}
-
-				hRes = g_pDevice->SetSamplerState(dwStage, (D3DSAMPLERSTATETYPE)it->first, it->second.first);
-				if (FAILED(hRes)) return TraceError(hRes);
-			}
-
-			pTextureStage[dwStage].mpNewSamplerState.clear();
-		}
-	}
-	return nullptr;
-}
+/*
 void ZDirect3D::SetTexture(DWORD dwStage, Texture* pTexture, DWORD dwOp, DWORD dwArg2)
 {
 	ResetTextureStageState(dwStage);
@@ -348,7 +158,7 @@ void ZDirect3D::SetTexture(DWORD dwStage, Texture* pTexture, DWORD dwOp, DWORD d
 	}
 	SetTextureStageState(dwStage, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
 }
-
+*/
 Error* ZDirect3D::AddTexture(Texture* pTexture)
 {
 	std::pair< std::set< Texture* >::iterator, bool > itb = created_textures.insert(pTexture);
@@ -507,50 +317,10 @@ void ZDirect3D::DestroyTexture(Texture* pTexture)
 		pTexture->d3d_texture = NULL;
 	}
 }
-void ZDirect3D::SetTextureStageState(DWORD dwStage, D3DTEXTURESTAGESTATETYPE dwKey, DWORD dwValue)
-{
-	pTextureStage[dwStage].mpNewState[(DWORD)dwKey] = dwValue;
-}
-void ZDirect3D::SetSamplerState(DWORD dwStage, D3DSAMPLERSTATETYPE dwKey, DWORD dwValue)
-{
-	pTextureStage[dwStage].mpNewSamplerState[(DWORD)dwKey] = dwValue;
-}
-void ZDirect3D::ResetTextureStageState(DWORD dwStage)
-{
-	if (pTextureStage[dwStage].pNewTexture != (Texture*)-1)
-	{
-		pTextureStage[dwStage].pNewTexture = NULL;
-	}
 
-	pTextureStage[dwStage].mpNewState.clear();
-	for (StateBuffer::iterator it = pTextureStage[dwStage].mpState.begin(); it != pTextureStage[dwStage].mpState.end(); it++)
-	{
-		if (it->second.first != it->second.second)
-		{
-			SetTextureStageState(dwStage, (D3DTEXTURESTAGESTATETYPE)it->first, it->second.second);
-		}
-	}
-
-	pTextureStage[dwStage].mpNewSamplerState.clear();
-	for (StateBuffer::iterator it = pTextureStage[dwStage].mpSamplerState.begin(); it != pTextureStage[dwStage].mpSamplerState.end(); it++)
-	{
-		if (it->second.first != it->second.second)
-		{
-			SetSamplerState(dwStage, (D3DSAMPLERSTATETYPE)it->first, it->second.second);
-		}
-	}
-}
-Error* ZDirect3D::DrawSprite(const Point<int>& p, const Rect<int>& spr, ColorRgb cDiffuse, ColorRgb cSpecular)
+Error* ZDirect3D::DrawSprite(const RenderState& render_state, const Point<int>& p, const Rect<int>& spr, ColorRgb diffuse, ColorRgb specular)
 {
-	std::vector<VertexTL> pv;
-	std::vector<Face> pf;
-	SpriteBuffer::AddSprite(p, spr, cDiffuse, cSpecular, pv, pf);
-	return DrawIndexedPrimitive(pv, pf);
-}
-void ZDirect3D::ResetTextureState()
-{
-	for (DWORD dwStage = 0; dwStage < 8; dwStage++)
-	{
-		ResetTextureStageState(dwStage);
-	}
+	GeometryBuffer geometry_buffer;
+	geometry_buffer.AddSprite(p, spr, diffuse, specular);
+	return DrawIndexedPrimitive(render_state, geometry_buffer);
 }

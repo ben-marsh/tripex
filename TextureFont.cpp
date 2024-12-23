@@ -80,6 +80,16 @@ TextureFont::Glyph* TextureFont::FindGlyph(char character)
 	return &glyphs[index];
 }
 
+const TextureFont::Glyph* TextureFont::FindGlyph(char character) const
+{
+	uint8 index = char_to_glyph[(uint8)character];
+	if (index == 0xff)
+	{
+		return nullptr;
+	}
+	return &glyphs[index];
+}
+
 ColorRgb* TextureFont::GetBitmap()
 {
 	if (pixels == NULL)
@@ -140,15 +150,15 @@ Texture* TextureFont::GetTexture()
 	return texture.get();
 }
 
-void TextureFont::Draw(SpriteBuffer& sb, Glyph* glyph, const Point<int>& pos, ColorRgb c)
+void TextureFont::Draw(GeometryBuffer& sb, const Glyph& glyph, const Point<int>& pos, ColorRgb c) const
 {
-	if (glyph->character != ' ')
+	if (glyph.character != ' ')
 	{
-		sb.AddSprite(pos, texture.get(), ZDirect3D::LuminanceOpacity, Rect<int>(glyph->bitmap_x, glyph->bitmap_y, width, height), c);
+		sb.AddSprite(pos, Rect<int>(glyph.bitmap_x, glyph.bitmap_y, width, height), c);
 	}
 }
 
-void TextureFont::Draw(SpriteBuffer* sb, const char* text, Point<int> pos, ColorRgb color, int frame_in, int frame_out, int frame, int flags)
+void TextureFont::Draw(GeometryBuffer& geom, const char* text, Point<int> pos, ColorRgb color, int frame_in, int frame_out, int frame, int flags) const
 {
 	int relative_in = frame - frame_in;
 	int relative_out = frame - frame_out;
@@ -167,20 +177,18 @@ void TextureFont::Draw(SpriteBuffer* sb, const char* text, Point<int> pos, Color
 	int start_x = pos.x;
 	for (int i = 0; text[i] != 0; i++)
 	{
-		Glyph* glyph = FindGlyph(text[i]);
+		const Glyph* glyph = FindGlyph(text[i]);
 		if (glyph != NULL)
 		{
-			if (sb != NULL)
+			if (faded)
 			{
-				if (faded)
-				{
-					float brightness = Bound<float>(float(relative_in) / LETTER_APPEAR_FRAMES, 0, 1);
-					brightness *= 1 - Bound<float>(float(relative_out) / LETTER_APPEAR_FRAMES, 0, 1);
-					glyph_color = color * brightness;
-				}
-
-				Draw(*sb, glyph, Point<int>(pos.x - glyph->start, pos.y), glyph_color);
+				float brightness = Bound<float>(float(relative_in) / LETTER_APPEAR_FRAMES, 0, 1);
+				brightness *= 1 - Bound<float>(float(relative_out) / LETTER_APPEAR_FRAMES, 0, 1);
+				glyph_color = color * brightness;
 			}
+
+			Draw(geom, *glyph, Point<int>(pos.x - glyph->start, pos.y), glyph_color);
+
 			pos.x += glyph->end - glyph->start;
 
 			if (faded)
@@ -192,23 +200,23 @@ void TextureFont::Draw(SpriteBuffer* sb, const char* text, Point<int> pos, Color
 	}
 }
 
-void TextureFont::Draw(SpriteBuffer* psb, const char* text, const Point<int>& p, ColorRgb c, int flags)
+void TextureFont::Draw(GeometryBuffer& geom, const char* text, const Point<int>& p, ColorRgb c, int flags) const
 {
-	Draw(psb, text, p, c, -1, -1, -1, flags);
+	Draw(geom, text, p, c, -1, -1, -1, flags);
 }
 
-int TextureFont::GetWidth(char c)
+int TextureFont::GetWidth(char c) const
 {
 	char sBuf[2] = { c, 0 };
 	return GetWidth(sBuf);
 }
 
-int TextureFont::GetWidth(const char* text)
+int TextureFont::GetWidth(const char* text) const
 {
 	int width = 0;
 	for (int i = 0; text[i] != 0; i++)
 	{
-		Glyph* glyph = FindGlyph(text[i]);
+		const Glyph* glyph = FindGlyph(text[i]);
 		if (glyph != NULL)
 		{
 			width += glyph->end - glyph->start;

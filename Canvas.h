@@ -22,7 +22,7 @@ public:
 	uint8* GetDataPtr();
 	Error* UploadTextures();
 	Texture* GetTexture(int x, int y);
-	Error* Render();
+	Error* Render(const RenderState& render_state);
 
 private:
 	std::unique_ptr<uint8[]> data;

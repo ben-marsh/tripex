@@ -100,7 +100,7 @@ HRESULT ZGrid::Calculate()
 //{
 //	callback = fn;
 //}
-Error* TexturedGrid::Render( )
+Error* TexturedGrid::Render(const RenderState& render_state)
 {
 	if(scr_width != g_pD3D->GetWidth() || scr_height != g_pD3D->GetHeight() )
 	{
@@ -205,7 +205,7 @@ Error* TexturedGrid::Render( )
 		update_edges = false;
 	}
 
-	Error* error = g_pD3D->DrawIndexedPrimitive(vertices, faces);
+	Error* error = g_pD3D->DrawIndexedPrimitive(render_state, vertices, faces);
 	if(error) return TraceError(error);
 
 	return nullptr;

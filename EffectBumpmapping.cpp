@@ -406,15 +406,24 @@ public:
 			//			hRes = d3d->SetState(ZDirect3D::Shade);//D3DRS_SHADE);
 //			if(FAILED(hRes)) return TraceError(hRes);
 
-			g_pD3D->SetTexture(0, texture);
-			g_pD3D->SetState(ZDirect3D::Shade);
-			error = grid.Render( );
-			if(error) return TraceError(error);
+			{
+				RenderState render_state;
+				render_state.enable_zbuffer = false;
+				render_state.texture_stages[0].texture = texture;
 
-			g_pD3D->SetTexture(0, pc.GetTexture(0, 0));
-			g_pD3D->SetState(ZDirect3D::Transparent | ZDirect3D::Shade);// | D3DRS_SHADE);
-			error = gridbm.Render( );
-			if(error) return TraceError(error);
+				error = grid.Render(render_state);
+				if (error) return TraceError(error);
+			}
+
+			{
+				RenderState render_state;
+				render_state.dst_blend = D3DBLEND_ONE;
+				render_state.texture_stages[0].texture = pc.GetTexture(0, 0);
+				render_state.enable_zbuffer = false;
+
+				error = gridbm.Render(render_state);
+				if (error) return TraceError(error);
+			}
 		}
 //	d3d->lpd3dDevice->SetTexture(0, texture->GetSurface());
 //	d3d->lpd3dDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);

@@ -17,7 +17,7 @@
 
 extern Texture *pBlankTexture;
 
-class EffectSuperSampling : public EffectBase
+class EffectDotStar : public EffectBase
 {
 public:
 	// 256x256
@@ -54,7 +54,7 @@ public:
 	float fTotalElapsed;
 	double brt;
 
-	EffectSuperSampling() : //: camera(0),
+	EffectDotStar() : //: camera(0),
 		b(Vector3(-100, -100, 120), Vector3(100, 100, 140)),
 		b2(Vector3(-20, -20, -20), Vector3(20, 20, 20))
 	{
@@ -266,8 +266,10 @@ public:
 		pTargetVertex.nStep = 100;
 		pTargetFace.nStep = 100;
 
-		g_pD3D->SetTexture(0, pTexture);
-		g_pD3D->SetState(ZDirect3D::Transparent);
+		RenderState render_state;
+		render_state.dst_blend = D3DBLEND_ONE;
+		render_state.enable_zbuffer = false;
+		render_state.texture_stages[0].texture = pTexture;
 
 		ColorRgb pcColour[5];
 		for(int k = 0; k < 5; k++)
@@ -337,24 +339,22 @@ public:
 			}
 			dY += dSize;
 		}
-		error = g_pD3D->DrawIndexedPrimitive(pTargetVertex, pTargetFace);
+		error = g_pD3D->DrawIndexedPrimitive(render_state, pTargetVertex, pTargetFace);
 		if (error) return TraceError(error);
 
 		//lpd3dDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, D3DFVF_TLVERTEX, pVertex, 4, pwFace, 6, 0);
 
 		if(pTint != pBlankTexture)
 		{
-			g_pD3D->SetTexture(0, pTint);
-			g_pD3D->ResetRenderState();
-			g_pD3D->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_DESTCOLOR);
-			g_pD3D->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
-			g_pD3D->SetRenderState(D3DRS_ZENABLE, FALSE);
-			g_pD3D->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
-			g_pD3D->DrawSprite(Point<int>(0, 0), Rect<int>(0, 0, g_pD3D->GetWidth(), g_pD3D->GetHeight()), ColorRgb::Grey(brt * 255.0));
+			RenderState render_state;
+			render_state.src_blend = D3DBLEND_DESTCOLOR;
+			render_state.dst_blend = D3DBLEND_ONE;
+			render_state.enable_zbuffer = false;
+			g_pD3D->DrawSprite(render_state, Point<int>(0, 0), Rect<int>(0, 0, g_pD3D->GetWidth(), g_pD3D->GetHeight()), ColorRgb::Grey(brt * 255.0));
 		}
 
 		return nullptr;
 	}
 };
 
-EXPORT_EFFECT( SuperSampling, EffectSuperSampling )
+EXPORT_EFFECT( DotStar, EffectDotStar )
