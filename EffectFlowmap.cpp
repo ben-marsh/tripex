@@ -100,11 +100,11 @@ public:
 	ColorRgb dstcolour[ 256 ];
 	double fadecolour;
 
-	ZArray<unsigned char> bf1, bf2;//unsigned char far *bf1, *bf2;
-	ZArray<unsigned char> multtab;
+	std::vector<unsigned char> bf1, bf2;//unsigned char far *bf1, *bf2;
+	std::vector<unsigned char> multtab;
 
-	ZArray<unsigned int> sp[ 2 ];
-	ZArray<unsigned int> mo[ 2 ];
+	std::vector<unsigned int> sp[ 2 ];
+	std::vector<unsigned int> mo[ 2 ];
 	
 	int nCalcX;
 	int nCalcY;
@@ -198,9 +198,9 @@ public:
 		pCanvas = new Canvas( width, height );
 //		pc.Create(false, nFlowmapW, nFlowmapH);
 		
-		bf1.SetLength(width * height);
-		bf2.SetLength(width * height);
-		multtab.SetLength(PRECISION*PRECISION*4*256);
+		bf1.resize(width * height);
+		bf2.resize(width * height);
+		multtab.resize(PRECISION*PRECISION*4*256);
 		
 	
 		int x, y, c, i, j = 0;
@@ -228,8 +228,8 @@ public:
 		
 		for(int k = 0; k < 2; k++)
 		{
-			sp[k].SetLength(width * height);
-			mo[k].SetLength(width * height);
+			sp[k].resize(width * height);
+			mo[k].resize(width * height);
 		}
 			
 		ChangeEffect();
@@ -255,16 +255,16 @@ public:
 		calcline = height * CALCDIVISIONS;
 	}
 
-	static inline void AddPixel(ZArray<unsigned char> &pBuffer, int nPos, unsigned char c)
+	static inline void AddPixel(std::vector<unsigned char> &pBuffer, int nPos, unsigned char c)
 	{
 		if(255 - pBuffer[nPos] < c) pBuffer[nPos] = 255;
 		else pBuffer[nPos] += c;
 	}
-	static void DrawAAPixel(ZArray<unsigned char> &pBuffer, int nPos, double alpha)
+	static void DrawAAPixel(std::vector<unsigned char> &pBuffer, int nPos, double alpha)
 	{
 		pBuffer[nPos] = (pBuffer[nPos] * (1 - alpha)) + (255.0 * alpha);
 	}
-	static void DrawAALine(ZArray<unsigned char> &ptr, double x1, double y1, double x2, double y2, int xw, int h, double alpha)
+	static void DrawAALine(std::vector<unsigned char> &ptr, double x1, double y1, double x2, double y2, int xw, int h, double alpha)
 	{
 		double xd = x2 - x1, yd = y2 - y1;
 		if(fabs(xd) > fabs(yd))
@@ -524,7 +524,7 @@ public:
 			}
 		}
 	}
-	void DrawOscilloscope(double dElapsed, int nOsc, double dBr, const AudioData& audio_data, ZArray<unsigned char> &dst)
+	void DrawOscilloscope(double dElapsed, int nOsc, double dBr, const AudioData& audio_data, std::vector<unsigned char> &dst)
 	{
 		double xsprev, ysprev;
 		dOscSpin += dElapsed * 1 * 3.14159 / 180.0;
@@ -756,8 +756,8 @@ public:
 		
 		br = params.brightness;
 		
-		ZArray<unsigned char> &src = fOddFrame? bf1 : bf2;
-		ZArray<unsigned char> &dst = fOddFrame? bf2 : bf1;
+		std::vector<unsigned char> &src = fOddFrame? bf1 : bf2;
+		std::vector<unsigned char> &dst = fOddFrame? bf2 : bf1;
 		
 		//	int index[128];
 		double r = params.audio_data.GetIntensity( );
@@ -810,8 +810,8 @@ public:
 		
 		amplitude = 70;
 		
-		ZArray<unsigned int> &mot = mo[tflowmap];
-		ZArray<unsigned int> &spt = sp[tflowmap];
+		std::vector<unsigned int> &mot = mo[tflowmap];
+		std::vector<unsigned int> &spt = sp[tflowmap];
 		
 		unsigned char *mt;
 		int nIterations = width * height * 4;
@@ -852,7 +852,7 @@ public:
 
 		pCanvas->color = ColorRgb::Grey(255.0 * params.brightness);//D3DRGB(brightness, brightness, brightness);
 
-		memcpy( pCanvas->GetDataPtr( ), (fOddFrame? bf2 : bf1).GetBuffer( ), bf1.GetSize());
+		memcpy( pCanvas->GetDataPtr( ), (fOddFrame? bf2 : bf1).data( ), bf1.size());
 		error = pCanvas->UploadTextures(params.renderer);
 //		hRes = pc.Calculate((fOddFrame? bf2 : bf1).GetBuffer());
 		if(error) return TraceError(error);

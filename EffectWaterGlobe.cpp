@@ -29,9 +29,9 @@ class EffectWaterGlobe : public EffectBase
 	public:
 		int nPos;
 		float fDamping;
-		ZArray<Vector3> pvDir;
-		ZArray<float> pfPos, pfVel;
-		ZArray<uint16*> ppwAdjacent;
+		std::vector<Vector3> pvDir;
+		std::vector<float> pfPos, pfVel;
+		std::vector<std::unique_ptr<uint16[]>> ppwAdjacent;
 		float fSize;
 		float fAngle;
 		float fAverage;
@@ -49,35 +49,41 @@ class EffectWaterGlobe : public EffectBase
 //		FindFaceEdges();
 			FindVertexFaceList();
 
-			ppwAdjacent.SetLength(vertices.GetLength());
+			ppwAdjacent.resize(vertices.GetLength());
+
+			std::vector<uint16> indices;
 			for(int i = 0; i < vertices.GetLength(); i++)
 			{
-				ZArray<uint16> pwIndex;
+				indices.clear();
 				for(int j = 0; vertex_face_list[i][j] != WORD_INVALID_INDEX; j++)
 				{
 					Face &f = faces[vertex_face_list[i][j]];
 					for(int k = 0; k < 3; k++)
 					{
-						if(f[k] != i && pwIndex.IndexOf(f[k]) == -1)
+						if(f[k] != i && std::find(indices.begin(), indices.end(), f[k]) == indices.end())
 						{
-							pwIndex.Add(f[k]);
+							indices.push_back(f[k]);
 						}
 					}
 				}
-				pwIndex.Add(WORD_INVALID_INDEX);
-				ppwAdjacent[i] = pwIndex.Detach();
+				indices.push_back(WORD_INVALID_INDEX);
+
+				std::unique_ptr<uint16[]> index_array = std::make_unique<uint16[]>(indices.size());
+				memcpy(index_array.get(), indices.data(), indices.size() * sizeof(indices[0]));
+
+				ppwAdjacent[i] = std::move(index_array);
 			}
 
 			fDamping = 1.0f;
-			pvDir.SetLength(vertices.GetLength());
+			pvDir.resize(vertices.GetLength());
 			for(int i = 0; i < vertices.GetLength(); i++)
 			{
 				pvDir[i] = vertices[i].position;
 			}
-			pfPos.SetLength(vertices.GetLength());
-			pfPos.Fill(0);
-			pfVel.SetLength(vertices.GetLength());
-			pfVel.Fill(0);
+			pfPos.resize(vertices.GetLength());
+//			memset(pfPos.data(), 0, pfPos.size() * sizeof(float));
+			pfVel.resize(vertices.GetLength());
+//			memset(pfVel.data(), 0, pfVel.size() * sizeof(float));
 		}
 		void Update()
 		{

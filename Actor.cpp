@@ -246,7 +246,6 @@ Vector3 Actor::GetDelayedPosition(int vertex, ExposureData* exposure_data)
 
 void Actor::Calculate(const Renderer& renderer, Camera* camera, float elapsed)
 {
-	int i, j;
 	flags.set(F_VALID_TRANSFORMED_DATA, false);
 
 	Matrix44 mTransform = Matrix44::Rotate(yaw, pitch, roll) * Matrix44::Translate(position) * camera->GetTransform();
@@ -270,7 +269,7 @@ void Actor::Calculate(const Renderer& renderer, Camera* camera, float elapsed)
 	flags.set(F_USE_SPECULAR, (max_light > 255) || flags.test(F_VALID_VERTEX_SPECULAR));
 
 	// set up the texturing
-	ZArray<TextureEntry*> use_textures;
+	std::vector<TextureEntry*> use_textures;
 	if (flags.test(F_DRAW_VERTEX_SPRITES))
 	{
 		_ASSERT(textures[0].type == TextureType::Sprite);
@@ -278,12 +277,12 @@ void Actor::Calculate(const Renderer& renderer, Camera* camera, float elapsed)
 	}
 	else
 	{
-		for (i = 0; i < MAX_TEXTURES; i++)
+		for (int i = 0; i < MAX_TEXTURES; i++)
 		{
 			switch (textures[i].type)
 			{
 			case TextureType::Normal:
-				use_textures.Add(&textures[i]);
+				use_textures.push_back(&textures[i]);
 				break;
 			case TextureType::Lightmap:
 			case TextureType::Envmap:
@@ -300,16 +299,16 @@ void Actor::Calculate(const Renderer& renderer, Camera* camera, float elapsed)
 				{
 					textures[i].rotation = Matrix44::Rotate(yaw, pitch, roll);
 				}
-				use_textures.Add(&textures[i]);
+				use_textures.push_back(&textures[i]);
 				break;
 			}
 		}
-		num_textures = use_textures.GetLength();
+		num_textures = (int)use_textures.size();
 	}
 
 	// set up the frame array
 	Frame* store_frame = NULL;
-	for (i = 0; i < unused_frames.GetLength();)
+	for (int i = 0; i < unused_frames.GetLength();)
 	{
 		if (unused_frames[i]->time_to_live > timeGetTime())
 		{
@@ -440,7 +439,7 @@ void Actor::Calculate(const Renderer& renderer, Camera* camera, float elapsed)
 	int max_history_length = MAX_VERTICES / (4 * vertices.GetLength());
 
 	// transform
-	for (i = 0; i < vertices.GetLength(); i++)
+	for (int i = 0; i < vertices.GetLength(); i++)
 	{
 		VertexTL* pVert = transformed_vertices.AddEmptyPtr();
 		if (flags.test(F_NO_TRANSFORM)) pVert->position = vertices[i].position;
@@ -454,7 +453,7 @@ void Actor::Calculate(const Renderer& renderer, Camera* camera, float elapsed)
 	// light
 	if (lights.size() > 0)
 	{
-		for (i = 0; i < vertices.GetLength(); i++)
+		for (int i = 0; i < vertices.GetLength(); i++)
 		{
 			WideColorRgb wcLight = ambient_light_color;
 			for (const Light& light : lights)
@@ -494,7 +493,7 @@ void Actor::Calculate(const Renderer& renderer, Camera* camera, float elapsed)
 	}
 	else
 	{
-		for (i = 0; i < vertices.GetLength(); i++)
+		for (int i = 0; i < vertices.GetLength(); i++)
 		{
 			transformed_vertices[i].diffuse = init_diffuse;
 			transformed_vertices[i].specular = init_specular;
@@ -502,7 +501,7 @@ void Actor::Calculate(const Renderer& renderer, Camera* camera, float elapsed)
 	}
 	if (flags.test(F_VALID_VERTEX_DIFFUSE))
 	{
-		for (i = 0; i < vertices.GetLength(); i++)
+		for (int i = 0; i < vertices.GetLength(); i++)
 		{
 			transformed_vertices[i].diffuse.r = (uint8)(transformed_vertices[i].diffuse.r * vertices[i].diffuse.r / 255.0f);
 			transformed_vertices[i].diffuse.g = (uint8)(transformed_vertices[i].diffuse.g * vertices[i].diffuse.g / 255.0f);
@@ -511,25 +510,25 @@ void Actor::Calculate(const Renderer& renderer, Camera* camera, float elapsed)
 	}
 	if (flags.test(F_VALID_VERTEX_SPECULAR))
 	{
-		for (i = 0; i < vertices.GetLength(); i++)
+		for (int i = 0; i < vertices.GetLength(); i++)
 		{
 			transformed_vertices[i].specular = transformed_vertices[i].specular + vertices[i].specular;
 		}
 	}
 
 	// texture
-	for (j = 0; j < use_textures.GetLength(); j++)
+	for (int j = 0; j < use_textures.size(); j++)
 	{
 		if (use_textures[j]->type == TextureType::Normal)
 		{
-			for (i = 0; i < vertices.GetLength(); i++)
+			for (int i = 0; i < vertices.GetLength(); i++)
 			{
 				transformed_vertices[i].tex_coords[j] = vertices[i].tex_coord[j];
 			}
 		}
 		else
 		{
-			for (i = 0; i < vertices.GetLength(); i++)
+			for (int i = 0; i < vertices.GetLength(); i++)
 			{
 				trans_normal = vertices[i].normal * use_textures[j]->rotation;
 				transformed_vertices[i].tex_coords[j].x = (trans_normal.x * 1.0f) + 0.5f;
@@ -558,7 +557,7 @@ void Actor::Calculate(const Renderer& renderer, Camera* camera, float elapsed)
 			}
 
 			VertexTL* new_exposure_vertex = exposure_vertex + vertices.GetLength();
-			for (i = 0; i < vertices.GetLength(); i++)
+			for (int i = 0; i < vertices.GetLength(); i++)
 			{
 				new_exposure_vertex[i].diffuse = exposure_vertex[i].diffuse + exposure_light_delta;
 				new_exposure_vertex[i].specular = exposure_vertex[i].specular + exposure_light_delta;
@@ -567,14 +566,14 @@ void Actor::Calculate(const Renderer& renderer, Camera* camera, float elapsed)
 
 			if (!flags.test(F_DO_ROTATION_HISTORY))
 			{
-				for (i = 0; i < vertices.GetLength(); i++)
+				for (int i = 0; i < vertices.GetLength(); i++)
 				{
 					new_exposure_vertex[i].position = (frames[exp_base[exp].frame]->positions[i] * (1 - exp_base[exp].pos)) + (frames[exp_base[exp].frame + 1]->positions[i] * exp_base[exp].pos);
 				}
 			}
 			else
 			{
-				for (i = 0; i < vertices.GetLength(); i++)
+				for (int i = 0; i < vertices.GetLength(); i++)
 				{
 					new_exposure_vertex[i].position = vertices[i].position * exp_base[exp].transform;
 				}
@@ -736,7 +735,7 @@ void Actor::Calculate(const Renderer& renderer, Camera* camera, float elapsed)
 		}
 
 		// Do the camera transform
-		for (i = 0; i < transformed_vertices.GetLength(); i++)
+		for (int i = 0; i < transformed_vertices.GetLength(); i++)
 		{
 			Vector3& v = transformed_vertices[i].position;
 

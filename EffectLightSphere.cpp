@@ -23,10 +23,10 @@ public:
 	Texture *tex;
 	Texture *tx;
 
-	ZArray<Vector3> pvPosition[4];
-	ZArray<double> position;
-	ZArray<double> speed;
-	ZArray<double> length[FRAMES];
+	std::vector<Vector3> pvPosition[4];
+	std::vector<double> position;
+	std::vector<double> speed;
+	std::vector<double> length[FRAMES];
 
 	bool fNotRendered;
 	int nSources;
@@ -49,10 +49,10 @@ public:
 		if(bMeshHQ) nSources = 100;
 		else nSources = 60;
 
-		for(int i = 0; i < 4; i++) pvPosition[i].SetLength(nSources);
-		for(int i = 0; i < FRAMES; i++) length[i].SetLength(nSources);
-		position.SetLength(nSources);
-		speed.SetLength(nSources);
+		for(int i = 0; i < 4; i++) pvPosition[i].resize(nSources);
+		for(int i = 0; i < FRAMES; i++) length[i].resize(nSources);
+		position.resize(nSources);
+		speed.resize(nSources);
 
 		obj.position.z = 50;
 		obj.vertices.SetLength(nSources);

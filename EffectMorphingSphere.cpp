@@ -14,7 +14,7 @@ class EffectMorphingSphere : public EffectBase
 public:
 	Actor pObj[NOBJ + 1];
 	Camera camera;
-	ZArray<float> pfAng;
+	std::vector<float> pfAng;
 	ContainedBezierCurve<1> b;
 	float fBezPos;
 	
@@ -23,7 +23,7 @@ public:
 		fBezPos = 0;
 		pObj[NOBJ].CreateTetrahedronGeosphere(1.0, 4);
 		pObj[NOBJ].FindFaceOrder(Vector3::Origin());
-		pfAng.SetLength(pObj[NOBJ].vertices.GetLength());
+		pfAng.resize(pObj[NOBJ].vertices.GetLength());
 		for(int i = 0; i < pObj[NOBJ].vertices.GetLength(); i++)
 		{
 			pfAng[i] = pObj[NOBJ].vertices[i].position.z * PI * 2;

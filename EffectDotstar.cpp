@@ -29,13 +29,13 @@ public:
 	};
 
 	Texture *pTexture, *pTint;
-	ZArray<VertexTL> pTargetVertex;
-	ZArray<Face> pTargetFace;
+	std::vector<VertexTL> pTargetVertex;
+	std::vector<Face> pTargetFace;
 
 	Camera camera;
 	Actor obj;
 	Actor objTent;
-	ZArray<unsigned char> pBuffer, pTarget;
+	std::vector<unsigned char> pBuffer, pTarget;
 	BezierCurve pb[NUMBEZ];
 	float pfPos[NUMBEZ];
 	double dPos;
@@ -71,10 +71,8 @@ public:
 		fTotal = 0;
 
 		camera.position.z = -80;
-		pBuffer.SetLength(512 * 256);
-		pBuffer.Fill(0);
-		pTarget.SetLength(128 * 64);
-		pTarget.Fill(0);	
+		pBuffer.resize(512 * 256);
+		pTarget.resize(128 * 64);
 
 		for(int i = 0; i < NUMBEZ; i++)
 		{
@@ -188,9 +186,10 @@ public:
 		fPos += params.elapsed * 0.1;
 		while(fPos >= 1.0f) fPos -= 1.0f;
 
-		pBuffer.Fill(0);
+		std::fill(pBuffer.begin(), pBuffer.end(), 0);
+
 		int nSub = 1.0f * fTotalElapsed;
-		for(int k = 0; k < pTarget.GetLength(); k++)
+		for(int k = 0; k < pTarget.size(); k++)
 		{
 			pTarget[k] = std::max(0, std::min<int>(pTarget[k], 8) - nSub);//min(pTarget[k], 4) - 1);	
 		}
@@ -261,10 +260,8 @@ public:
 
 		double dSize = /*1.2 **/ (std::min(params.renderer.GetWidth(), params.renderer.GetHeight()) - 1) / 64.0f;//min(d3d->GetWidth(), d3d->GetHeight()) / 64.0;
 
-		pTargetVertex.Empty();
-		pTargetFace.Empty();
-		pTargetVertex.nStep = 100;
-		pTargetFace.nStep = 100;
+		pTargetVertex.clear();
+		pTargetFace.clear();
 
 		RenderState render_state;
 		render_state.dst_blend = D3DBLEND_ONE;
@@ -295,7 +292,9 @@ public:
 
 					if(dX1 >= 0 && dY1 >= 0 && dX2 < params.renderer.GetWidth() - 1 && dY2 < params.renderer.GetHeight() - 1)
 					{
-						int nV = pTargetVertex.AddEmpty(4);
+						uint16 nV = (uint16)pTargetVertex.size();
+						pTargetVertex.resize(nV + 4);
+
 						VertexTL *pVertex = &pTargetVertex[nV];
 
 						pVertex[0].position.x = dX1;//dX + p;
@@ -329,9 +328,8 @@ public:
 						pVertex[3].tex_coords[0].x = 0;
 						pVertex[3].tex_coords[0].y = 1;
 
-						Face *pFace = pTargetFace.AddEmptyPtr(2);
-						pFace[0] = Face(nV + 0, nV + 1, nV + 3);
-						pFace[1] = Face(nV + 1, nV + 2, nV + 3);
+						pTargetFace.push_back(Face(nV + 0, nV + 1, nV + 3));
+						pTargetFace.push_back(Face(nV + 1, nV + 2, nV + 3));
 					}
 				}
 				dX += dSize;

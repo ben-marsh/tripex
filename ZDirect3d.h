@@ -1,7 +1,6 @@
 #pragma once
 
 #include <d3d9.h>
-#include "ZArray.h"
 #include "ColorRgb.h"
 #include "Vector3.h"
 #include "Face.h"

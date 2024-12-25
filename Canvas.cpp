@@ -66,12 +66,13 @@ Texture* Canvas::GetTexture(int x, int y)
 Error* Canvas::Render(Renderer& renderer, const RenderState& render_state)
 {
 	Error* error;
-	ZArray<Face> faces;
-	faces.Add(Face(0, 1, 3));
-	faces.Add(Face(1, 2, 3));
+	std::vector<Face> faces;
+	faces.push_back(Face(0, 1, 3));
+	faces.push_back(Face(1, 2, 3));
 	//WORD face[6] = { 0, 1, 3, 1, 2, 3 };
 
-	ZArray<VertexTL> v(4);
+	std::vector<VertexTL> v;
+	v.resize(4);
 	//	ZVertexTL v[4];
 	v[0].position.z = 1;
 	v[0].rhw = 1;

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "ZArray.h"
 #include "ZDirect3D.h"
 #include <vector>
 

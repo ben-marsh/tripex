@@ -89,7 +89,7 @@ public:
 	{
 	public:
 		Texture *pTexture;
-		ZArray<unsigned char> pBumpmap;
+		std::vector<unsigned char> pBumpmap;
 	};
 
 	Texture *light, *texture;
@@ -99,18 +99,11 @@ public:
 	TexturedGrid grid;
 	TexturedGrid gridbm;
 	float tx, ty;
-	unsigned char pnLightMap[256 * 256];//envmap
+	unsigned char lightmap[256 * 256];
 	unsigned char pnBuf[256 * 256];
-//	ZArray<unsigned char> envmap;
 	unsigned short *pnCurrentBump;
-//	ZArray<unsigned char> *pCurrentBumpmap;
-//	ZArray<short int> pBumpX;
-//	ZArray<short int> pBumpY;
-//	ZArray<unsigned short int> pBumpIndex;
-//	ZPtrArray<BumpmapData*> pBump;
-//	ZArray<unsigned char> pBuf;
 
-	std::map< Texture*, std::unique_ptr<unsigned short[]> > mpBumpIndex;
+	std::map<Texture*, std::unique_ptr<unsigned short[]>> mpBumpIndex;
 
 	Actor obj;
 	Camera camera;
@@ -194,7 +187,7 @@ public:
 				float ny = (y - 128.0f) / 128.0f;
 				float nz = 1.0f - sqrtf(nx*nx + ny*ny);
 				int br = (int)( (nz + (nz * nz * nz * nz)) * 256.0f );
-				pnLightMap[i++] = std::min(std::max(br, 0), 255);
+				lightmap[i++] = std::min(std::max(br, 0), 255);
 			}
 		}
 
@@ -354,7 +347,7 @@ public:
 				unsigned char lx = (unsigned char)tx;
 				for(i = 0; i < 256*256; i++)
 				{
-					data[i] = pnLightMap[(unsigned short)(pnCurrentBump[i] + lx)];
+					data[i] = lightmap[(unsigned short)(pnCurrentBump[i] + lx)];
 				}
 			}
 #endif

@@ -21,7 +21,7 @@ TexturedGrid::TexturedGrid(int width, int height)//, DWORD dwVertexFormat)//, Gr
 //	this->sWidth = this->sHeight = -1;
 
 //	pVertex.SetFormat(dwVertexFormat);
-	vertices.SetLength((this->width + 1) * (this->height + 1));
+	vertices.resize((this->width + 1) * (this->height + 1));
 //	vertices = (width + 1) * (height + 1);
 //	vertex = new D3DTLVERTEX[vertices];
 //	pFace.SetLength(this->nWidth * this->nHeight * 2);
@@ -149,7 +149,7 @@ Error* TexturedGrid::Render(Renderer& renderer, const RenderState& render_state)
 				i++;
 			}
 		}
-		faces.SetLength(0);
+		faces.clear();
 //		nStartX = nStartY = 3;
 //		nStartX+=1;
 //		nStartY+=1;
@@ -164,8 +164,8 @@ Error* TexturedGrid::Render(Renderer& renderer, const RenderState& render_state)
 			{
 				if(x >= start_x - 1 && x <= width - start_x && y >= start_y - 1 && y <= height - start_y)
 				{
-					faces.Add(Face(vertex_index, vertex_index + height + 1, vertex_index + height + 2));
-					faces.Add(Face(vertex_index, vertex_index + height + 2, vertex_index + 1));
+					faces.push_back(Face(vertex_index, vertex_index + height + 1, vertex_index + height + 2));
+					faces.push_back(Face(vertex_index, vertex_index + height + 2, vertex_index + 1));
 				}
 				vertex_index++;
 			}
