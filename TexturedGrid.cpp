@@ -100,12 +100,14 @@ HRESULT ZGrid::Calculate()
 //{
 //	callback = fn;
 //}
-Error* TexturedGrid::Render(const RenderState& render_state)
+Error* TexturedGrid::Render(Renderer& renderer, const RenderState& render_state)
 {
-	if(scr_width != g_pD3D->GetWidth() || scr_height != g_pD3D->GetHeight() )
+	int new_scr_width = renderer.GetWidth();
+	int new_scr_height = renderer.GetHeight();
+	if(scr_width != new_scr_width || scr_height != new_scr_height)
 	{
-		scr_width = g_pD3D->GetWidth();
-		scr_height = g_pD3D->GetHeight();
+		scr_width = new_scr_width;
+		scr_height = new_scr_height;
 //		float fScaleX = nScrWidth / 640.0;
 //		float fScaleY = nScrHeight / 480.0;
 
@@ -182,7 +184,7 @@ Error* TexturedGrid::Render(const RenderState& render_state)
 			vertices[index1].tex_coords[0].y = (pos_x * vertices[index1].tex_coords[0].y) + ((1 - pos_x) * vertices[index1 + (height + 1)].tex_coords[0].y);
 			index1++;
 
-			vertices[index2].position.x = g_pD3D->GetWidth() - 1.25f;
+			vertices[index2].position.x = scr_width - 1.25f;
 			vertices[index2].tex_coords[0].x = (pos_x * vertices[index2].tex_coords[0].x) + ((1 - pos_x) * vertices[index2 - (height + 1)].tex_coords[0].x);
 			vertices[index2].tex_coords[0].y = (pos_x * vertices[index2].tex_coords[0].y) + ((1 - pos_x) * vertices[index2 - (height + 1)].tex_coords[0].y);
 			index2++;
@@ -197,7 +199,7 @@ Error* TexturedGrid::Render(const RenderState& render_state)
 			vertices[index1].tex_coords[0].y = (pos_x * vertices[index1].tex_coords[0].y) + ((1 - pos_x) * vertices[index1 + 1].tex_coords[0].y);
 			index1 += height + 1;
 
-			vertices[index2].position.y = g_pD3D->GetHeight() - 1.25f;
+			vertices[index2].position.y = scr_height - 1.25f;
 			vertices[index2].tex_coords[0].x = (pos_x * vertices[index2].tex_coords[0].x) + ((1 - pos_x) * vertices[index2 - 1].tex_coords[0].x);
 			vertices[index2].tex_coords[0].y = (pos_x * vertices[index2].tex_coords[0].y) + ((1 - pos_x) * vertices[index2 - 1].tex_coords[0].y);
 			index2 += height + 1;
@@ -205,7 +207,7 @@ Error* TexturedGrid::Render(const RenderState& render_state)
 		update_edges = false;
 	}
 
-	Error* error = g_pD3D->DrawIndexedPrimitive(render_state, vertices, faces);
+	Error* error = renderer.DrawIndexedPrimitive(render_state, vertices, faces);
 	if(error) return TraceError(error);
 
 	return nullptr;

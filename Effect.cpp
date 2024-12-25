@@ -40,31 +40,30 @@ void EffectHandler::Destroy()
 {
 	pEffect.reset();
 }
-Error* EffectHandler::Calculate(float fElapsed, AudioData* pAudio)
+Error* EffectHandler::Calculate(float fElapsed, AudioData& audio_data, Renderer& renderer)
 {
 	_ASSERT(pEffect != NULL);
 
-	pAudio->SetIntensityBeatScale( fSensitivity * 3.0f );
+	audio_data.SetIntensityBeatScale( fSensitivity * 3.0f );
 
-	EffectBase::CalculateParams params(fBr, GetElapsed(fElapsed), *pAudio);
+	EffectBase::CalculateParams params(fBr, GetElapsed(fElapsed), audio_data, renderer);
 	Error* error = pEffect->Calculate(params);
 
-	pAudio->SetIntensityBeatScale( 0.0f );
+	audio_data.SetIntensityBeatScale( 0.0f );
 	return error;
 }
-Error* EffectHandler::Reconfigure(AudioData* audio_data, const TextureLibrary& texture_library)
+Error* EffectHandler::Reconfigure(const AudioData& audio_data, const TextureLibrary& texture_library)
 {
 	_ASSERT(pEffect != NULL);
 
-	EffectBase::ReconfigureParams params(*audio_data, texture_library);
+	EffectBase::ReconfigureParams params(audio_data, texture_library);
 	return pEffect->Reconfigure(params);
 }
-Error* EffectHandler::Render()
+Error* EffectHandler::Render(Renderer& renderer)
 {
 	_ASSERT(pEffect != NULL);
 
-	EffectBase::RenderParams params;
-
+	EffectBase::RenderParams params(renderer);
 	return pEffect->Render(params);
 }
 bool EffectHandler::CanRender(float fFrames)

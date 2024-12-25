@@ -5,6 +5,7 @@
 #include <memory>
 #include "error.h"
 #include "AudioData.h"
+#include "Renderer.h"
 #include "TextureLibrary.h"
 
 #define EFFECT_MAX_TEXTURES 2
@@ -53,11 +54,13 @@ public:
 		float brightness;
 		float elapsed;
 		const AudioData& audio_data;
+		Renderer& renderer;
 
-		CalculateParams(float brightness, float elapsed, const AudioData& audio_data)
+		CalculateParams(float brightness, float elapsed, const AudioData& audio_data, Renderer& renderer)
 			: brightness(brightness)
 			, elapsed(elapsed)
 			, audio_data(audio_data)
+			, renderer(renderer)
 		{
 		}
 	};
@@ -76,6 +79,12 @@ public:
 
 	struct RenderParams
 	{
+		Renderer& renderer;
+
+		RenderParams(Renderer& renderer)
+			: renderer(renderer)
+		{
+		}
 	};
 
 	class EffectHandler* pEffectPtr;
@@ -123,9 +132,9 @@ public:
 	virtual void Create() = 0;
 	virtual void Destroy();
 
-	Error* Calculate(float elapsed, AudioData* audio_data);
-	Error* Reconfigure(AudioData* audio_data, const TextureLibrary& texture_library);
-	Error* Render();
+	Error* Calculate(float elapsed, AudioData& audio_data, Renderer& renderer);
+	Error* Reconfigure(const AudioData& audio_data, const TextureLibrary& texture_library);
+	Error* Render(Renderer& renderer);
 	bool CanRender(float fElapsed);
 
 	float GetElapsed(float fFrames);

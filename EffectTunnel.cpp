@@ -261,7 +261,7 @@ public:
 
 		for(int i = 0; i < 2; i++)
 		{
-			pObj[i].Calculate(&camera, params.elapsed);
+			pObj[i].Calculate(params.renderer, &camera, params.elapsed);
 		}
 		return nullptr;
 	}
@@ -276,7 +276,7 @@ public:
 	{
 		for(int i = 0; i < 2; i++)
 		{
-			Error* error = pObj[i].Render();
+			Error* error = pObj[i].Render(params.renderer);
 			if(error) return TraceError(error);
 		}
 		return nullptr;

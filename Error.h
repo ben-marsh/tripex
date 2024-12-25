@@ -11,6 +11,7 @@ struct Error
 	std::vector<std::pair<const char*, uint32_t>> trace;
 
 	Error(HRESULT code);
+	Error(std::string message);
 	~Error();
 
 	Error* AddTrace(const char* file, uint32_t line);

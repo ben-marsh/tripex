@@ -166,7 +166,7 @@ public:
 			pObjPlane[i].position.z = -60;
 			double dBr = params.brightness * 0.2 * (0.1 + (0.9 * fabs((i / dCentre) - 1)));
 			pObjPlane[i].ambient_light_color = ColorRgb::Grey(255.0 * dBr);
-			pObjPlane[i].Calculate(&camera, params.elapsed);
+			pObjPlane[i].Calculate(params.renderer, &camera, params.elapsed);
 		}
 
 		for(int i = 0; i < BEZIERS; i++)
@@ -184,7 +184,7 @@ public:
 			}
 			double dBr = params.brightness * 0.2;
 			pObj[i].ambient_light_color = ColorRgb::Grey(255.0 * dBr);//(255D3DRGB(dBr, dBr, dBr);
-			pObj[i].Calculate(&camera, params.elapsed);
+			pObj[i].Calculate(params.renderer, &camera, params.elapsed);
 		}
 		
 		static float fel = 0.0f;
@@ -197,7 +197,7 @@ public:
 			obj.vertices[0].position.y = 5 * sin(fAng);//pObj[0].pVertex[0].GetPosition();
 			obj.vertices[0].position.z = -100;//pObj[0].pVertex[0].GetPosition();
 		}
-		obj.Calculate(&camera, params.elapsed);
+		obj.Calculate(params.renderer, &camera, params.elapsed);
 
 		dMult = params.audio_data.GetDampenedBand(pEffectPtr->fSensitivity, 0, 1.0f);//average;
 		dAngX += sm * dMult * 9 * g_fDegToRad;
@@ -218,9 +218,10 @@ public:
 	//	hRes = obj.Render(d3d);
 	//	if(FAILED(hRes)) return TraceError(hRes);
 
-		error = pObjPlane[0].Render();
+		error = pObjPlane[0].Render(params.renderer);
 		if(error) return TraceError(error);
-		error = pObjPlane[TWISTPLANES-1].Render();
+
+		error = pObjPlane[TWISTPLANES-1].Render(params.renderer);
 		if(error) return TraceError(error);
 	//	for(int i = 0; i < TWISTPLANES; i++)
 	//	{
@@ -229,7 +230,7 @@ public:
 	//	}
 		for(int i = 0; i < BEZIERS; i++)
 		{
-			error = pObj[i].Render();
+			error = pObj[i].Render(params.renderer);
 			if(error) return TraceError(error);
 		}
 
@@ -244,7 +245,7 @@ public:
 			render_state.enable_zbuffer = false;
 			render_state.texture_stages[0].texture = pTint;
 
-			error = g_pD3D->DrawSprite(render_state, Point<int>(0, 0), Rect<int>(0, 0, g_pD3D->GetWidth(), g_pD3D->GetHeight()), ColorRgb::Grey(brt * 255.0));
+			error = params.renderer.DrawSprite(render_state, Point<int>(0, 0), Rect<int>(0, 0, params.renderer.GetWidth(), params.renderer.GetHeight()), ColorRgb::Grey(brt * 255.0));
 			if(error) return TraceError(error);
 		}
 		return nullptr;

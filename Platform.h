@@ -25,3 +25,8 @@ static const float g_fRadToDeg = 57.295779513082320876798154814105f;//180.0f / P
 #pragma warning(disable:4244)
 
 #define timeGetTime() ((DWORD)GetTickCount64())
+
+#define IMPLEMENT_ENUM_FLAGS(FlagType) \
+	inline FlagType operator~(FlagType a){ return (FlagType)~(uint32)a; } \
+	inline FlagType operator|(FlagType a, FlagType b){ return (FlagType)((uint32)a | (uint32)b); } \
+	inline FlagType operator&(FlagType a, FlagType b){ return (FlagType)((uint32)a & (uint32)b); }

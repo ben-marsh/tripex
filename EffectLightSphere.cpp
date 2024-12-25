@@ -111,7 +111,7 @@ public:
 			obj.roll += elapsed * params.audio_data.GetIntensity( ) * 4.0 * 3.14159 / 180.0;
 			obj.pitch += elapsed * params.audio_data.GetIntensity( ) * 3.0 * 3.14159 / 180.0;
 			obj.yaw += elapsed * 2.0 * 3.14159 / 180.0;
-			obj.Calculate(&camera, 1.0);
+			obj.Calculate(params.renderer, &camera, 1.0);
 			obj.ambient_light_color = ColorRgb::Grey(64.0 * params.brightness);
 		}
 		return nullptr;
@@ -144,7 +144,7 @@ public:
 	}
 	Error* Render(const RenderParams& params) override
 	{
-		Error* error = obj.Render( );
+		Error* error = obj.Render(params.renderer);
 		if(error) return TraceError(error);
 
 		if(pTint != pBlankTexture)
@@ -155,7 +155,7 @@ public:
 			render_state.enable_zbuffer = false;
 			render_state.texture_stages[0].texture = pTint;
 
-			g_pD3D->DrawSprite(render_state, Point<int>(0, 0), Rect<int>(0, 0, g_pD3D->GetWidth(), g_pD3D->GetHeight()), ColorRgb::Grey(brt * 255.0));
+			params.renderer.DrawSprite(render_state, Point<int>(0, 0), Rect<int>(0, 0, params.renderer.GetWidth(), params.renderer.GetHeight()), ColorRgb::Grey(brt * 255.0));
 		}
 		return nullptr;
 	}

@@ -203,8 +203,8 @@ public:
 //	obj->x = accum * PTDIST;
 		for(i = 0; i < PTCIRCUM; i++) accwf[i] = 0;
 
-		obj.Calculate(&cCamera, params.elapsed);
-		coil.Calculate(&cCamera, params.elapsed);
+		obj.Calculate(params.renderer, &cCamera, params.elapsed);
+		coil.Calculate(params.renderer, &cCamera, params.elapsed);
 		return nullptr;
 	}
 	Error* Render(const RenderParams& params) override
@@ -216,10 +216,10 @@ public:
 //	coil->property(objTransparent, true);
 //	coil->property(objZBuffer, false);
 
-		error = obj.Render();
+		error = obj.Render(params.renderer);
 		if(error) return TraceError(error);
 
-		error = coil.Render();
+		error = coil.Render(params.renderer);
 		if(error) return TraceError(error);
 
 		return nullptr;

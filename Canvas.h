@@ -18,13 +18,13 @@ public:
 	PALETTEENTRY palette[256];
 
 	Canvas(int width, int height);
-	Error* Create();
+	Error* Create(Renderer& renderer);
 	uint8* GetDataPtr();
-	Error* UploadTextures();
+	Error* UploadTextures(Renderer& renderer);
 	Texture* GetTexture(int x, int y);
-	Error* Render(const RenderState& render_state);
+	Error* Render(Renderer& renderer, const RenderState& render_state);
 
 private:
 	std::unique_ptr<uint8[]> data;
-	std::vector<Texture> textures;
+	std::vector<std::shared_ptr<Texture>> textures;
 };

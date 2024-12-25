@@ -15,6 +15,7 @@ uint8* g_apnWaveBuf[2] = { NULL, };
 WAVEFORMATEX g_wfex;
 
 Tripex* g_pTripex;
+ZDirect3D* g_direct3d;
 
 void AudioData(short* pAudioData, int iAudioDataLength, float* pFreqData, int iFreqDataLength)
 {
@@ -38,30 +39,6 @@ void AudioData(short* pAudioData, int iAudioDataLength, float* pFreqData, int iF
 /*---------------------------------
 * CreateD3D( )
 -----------------------------------*/
-
-bool CreateD3D(HWND hWnd)
-{
-	g_pd3d = Direct3DCreate9(D3D_SDK_VERSION);
-	if (g_pd3d == NULL) return FALSE;
-
-	D3DDISPLAYMODE d3ddm;
-	HRESULT hRes = g_pd3d->GetAdapterDisplayMode(D3DADAPTER_DEFAULT, &d3ddm);
-	if (FAILED(hRes)) return FALSE;
-
-	D3DPRESENT_PARAMETERS d3dpp;
-	ZeroMemory(&d3dpp, sizeof(d3dpp));
-	d3dpp.Windowed = TRUE;
-	d3dpp.SwapEffect = D3DSWAPEFFECT_COPY;
-	d3dpp.BackBufferFormat = d3ddm.Format;
-	d3dpp.EnableAutoDepthStencil = TRUE;
-	d3dpp.AutoDepthStencilFormat = D3DFMT_D16;
-	d3dpp.hDeviceWindow = hWnd;
-
-	hRes = g_pd3d->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, hWnd, D3DCREATE_SOFTWARE_VERTEXPROCESSING, &d3dpp, &g_pd3dDevice);
-	if (FAILED(hRes)) return FALSE;
-
-	return TRUE;
-}
 
 /*---------------------------------
 * DestroyD3D( )
@@ -214,20 +191,26 @@ LRESULT CALLBACK TxWndProc(HWND hWnd, uint32 nMsg, WPARAM wParam, LPARAM lParam)
 				OutputWaveInError(mRes);
 				DestroyWaveIn();
 			}
-			else if (!CreateD3D(hWnd))
-			{
-				printf("couldn't create device\n");
-				DestroyWindow(hWnd);
-			}
 			else
 			{
-				g_pTripex = new Tripex();
+				g_direct3d = new ZDirect3D();
 
-				Error* error = g_pTripex->Startup();
+				Error* error = g_direct3d->Open(hWnd);
 				if (error)
 				{
 					HandleError(hWnd, error);
+					return FALSE;
 				}
+
+				g_pTripex = new Tripex(*g_direct3d);
+
+				error = g_pTripex->Startup();
+				if (error)
+				{
+					HandleError(hWnd, error);
+					return FALSE;
+				}
+
 				SetTimer(hWnd, TICK_TIMER_ID, 10, NULL);
 			}
 		}
@@ -271,6 +254,14 @@ LRESULT CALLBACK TxWndProc(HWND hWnd, uint32 nMsg, WPARAM wParam, LPARAM lParam)
 
 			delete g_pTripex;
 			g_pTripex = nullptr;
+		}
+
+		if (g_direct3d != nullptr)
+		{
+			g_direct3d->Close();
+
+			delete g_direct3d;
+			g_direct3d = nullptr;
 		}
 
 		DestroyD3D();

@@ -41,10 +41,8 @@
     <ClCompile Include="BezierCurve.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Matrix44.cpp" />
-    <ClCompile Include="Actor-Clip.cpp" />
     <ClCompile Include="Actor.cpp" />
     <ClCompile Include="Canvas.cpp" />
-    <ClCompile Include="SpriteBuffer.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TextureFont.cpp" />
     <ClCompile Include="Tripex.cpp" />
@@ -54,6 +52,10 @@
     <ClCompile Include="TextureData.cpp">
       <Filter>Data</Filter>
     </ClCompile>
+    <ClCompile Include="ColorHsv.cpp" />
+    <ClCompile Include="GeometryBuffer.cpp" />
+    <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="TextureLibrary.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Config.h" />
@@ -83,7 +85,6 @@
     <ClInclude Include="Canvas.h" />
     <ClInclude Include="Point.h" />
     <ClInclude Include="Rect.h" />
-    <ClInclude Include="SpriteBuffer.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="TextureFont.h" />
     <ClInclude Include="Tripex.h" />
@@ -94,6 +95,10 @@
       <Filter>Data</Filter>
     </ClInclude>
     <ClInclude Include="Vertex.h" />
+    <ClInclude Include="GeometryBuffer.h" />
+    <ClInclude Include="Renderer.h" />
+    <ClInclude Include="TextureLibrary.h" />
+    <ClInclude Include="ComPtr.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Fourier.inl" />

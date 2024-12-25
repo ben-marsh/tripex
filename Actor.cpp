@@ -244,7 +244,7 @@ Vector3 Actor::GetDelayedPosition(int vertex, ExposureData* exposure_data)
 	}
 }
 
-void Actor::Calculate(Camera* camera, float elapsed)
+void Actor::Calculate(const Renderer& renderer, Camera* camera, float elapsed)
 {
 	int i, j;
 	flags.set(F_VALID_TRANSFORMED_DATA, false);
@@ -630,9 +630,11 @@ void Actor::Calculate(Camera* camera, float elapsed)
 	float mult_z = 1 / clip_max_z;
 	if (camera->flags.test(Camera::F_SCREEN_TRANSFORM))
 	{
-		camera->screen_x = (g_pD3D->GetWidth() / 2.0f) - 0.25f;
-		camera->screen_y = (g_pD3D->GetHeight() / 2.0f) - 0.25f;
-		camera->scale = std::min(g_pD3D->GetWidth() / 640.0f, g_pD3D->GetHeight() / 480.0f) * camera->perspective;
+		int width = renderer.GetWidth();
+		int height = renderer.GetHeight();
+		camera->screen_x = (width / 2.0f) - 0.25f;
+		camera->screen_y = (height / 2.0f) - 0.25f;
+		camera->scale = std::min(width / 640.0f, height / 480.0f) * camera->perspective;
 	}
 	else
 	{
@@ -690,7 +692,7 @@ void Actor::Calculate(Camera* camera, float elapsed)
 		if (exp_base.GetLength() <= 1)
 		{
 			clipped_faces = faces;
-			Clip(clipped_faces, clip_mask & (CLIP_PLANE_MIN_Z | CLIP_FLAG_MAX_Z));
+			Clip(renderer, clipped_faces, clip_mask & (CLIP_PLANE_MIN_Z | CLIP_FLAG_MAX_Z));
 		}
 		else
 		{
@@ -730,7 +732,7 @@ void Actor::Calculate(Camera* camera, float elapsed)
 				}
 			}
 
-			Clip(clipped_faces, clip_mask & (CLIP_PLANE_MIN_Z | CLIP_FLAG_MAX_Z));
+			Clip(renderer, clipped_faces, clip_mask & (CLIP_PLANE_MIN_Z | CLIP_FLAG_MAX_Z));
 		}
 
 		// Do the camera transform
@@ -748,12 +750,12 @@ void Actor::Calculate(Camera* camera, float elapsed)
 	}
 
 	// Clip to the screen boundaries
-	Clip(clipped_faces, clip_mask & ~(CLIP_PLANE_MIN_Z | CLIP_FLAG_MAX_Z));
+	Clip(renderer, clipped_faces, clip_mask & ~(CLIP_PLANE_MIN_Z | CLIP_FLAG_MAX_Z));
 
 	flags.set(F_VALID_TRANSFORMED_DATA);
 }
 
-Error* Actor::Render()
+Error* Actor::Render(Renderer& renderer)
 {
 	if (!flags.test(F_VALID_TRANSFORMED_DATA))
 	{
@@ -831,7 +833,7 @@ Error* Actor::Render()
 
 		if (clipped_faces.GetLength() > 0)
 		{
-			Error* error = g_pD3D->DrawIndexedPrimitive(render_state, transformed_vertices, clipped_faces);
+			Error* error = renderer.DrawIndexedPrimitive(render_state, transformed_vertices, clipped_faces);
 			if (error) return TraceError(error);
 		}
 	}
@@ -839,7 +841,7 @@ Error* Actor::Render()
 	return nullptr;
 }
 
-void Actor::Clip(ZArray<Face>& faces, uint16 plane_mask)
+void Actor::Clip(const Renderer& renderer, ZArray<Face>& faces, uint16 plane_mask)
 {
 	ZArray<Face> output_faces;
 	output_faces.Empty();
@@ -859,7 +861,7 @@ void Actor::Clip(ZArray<Face>& faces, uint16 plane_mask)
 
 	if (!flags.test(F_VALID_CLIP_PLANES))
 	{
-		Rect<float> clip_rect = g_pD3D->GetClipRect();
+		Rect<float> clip_rect = renderer.GetClipRect();
 
 		clip_min_x = clip_rect.left;
 		clip_max_x = clip_rect.right;

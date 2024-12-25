@@ -213,7 +213,7 @@ public:
 				n += 4;
 			}
 
-			m_pObj[ i ].Calculate( &m_cCamera, params.elapsed );
+			m_pObj[ i ].Calculate(params.renderer, &m_cCamera, params.elapsed );
 		}
 
 		for( i = 0; i < LIMITER_H; i++ )
@@ -231,7 +231,7 @@ public:
 			
 			float fBr = Bound< float >( 0.9f - ( ( float )i ) / LIMITER_H, 0.0f, 1.0f );
 			m_pLimit[ i ].ambient_light_color = ColorRgb::Grey( ( int )( 255.0f * fBr * params.brightness ) );
-			m_pLimit[ i ].Calculate( &m_cCamera, params.elapsed);
+			m_pLimit[ i ].Calculate(params.renderer, &m_cCamera, params.elapsed);
 		}
 
 		return nullptr;
@@ -266,12 +266,12 @@ public:
 		Error* error;
 		for( int i = 0; i < TRAIL_H; i++ )
 		{
-			error = m_pObj[ i ].Render( );
+			error = m_pObj[ i ].Render(params.renderer);
 			if( error ) return TraceError( error );
 		}
 		for( int i = 0; i < LIMITER_H; i++ )
 		{
-			error = m_pLimit[ i ].Render( );
+			error = m_pLimit[ i ].Render(params.renderer);
 			if( error ) return TraceError( error );
 		}
 		return nullptr;

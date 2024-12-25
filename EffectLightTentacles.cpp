@@ -73,7 +73,7 @@ public:
 		obj.yaw += params.audio_data.GetIntensity( ) * params.elapsed * 4.0 * 3.14159 / 180.0;
 		obj.ambient_light_color = ColorRgb::Grey(params.brightness * 255.0);
 //		obj.cAmbientLight = ZWideColour(255, 255, 255);
-		obj.Calculate(&camera, params.elapsed);
+		obj.Calculate(params.renderer, &camera, params.elapsed);
 
 		while(pos > 1)
 		{
@@ -105,7 +105,7 @@ public:
 	}
 	Error* Render(const RenderParams& params) override
 	{
-		Error* error = obj.Render( );
+		Error* error = obj.Render(params.renderer);
 		if(error) return TraceError(error);
 
 		return nullptr;

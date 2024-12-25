@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ZDirect3D.h"
+#include "Renderer.h"
 
 class TexturedGrid
 {
@@ -16,5 +16,5 @@ public:
 	bool update_edges;
 
 	TexturedGrid(int width, int height);
-	Error* Render(const RenderState& render_state);
+	Error* Render(Renderer& renderer, const RenderState& render_state);
 };

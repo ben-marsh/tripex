@@ -106,7 +106,7 @@ public:
 		{
 			for(int i = 0; i < RINGS; i++)
 			{
-				pObj[i].Calculate(&camera, params.elapsed);
+				pObj[i].Calculate(params.renderer, &camera, params.elapsed);
 			}
 		}
 		return nullptr;
@@ -125,7 +125,7 @@ public:
 		Error* error;
 		for(int i = 0; i < RINGS; i++)
 		{
-			error = pObj[i].Render(); 
+			error = pObj[i].Render(params.renderer);
 			if(error) return TraceError(error);
 		}
 		return nullptr;

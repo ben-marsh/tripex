@@ -201,7 +201,7 @@ public:
 		obj.flags.reset(Actor::F_VALID_VERTEX_NORMALS);
 
 		obj.Create();
-		obj.Calculate(&camera, params.elapsed);
+		obj.Calculate(params.renderer, &camera, params.elapsed);
 		return nullptr;
 	}
 	Error* Reconfigure(const ReconfigureParams& params) override
@@ -214,7 +214,7 @@ public:
 		Error* error;
 		obj.flags.set(Actor::F_DRAW_TRANSPARENT);
 
-		error = obj.Render();//scene->render(d3d);
+		error = obj.Render(params.renderer);//scene->render(d3d);
 		if(error) return TraceError(error);
 
 		return nullptr;

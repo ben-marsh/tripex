@@ -111,14 +111,14 @@ public:
 	//		fvVertex++;
 		}
 		obj.flags.set( Actor::F_VALID_VERTEX_DIFFUSE );
-		obj.Calculate(&camera, params.elapsed);
+		obj.Calculate(params.renderer, &camera, params.elapsed);
 		return nullptr;
 	}
 	Error* Render(const RenderParams& params) override
 	{
 		Error* error;
 
-		error = obj.Render( );
+		error = obj.Render(params.renderer);
 		if (error) return TraceError(error);
 
 		if(pTint != pBlankTexture)
@@ -129,7 +129,7 @@ public:
 			render_state.enable_zbuffer = false;
 			render_state.texture_stages[0].texture = pTint;
 
-			g_pD3D->DrawSprite(render_state, Point<int>(0, 0), Rect<int>(0, 0, g_pD3D->GetWidth(), g_pD3D->GetHeight()), ColorRgb::Grey(brt * 255.0));
+			params.renderer.DrawSprite(render_state, Point<int>(0, 0), params.renderer.GetViewportRect(), ColorRgb::Grey(brt * 255.0));
 		}
 		return nullptr;
 	}

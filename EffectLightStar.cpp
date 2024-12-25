@@ -81,13 +81,13 @@ public:
 			obj.vertices[i].position.z = cos(pdAng[i]) * pdRadius[i];
 		}
 		obj.ambient_light_color = ColorRgb::Grey(128.0 * params.brightness);//->color = D3DRGB(dBr, dBr, dBr);
-		obj.Calculate(&camera, params.elapsed);
+		obj.Calculate(params.renderer, &camera, params.elapsed);
 
 		return nullptr;
 	}
 	Error* Render(const RenderParams& params) override
 	{
-		Error* error = obj.Render( );
+		Error* error = obj.Render(params.renderer);
 		if(error) return TraceError(error);
 
 		if(pTint != pBlankTexture)
@@ -98,7 +98,7 @@ public:
 			render_state.enable_zbuffer = false;
 			render_state.texture_stages[0].texture = pTint;
 
-			g_pD3D->DrawSprite(render_state, Point<int>(0, 0), Rect<int>(0, 0, g_pD3D->GetWidth(), g_pD3D->GetHeight()), ColorRgb::Grey(brt * 255.0));
+			params.renderer.DrawSprite(render_state, Point<int>(0, 0), Rect<int>(0, 0, params.renderer.GetWidth(), params.renderer.GetHeight()), ColorRgb::Grey(brt * 255.0));
 		}
 
 		return nullptr;

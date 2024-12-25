@@ -20,7 +20,8 @@
 
 Texture *pBlankTexture;
 
-Tripex::Tripex()
+Tripex::Tripex(Renderer& renderer)
+	: renderer(renderer)
 {
 	CreateEffectList();
 	CreateCfgItems();
@@ -54,35 +55,26 @@ DWORD WINAPI Tripex::InitialiseThread(void *pParam)
 
 	_ASSERT(num_internal_textures >= 1);
 
-	int nTexture = 0;
-	for(int i = 0; i < (int)texture_sources.size(); i++ )//nIntTextures + nDiskTextures; i++)
-	{
-		const uint32 *pnTexData = internal_textures[ texture_sources[ i ]->internal_id ];
-
-		Texture *pTexture = new Texture( );
-		pTexture->SetFlags( Texture::F_FILTERING | Texture::F_MIP_CHAIN );
-		pTexture->SetSource( pnTexData + 1, *pnTexData );
-
-		texture_sources[ i ]->texture = pTexture;
-
-		nTexture++;
-	}
-
 	pBlankTexture = NULL;
 	for(int i = 0; i < (int)texture_sources.size(); i++)
 	{
-		Texture* texture = texture_sources[i]->texture;
+		const uint32* pnTexData = internal_textures[texture_sources[i]->internal_id];
+
+		std::shared_ptr<Texture> texture;
+
+		Error* error = renderer.CreateTextureFromImage(pnTexData + 1, *pnTexData, texture);
+		_ASSERT(error == nullptr);
+
+		texture_sources[i]->texture = texture.get();
 
 		if(texture_sources[i]->internal && texture_sources[i]->internal_id == 1)
 		{
-			pBlankTexture = texture;
+			pBlankTexture = texture.get();
 		}
 		for(std::set<TextureClass>::iterator it = texture_sources[i]->classes.begin(); it != texture_sources[i]->classes.end(); it++)
 		{
 			texture_library.Add(*it, texture);
 		}
-
-		g_pD3D->AddTexture(texture);
 	}
 
 	for(int i = 0; i < enabled_effects.size(); i++)
@@ -116,19 +108,16 @@ Error* Tripex::Startup()
 	UpdateCfgItems(true);
 
 	pAudio = std::make_unique<AudioData>( 512 );
-	g_pD3D = new ZDirect3D;
 
 	srand( timeGetTime( ) );
 
-	PALETTEENTRY *ppe = new PALETTEENTRY[ 256 ];
+	std::vector<PALETTEENTRY> pe;
+	pe.resize(256);
+	for( int i = 0; i < 256; i++ )
 	{
-		for( int i = 0; i < 256; i++ )
-		{
-			ppe->peRed = ppe->peGreen = ppe->peBlue = i;
-			ppe->peFlags = 0xff;
-		}
+		pe[i].peRed = pe[i].peGreen = pe[i].peBlue = i;
+		pe[i].peFlags = 0xff;
 	}
-
 
 //	{for( int i = 0; i < 256 * 256; i++ )
 //	{
@@ -137,19 +126,23 @@ Error* Tripex::Startup()
 //	}
 //	}
 
-	gui = std::make_unique<Texture>();
-	gui->SetSource( ppe, &g_anTexRawGUI[ 1 ], 256 * 256, 256 );
+	Error* error = renderer.CreateTexture(256, 256, D3DFMT_P8, &g_anTexRawGUI[ 1 ], 256 * 256, 256, pe.data(), TextureFlags::None, gui);
+	if (error) return TraceError(error);
 
 //	gui = auto_ptr< ZTexture >(new ZTexture(pc));//(ZColour*)g_anTexRawGUI ));//cGUI.GetPtr()));
 //	gui->m_nFlags.set(ZTexture::F_POINT_FILTER);
 
 	// TEXTURE
-	g_pD3D->AddTexture( gui.get( ) );
+//	renderer.AddTexture( gui.get( ) );
 //	g_pD3D->vpTexture.push_back(gui.get());//auto_ptr< ZTexture >(gui);
 
 	tef.Add( ( uint8* )&g_anTexRawFont[ 1 ] );
 	tef.FindGlyph(' ')->end = 2;
-	g_pD3D->AddTexture( tef.GetTexture( ) );
+	
+	error = tef.Create(renderer);
+	if (error) return TraceError(error);
+
+//	renderer.AddTexture( tef.GetTexture( ) );
 //	g_pD3D->vpTexture.push_back(tef.GetTexture());
 
 //	pcBuffer.SetLength(1024 * 16);
@@ -166,7 +159,7 @@ Error* Tripex::Startup()
 
 	for( int i = 0; i < (int)vpTexture.size(); i++)
 	{
-		g_pD3D->AddTexture( vpTexture[ i ].get( ) );
+//		renderer.AddTexture( vpTexture[ i ].get( ) );
 //		g_pD3D->vpTexture.push_back(vpTexture[i].get());
 	}
 
@@ -175,9 +168,6 @@ Error* Tripex::Startup()
 	txs.set(TXS_CHANGE_EFFECT);
 
 	txs.set( TXS_RESET_TIMING );
-
-	Error* error = g_pD3D->Open( );
-	if( error ) return TraceError( error );
 
 //	hRes = pcHUD->Initialise(d3d.get());
 //	if(FAILED(hRes)) return TraceError(hRes);
@@ -234,7 +224,7 @@ Error* Tripex::Render()
 //				bInFade = false;
 			fEffectFrames = 0;
 
-			Error* error = enabled_effects[nEffect]->Reconfigure(pAudio.get(), texture_library);
+			Error* error = enabled_effects[nEffect]->Reconfigure(*pAudio.get(), texture_library);
 			if(error) return TraceError(error); 
 		}
 	}
@@ -306,7 +296,7 @@ Error* Tripex::Render()
 	}
 	if(txs[TXS_RECONFIGURE])//bReconfigure)
 	{
-		Error* error = enabled_effects[nEffect]->Reconfigure(pAudio.get(), texture_library);
+		Error* error = enabled_effects[nEffect]->Reconfigure(*pAudio.get(), texture_library);
 		if(error) return TraceError(error);
 
 		txs.reset(TXS_IN_FADE);
@@ -332,7 +322,7 @@ Error* Tripex::Render()
 
 	if(ppDrawEffect[1]->fBr > FLOAT_ZERO && !txs[TXS_RESET_TARGET])
 	{
-		Error* error = ppDrawEffect[1]->Reconfigure(pAudio.get(), texture_library);
+		Error* error = ppDrawEffect[1]->Reconfigure(*pAudio.get(), texture_library);
 		if(error) return TraceError(error);
 
 		txs[TXS_RESET_TARGET] = true;
@@ -359,7 +349,7 @@ Error* Tripex::Render()
 
 	for(int i = 0; i < 2; i++)
 	{
-		Error* error = ppDrawEffect[i]->Calculate( fFrames, pAudio.get() );
+		Error* error = ppDrawEffect[i]->Calculate( fFrames, *pAudio.get(), renderer );
 		if(error) return TraceError(error);
 	}
 
@@ -368,7 +358,7 @@ Error* Tripex::Render()
 //	static unsigned int nc = 0x0000ffff;
 //	nc ^= 0x00005553;
 
-	Error* error = g_pD3D->BeginFrame();
+	Error* error = renderer.BeginFrame();
 	if (error) return TraceError(error);
 
 //	g_pD3D->SetTexture(0, gui.get());
@@ -391,7 +381,7 @@ Error* Tripex::Render()
 	{
 		DWORD dwStartTick = timeGetTime( );
 
-		error = ppDrawEffect[i]->Render( );
+		error = ppDrawEffect[i]->Render(renderer);
 		if(error) return TraceError(error);
 	}
 
@@ -441,7 +431,7 @@ Error* Tripex::Render()
 		render_state.dst_blend = D3DBLEND_INVSRCCOLOR;
 		render_state.enable_zbuffer = false;
 
-		Error* error = g_pD3D->DrawIndexedPrimitive(render_state, overlay_background);
+		error = renderer.DrawIndexedPrimitive(render_state, overlay_background);
 		if (error) return TraceError(error);
 	}
 
@@ -453,7 +443,7 @@ Error* Tripex::Render()
 		render_state.enable_zbuffer = false;
 		render_state.texture_stages[0].texture = tef.texture.get();
 
-		Error* error = g_pD3D->DrawIndexedPrimitive(render_state, overlay_text);
+		error = renderer.DrawIndexedPrimitive(render_state, overlay_text);
 		if (error) return TraceError(error);
 	}
 
@@ -464,11 +454,11 @@ Error* Tripex::Render()
 		render_state.dst_blend = D3DBLEND_INVSRCCOLOR;
 		render_state.enable_zbuffer = false;
 
-		Error* error = g_pD3D->DrawIndexedPrimitive(render_state, overlay_foreground);
+		error = renderer.DrawIndexedPrimitive(render_state, overlay_foreground);
 		if (error) return TraceError(error);
 	}
 
-	error = g_pD3D->EndFrame();
+	error = renderer.EndFrame();
 	if (error) return TraceError(error);
 
 //	AddFrameTime(true, clock() - dwRenderStartClock);
@@ -480,8 +470,6 @@ void Tripex::Shutdown( )
 {
 	if(!txs.test(TXS_STARTED)) return;
 	txs[TXS_STARTED] = false;
-
-	g_pD3D->Close( );
 
 	pAudio.reset();
 
@@ -531,7 +519,7 @@ int Tripex::GetClippedLineLength(const TextureFont& pFont, const char* sText, in
 
 void Tripex::DrawMessage(const TextureFont& font, int y, const char* text, float brightness, float back_brightness)
 {
-	const int clip_width = g_pD3D->GetWidth() - 40;
+	const int clip_width = renderer.GetWidth() - 40;
 	const int line_height = 20;
 
 	std::vector<std::string> lines;
@@ -557,7 +545,7 @@ void Tripex::DrawMessage(const TextureFont& font, int y, const char* text, float
 		}
 	}
 
-	int centre_x = g_pD3D->GetWidth() / 2;
+	int centre_x = renderer.GetWidth() / 2;
 
 	if (back_brightness > FLOAT_ZERO)
 	{

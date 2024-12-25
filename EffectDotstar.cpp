@@ -206,7 +206,7 @@ public:
 //	obj.fYaw += 0.5 * elapsed * ys * 3.14159 / 180.0;
 
 		obj.clip_mask = 0;
-		obj.Calculate(&camera, params.elapsed);
+		obj.Calculate(params.renderer, &camera, params.elapsed);
 //	ZFlexibleVertex fvVertex = obj.pTransVertex[0];
 		for(int i = 0; i < obj.transformed_vertices.GetLength(); i++)
 		{
@@ -259,7 +259,7 @@ public:
 	{
 		Error* error;
 
-		double dSize = /*1.2 **/ (std::min(g_pD3D->GetWidth(), g_pD3D->GetHeight()) - 1) / 64.0f;//min(d3d->GetWidth(), d3d->GetHeight()) / 64.0;
+		double dSize = /*1.2 **/ (std::min(params.renderer.GetWidth(), params.renderer.GetHeight()) - 1) / 64.0f;//min(d3d->GetWidth(), d3d->GetHeight()) / 64.0;
 
 		pTargetVertex.Empty();
 		pTargetFace.Empty();
@@ -278,12 +278,12 @@ public:
 		}
 
 		int nIndex = 0;
-		double dY = (g_pD3D->GetHeight() - 1 - (dSize * (64.0 /*- (2.0 * fPos)*/))) / 2;
-		double dCY = g_pD3D->GetHeight() / 2.0;
+		double dY = (params.renderer.GetHeight() - 1 - (dSize * (64.0 /*- (2.0 * fPos)*/))) / 2;
+		double dCY = params.renderer.GetHeight() / 2.0;
 		for(int j = 0; j < 64; j++)
 		{
-			double dX = (g_pD3D->GetWidth() - 1 - (dSize * 128.0)) / 2;
-			double dCX = g_pD3D->GetWidth() / 2.0;
+			double dX = (params.renderer.GetWidth() - 1 - (dSize * 128.0)) / 2;
+			double dCX = params.renderer.GetWidth() / 2.0;
 			for(int i = 0; i < 128; i++)
 			{
 				if(pTarget[nIndex] != 0)
@@ -293,7 +293,7 @@ public:
 					double dX1 = dX + p, dX2 = dX + dSize - p;
 					double dY1 = dY + p, dY2 = dY + dSize - p;
 
-					if(dX1 >= 0 && dY1 >= 0 && dX2 < g_pD3D->GetWidth() - 1 && dY2 < g_pD3D->GetHeight() - 1)
+					if(dX1 >= 0 && dY1 >= 0 && dX2 < params.renderer.GetWidth() - 1 && dY2 < params.renderer.GetHeight() - 1)
 					{
 						int nV = pTargetVertex.AddEmpty(4);
 						VertexTL *pVertex = &pTargetVertex[nV];
@@ -339,7 +339,7 @@ public:
 			}
 			dY += dSize;
 		}
-		error = g_pD3D->DrawIndexedPrimitive(render_state, pTargetVertex, pTargetFace);
+		error = params.renderer.DrawIndexedPrimitive(render_state, pTargetVertex, pTargetFace);
 		if (error) return TraceError(error);
 
 		//lpd3dDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, D3DFVF_TLVERTEX, pVertex, 4, pwFace, 6, 0);
@@ -350,7 +350,7 @@ public:
 			render_state.src_blend = D3DBLEND_DESTCOLOR;
 			render_state.dst_blend = D3DBLEND_ONE;
 			render_state.enable_zbuffer = false;
-			g_pD3D->DrawSprite(render_state, Point<int>(0, 0), Rect<int>(0, 0, g_pD3D->GetWidth(), g_pD3D->GetHeight()), ColorRgb::Grey(brt * 255.0));
+			params.renderer.DrawSprite(render_state, Point<int>(0, 0), Rect<int>(0, 0, params.renderer.GetWidth(), params.renderer.GetHeight()), ColorRgb::Grey(brt * 255.0));
 		}
 
 		return nullptr;

@@ -175,7 +175,7 @@ public:
 				pObj[i].flags.set(Actor::F_VALID_VERTEX_DIFFUSE);
 	//}
 //			obj[i]->ExposureCapture();
-				pObj[i].Calculate(&cCamera, 1.0);
+				pObj[i].Calculate(params.renderer, &cCamera, 1.0);
 			}
 			accum--;
 		}
@@ -186,7 +186,7 @@ public:
 		Error* error;
 		for(int i = 0; i < RINGS; i++)
 		{
-			error = pObj[i].Render();
+			error = pObj[i].Render(params.renderer);
 			if(error) return TraceError(error);
 		}
 		return nullptr;

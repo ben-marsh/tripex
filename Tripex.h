@@ -13,16 +13,17 @@ class Tripex
 public:
 	std::bitset<TXS_LAST> txs;
 
+	Renderer& renderer;
 	TextureFont tef;
-	Texture *ptefTexture;
+	Texture* ptefTexture;
 	std::vector< std::unique_ptr< Texture > > vpTexture;
 	float fEffectFrames, fFadePos;
-	char sStatusMsg[ 256 ];
+	char sStatusMsg[256];
 	DWORD dwStatusTime;
 	unsigned int id;
 	int nEffect;
 	int nNextEffect;
-	std::unique_ptr< Texture > gui;
+	std::shared_ptr<Texture> gui;
 	DWORD dwLastTime;
 	std::unique_ptr<AudioData> pAudio;
 
@@ -35,12 +36,12 @@ public:
 	GeometryBuffer overlay_text;
 	GeometryBuffer overlay_foreground;
 
-	Tripex();
-	void ShowStatusMsg( const char *sFormat, ... );
-	DWORD WINAPI InitialiseThread(void *pParam);
-	Error* Startup( );
-	Error* Render( );
-	void Shutdown( );
+	Tripex(Renderer& renderer);
+	void ShowStatusMsg(const char* sFormat, ...);
+	DWORD WINAPI InitialiseThread(void* pParam);
+	Error* Startup();
+	Error* Render();
+	void Shutdown();
 
 private:
 	EffectHandler* pEffectBlank;
@@ -64,7 +65,7 @@ private:
 	void DrawMessage(const TextureFont& font, int y, const char* sText, float fBr, float fBackBr);
 	int GetClippedLineLength(const TextureFont& pFont, const char* sText, int nClipWidth);
 
-	void AddEffect(std::shared_ptr<EffectHandler> (*fn)(), const char* sName, int nDrawOrder, float fStartupWeight, TextureClass nTex, ...);
+	void AddEffect(std::shared_ptr<EffectHandler>(*fn)(), const char* sName, int nDrawOrder, float fStartupWeight, TextureClass nTex, ...);
 	void CreateEffectList();
 
 	ConfigItem* AddCfgItem(ConfigItem* pItem);

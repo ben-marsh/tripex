@@ -4,6 +4,7 @@
 #include <set>
 #include <map>
 #include <vector>
+#include <memory>
 
 enum class TextureClass
 {
@@ -91,10 +92,10 @@ enum class TextureClass
 class TextureLibrary
 {
 public:
-	void Add(TextureClass tc, Texture* texture);
+	void Add(TextureClass tc, std::shared_ptr<Texture> texture);
 	Texture* Find(TextureClass tc) const;
 
 private:
 	std::set<Texture*> textures;
-	std::map<TextureClass, std::vector<Texture*>> textures_by_class;
+	std::map<TextureClass, std::vector<std::shared_ptr<Texture>>> textures_by_class;
 };

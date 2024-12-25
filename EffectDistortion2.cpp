@@ -149,7 +149,7 @@ public:
 		render_state.enable_zbuffer = false;
 		render_state.texture_stages[0].texture = tx;
 
-		Error* error = grid.Render(render_state);
+		Error* error = grid.Render(params.renderer, render_state);
 		if(error) return TraceError(error);
 
 		return nullptr;

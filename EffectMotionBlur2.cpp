@@ -112,7 +112,7 @@ public:
 			pObj[i].roll += pfa[0] * params.elapsed * (params.audio_data.GetIntensity( ) + 0.1);
 			pObj[i].pitch += pfa[1] * params.elapsed * params.audio_data.GetIntensity( ) ;
 			pObj[i].yaw += pfa[2] * params.elapsed * (params.audio_data.GetIntensity( ) + 0.2);
-			pObj[i].Calculate(&camera, params.elapsed);
+			pObj[i].Calculate(params.renderer, &camera, params.elapsed);
 		}
 		return nullptr;
 	}
@@ -130,7 +130,7 @@ public:
 	{
 		for(int i = 0; i < PIPES; i++)
 		{
-			Error* error = pObj[i].Render();
+			Error* error = pObj[i].Render(params.renderer);
 			if(error) return TraceError(error);
 		}
 		return nullptr;

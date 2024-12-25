@@ -284,7 +284,7 @@ public:
 		{
 			if(!fStarted)
 			{
-				error = pc.Create( );//.Initialise( );
+				error = pc.Create(params.renderer);//.Initialise( );
 				if(error) return TraceError(error);
 				fStarted = true;
 			}
@@ -359,7 +359,7 @@ public:
 			}
 #endif
 
-			error = pc.UploadTextures( );
+			error = pc.UploadTextures(params.renderer);
 			if( error ) return TraceError( error );
 //			hRes = pc.Calculate(pnBuf);
 //			if(FAILED(hRes)) return TraceError(hRes);
@@ -386,7 +386,7 @@ public:
 			obj.position.z = 150.0f * cosf(angle * 1.6f) * sinf(angle * 0.5f) * cosf(angle * 1.1f) * sinf(angle * 1.2f);
 			if(texture == pBlankTexture) obj.position.z = (obj.position.z / 2) - 50;
 			obj.exposure = bLast? 1 : 0;
-			obj.Calculate(&camera, fThis);
+			obj.Calculate(params.renderer, &camera, fThis);
 
 			if(bLast) break;
 			fPos = fNext;
@@ -411,7 +411,7 @@ public:
 				render_state.enable_zbuffer = false;
 				render_state.texture_stages[0].texture = texture;
 
-				error = grid.Render(render_state);
+				error = grid.Render(params.renderer, render_state);
 				if (error) return TraceError(error);
 			}
 
@@ -421,7 +421,7 @@ public:
 				render_state.texture_stages[0].texture = pc.GetTexture(0, 0);
 				render_state.enable_zbuffer = false;
 
-				error = gridbm.Render(render_state);
+				error = gridbm.Render(params.renderer, render_state);
 				if (error) return TraceError(error);
 			}
 		}
@@ -450,7 +450,7 @@ public:
 	hRes = gridbm->Render(d3d);
 	if(FAILED(hRes)) return hRes;
 */	
-		error = obj.Render( );//scene->render(d3d);
+		error = obj.Render(params.renderer);//scene->render(d3d);
 		if(error) return TraceError(error);
 
 		return nullptr;
@@ -472,55 +472,40 @@ public:
 				{
 					pnCurrentBump = it->second.get();
 				}
-				else
+				else if(texture->width == 256 && texture->height == 256 && texture->format == D3DFMT_X8R8G8B8)
 				{
-					IDirect3DSurface9* pSurface;
+					std::vector<uint8> buffer;
 
-					HRESULT hRes = texture->d3d_texture->GetSurfaceLevel(0, &pSurface);
-					if (FAILED(hRes)) return TraceError(hRes);
+					Error* error = texture->GetPixelData(buffer);
+					if (error) return TraceError(error);
 
-					RECT Rect = { 0, 0, 256, 256 };
+					std::unique_ptr< unsigned short[] > pb(new unsigned short[256 * 256]);
 
-					D3DSURFACE_DESC d3dsd;
-					hRes = pSurface->GetDesc(&d3dsd);
-					if (FAILED(hRes)) return TraceError(hRes);
-
-					D3DLOCKED_RECT d3dr;
-					if (d3dsd.Width == 256 &&
-						d3dsd.Height == 256 &&
-						d3dsd.Format == D3DFMT_X8R8G8B8 &&
-						SUCCEEDED(pSurface->LockRect(&d3dr, NULL, 0)))
+					unsigned char* pcSrc = (unsigned char*)buffer.data();
+					unsigned char pbBump[256 * 256];
+					unsigned char* pbDst = pbBump;
+					for (int nY = 0; nY < 256; nY++)
 					{
-						std::unique_ptr< unsigned short[] > pb(new unsigned short[256 * 256]);
-
-						unsigned char* pcSrc = (unsigned char*)d3dr.pBits;
-						unsigned char pbBump[256 * 256];
-						unsigned char* pbDst = pbBump;
-						for (int nY = 0; nY < 256; nY++)
+						for (int nX = 0; nX < 256; nX++)
 						{
-							for (int nX = 0; nX < 256; nX++)
-							{
-								*(pbDst++) = ((unsigned)pcSrc[0] + (unsigned)pcSrc[1] + (unsigned)pcSrc[2]) / 3;// unsigned int(pcSrc->m_nR) + unsigned int(pcSrc->m_nG) + unsigned int(pcSrc->m_nB)) / 3;
-								pcSrc += 4;
-							}
+							*(pbDst++) = ((unsigned)pcSrc[0] + (unsigned)pcSrc[1] + (unsigned)pcSrc[2]) / 3;// unsigned int(pcSrc->m_nR) + unsigned int(pcSrc->m_nG) + unsigned int(pcSrc->m_nB)) / 3;
+							pcSrc += 4;
 						}
-
-						int nIndex = 0;
-						for (int nY = 0; nY < 256; nY++)
-						{
-							for (int nX = 0; nX < 256; nX++)
-							{
-								int nBumpX = (int)pbBump[(nIndex + 1) & 0xffff] - (int)pbBump[(nIndex - 1) & 0xffff] + 128 - nX;
-								int nBumpY = (int)pbBump[(nIndex + 256) & 0xffff] - (int)pbBump[(nIndex - 256) & 0xffff] + 128 - nY;
-								pb.get()[nIndex] = (((unsigned char)nBumpY) << 8) | ((unsigned char)nBumpX);
-								nIndex++;
-							}
-						}
-						pnCurrentBump = pb.get(); 
-						mpBumpIndex[texture] = std::move(pb);
-
-						pSurface->UnlockRect();
 					}
+
+					int nIndex = 0;
+					for (int nY = 0; nY < 256; nY++)
+					{
+						for (int nX = 0; nX < 256; nX++)
+						{
+							int nBumpX = (int)pbBump[(nIndex + 1) & 0xffff] - (int)pbBump[(nIndex - 1) & 0xffff] + 128 - nX;
+							int nBumpY = (int)pbBump[(nIndex + 256) & 0xffff] - (int)pbBump[(nIndex - 256) & 0xffff] + 128 - nY;
+							pb.get()[nIndex] = (((unsigned char)nBumpY) << 8) | ((unsigned char)nBumpX);
+							nIndex++;
+						}
+					}
+					pnCurrentBump = pb.get(); 
+					mpBumpIndex[texture] = std::move(pb);
 				}
 
 /*				for(int i = 0;;i++)

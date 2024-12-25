@@ -26,6 +26,16 @@ RenderState::RenderState()
 
 ////// Renderer //////
 
+int Renderer::GetWidth() const
+{
+	return GetViewportRect().GetWidth();
+}
+
+int Renderer::GetHeight() const
+{
+	return GetViewportRect().GetHeight();
+}
+
 Error* Renderer::DrawIndexedPrimitive(const RenderState& render_state, ZArray<VertexTL>& vertices, ZArray<Face>& faces)
 {
 	Error* error = DrawIndexedPrimitive(render_state, vertices.GetLength(), vertices.GetBuffer(), faces.GetLength(), faces.GetBuffer());
@@ -42,4 +52,11 @@ Error* Renderer::DrawIndexedPrimitive(const RenderState& render_state, const Geo
 {
 	Error* error = DrawIndexedPrimitive(render_state, (uint32_t)geometry_buffer.vertices.size(), geometry_buffer.vertices.data(), (uint32_t)geometry_buffer.faces.size(), geometry_buffer.faces.data());
 	return TraceError(error);
+}
+
+Error* Renderer::DrawSprite(const RenderState& render_state, const Point<int>& p, const Rect<int>& spr, ColorRgb diffuse, ColorRgb specular)
+{
+	GeometryBuffer geometry_buffer;
+	geometry_buffer.AddSprite(p, spr, diffuse, specular);
+	return DrawIndexedPrimitive(render_state, geometry_buffer);
 }

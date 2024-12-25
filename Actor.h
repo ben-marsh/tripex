@@ -175,8 +175,8 @@ public:
 	Vector3 GetCentre();
 
 	// pipeline functions
-	void Calculate(Camera* pCamera, float fElapsed = 1.0f);
-	Error* Render();
+	void Calculate(const Renderer& renderer, Camera* pCamera, float fElapsed = 1.0f);
+	Error* Render(Renderer& renderer);
 
 	// stock objects
 	void CreateCube(float fSize);
@@ -199,7 +199,7 @@ protected:
 
 	Vector3 GetDelayedPosition(int nVertex, ExposureData* pData);
 
-	void Clip(ZArray<Face>& faces, WORD plane_mask);
+	void Clip(const Renderer& renderer, ZArray<Face>& faces, WORD plane_mask);
 	bool IsClipRequired(const Face& face, uint16 plane_mask, const ZArray<VertexInfo>& vertex_info) const;
 	uint16 GetRequiredClipPlanes(const Vector3& v) const;
 	void AddClippedFace(Face& f, WORD wPlaneMask, ZArray<Face>&, const ZArray<VertexInfo>& vertex_info, ZArray<Face>& pfOut, ZArray<int>& unused_faces);

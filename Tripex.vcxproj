@@ -243,6 +243,7 @@
     <ClCompile Include="Tripex.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ComPtr.h" />
     <ClInclude Include="ConfigItem.h" />
     <ClInclude Include="config-defaults.h" />
     <ClInclude Include="Config.h" />

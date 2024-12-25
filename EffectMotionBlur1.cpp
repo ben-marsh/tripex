@@ -60,7 +60,7 @@ public:
 			pObj[i].pitch += ps[i] * params.audio_data.GetIntensity( ) * params.elapsed;
 			pObj[i].yaw += ys[i] * std::max(0.1f, params.audio_data.GetIntensity( )) * params.elapsed;
 			pObj[i].ambient_light_color = ColorRgb::Grey(params.brightness * 20.0f);// / pObj[i].nExposure);
-			pObj[i].Calculate(&camera, params.elapsed);
+			pObj[i].Calculate(params.renderer, &camera, params.elapsed);
 		}
 		return nullptr;
 	}
@@ -69,7 +69,7 @@ public:
 		Error* error;
 		for(int i = 0; i < RINGS; i++)
 		{
-			error = pObj[i].Render( );
+			error = pObj[i].Render(params.renderer);
 			if(error) return TraceError(error);
 		}
 		return nullptr;

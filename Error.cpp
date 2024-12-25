@@ -11,6 +11,11 @@ Error::Error(HRESULT hRes)
 	message = sBuf;
 }
 
+Error::Error(std::string message)
+{
+	this->message = message;
+}
+
 Error::~Error()
 {
 }

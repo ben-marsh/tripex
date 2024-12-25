@@ -632,7 +632,7 @@ public:
 	
 		if(fFirstRender)
 		{
-			error = pCanvas->Create( );//pc.Initialise( );
+			error = pCanvas->Create(params.renderer);//pc.Initialise( );
 			if(error) return TraceError(error);
 
 			fFirstRender = false;
@@ -853,7 +853,7 @@ public:
 		pCanvas->color = ColorRgb::Grey(255.0 * params.brightness);//D3DRGB(brightness, brightness, brightness);
 
 		memcpy( pCanvas->GetDataPtr( ), (fOddFrame? bf2 : bf1).GetBuffer( ), bf1.GetSize());
-		error = pCanvas->UploadTextures( );
+		error = pCanvas->UploadTextures(params.renderer);
 //		hRes = pc.Calculate((fOddFrame? bf2 : bf1).GetBuffer());
 		if(error) return TraceError(error);
 		
@@ -871,7 +871,7 @@ public:
 		render_state.dst_blend = D3DBLEND_ONE;
 		render_state.enable_zbuffer = false;
 		
-		Error* error = pCanvas->Render(render_state);
+		Error* error = pCanvas->Render(params.renderer, render_state);
 		if(error) return TraceError(error);
 
 		return nullptr;

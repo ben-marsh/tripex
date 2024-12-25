@@ -1,7 +1,6 @@
 #include "Fourier.h"
 #include <math.h>
 
-
 inline Fourier::Complex::Complex()
 {
 	real = 0.0f;

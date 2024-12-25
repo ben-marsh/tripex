@@ -86,7 +86,7 @@ public:
 			float fBlend = float(i) / NOBJ;
 			float fMult2 = (i == 0)? 1.0f : std::min(1.0, params.audio_data.GetIntensity( ) * 1.5);//(averagefloat(i) / NOBJ);
 			pObj[i].ambient_light_color = params.brightness * (ColorRgb::Grey(96 * fMult2 * (1 - (0.4 * float(i) / NOBJ))) - ColorRgb(fBlend * 40.0, fBlend * 40.0, fBlend * 5.0));
-			pObj[i].Calculate(&camera, params.elapsed);
+			pObj[i].Calculate(params.renderer, &camera, params.elapsed);
 		}
 		return nullptr;
 	}
@@ -103,7 +103,7 @@ public:
 	{
 		for(int i = 0; i < NOBJ; i++)
 		{
-			Error* error = pObj[i].Render( ); 
+			Error* error = pObj[i].Render(params.renderer);
 			if(error) return TraceError(error);
 		}
 

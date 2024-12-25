@@ -128,7 +128,7 @@ public:
 		obj.roll += params.elapsed * 3.14159 / 180.0f;
 		obj.pitch += params.elapsed * 2.0f * 3.14159 / 180.0f;
 		obj.yaw += params.elapsed * 3.0f * 3.14159 / 180.0f;
-		obj.Calculate(&cam, params.elapsed);
+		obj.Calculate(params.renderer, &cam, params.elapsed);
 
 		if(fAvTotal > 6 || bReset)
 		{
@@ -186,7 +186,7 @@ public:
 			pObj[i].pitch += params.audio_data.GetIntensity( ) * params.elapsed * 10.0 * 3.14159 / 180.0;
 			pObj[i].yaw += (params.audio_data.GetIntensity( ) + params.audio_data.GetBeat( ) ) * params.elapsed * 7 * 3.14159 / 180.0;
 			pObj[i].ambient_light_color = ColorRgb::Grey(params.brightness * 48.0f);// / pObj[i].nExposure);
-			pObj[i].Calculate(&camera, params.elapsed);
+			pObj[i].Calculate(params.renderer, &camera, params.elapsed);
 		}
 
 		return nullptr;
@@ -195,7 +195,7 @@ public:
 	{
 		for(int i = 0; i < 9; i++)
 		{
-			Error* error = pObj[i].Render();
+			Error* error = pObj[i].Render(params.renderer);
 			if(error) return TraceError(error);
 		}
 		return nullptr;

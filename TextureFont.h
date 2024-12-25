@@ -27,7 +27,7 @@ public:
 	};
 
 	std::vector<Glyph> glyphs;
-	std::unique_ptr<Texture> texture;
+	std::shared_ptr<Texture> texture;
 	std::unique_ptr<ColorRgb[]> pixels;
 	uint8 char_to_glyph[256];
 
@@ -36,8 +36,8 @@ public:
 	TextureFont();
 	~TextureFont();
 	void Add(const uint8 *source_data);
+	Error* Create(Renderer& renderer);
 	ColorRgb *GetBitmap();
-	Texture* GetTexture();
 	Glyph* FindGlyph(char character);
 	const Glyph* FindGlyph(char character) const;
 	int GetWidth(char c) const;

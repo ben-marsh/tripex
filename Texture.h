@@ -1,32 +1,28 @@
 #pragma once
 
 #include <d3d9.h>
+#include "Error.h"
+
+enum class TextureFlags
+{
+	None = 0,
+	Dynamic = 1,
+	CreateMips = 2,
+	Filter = 4,
+};
 
 class Texture
 {
 public:
-	enum
-	{
-		F_DYNAMIC = (1 << 0),
-		F_MIP_CHAIN = (1 << 1),
-		F_FILTERING = (1 << 2),
-	};
+	const int width;
+	const int height;
+	const D3DFORMAT format;
+	const TextureFlags flags;
 
-	uint32 flags;
-	IDirect3DTexture9* d3d_texture;
-
-	D3DFORMAT format;
-	uint32 data_size;
-	uint32 data_stride;
-	const void* data;
-	const PALETTEENTRY* palette;
-
-	Texture();
-	~Texture();
-
-	void SetFlags(uint32 flags);
-
-	void SetSource(const void* data, uint32 data_size);
-	void SetSource(D3DFORMAT format, const void* data, uint32 data_size, uint32 data_stride);
-	void SetSource(const PALETTEENTRY* pPalette, const void* data, uint32 data_size, uint32 data_stride);
+	Texture(int width, int height, D3DFORMAT format, TextureFlags flags);
+	virtual ~Texture();
+	virtual void SetDirty() = 0;
+	virtual Error* GetPixelData(std::vector<uint8>& buffer) const = 0;
 };
+
+IMPLEMENT_ENUM_FLAGS(TextureFlags)

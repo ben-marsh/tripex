@@ -16,8 +16,16 @@ Canvas::Canvas(int width, int height)
 	int num_textures = num_textures_x * num_textures_y;
 	data = std::make_unique<uint8[]>(stride * num_textures_y * texture_h);
 	textures.resize(num_textures);
-	memset(palette, 0, sizeof(palette));
 
+	for (int idx = 0; idx < 256; idx++)
+	{
+		palette[idx].peRed = palette[idx].peGreen = palette[idx].peBlue = idx;
+		palette[idx].peFlags = 0xff;
+	}
+}
+
+Error* Canvas::Create(Renderer& renderer)
+{
 	int32 texture_idx = 0;
 	for (int32 y = 0; y < num_textures_y; y++)
 	{
@@ -25,19 +33,13 @@ Canvas::Canvas(int width, int height)
 		{
 			uint8* source_data = &data[(x * 256) + (y * 256 * stride)];
 
-			Texture& texture = textures[texture_idx++];
-			texture.SetFlags(Texture::F_DYNAMIC);
-			texture.SetSource(palette, source_data, 256 * 256, stride);
-		}
-	}
-}
+			std::shared_ptr<Texture> texture;
 
-Error* Canvas::Create()
-{
-	for (Texture& texture : textures)
-	{
-		Error* error = g_pD3D->AddTexture(&texture);
-		if (error) return TraceError(error);
+			Error* error = renderer.CreateTexture(256, 256, D3DFMT_P8, source_data, 256 * 256, stride, palette, TextureFlags::Dynamic | TextureFlags::Filter, texture);
+			if (error) return TraceError(error);
+
+			textures[texture_idx++] = std::move(texture);
+		}
 	}
 	return nullptr;
 }
@@ -47,22 +49,21 @@ uint8* Canvas::GetDataPtr()
 	return data.get();
 }
 
-Error* Canvas::UploadTextures()
+Error* Canvas::UploadTextures(Renderer& renderer)
 {
-	for (Texture& texture : textures)
+	for (std::shared_ptr<Texture>& texture : textures)
 	{
-		Error* error = g_pD3D->UploadTexture(&texture);
-		if (error) return TraceError(error);
+		texture->SetDirty();
 	}
 	return nullptr;
 }
 
 Texture* Canvas::GetTexture(int x, int y)
 {
-	return &textures[(y * num_textures_x) + x];
+	return textures[(y * num_textures_x) + x].get();
 }
 
-Error* Canvas::Render(const RenderState& render_state)
+Error* Canvas::Render(Renderer& renderer, const RenderState& render_state)
 {
 	Error* error;
 	ZArray<Face> faces;
@@ -88,12 +89,12 @@ Error* Canvas::Render(const RenderState& render_state)
 	int width = num_textures_x * 256;
 	int height = num_textures_y * 256;
 
-	float s = float(g_pD3D->GetWidth()) / width;
+	float s = float(renderer.GetWidth()) / width;
 	//	double ys = double(d3d->GetHeight()) / height;
 	//	double s = xs;//min(xs, ys);
 
-	float xc = (g_pD3D->GetWidth() - (num_textures_x * 254 * s)) / 2;
-	float yc = (g_pD3D->GetHeight() - (num_textures_y * 254 * s)) / 2;
+	float xc = (renderer.GetWidth() - (num_textures_x * 254 * s)) / 2;
+	float yc = (renderer.GetHeight() - (num_textures_y * 254 * s)) / 2;
 
 	int i = 0;
 	for (int vi = 0; vi < num_textures_y; vi++)
@@ -133,24 +134,24 @@ Error* Canvas::Render(const RenderState& render_state)
 				v[1].tex_coords[0].x = (v[1].tex_coords[0].x * (1 - fPos)) + (v[2].tex_coords[0].x * fPos);
 				v[1].tex_coords[0].y = (v[1].tex_coords[0].y * (1 - fPos)) + (v[2].tex_coords[0].y * fPos);
 			}
-			if (v[3].position.y > g_pD3D->GetHeight())
+			if (v[3].position.y > renderer.GetHeight())
 			{
-				if (v[0].position.y > g_pD3D->GetHeight()) continue;
+				if (v[0].position.y > renderer.GetHeight()) continue;
 
-				float fPos = (g_pD3D->GetHeight() - v[0].position.y) / (v[3].position.y - v[0].position.y);
+				float fPos = (renderer.GetHeight() - v[0].position.y) / (v[3].position.y - v[0].position.y);
 				v[2].tex_coords[0].x = (v[1].tex_coords[0].x * (1 - fPos)) + (v[2].tex_coords[0].x * fPos);
 				v[2].tex_coords[0].y = (v[1].tex_coords[0].y * (1 - fPos)) + (v[2].tex_coords[0].y * fPos);
 
 				v[3].tex_coords[0].x = (v[0].tex_coords[0].x * (1 - fPos)) + (v[3].tex_coords[0].x * fPos);
 				v[3].tex_coords[0].y = (v[0].tex_coords[0].y * (1 - fPos)) + (v[3].tex_coords[0].y * fPos);
 
-				v[2].position.y = v[3].position.y = (float)g_pD3D->GetHeight();
+				v[2].position.y = v[3].position.y = (float)renderer.GetHeight();
 			}
 
 			RenderState temp_render_state = render_state;
 			temp_render_state.texture_stages[0].texture = GetTexture(hi, vi);
 
-			error = g_pD3D->DrawIndexedPrimitive(temp_render_state, v, faces);
+			error = renderer.DrawIndexedPrimitive(temp_render_state, v, faces);
 			if (error) return TraceError(error);
 		}
 	}

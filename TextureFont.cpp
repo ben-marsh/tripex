@@ -140,14 +140,14 @@ ColorRgb* TextureFont::GetBitmap()
 	return pixels.get();
 }
 
-Texture* TextureFont::GetTexture()
+Error* TextureFont::Create(Renderer& renderer)
 {
 	if (texture.get() == NULL)
 	{
-		texture = std::make_unique<Texture>();
-		texture->SetSource(D3DFMT_X8R8G8B8, GetBitmap(), 256 * 256 * 4, 256 * 4);
+		Error* error = renderer.CreateTexture(256, 256, D3DFMT_X8R8G8B8, GetBitmap(), 256 * 256 * 4, 256 * 4, nullptr, TextureFlags::None, texture);
+		if (error) return TraceError(error);
 	}
-	return texture.get();
+	return nullptr;
 }
 
 void TextureFont::Draw(GeometryBuffer& sb, const Glyph& glyph, const Point<int>& pos, ColorRgb c) const

@@ -71,7 +71,7 @@ public:
 //		fclose(file);
 		obj.exposure_light_delta = WideColorRgb(-2, -2, 0);
 
-		obj.Calculate(&camera, elapsed);
+		obj.Calculate(params.renderer, &camera, elapsed);
 
 		camera.position = Vector3(40 * sin(a) * cos(a * 1.2), 40 * cos(a * 0.7) * sin(a * 0.9), 40 * cos(a * 1.4) * sin(0.7));
 		return nullptr;
@@ -84,7 +84,7 @@ public:
 	}
 	Error* Render(const RenderParams& params) override
 	{
-		Error* error = obj.Render();
+		Error* error = obj.Render(params.renderer);
 		if(error) return TraceError(error);
 
 		return nullptr;
