@@ -9,8 +9,6 @@
 #define STEPSIZE 4//1
 // 60 3
 
-extern Texture *pBlankTexture;
-
 class EffectLightTentacles : public EffectBase
 {
 public:

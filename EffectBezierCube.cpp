@@ -23,8 +23,6 @@
 #define bcCubeRadius 30	// radius of the container cylinder of the cube
 #define bcCubeHeight 80	// height of the cube
 
-extern Texture *pBlankTexture;
-
 class EffectBezierCube : public EffectBase
 {
 public:
@@ -237,7 +235,7 @@ public:
 	//	hRes = pScene->render(d3d);
 	//	if(FAILED(hRes)) return hRes;
 
-		if(pTint != pBlankTexture)
+		if(pTint != nullptr)
 		{
 			RenderState render_state;
 			render_state.src_blend = D3DBLEND_DESTCOLOR;
@@ -263,6 +261,7 @@ public:
 		{
 			pObj[i].textures[0].texture = pTexture;
 		}
+
 		pTint = params.texture_library.Find(TextureClass::BezierCubeBackground);
 		return nullptr;
 	}

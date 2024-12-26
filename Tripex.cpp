@@ -18,8 +18,6 @@
 #define MSG_DISPLAY_TIME 4000
 #define MSG_FADEOUT_TIME 1000
 
-Texture *pBlankTexture;
-
 Tripex::Tripex(Renderer& renderer)
 	: renderer(renderer)
 {
@@ -55,25 +53,23 @@ DWORD WINAPI Tripex::InitialiseThread(void *pParam)
 
 	_ASSERT(num_internal_textures >= 1);
 
-	pBlankTexture = NULL;
-	for(int i = 0; i < (int)texture_sources.size(); i++)
+	for(TextureSource* texture_source : texture_sources)
 	{
-		const uint32* pnTexData = internal_textures[texture_sources[i]->internal_id];
+		const uint32* pnTexData = internal_textures[texture_source->internal_id];
 
 		std::shared_ptr<Texture> texture;
 
-		Error* error = renderer.CreateTextureFromImage(pnTexData + 1, *pnTexData, texture);
-		_ASSERT(error == nullptr);
-
-		texture_sources[i]->texture = texture.get();
-
-		if(texture_sources[i]->internal && texture_sources[i]->internal_id == 1)
+		if (!texture_source->internal || texture_source->internal_id != 1)
 		{
-			pBlankTexture = texture.get();
+			Error* error = renderer.CreateTextureFromImage(pnTexData + 1, *pnTexData, texture);
+			_ASSERT(error == nullptr);
+
+			texture_source->texture = texture.get();
 		}
-		for(std::set<TextureClass>::iterator it = texture_sources[i]->classes.begin(); it != texture_sources[i]->classes.end(); it++)
+
+		for (TextureClass texture_class : texture_source->classes)
 		{
-			texture_library.Add(*it, texture);
+			texture_library.Add(texture_class, texture);
 		}
 	}
 
@@ -87,8 +83,6 @@ DWORD WINAPI Tripex::InitialiseThread(void *pParam)
 Error* Tripex::Startup()
 {
 	txs.reset();
-
-	pBlankTexture = NULL;
 
 	enabled_effects.push_back(effects[0]);
 

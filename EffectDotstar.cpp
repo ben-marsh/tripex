@@ -15,8 +15,6 @@
 #define SAMPLESHIFT 2
 #define TRISIZE 30.0
 
-extern Texture *pBlankTexture;
-
 class EffectDotStar : public EffectBase
 {
 public:
@@ -342,7 +340,7 @@ public:
 
 		//lpd3dDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, D3DFVF_TLVERTEX, pVertex, 4, pwFace, 6, 0);
 
-		if(pTint != pBlankTexture)
+		if(pTint != nullptr)
 		{
 			RenderState render_state;
 			render_state.src_blend = D3DBLEND_DESTCOLOR;

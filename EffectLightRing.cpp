@@ -13,8 +13,6 @@
 
 //static double linearity = 0;
 
-extern Texture *pBlankTexture;
-
 //static unsigned int buffersize = 0;
 //static D3DTLVERTEX *vb = NULL;
 
@@ -116,7 +114,7 @@ public:
 		error = obj.Render(params.renderer);
 		if(error) return TraceError(error);	
 
-		if(ptTint != pBlankTexture)
+		if(ptTint != nullptr)
 		{
 			RenderState render_state;
 			render_state.src_blend = D3DBLEND_DESTCOLOR;

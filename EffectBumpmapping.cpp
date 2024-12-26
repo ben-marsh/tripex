@@ -25,7 +25,6 @@
 
 extern bool bMeshHQ;
 extern std::vector< std::unique_ptr< Texture > > vpTexture;
-extern Texture *pBlankTexture;
 extern bool fBigBeat;
 
 void MakeTentacles(Actor &obj, int segs, float l, float r)
@@ -273,7 +272,7 @@ public:
 
 		ya += params.elapsed * g_fDegToRad;
 
-		if(texture != pBlankTexture)
+		if(texture != nullptr)
 		{
 			if(!fStarted)
 			{
@@ -377,7 +376,7 @@ public:
 			obj.position.x = 200.0f * cosf(angle) * sinf(angle * 1.3f) * cosf(angle * 2.3f) * sinf(angle * 0.6f);
 			obj.position.y = 100.0f * cosf(angle * 0.2f) * sinf(angle * 1.1f) * cosf(angle * 1.6f) * sinf(angle * 1.2f);
 			obj.position.z = 150.0f * cosf(angle * 1.6f) * sinf(angle * 0.5f) * cosf(angle * 1.1f) * sinf(angle * 1.2f);
-			if(texture == pBlankTexture) obj.position.z = (obj.position.z / 2) - 50;
+			if(texture == nullptr) obj.position.z = (obj.position.z / 2) - 50;
 			obj.exposure = bLast? 1 : 0;
 			obj.Calculate(params.renderer, &camera, fThis);
 
@@ -391,7 +390,7 @@ public:
 		Error* error;
 		static double angle = 0;
 
-		if(texture == pBlankTexture)
+		if(texture == nullptr)
 		{
 		}
 		else
@@ -458,8 +457,8 @@ public:
 //		else
 //		{
 			texture = params.texture_library.Find(TextureClass::BumpMapBackground);
-			if(texture != pBlankTexture)
-			{	
+			if (texture != nullptr)
+			{
 				std::map< Texture*, std::unique_ptr< unsigned short[] > >::iterator it = mpBumpIndex.find(texture);
 				if(it != mpBumpIndex.end())
 				{

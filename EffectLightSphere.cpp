@@ -11,7 +11,6 @@
 
 extern bool bMeshHQ;
 
-extern Texture *pBlankTexture;
 //extern EFFECT lightsphere;
 
 class EffectLightSphere : public EffectBase
@@ -147,7 +146,7 @@ public:
 		Error* error = obj.Render(params.renderer);
 		if(error) return TraceError(error);
 
-		if(pTint != pBlankTexture)
+		if(pTint != nullptr)
 		{
 			RenderState render_state;
 			render_state.src_blend = D3DBLEND_DESTCOLOR;

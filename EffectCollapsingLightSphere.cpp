@@ -20,8 +20,6 @@
 #define SPEEDSPREAD 20
 #define FOREGROUNDBR 0.5
 
-extern Texture *pBlankTexture;
-
 class EffectCollapsingLightSphere : public EffectBase
 {
 public:
@@ -121,7 +119,7 @@ public:
 		error = obj.Render(params.renderer);
 		if (error) return TraceError(error);
 
-		if(pTint != pBlankTexture)
+		if(pTint != nullptr)
 		{
 			RenderState render_state;
 			render_state.src_blend = D3DBLEND_DESTCOLOR;
