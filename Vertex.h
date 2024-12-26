@@ -18,7 +18,7 @@ struct Vertex
 struct VertexTL // Transformed and lit vertex
 {
 	Vector3 position;
-	float rhw;
+	float rhw{};
 	ColorRgb diffuse;
 	ColorRgb specular;
 	Point<float> tex_coords[MAX_TEXTURES];

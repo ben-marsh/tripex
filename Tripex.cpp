@@ -15,9 +15,6 @@
 
 /****** constants *****/
 
-#define MSG_DISPLAY_TIME 4000
-#define MSG_FADEOUT_TIME 1000
-
 Tripex::Tripex(Renderer& renderer)
 	: renderer(renderer)
 {

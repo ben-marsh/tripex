@@ -44,6 +44,9 @@ public:
 	void Shutdown();
 
 private:
+	static const int MSG_DISPLAY_TIME = 4000;
+	static const int MSG_FADEOUT_TIME = 1000;
+
 	EffectHandler* pEffectBlank;
 
 	std::vector< ConfigItem* >* pppCfgItem = NULL;

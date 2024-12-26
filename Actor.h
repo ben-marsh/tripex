@@ -29,18 +29,18 @@ public:
 	struct ExposureData
 	{
 		Matrix44 transform;
-		float time;
-		int32 frame;
-		float pos;
+		float time = 0.0f;
+		int32 frame = 0;
+		float pos = 0.0f;
 	};
 
 	struct Frame
 	{
-		DWORD time_to_live;
+		DWORD time_to_live = 0;
 		std::vector<Vector3> positions;
 		std::vector<float> distances;
-		float elapsed;
-		float pitch, yaw, roll;
+		float elapsed = 0.0f;
+		float pitch = 0.0f, yaw = 0.0f, roll = 0.0f;
 	};
 
 	enum class TextureType

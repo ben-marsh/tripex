@@ -5,7 +5,7 @@ template<class T> class Point
 public:
 	T x, y;
 
-	Point() {}
+	Point() : x(), y() {}
 	Point(T nX, T nY) { this->Set(nX, nY); }
 	Point(const Point<T>& p) { this->Set(p); }
 

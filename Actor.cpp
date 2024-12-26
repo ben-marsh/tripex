@@ -1240,8 +1240,8 @@ void Actor::CreateGeosphere(float radius, int num_vertices)
 {
 	struct GeoEdge : public Edge
 	{
-		float length;
-		uint16 faces[2];
+		float length{};
+		uint16 faces[2]{};
 
 		void FindLength(Actor* pObj) { length = (pObj->vertices[(*this)[0]].position - pObj->vertices[(*this)[1]].position).Length(); }
 	};
@@ -1411,7 +1411,7 @@ void Actor::CreateTetrahedronGeosphere(float radius, int num_iterations)
 {
 	struct TetraGeoEdge : public Edge
 	{
-		int split;
+		int split = 0;
 	};
 
 	std::vector<TetraGeoEdge> geo_edges;
