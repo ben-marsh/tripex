@@ -6,6 +6,8 @@
 #include "Tripex.h"
 #include "effect.h"
 
+#define USE_RANDOM_AUDIO 1
+
 IDirect3D9* g_pd3d = NULL;
 IDirect3DDevice9* g_pd3dDevice = NULL;
 
@@ -223,6 +225,13 @@ LRESULT CALLBACK TxWndProc(HWND hWnd, uint32 nMsg, WPARAM wParam, LPARAM lParam)
 		{
 			int nIdx = (int)((WAVEHDR*)lParam - g_aWaveHdr);
 			RemoveWaveInBuffer(nIdx);
+
+#if USE_RANDOM_AUDIO
+			for (int idx = 0; idx < g_aWaveHdr[nIdx].dwBytesRecorded; idx++)
+			{
+				g_aWaveHdr[nIdx].lpData[idx] = rand();
+			}
+#endif
 
 			void _cdecl AudioData(short* pAudioData, int iAudioDataLength, float* pFreqData, int iFreqDataLength);
 			AudioData((short*)g_aWaveHdr[nIdx].lpData, g_aWaveHdr[nIdx].dwBytesRecorded, NULL, 0);
