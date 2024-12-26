@@ -23,8 +23,8 @@ public:
 		fBezPos = 0;
 		pObj[NOBJ].CreateTetrahedronGeosphere(1.0, 4);
 		pObj[NOBJ].FindFaceOrder(Vector3::Origin());
-		pfAng.resize(pObj[NOBJ].vertices.GetLength());
-		for(int i = 0; i < pObj[NOBJ].vertices.GetLength(); i++)
+		pfAng.resize(pObj[NOBJ].vertices.size());
+		for(int i = 0; i < pObj[NOBJ].vertices.size(); i++)
 		{
 			pfAng[i] = pObj[NOBJ].vertices[i].position.z * PI * 2;
 		}
@@ -36,7 +36,7 @@ public:
 			v.z = 0.5 - (float(rand()) / RAND_MAX);
 			v.Normalize();
 
-			for(int j = 0; j < pObj[NOBJ].vertices.GetLength(); j++)
+			for(int j = 0; j < pObj[NOBJ].vertices.size(); j++)
 			{
 				if(pObj[NOBJ].vertices[j].position.Dot(v) < 0)
 				{
@@ -52,7 +52,7 @@ public:
 		for(int i = 0; i < NOBJ; i++)
 		{
 			pObj[i].faces = pObj[NOBJ].faces;
-			pObj[i].vertices.SetLength(pObj[NOBJ].vertices.GetLength());
+			pObj[i].vertices.resize(pObj[NOBJ].vertices.size());
 			pObj[i].flags.set( Actor::F_DRAW_TRANSPARENT );
 			pObj[i].flags.set( Actor::F_NO_CULL );
 		}
@@ -68,7 +68,7 @@ public:
 //	camera.vPosition = ZVector(0, sin(fPos), cos(fPos)) * 200.0f;
 //	camera.PointAt(ZVector::Origin());
 
-		for(int i = 0; i < pObj[NOBJ].vertices.GetLength(); i++)
+		for(int i = 0; i < pObj[NOBJ].vertices.size(); i++)
 		{
 			pfAng[i] += params.audio_data.GetIntensity( ) * params.elapsed * 8.0 * 3.14159 / 180.0;
 		}
@@ -76,7 +76,7 @@ public:
 		{
 			float fOfs = i * 60.0 * 3.14159 / 180.0;
 			float fMult = 1.0 + (i * 1.0 / NOBJ);
-			for(int j = 0; j < pObj[i].vertices.GetLength(); j++)
+			for(int j = 0; j < pObj[i].vertices.size(); j++)
 			{
 				pObj[i].vertices[j].position = pObj[NOBJ].vertices[j].position * 200.0f * fMult * (1.0f + ((float)HILLSZ * (float)sin(pfAng[j] + fOfs)));
 			}

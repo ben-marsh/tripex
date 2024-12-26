@@ -28,8 +28,8 @@ public:
 	EffectTube()
 	{
 		int i, j;
-		coil.vertices.SetLength(CLENGTH * 4);
-		coil.faces.SetLength((CLENGTH - 1) * 8);
+		coil.vertices.resize(CLENGTH * 4);
+		coil.faces.resize((CLENGTH - 1) * 8);
 		coil.flags.set(Actor::F_DRAW_TRANSPARENT);
 		coil.flags.set(Actor::F_DRAW_Z_BUFFER);
 		coil.flags.set(Actor::F_NO_CULL);
@@ -74,11 +74,11 @@ public:
 				f++;
 			}
 		}
-		_ASSERT(f == coil.faces.GetLength());
+		_ASSERT(f == coil.faces.size());
 //	coil.FindVertexNormals();
 
-		obj.vertices.SetLength(PTCIRCUM * PTLENGTH);
-		obj.faces.SetLength((PTCIRCUM * 2) * (PTLENGTH - 1));
+		obj.vertices.resize(PTCIRCUM * PTLENGTH);
+		obj.faces.resize((PTCIRCUM * 2) * (PTLENGTH - 1));
 		obj.flags.set( Actor::F_DRAW_Z_BUFFER );
 		obj.flags.set( Actor::F_DRAW_TRANSPARENT );
 
@@ -120,7 +120,7 @@ public:
 		}
 		obj.flags.set(Actor::F_VALID_VERTEX_DIFFUSE);
 		coil.flags.set(Actor::F_VALID_VERTEX_DIFFUSE);
-		_ASSERT(f == obj.faces.GetLength());
+		_ASSERT(f == obj.faces.size());
 
 //	scene = new World();
 //	scene->vpObject.Add(obj);

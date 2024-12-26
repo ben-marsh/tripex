@@ -69,7 +69,7 @@ public:
 		obj.sprite_size = 2.0f;//2.0f;
 		obj.exposure_light_delta = WideColorRgb(-2, -2, -2);//10, -10, -10);
 	
-		obj.vertices.SetLength(SOURCES);
+		obj.vertices.resize(SOURCES);
 	}
 	Error* Calculate(const CalculateParams& params) override
 	{

@@ -33,7 +33,7 @@ public:
 //		obj.Set(ZObject::ValidVertexColours);
 		obj.flags.set( Actor::F_VALID_VERTEX_DIFFUSE );
 //		obj.pVertex.SetFormat(D3DFVF_DIFFUSE);
-		obj.vertices.SetLength(LENGTH * NMPOINTS);
+		obj.vertices.resize(LENGTH * NMPOINTS);
 		obj.sprite_size = 5;//6;
 		obj.exposure = 1;
 		obj.frame_history = 3.0f;

@@ -49,7 +49,7 @@ public:
 		dTilt = 0;
 
 		nStage = 0;
-		obj.vertices.SetLength(SOURCES);
+		obj.vertices.resize(SOURCES);
 	//	pObj->Create(SOURCES, 1);
 		obj.flags.set( Actor::F_DRAW_TRANSPARENT );
 		obj.flags.set( Actor::F_DRAW_VERTEX_SPRITES );
@@ -86,7 +86,7 @@ public:
 		float fTwistMult = sin(dTilt);// * 3.14159 / 128.0);
 		float multp = (/*fac*/dTilt * params.audio_data.GetIntensity( )) + (1 - dTilt/*fac*/) + 0.1;
 
-		obj.vertices.SetLength(SOURCES);
+		obj.vertices.resize(SOURCES);
 		for(int i = 0; i < SOURCES; i++)
 		{
 			float x = cos(pdAng[i]) * pdRadius[i];

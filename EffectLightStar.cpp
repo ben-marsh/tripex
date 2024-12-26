@@ -28,7 +28,7 @@ public:
 		dViewAng = 0;
 		nSpikes = 8;
 
-		obj.vertices.SetLength(SOURCES);
+		obj.vertices.resize(SOURCES);
 		obj.flags.set( Actor::F_DRAW_TRANSPARENT );
 		obj.flags.set( Actor::F_DRAW_Z_BUFFER, false );
 		obj.flags.set( Actor::F_DRAW_VERTEX_SPRITES );

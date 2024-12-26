@@ -87,11 +87,11 @@ public:
 				int nIndex = j * nCrossSection;
 				for(int i = 0; i < nCrossSection - 1; i++)
 				{
-					pObj[no].faces.Add(Face(nIndex + i, nIndex + (i + 1), nIndex + nCrossSection + i)); 
-					pObj[no].faces.Add(Face(nIndex + (i + 1), nIndex + nCrossSection + (i + 1), nIndex + nCrossSection + i)); 
+					pObj[no].faces.push_back(Face(nIndex + i, nIndex + (i + 1), nIndex + nCrossSection + i));
+					pObj[no].faces.push_back(Face(nIndex + (i + 1), nIndex + nCrossSection + (i + 1), nIndex + nCrossSection + i));
 				}
 			}
-			pObj[no].vertices.SetLength(nTunnelL * nCrossSection);
+			pObj[no].vertices.resize(nTunnelL * nCrossSection);
 
 			int k = 0;
 			for(int j = 0; j < nTunnelL; j++)

@@ -34,7 +34,7 @@ public:
 
 	using Renderer::DrawIndexedPrimitive;
 
-	virtual Error* DrawIndexedPrimitive(const RenderState& render_state, uint32_t num_vertices, const VertexTL* vertices, uint32_t num_faces, const Face* faces) override;
+	virtual Error* DrawIndexedPrimitive(const RenderState& render_state, size_t num_vertices, const VertexTL* vertices, size_t num_faces, const Face* faces) override;
 
 	virtual Rect<int> GetViewportRect() const override;
 	virtual Rect<float> GetClipRect() const override;

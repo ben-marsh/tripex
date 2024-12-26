@@ -55,7 +55,7 @@ public:
 		speed.resize(nSources);
 
 		obj.position.z = 50;
-		obj.vertices.SetLength(nSources);
+		obj.vertices.resize(nSources);
 		obj.flags.set( Actor::F_DRAW_TRANSPARENT );
 		obj.flags.set( Actor::F_DRAW_VERTEX_SPRITES );
 		obj.flags.set( Actor::F_DRAW_VERTEX_SPRITE_HISTORY );

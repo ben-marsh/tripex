@@ -254,8 +254,10 @@ Error* ZDirect3D::CreateTextureFromImage(const void* data, uint32 data_size, std
 	return nullptr;
 }
 
-Error* ZDirect3D::DrawIndexedPrimitive(const RenderState& render_state, uint32_t num_vertices, const VertexTL* vertices, uint32_t num_faces, const Face* faces)
+Error* ZDirect3D::DrawIndexedPrimitive(const RenderState& render_state, size_t num_vertices, const VertexTL* vertices, size_t num_faces, const Face* faces)
 {
+	_ASSERT(num_vertices < 32768);
+
 	device->SetRenderState(D3DRS_CULLMODE, render_state.enable_culling? D3DCULL_CCW : D3DCULL_NONE);
 	device->SetRenderState(D3DRS_SHADEMODE, render_state.enable_shading ? D3DSHADE_GOURAUD : D3DSHADE_FLAT);
 	device->SetRenderState(D3DRS_SPECULARENABLE, render_state.enable_specular ? TRUE : FALSE);
@@ -336,7 +338,7 @@ Error* ZDirect3D::DrawIndexedPrimitive(const RenderState& render_state, uint32_t
 		device->SetSamplerState(stage, D3DSAMP_ADDRESSV, render_state.texture_stages[stage].address_v);
 	}
 
-	HRESULT hRes = device->DrawIndexedPrimitiveUP(D3DPT_TRIANGLELIST, 0, num_vertices, num_faces, faces, D3DFMT_INDEX16, vertices, sizeof(VertexTL));
+	HRESULT hRes = device->DrawIndexedPrimitiveUP(D3DPT_TRIANGLELIST, 0, (UINT)num_vertices, (UINT)num_faces, faces, D3DFMT_INDEX16, vertices, sizeof(VertexTL));
 	if (FAILED(hRes)) return TraceError(hRes);
 
 	return nullptr;

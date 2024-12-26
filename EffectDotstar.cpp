@@ -81,14 +81,14 @@ public:
 		}
 
 		int nIndex = 0;
-		obj.vertices.SetLength(nStarVertices);
+		obj.vertices.resize(nStarVertices);
 		for(int i = 0; i < nStarVertices; i++)
 		{
 			obj.vertices[i].position = Vector3(pfStarVertex[nIndex], pfStarVertex[nIndex + 1], pfStarVertex[nIndex + 2]);
 			nIndex += 3;
 		}
 		nIndex = 0;
-		obj.faces.SetLength(nStarFaces);
+		obj.faces.resize(nStarFaces);
 		for(int i = 0; i < nStarFaces; i++)
 		{
 			obj.faces[i] = Face(pwStarFace[nIndex], pwStarFace[nIndex + 1], pwStarFace[nIndex + 2]);
@@ -207,14 +207,14 @@ public:
 		obj.clip_mask = 0;
 		obj.Calculate(params.renderer, &camera, params.elapsed);
 //	ZFlexibleVertex fvVertex = obj.pTransVertex[0];
-		for(int i = 0; i < obj.transformed_vertices.GetLength(); i++)
+		for(int i = 0; i < obj.transformed_vertices.size(); i++)
 		{
 			obj.transformed_vertices[i].position.x += 256.0;
 			obj.transformed_vertices[i].position.y += 128.0;// - (4 * fPos);
 //		fvVertex++;
 		}
 
-		for(int i = 0; i < obj.clipped_faces.GetLength(); i++)
+		for(int i = 0; i < obj.clipped_faces.size(); i++)
 		{
 			Face *pf = &obj.clipped_faces[i];
 			DrawTriangle(&obj.transformed_vertices[(*pf)[0]].position, &obj.transformed_vertices[(*pf)[1]].position, &obj.transformed_vertices[(*pf)[2]].position);

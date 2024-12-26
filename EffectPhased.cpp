@@ -28,7 +28,7 @@ public:
 		fFirstCalc = false;
 		accum = 0;
 
-		obj.vertices.SetLength(DEPTH*DEPTH*DEPTH);
+		obj.vertices.resize(DEPTH*DEPTH*DEPTH);
 		obj.frame_history = 5.0f;
 		obj.flags.set( Actor::F_DRAW_TRANSPARENT );
 		obj.flags.set( Actor::F_DRAW_VERTEX_SPRITES );

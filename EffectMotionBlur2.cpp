@@ -39,8 +39,8 @@ public:
 		{
 			pObj[p].CreateTetrahedron(100);
 //		pObj[p].pVertex.SetFormat(D3DFVF_NORMAL | D3DFVF_TEX1);
-			pObj[p].vertices.SetLength(nVertices);
-			pObj[p].faces.SetLength(PIPE_LENGTH * PIPE_CIRCUMPOINTS * 2);
+			pObj[p].vertices.resize(nVertices);
+			pObj[p].faces.resize(PIPE_LENGTH * PIPE_CIRCUMPOINTS * 2);
 			pObj[p].flags.set( Actor::F_NO_CULL );
 			pObj[p].flags.set( Actor::F_DRAW_TRANSPARENT );
 			pObj[p].frame_history = 4.0f;

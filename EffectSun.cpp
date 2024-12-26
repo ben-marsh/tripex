@@ -52,8 +52,8 @@ public:
 //			obj[o]->Create(TRI * 2 * ((LAYERS * 2) + 1), TRI * ((LAYERS * 2) + 1));
 //			obj[o]->Create((LAYERS*2+1)*TRI*2, TRI * 2 * (LAYERS*2+1));
 	//		pObj[o].pVertex.SetFormat(D3DFVF_DIFFUSE);
-			pObj[o].vertices.SetLength((LAYERS * 2 + 1) * TRI * 2);
-			pObj[o].faces.SetLength(TRI * 2 * (LAYERS * 2 + 1));
+			pObj[o].vertices.resize((LAYERS * 2 + 1) * TRI * 2);
+			pObj[o].faces.resize(TRI * 2 * (LAYERS * 2 + 1));
 //			obj[o]->x = 400.0 * cos(o * 2.0 * 3.14159 / RINGS);
 //			obj[o]->y = 400.0 * sin(o * 2.0 * 3.14159 / RINGS);
 //				(TRI * 2 * ((LAYERS * 2) + 1)) + 1, TRI * 2 * ((LAYERS * 2) + 1));

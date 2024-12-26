@@ -5,7 +5,6 @@
 #include "Vector3.h"
 #include "Face.h"
 #include "Edge.h"
-#include "ZArray.h"
 #include "ColorRgb.h"
 
 #define WORD_INVALID_INDEX ((uint16)0x0ffff)
@@ -38,8 +37,8 @@ public:
 	struct Frame
 	{
 		DWORD time_to_live;
-		ZArray<Vector3> positions;
-		ZArray<float> distances;
+		std::vector<Vector3> positions;
+		std::vector<float> distances;
 		float elapsed;
 		float pitch, yaw, roll;
 	};
@@ -123,8 +122,8 @@ public:
 
 	WideColorRgb ambient_light_color;
 	WideColorRgb exposure_light_delta;
-	ZArray<Frame*> frames;
-	ZArray<Frame*> unused_frames;
+	std::vector<Frame*> frames;
+	std::vector<Frame*> unused_frames;
 
 	float clip_min_x;
 	float clip_max_x;
@@ -150,17 +149,17 @@ public:
 	TextureEntry textures[MAX_TEXTURES];
 	std::vector<Light> lights;
 
-	ZArray<Vertex> vertices;
-	ZArray<VertexTL> transformed_vertices;
+	std::vector<Vertex> vertices;
+	std::vector<VertexTL> transformed_vertices;
 
-	ZArray<Face> faces;
-	ZArray<Face> clipped_faces;
+	std::vector<Face> faces;
+	std::vector<Face> clipped_faces;
 
-	ZArray<Edge> edges;
-	ZArray<Edge> clipped_edges;
+	std::vector<Edge> edges;
+	std::vector<Edge> clipped_edges;
 
-	ZArray<uint16*> vertex_face_list;
-	ZArray<float> vertex_delay_factor;
+	std::vector<uint16*> vertex_face_list;
+	std::vector<float> vertex_delay_factor;
 
 	Actor();
 	~Actor();
@@ -194,14 +193,14 @@ protected:
 		uint16 index;
 	};
 
-	ZArray<Vector3> face_normals; // buffer for calculating vertex normals
+	std::vector<Vector3> face_normals; // buffer for calculating vertex normals
 	int num_textures;
 
 	Vector3 GetDelayedPosition(int nVertex, ExposureData* pData);
 
-	void Clip(const Renderer& renderer, ZArray<Face>& faces, WORD plane_mask);
-	bool IsClipRequired(const Face& face, uint16 plane_mask, const ZArray<VertexInfo>& vertex_info) const;
+	void Clip(const Renderer& renderer, std::vector<Face>& faces, uint16 plane_mask);
+	bool IsClipRequired(const Face& face, uint16 plane_mask, const std::vector<VertexInfo>& vertex_info) const;
 	uint16 GetRequiredClipPlanes(const Vector3& v) const;
-	void AddClippedFace(Face& f, WORD wPlaneMask, ZArray<Face>&, const ZArray<VertexInfo>& vertex_info, ZArray<Face>& pfOut, ZArray<int>& unused_faces);
-	int ClipEdge(const Face& face, int nIn, int nOut, WORD wPlaneFlag, WORD wClipRequired, ZArray<VertexInfo>& vertex_info, ZArray<VertexTL>& pvOut, ZArray<int>& unused_vertices);
+	void AddClippedFace(Face& f, uint16 wPlaneMask, std::vector<Face>&, const std::vector<VertexInfo>& vertex_info, std::vector<Face>& pfOut, std::vector<int>& unused_faces);
+	int ClipEdge(const Face& face, int nIn, int nOut, uint16 wPlaneFlag, uint16 wClipRequired, std::vector<VertexInfo>& vertex_info, std::vector<VertexTL>& pvOut, std::vector<int>& unused_vertices);
 };

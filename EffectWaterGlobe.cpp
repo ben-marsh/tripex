@@ -49,10 +49,10 @@ class EffectWaterGlobe : public EffectBase
 //		FindFaceEdges();
 			FindVertexFaceList();
 
-			ppwAdjacent.resize(vertices.GetLength());
+			ppwAdjacent.resize(vertices.size());
 
 			std::vector<uint16> indices;
-			for(int i = 0; i < vertices.GetLength(); i++)
+			for(int i = 0; i < vertices.size(); i++)
 			{
 				indices.clear();
 				for(int j = 0; vertex_face_list[i][j] != WORD_INVALID_INDEX; j++)
@@ -75,14 +75,14 @@ class EffectWaterGlobe : public EffectBase
 			}
 
 			fDamping = 1.0f;
-			pvDir.resize(vertices.GetLength());
-			for(int i = 0; i < vertices.GetLength(); i++)
+			pvDir.resize(vertices.size());
+			for(int i = 0; i < vertices.size(); i++)
 			{
 				pvDir[i] = vertices[i].position;
 			}
-			pfPos.resize(vertices.GetLength());
+			pfPos.resize(vertices.size());
 //			memset(pfPos.data(), 0, pfPos.size() * sizeof(float));
-			pfVel.resize(vertices.GetLength());
+			pfVel.resize(vertices.size());
 //			memset(pfVel.data(), 0, pfVel.size() * sizeof(float));
 		}
 		void Update()
@@ -90,11 +90,11 @@ class EffectWaterGlobe : public EffectBase
 			if(fAngle > 360.0f)
 			{
 				fAngle = 0.0f;
-				nPos = rand() * vertices.GetLength() / RAND_MAX;
+				nPos = rand() * (int)vertices.size() / RAND_MAX;
 				fSize = fAverage * 0.5f;
 			}
 			fAngle += 20.0f;//= 3.14159 / 180.0;
-			for(int i = 0; i < vertices.GetLength(); i++)
+			for(int i = 0; i < vertices.size(); i++)
 			{
 				float fAccel = 0;
 				int j;
@@ -105,7 +105,7 @@ class EffectWaterGlobe : public EffectBase
 				fAccel /= j;
 				pfVel[i] += fAccel - pfPos[i];
 			}
-			for(int i = 0; i < vertices.GetLength(); i++)
+			for(int i = 0; i < vertices.size(); i++)
 			{
 				pfPos[i] += pfVel[i];
 				pfPos[i] *= fDamping;
@@ -114,7 +114,7 @@ class EffectWaterGlobe : public EffectBase
 		}
 		void Create()
 		{
-			for(int i = 0; i < vertices.GetLength(); i++)
+			for(int i = 0; i < vertices.size(); i++)
 			{
 				vertices[i].position = pvDir[i] * (1 + Bound<float>(pfPos[i], MINSZ, MAXSZ));
 			}
@@ -132,11 +132,11 @@ class EffectWaterGlobe : public EffectBase
 		float AverageHeight()
 		{
 			float fHeight = 0;
-			for(int i = 0; i < vertices.GetLength(); i++) 
+			for(int i = 0; i < vertices.size(); i++) 
 			{
 				fHeight += pfPos[i];
 			}
-			return fHeight / vertices.GetLength();
+			return fHeight / vertices.size();
 		}
 	};
 	WaterObj obj;

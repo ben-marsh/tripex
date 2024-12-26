@@ -38,7 +38,7 @@ void MakeTentacles(Actor &obj, int segs, float l, float r)
 
 	float u[TTEMP] = { r,-r,-r, r }, v[TTEMP] = { r, r,-r,-r };
 
-	obj.vertices.SetLength(TARMS * (((segs - 1) * TTEMP) + 1));
+	obj.vertices.resize(TARMS * (((segs - 1) * TTEMP) + 1));
 
 	int vn = 0, fn = 0;
 	for(int i = 0; i < 6; i++) // each arm
@@ -56,12 +56,12 @@ void MakeTentacles(Actor &obj, int segs, float l, float r)
 				{
 					if(j == segs - 2)
 					{
-						obj.faces.Add(Face(vn + k, vn + ((k + 1) % TTEMP), vn + TTEMP));
+						obj.faces.push_back(Face(vn + k, vn + ((k + 1) % TTEMP), vn + TTEMP));
 					}
 					else
 					{
-						obj.faces.Add(Face(vn + k, vn + k + TTEMP, vn + ((k + 1) % TTEMP)));
-						obj.faces.Add(Face(vn + ((k + 1) % TTEMP), vn + k + TTEMP, vn + TTEMP + ((k + 1) % TTEMP)));
+						obj.faces.push_back(Face(vn + k, vn + k + TTEMP, vn + ((k + 1) % TTEMP)));
+						obj.faces.push_back(Face(vn + ((k + 1) % TTEMP), vn + k + TTEMP, vn + TTEMP + ((k + 1) % TTEMP)));
 					}
 				}
 				for(int k = 0; k < TTEMP; k++)

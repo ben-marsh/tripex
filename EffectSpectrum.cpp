@@ -48,8 +48,8 @@ public:
 
 		for(int i = 0; i < TRAIL_H; i++)
 		{
-			m_pObj[i].vertices.SetLength(TRAIL_W * 4);
-			m_pObj[i].faces.SetLength((TRAIL_W - 1) * 8);
+			m_pObj[i].vertices.resize(TRAIL_W * 4);
+			m_pObj[i].faces.resize((TRAIL_W - 1) * 8);
 			m_pObj[i].flags.set(Actor::F_DRAW_TRANSPARENT);
 			m_pObj[i].flags.set( Actor::F_DRAW_Z_BUFFER, false );
 			uint16 v = 0, f = 0;
@@ -84,7 +84,7 @@ public:
 		}
 		for(int i = 0; i < LIMITER_H; i++)
 		{
-			m_pLimit[i].vertices.SetLength(TRAIL_W);
+			m_pLimit[i].vertices.resize(TRAIL_W);
 			m_pLimit[i].flags.set(Actor::F_DRAW_TRANSPARENT);
 			m_pLimit[i].flags.set(Actor::F_DRAW_Z_BUFFER, false );
 			m_pLimit[i].flags.set(Actor::F_DRAW_VERTEX_SPRITES);

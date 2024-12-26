@@ -227,7 +227,7 @@ LRESULT CALLBACK TxWndProc(HWND hWnd, uint32 nMsg, WPARAM wParam, LPARAM lParam)
 			RemoveWaveInBuffer(nIdx);
 
 #if USE_RANDOM_AUDIO
-			for (int idx = 0; idx < g_aWaveHdr[nIdx].dwBytesRecorded; idx++)
+			for (int idx = 0; idx < (int)g_aWaveHdr[nIdx].dwBytesRecorded; idx++)
 			{
 				g_aWaveHdr[nIdx].lpData[idx] = rand();
 			}

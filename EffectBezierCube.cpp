@@ -83,7 +83,7 @@ public:
 			pObjPlane[i].sprite_size = 5.0f;//fRenderAsLights(10.0);
 			pObjPlane[i].flags.set( Actor::F_DO_FRAME_HISTORY );
 
-			pObjPlane[i].vertices.SetLength(TWISTPLANECORNERS);
+			pObjPlane[i].vertices.resize(TWISTPLANECORNERS);
 			Vector3 vCorner[BEZIERS];
 			for(int j = 0; j < BEZIERS; j++)
 			{
@@ -116,7 +116,7 @@ public:
 		}
 		for(int i = 0; i < BEZIERS; i++)
 		{
-			pObj[i].vertices.SetLength(BEZIERPOINTS);
+			pObj[i].vertices.resize(BEZIERPOINTS);
 			pObj[i].flags.set( Actor::F_DRAW_TRANSPARENT );
 			pObj[i].flags.set( Actor::F_DRAW_VERTEX_SPRITES );
 			for(int j = 0; j < BEZIERPOINTS; j++)
@@ -192,7 +192,7 @@ public:
 		for(; fel > 1.0; fel--)
 		{
 			fAng += 8.0f * g_fDegToRad;
-			obj.vertices.SetLength(1);
+			obj.vertices.resize(1);
 			obj.vertices[0].position.x = 5 * cos(fAng);//pObj[0].pVertex[0].GetPosition();
 			obj.vertices[0].position.y = 5 * sin(fAng);//pObj[0].pVertex[0].GetPosition();
 			obj.vertices[0].position.z = -100;//pObj[0].pVertex[0].GetPosition();
