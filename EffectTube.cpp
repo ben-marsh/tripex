@@ -74,7 +74,7 @@ public:
 				f++;
 			}
 		}
-		_ASSERT(f == coil.faces.size());
+		assert(f == coil.faces.size());
 //	coil.FindVertexNormals();
 
 		obj.vertices.resize(PTCIRCUM * PTLENGTH);
@@ -120,7 +120,7 @@ public:
 		}
 		obj.flags.set(Actor::F_VALID_VERTEX_DIFFUSE);
 		coil.flags.set(Actor::F_VALID_VERTEX_DIFFUSE);
-		_ASSERT(f == obj.faces.size());
+		assert(f == obj.faces.size());
 
 //	scene = new World();
 //	scene->vpObject.Add(obj);

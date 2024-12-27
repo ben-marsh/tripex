@@ -35,7 +35,7 @@ void BezierCurve::Clear()
 
 Vector3 &BezierCurve::GetPoint(int index)
 {
-	_ASSERT(index >= 0 && index < points.size());
+	assert(index >= 0 && index < points.size());
 	return points[index];
 }
 
@@ -46,7 +46,7 @@ Vector3 &BezierCurve::operator[](int nPos)
 
 int BezierCurve::Binomial(int level, int index)
 {
-	_ASSERT(index >= 0 && index <= level && level >= 0);
+	assert(index >= 0 && index <= level && level >= 0);
 	if (index == 0 || index == level)
 	{
 		return 1;
@@ -59,7 +59,7 @@ int BezierCurve::Binomial(int level, int index)
 
 Vector3 BezierCurve::Calculate(float fPos)
 {
-	_ASSERT(fPos >= 0 && fPos <= 1);
+	assert(fPos >= 0 && fPos <= 1);
 
 	Vector3 v(0, 0, 0);
 	for(int i = 0; i < points.size(); i++)

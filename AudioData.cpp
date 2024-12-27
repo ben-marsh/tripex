@@ -1,9 +1,7 @@
 #include "Platform.h"
+#include <assert.h>
 #include "AudioData.h"
 #include "Misc.h"
-
-
-////////
 #include "Renderer.h"
 #include "effect.h"
 
@@ -129,7 +127,7 @@ void AudioData::AddData(const void* data, size_t data_size)
 		}
 		break;
 	default:
-		_ASSERT(false);
+		assert(false);
 		break;
 	}
 
@@ -302,19 +300,19 @@ void AudioData::SetIntensityBeatScale(float scale)
 
 float AudioData::GetSample(int sample_idx) const
 {
-	_ASSERT(sample_idx >= 0 && sample_idx < num_samples);
+	assert(sample_idx >= 0 && sample_idx < num_samples);
 	return ((float)mono_samples[sample_idx]) / (1 << 15);
 }
 
 float AudioData::GetSample(int channel_idx, int sample_idx) const
 {
-	_ASSERT(sample_idx >= 0 && sample_idx < num_samples);
-	_ASSERT(channel_idx >= 0 && channel_idx < 2);
+	assert(sample_idx >= 0 && sample_idx < num_samples);
+	assert(channel_idx >= 0 && channel_idx < 2);
 	return ((float)stereo_samples[channel_idx][sample_idx]) / (1 << 15);
 }
 
 float AudioData::GetBand(int band_idx) const
 {
-	_ASSERT(band_idx >= 0 && band_idx < num_samples);
+	assert(band_idx >= 0 && band_idx < num_samples);
 	return bands[band_idx];
 }

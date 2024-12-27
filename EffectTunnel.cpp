@@ -45,7 +45,7 @@ public:
 	{
 		for(int i = 0;;i++)
 		{
-			_ASSERT(i < nBeziers);
+			assert(i < nBeziers);
 			if(fPos < 1.0f) return b[j][i].Calculate(fPos);
 			fPos--;
 		}

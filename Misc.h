@@ -1,6 +1,8 @@
 #pragma once
 
+#include "Platform.h"
 #include <algorithm>
+#include <assert.h>
 
 #pragma warning(disable: 4786)
 #pragma runtime_checks( "",off )
@@ -27,7 +29,7 @@ inline int IntegerLog2(int value)
 {
 	int log = 0;
 	while (value > (1 << log)) log++;
-	_ASSERT(1 << log);
+	assert(1 << log);
 	return log;
 }
 
@@ -49,10 +51,10 @@ template< class T > inline T StepTo(T value, T target, T nStep)
 {
 	if (value < target)
 	{
-		return std::min(target, value + nStep);
+		return std::min<T>(target, value + nStep);
 	}
 	else
 	{
-		return std::max(target, value - nStep);
+		return std::max<T>(target, value - nStep);
 	}
 }

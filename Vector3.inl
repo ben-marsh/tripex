@@ -1,4 +1,5 @@
 #include "Matrix44.h"
+#include <assert.h>
 
 inline Vector3::Vector3()
 {
@@ -93,13 +94,13 @@ inline Vector3& Vector3::operator/=(float value)
 
 inline float& Vector3::operator[ ](int index)
 {
-	_ASSERT(index >= 0 && index < 3);
+	assert(index >= 0 && index < 3);
 	return elements[index];
 }
 
 inline const float& Vector3::operator[ ](int index) const
 {
-	_ASSERT(index >= 0 && index < 3);
+	assert(index >= 0 && index < 3);
 	return elements[index];
 }
 

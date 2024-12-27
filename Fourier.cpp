@@ -1,6 +1,7 @@
 #include "Platform.h"
 #include "Fourier.h"
 #include "Misc.h"
+#include <assert.h>
 
 /*---------------------------------
 * ZFft:
@@ -14,7 +15,7 @@ Fourier::Fourier(int num_samples)
 	: num_samples(num_samples)
 	, log_num_samples(IntegerLog2(num_samples))
 {
-	_ASSERT(num_samples == (1 << log_num_samples));
+	assert(num_samples == (1 << log_num_samples));
 
 	// precalc apodization function
 	scales = std::make_unique<float[]>(num_samples);
@@ -90,6 +91,6 @@ void Fourier::Update(const short int* anSample)
 
 float Fourier::GetAmplitude(int index) const
 {
-	_ASSERT(index >= 0 && index < num_samples);
+	assert(index >= 0 && index < num_samples);
 	return amplitudes[index];
 }

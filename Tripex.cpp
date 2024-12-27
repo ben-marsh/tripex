@@ -9,6 +9,7 @@
 #include "AudioData.h"
 //#include "mmsystem.h"
 #include <algorithm>
+#include <assert.h>
 #include "config-defaults.h"
 #include "Tripex.h"
 
@@ -45,7 +46,7 @@ DWORD WINAPI Tripex::InitialiseThread(void *pParam)
 
 	srand( timeGetTime( ) );
 
-	_ASSERT(num_internal_textures >= 1);
+	assert(num_internal_textures >= 1);
 
 	for(TextureSource* texture_source : texture_sources)
 	{
@@ -56,7 +57,7 @@ DWORD WINAPI Tripex::InitialiseThread(void *pParam)
 		if (!texture_source->internal || texture_source->internal_id != 1)
 		{
 			Error* error = renderer.CreateTextureFromImage(pnTexData + 1, *pnTexData, texture);
-			_ASSERT(error == nullptr);
+			assert(error == nullptr);
 
 			texture_source->texture = texture.get();
 		}
@@ -770,7 +771,7 @@ void Tripex::LoadCfgItems()
 				pItem->SetString(GetDefaultStr(pItem->sName.c_str()));
 				break;
 			default:
-				_ASSERT(false);
+				assert(false);
 				break;
 			}
 			pItem->bSave = false;

@@ -51,7 +51,7 @@ inline int Face::IndexOf(uint16 vtx) const
 inline Edge Face::GetEdge(int idx) const
 {
 	static const int next_idx[3] = { 1, 2, 0 };
-	_ASSERT(idx >= 0 && idx <= 2);
+	assert(idx >= 0 && idx <= 2);
 	return Edge(vertices[idx], vertices[next_idx[idx]]);
 }
 

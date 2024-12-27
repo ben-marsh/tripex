@@ -272,7 +272,7 @@ void Actor::Calculate(const Renderer& renderer, Camera* camera, float elapsed)
 	std::vector<TextureEntry*> use_textures;
 	if (flags.test(F_DRAW_VERTEX_SPRITES))
 	{
-		_ASSERT(textures[0].type == TextureType::Sprite);
+		assert(textures[0].type == TextureType::Sprite);
 		num_textures = 1;
 	}
 	else
@@ -595,7 +595,7 @@ void Actor::Calculate(const Renderer& renderer, Camera* camera, float elapsed)
 	}
 	else if (frames.size() > 1)
 	{
-		_ASSERT(exposure == 1);
+		assert(exposure == 1);
 		transformed_vertices.resize(0);
 
 		for (int i = 0; i < vertices.size(); i++)
@@ -779,7 +779,7 @@ Error* Actor::Render(Renderer& renderer)
 	//	tsDisable.AddState(D3DTSS_COLOROP, D3DTOP_DISABLE);
 
 	//	assert(pTransVertex.GetLength() < 16384 * 3);
-	_ASSERT(clipped_faces.size() * 3 < 0x0ffff);//D3DMAXNUMVERTICES);//16384);
+	assert(clipped_faces.size() * 3 < 0x0ffff);//D3DMAXNUMVERTICES);//16384);
 	//	assert(pClippedEdge.GetLength() < 16384);
 
 	bool stencil_z = flags.test(F_DRAW_Z_BUFFER) && flags.test(F_DRAW_TRANSPARENT);
@@ -1362,7 +1362,7 @@ void Actor::CreateGeosphere(float radius, int num_vertices)
 		}
 	}
 
-	_ASSERT(vertices.size() == num_vertices);
+	assert(vertices.size() == num_vertices);
 
 	for (int i = 0; i < vertices.size(); i++)
 	{
@@ -1402,7 +1402,7 @@ void Actor::CreateTorus(float outer_rad, float inner_rad, int outer_points, int 
 			faces.push_back(face);
 		}
 	}
-	_ASSERT(vertices.size() == num_vertices);
+	assert(vertices.size() == num_vertices);
 }
 
 void Actor::CreateTetrahedronGeosphere(float radius, int num_iterations)

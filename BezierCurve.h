@@ -69,7 +69,7 @@ template<int num_curves> Vector3 ContainedBezierCurve<num_curves>::Calculate(flo
 	float use = pos;
 	for (int i = 0;; use--)
 	{
-		_ASSERT(i < num_curves);
+		assert(i < num_curves);
 		if (use <= 1) return curves[i].Calculate(use);
 	}
 }

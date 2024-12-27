@@ -42,7 +42,7 @@ void EffectHandler::Destroy()
 }
 Error* EffectHandler::Calculate(float fElapsed, AudioData& audio_data, Renderer& renderer)
 {
-	_ASSERT(pEffect != NULL);
+	assert(pEffect != NULL);
 
 	audio_data.SetIntensityBeatScale( fSensitivity * 3.0f );
 
@@ -54,21 +54,21 @@ Error* EffectHandler::Calculate(float fElapsed, AudioData& audio_data, Renderer&
 }
 Error* EffectHandler::Reconfigure(const AudioData& audio_data, const TextureLibrary& texture_library)
 {
-	_ASSERT(pEffect != NULL);
+	assert(pEffect != NULL);
 
 	EffectBase::ReconfigureParams params(audio_data, texture_library);
 	return pEffect->Reconfigure(params);
 }
 Error* EffectHandler::Render(Renderer& renderer)
 {
-	_ASSERT(pEffect != NULL);
+	assert(pEffect != NULL);
 
 	EffectBase::RenderParams params(renderer);
 	return pEffect->Render(params);
 }
 bool EffectHandler::CanRender(float fFrames)
 {
-	_ASSERT(pEffect != NULL);
+	assert(pEffect != NULL);
 
 	if(fFrames > 3.8) return true;
 	else return pEffect->CanRender(GetElapsed(fFrames));

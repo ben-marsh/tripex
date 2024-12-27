@@ -163,7 +163,7 @@ D3DTEXTUREADDRESS RendererDirect3d::GetD3DTEXTUREADDRESS(TextureAddress address)
 		return D3DTADDRESS_WRAP;
 	}
 
-	_ASSERT(false);
+	assert(false);
 	return D3DTADDRESS_CLAMP;
 }
 
@@ -179,7 +179,7 @@ TextureFormat RendererDirect3d::GetTextureFormat(D3DFORMAT format)
 		return TextureFormat::P8;
 	}
 
-	_ASSERT(false);
+	assert(false);
 	return TextureFormat::Unknown;
 }
 
@@ -193,7 +193,7 @@ D3DFORMAT RendererDirect3d::GetD3DFORMAT(TextureFormat format)
 		return D3DFMT_P8;
 	}
 
-	_ASSERT(false);
+	assert(false);
 	return D3DFMT_UNKNOWN;
 }
 
@@ -277,7 +277,7 @@ Error* RendererDirect3d::CreateTextureFromImage(const void* data, uint32 data_si
 
 Error* RendererDirect3d::DrawIndexedPrimitive(const RenderState& render_state, size_t num_vertices, const VertexTL* vertices, size_t num_faces, const Face* faces)
 {
-	_ASSERT(num_vertices < 32768);
+	assert(num_vertices < 32768);
 
 	device->SetRenderState(D3DRS_CULLMODE, render_state.enable_culling? D3DCULL_CCW : D3DCULL_NONE);
 	device->SetRenderState(D3DRS_SHADEMODE, render_state.enable_shading ? D3DSHADE_GOURAUD : D3DSHADE_FLAT);
@@ -332,7 +332,7 @@ Error* RendererDirect3d::DrawIndexedPrimitive(const RenderState& render_state, s
 		device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCCOLOR);
 		break;
 	default:
-		_ASSERT(false);
+		assert(false);
 	}
 
 	for (int stage = 0; stage < RenderState::NUM_TEXTURE_STAGES; stage++)

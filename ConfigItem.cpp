@@ -4,6 +4,7 @@
 #include "ConfigItem.h"
 #include "Misc.h"
 #include <cstdarg>
+#include <assert.h>
 
 /************* CCfgItem ****************************************/
 ConfigItem::ConfigItem(const char *sName, int nType, void *pValue, bool bInitUpdate)
@@ -59,42 +60,42 @@ template < class T > T Get( const ConfigItem * const pItem, const T *pt1, const 
 }
 bool ConfigItem::SetInt(int nValue)
 {
-	_ASSERT(nType == CIT_INT);
+	assert(nType == CIT_INT);
 	return Set(this, &nNewValue, nValue);
 }
 bool ConfigItem::SetBool(bool bValue)
 {
-	_ASSERT(nType == CIT_BOOL);
+	assert(nType == CIT_BOOL);
 	return Set(this, &bNewValue, bValue);
 }
 bool ConfigItem::SetFloat(float fValue)
 {
-	_ASSERT(nType == CIT_FLOAT);
+	assert(nType == CIT_FLOAT);
 	return Set(this, &fNewValue, fValue);
 }
 bool ConfigItem::SetString(const char *sValue)
 {
-	_ASSERT(nType == CIT_STRING);
+	assert(nType == CIT_STRING);
 	return Set(this, psNewValue, sValue);
 }
 int ConfigItem::GetInt() const
 {
-	_ASSERT(nType == CIT_INT);
+	assert(nType == CIT_INT);
 	return Get< int >( this, &nNewValue, pnValue );
 }
 bool ConfigItem::GetBool() const
 {
-	_ASSERT(nType == CIT_BOOL);
+	assert(nType == CIT_BOOL);
 	return Get(this, &bNewValue, pbValue);
 }
 float ConfigItem::GetFloat() const
 {
-	_ASSERT(nType == CIT_FLOAT);
+	assert(nType == CIT_FLOAT);
 	return Get(this, &fNewValue, pfValue);
 }
 std::string ConfigItem::GetString() const
 {
-	_ASSERT(nType == CIT_STRING);
+	assert(nType == CIT_STRING);
 	return Get(this, psNewValue, psValue);
 }
 void ConfigItem::Update(bool bInit)
