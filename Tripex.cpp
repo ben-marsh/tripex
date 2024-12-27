@@ -195,7 +195,7 @@ Error* Tripex::Render()
 		if(nNewEffect != effect_idx)
 		{
 			effect_idx = nNewEffect;
-			ShowStatusMsg("Current Effect: %s", enabled_effects[effect_idx]->sName.c_str());
+			ShowStatusMsg("Current Effect: %s", enabled_effects[effect_idx]->name.c_str());
 
 //				if(bEffectLeft) nEffect--;
 //				else if(bEffectRight) nEffect++;
@@ -224,7 +224,7 @@ Error* Tripex::Render()
 
 		for(int i = 1; i < ( int )enabled_effects.size(); i++) 
 		{
-			enabled_effects[i]->bValid = (i != effect_idx && enabled_effects[effect_idx]->nDrawOrder != enabled_effects[i]->nDrawOrder);
+			enabled_effects[i]->bValid = (i != effect_idx && enabled_effects[effect_idx]->draw_order != enabled_effects[i]->draw_order);
 		}
 
 		float pt = 0;
@@ -321,7 +321,7 @@ Error* Tripex::Render()
 		txs.reset(TXS_IN_FADE);
 	}
 
-	if(ppDrawEffect[1]->nDrawOrder < ppDrawEffect[0]->nDrawOrder)
+	if(ppDrawEffect[1]->draw_order < ppDrawEffect[0]->draw_order)
 	{
 		std::swap( ppDrawEffect[1], ppDrawEffect[0] );
 	}
@@ -608,21 +608,12 @@ IMPORT_EFFECT(LightStar);
 IMPORT_EFFECT(LightSphere);
 IMPORT_EFFECT(LightRing);
 
-void Tripex::AddEffect(std::shared_ptr<EffectHandler> (*fn)(), const char* sName, int nDrawOrder, float fStartupWeight, TextureClass nTex, ...)
+void Tripex::AddEffect(std::shared_ptr<EffectHandler> (*fn)(), const char* name, int draw_order, float startup_weight)
 {
 	std::shared_ptr<EffectHandler> pEffect = fn();
-	pEffect->sName = sName;
-	pEffect->nDrawOrder = nDrawOrder;
-	pEffect->fStartupWeight = fStartupWeight;
-
-	va_list pArg;
-	va_start(pArg, nTex);
-	while (nTex != TextureClass::Invalid)
-	{
-		pEffect->snTexture.insert(nTex);
-		nTex = va_arg(pArg, TextureClass);
-	}
-	va_end(pArg);
+	pEffect->name = name;
+	pEffect->draw_order = draw_order;
+	pEffect->startup_weight = startup_weight;
 
 	if (effects.size() == 0)
 	{
@@ -632,7 +623,7 @@ void Tripex::AddEffect(std::shared_ptr<EffectHandler> (*fn)(), const char* sName
 	{
 		for (int i = 1;; i++)
 		{
-			if (i == effects.size() || _stricmp(pEffect->sName.c_str(), effects[i]->sName.c_str()) < 0)
+			if (i == effects.size() || _stricmp(pEffect->name.c_str(), effects[i]->name.c_str()) < 0)
 			{
 				effects.insert(effects.begin() + i, pEffect);
 				break;
@@ -643,34 +634,34 @@ void Tripex::AddEffect(std::shared_ptr<EffectHandler> (*fn)(), const char* sName
 
 void Tripex::CreateEffectList()
 {
-	AddEffect(&CreateEffect_Blank, "Blank", ZORDER_BLANK, 1.0f, TextureClass::Invalid);
+	AddEffect(&CreateEffect_Blank, "Blank", ZORDER_BLANK, 1.0f);
 
 	pEffectBlank = effects[0].get();
 
-	AddEffect(&CreateEffect_Tunnel, "Tunnel", ZORDER_TUNNEL, 1.0f, TextureClass::TunnelBackground, TextureClass::Invalid);
-	AddEffect(&CreateEffect_WaterGlobe, "WaterGlobe", ZORDER_WATERGLOBE, 10.0f, TextureClass::WaterGlobeEnvMap, TextureClass::Invalid);
-	AddEffect(&CreateEffect_Tube, "Tube", ZORDER_TUBE, 1.0f, TextureClass::TubeEnvMap, TextureClass::Invalid);
-	AddEffect(&CreateEffect_Sun, "Sun", ZORDER_SUN, 1.0f, TextureClass::Invalid);
-	AddEffect(&CreateEffect_Bumpmapping, "Bumpmapping", ZORDER_BUMPMAPPING, 8.0f, TextureClass::BumpMapBackground, TextureClass::BumpMapTentaclesEnvMap, TextureClass::Invalid);
-	AddEffect(&CreateEffect_Spectrum, "Spectrum", ZORDER_ANALYSER, 1.0f, TextureClass::AnalyzerEnvMap, TextureClass::Invalid);
-	AddEffect(&CreateEffect_Rings, "ConcentricRings", ZORDER_RINGS, 1.0f, TextureClass::RingsEnvMap, TextureClass::Invalid);
-	AddEffect(&CreateEffect_Phased, "Phased", ZORDER_PHASED, 1.0f, TextureClass::PhasedSprite, TextureClass::Invalid);
-	AddEffect(&CreateEffect_MotionBlur1, "MotionBlur1", ZORDER_MOTIONBLUR, 1.0f, TextureClass::MotionBlurEnvMap, TextureClass::Invalid);
-	AddEffect(&CreateEffect_MotionBlur2, "MotionBlur2", ZORDER_MOTIONBLUR2, 1.0f, TextureClass::MotionBlur2EnvMap, TextureClass::Invalid);
-	AddEffect(&CreateEffect_MotionBlur3, "MotionBlur3", ZORDER_MOTIONBLUR3, 1.0f, TextureClass::MotionBlur3EnvMap, TextureClass::Invalid);
-	AddEffect(&CreateEffect_MotionBlur3Alt, "MotionBlur3(Alt)", ZORDER_MOTIONBLUR3ALT, 1.0f, TextureClass::MotionBlur3AltEnvMap, TextureClass::Invalid);
-	AddEffect(&CreateEffect_MorphingSphere, "MorphingSphere", ZORDER_MORPHINGSPHERE, 1.0f, TextureClass::MorphingSphereEnvMap, TextureClass::Invalid);
-	AddEffect(&CreateEffect_LightTentacles, "LightTentacles", ZORDER_LIGHTTENTACLES, 1.0f, TextureClass::LightTentaclesSprite, TextureClass::Invalid);
-	AddEffect(&CreateEffect_LightStar, "LightStar", ZORDER_LIGHTSTAR, 1.0f, TextureClass::LightStarSprite, TextureClass::LightStarBackground, TextureClass::Invalid);
-	AddEffect(&CreateEffect_LightSphere, "LightSphere", ZORDER_LIGHTSPHERE, 1.0f, TextureClass::LightSphereSprite, TextureClass::LightSphereBackground, TextureClass::Invalid);
-	AddEffect(&CreateEffect_LightRing, "LightRing", ZORDER_LIGHTRING, 1.0f, TextureClass::LightRingSprite, TextureClass::LightRingBackground, TextureClass::Invalid);
-	AddEffect(&CreateEffect_Flowmap, "Flowmap", ZORDER_FLOWMAP, 10.0f, TextureClass::Invalid);
-	AddEffect(&CreateEffect_DotStar, "DotStar", ZORDER_DOTSTAR, 1.0f, TextureClass::DotStarSprite, TextureClass::DotStarBackground, TextureClass::Invalid);
-	AddEffect(&CreateEffect_Distortion2, "Distortion2", ZORDER_DISTORTION2, 1.0f, TextureClass::Distortion2Background, TextureClass::Invalid);
-	AddEffect(&CreateEffect_Distortion2Col, "Distortion2(Lit)", ZORDER_DISTORTION2COL, 1.0f, TextureClass::Distortion2ColBackground, TextureClass::Invalid);
-	AddEffect(&CreateEffect_CollapsingLightSphere, "CollapsingLightSphere", ZORDER_COLLAPSINGSPHERE, 1.0f, TextureClass::CollapsingSphereSprite, TextureClass::CollapsingSphereBackground, TextureClass::Invalid);
-	AddEffect(&CreateEffect_BezierCube, "BezierCube", ZORDER_BEZIERCUBE, 1.0f, TextureClass::BezierCubeSprite, TextureClass::BezierCubeBackground, TextureClass::Invalid);
-	AddEffect(&CreateEffect_Distortion1, "Distortion1", ZORDER_DISTORTION, 1.0f, TextureClass::DistortionBackground, TextureClass::Invalid);
+	AddEffect(&CreateEffect_Tunnel, "Tunnel", ZORDER_TUNNEL, 1.0f);
+	AddEffect(&CreateEffect_WaterGlobe, "WaterGlobe", ZORDER_WATERGLOBE, 10.0f);
+	AddEffect(&CreateEffect_Tube, "Tube", ZORDER_TUBE, 1.0f);
+	AddEffect(&CreateEffect_Sun, "Sun", ZORDER_SUN, 1.0f);
+	AddEffect(&CreateEffect_Bumpmapping, "Bumpmapping", ZORDER_BUMPMAPPING, 8.0f);
+	AddEffect(&CreateEffect_Spectrum, "Spectrum", ZORDER_ANALYSER, 1.0f);
+	AddEffect(&CreateEffect_Rings, "ConcentricRings", ZORDER_RINGS, 1.0f);
+	AddEffect(&CreateEffect_Phased, "Phased", ZORDER_PHASED, 1.0f);
+	AddEffect(&CreateEffect_MotionBlur1, "MotionBlur1", ZORDER_MOTIONBLUR, 1.0f);
+	AddEffect(&CreateEffect_MotionBlur2, "MotionBlur2", ZORDER_MOTIONBLUR2, 1.0f);
+	AddEffect(&CreateEffect_MotionBlur3, "MotionBlur3", ZORDER_MOTIONBLUR3, 1.0f);
+	AddEffect(&CreateEffect_MotionBlur3Alt, "MotionBlur3(Alt)", ZORDER_MOTIONBLUR3ALT, 1.0f);
+	AddEffect(&CreateEffect_MorphingSphere, "MorphingSphere", ZORDER_MORPHINGSPHERE, 1.0f);
+	AddEffect(&CreateEffect_LightTentacles, "LightTentacles", ZORDER_LIGHTTENTACLES, 1.0f);
+	AddEffect(&CreateEffect_LightStar, "LightStar", ZORDER_LIGHTSTAR, 1.0f);
+	AddEffect(&CreateEffect_LightSphere, "LightSphere", ZORDER_LIGHTSPHERE, 1.0f);
+	AddEffect(&CreateEffect_LightRing, "LightRing", ZORDER_LIGHTRING, 1.0f);
+	AddEffect(&CreateEffect_Flowmap, "Flowmap", ZORDER_FLOWMAP, 10.0f);
+	AddEffect(&CreateEffect_DotStar, "DotStar", ZORDER_DOTSTAR, 1.0f);
+	AddEffect(&CreateEffect_Distortion2, "Distortion2", ZORDER_DISTORTION2, 1.0f);
+	AddEffect(&CreateEffect_Distortion2Col, "Distortion2(Lit)", ZORDER_DISTORTION2COL, 1.0f);
+	AddEffect(&CreateEffect_CollapsingLightSphere, "CollapsingLightSphere", ZORDER_COLLAPSINGSPHERE, 1.0f);
+	AddEffect(&CreateEffect_BezierCube, "BezierCube", ZORDER_BEZIERCUBE, 1.0f);
+	AddEffect(&CreateEffect_Distortion1, "Distortion1", ZORDER_DISTORTION, 1.0f);
 }
 
 ConfigItem* Tripex::AddCfgItem(ConfigItem* pItem)

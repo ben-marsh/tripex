@@ -109,10 +109,9 @@ public:
 	int nLastUsed;
 	float fProb;
 
-	std::string sName;
-	std::set<TextureClass> snTexture;
-	int nDrawOrder;
-	float fStartupWeight;
+	std::string name;
+	int draw_order;
+	float startup_weight;
 
 	union
 	{

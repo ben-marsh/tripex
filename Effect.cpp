@@ -25,8 +25,8 @@ EffectHandler::EffectHandler()
 	bValid = false;
 	fBr = 0.0f;
 	fProb = 0.0f;
-	fStartupWeight = 0.0f;
-	nDrawOrder = 0;
+	startup_weight = 0.0f;
+	draw_order = 0;
 	nLastUsed = 0;
 
 
@@ -80,9 +80,9 @@ float EffectHandler::GetElapsed(float fFrames)
 std::string EffectHandler::GetCfgItemName() const
 {
 	std::string sCfgName = "Effects\\";
-	for(int i = 0; sName[i] != 0; i++)
+	for(int i = 0; name[i] != 0; i++)
 	{
-		if(isalnum(sName[i])) sCfgName += sName[i];
+		if(isalnum(name[i])) sCfgName += name[i];
 	}
 	return sCfgName;
 }

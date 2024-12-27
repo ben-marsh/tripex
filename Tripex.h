@@ -93,7 +93,7 @@ private:
 	void DrawMessage(const TextureFont& font, int y, const char* text, float brightness, float back_brightness);
 	int GetClippedLineLength(const TextureFont& font, const char* text, int clip_width);
 
-	void AddEffect(std::shared_ptr<EffectHandler>(*fn)(), const char* name, int draw_order, float startup_weight, TextureClass nTex, ...);
+	void AddEffect(std::shared_ptr<EffectHandler>(*fn)(), const char* name, int draw_order, float startup_weight);
 	void CreateEffectList();
 
 	ConfigItem* AddCfgItem(ConfigItem* item);
