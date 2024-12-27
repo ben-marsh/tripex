@@ -259,7 +259,6 @@
     <ClInclude Include="TextureSource.h" />
     <ClInclude Include="Effect.h" />
     <ClInclude Include="Error.h" />
-    <ClInclude Include="main.h" />
     <ClInclude Include="Misc.h" />
     <ClInclude Include="Platform.h" />
     <ClInclude Include="StarModel.h" />
@@ -289,7 +288,11 @@
   <ItemGroup>
     <None Include=".editorconfig" />
     <None Include=".gitignore" />
+    <None Include="Edge.inl" />
+    <None Include="Face.inl" />
     <None Include="packages.config" />
+    <None Include="Point.inl" />
+    <None Include="Rect.inl" />
     <None Include="Vector3.inl" />
     <None Include="Fourier.inl" />
     <None Include="Matrix44.inl" />

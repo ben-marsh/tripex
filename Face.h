@@ -4,155 +4,27 @@
 
 struct Face
 {
-	uint16 m_anVtx[3];
+	uint16 vertices[3];
 
-	// Constructors:
 	Face() = default;
-	Face(uint16 nVtx1, uint16 nVtx2, uint16 nVtx3);
+	Face(uint16 vtx1, uint16 vtx2, uint16 vtx3);
 
-	// Set( ):
 	void Set(const Face& f);
-	void Set(uint16 nVtx1, uint16 nVtx2, uint16 nVtx3);
+	void Set(uint16 vtx1, uint16 vtx2, uint16 vtx3);
 
-	// SwapOrder( ):
 	void SwapCull();
-
-	// Contains( ):
-	bool Contains(uint16 nVtx) const;
+	bool Contains(uint16 vtx) const;
 	bool Contains(const Edge& e) const;
+	void Replace(uint16 old_vtx, uint16 new_vtx);
+	int IndexOf(uint16 vtx) const;
+	Edge GetEdge(int idx) const;
 
-	// Replace( ):
-	void Replace(uint16 nOldVtx, uint16 nNewVtx);
-
-	// IndexOf( ):
-	int IndexOf(uint16 nVtx) const;
-
-	// GetEdge( ):
-	Edge GetEdge(int nIdx) const;
-
-	// operator=( ):
 	Face& operator=(const Face& f);
 
-	// operator==( ):
 	bool operator==(const Face& f) const;
 
-	// operator[ ]( ):
-	uint16& operator[ ](int nPos);
-	const uint16& operator[ ](int nPos) const;
+	uint16& operator[ ](int idx);
+	const uint16& operator[ ](int idx) const;
 };
 
-/*---------------------------------
-* Constructor:
------------------------------------*/
-
-inline Face::Face(uint16 nVtx1, uint16 nVtx2, uint16 nVtx3)
-{
-	Set(nVtx1, nVtx2, nVtx3);
-}
-
-/*---------------------------------
-* Set( ):
------------------------------------*/
-
-inline void Face::Set(const Face& f)
-{
-	Set(f.m_anVtx[0], f.m_anVtx[1], f.m_anVtx[2]);
-}
-
-inline void Face::Set(uint16 nVtx1, uint16 nVtx2, uint16 nVtx3)
-{
-	m_anVtx[0] = nVtx1;
-	m_anVtx[1] = nVtx2;
-	m_anVtx[2] = nVtx3;
-}
-
-/*---------------------------------
-* SwapCull( ):
------------------------------------*/
-
-inline void Face::SwapCull()
-{
-	std::swap(m_anVtx[0], m_anVtx[1]);
-}
-
-/*---------------------------------
-* Contains( ):
------------------------------------*/
-
-inline bool Face::Contains(uint16 nVtx) const
-{
-	return m_anVtx[0] == nVtx || m_anVtx[1] == nVtx || m_anVtx[2] == nVtx;
-}
-inline bool Face::Contains(const Edge& e) const
-{
-	return Contains(e[0]) && Contains(e[1]);
-}
-
-/*---------------------------------
-* Replace( ):
------------------------------------*/
-
-inline void Face::Replace(uint16 nOldVtx, uint16 nNewVtx)
-{
-	for (int i = 0; i < 3; i++)
-	{
-		if (m_anVtx[i] == nOldVtx) m_anVtx[i] = nNewVtx;
-	}
-}
-
-/*---------------------------------
-* IndexOf( ):
------------------------------------*/
-
-inline int Face::IndexOf(uint16 nVtx) const
-{
-	for (int i = 0; i < 3; i++)
-	{
-		if (m_anVtx[i] == nVtx) return i;
-	}
-	return -1;
-}
-
-/*---------------------------------
-* GetEdge( ):
------------------------------------*/
-
-inline Edge Face::GetEdge(int nIdx) const
-{
-	static const int anNextIdx[3] = { 1, 2, 0 };
-	_ASSERT(nIdx >= 0 && nIdx <= 2);
-	return Edge(m_anVtx[nIdx], m_anVtx[anNextIdx[nIdx]]);
-}
-
-/*---------------------------------
-* operator=( ):
------------------------------------*/
-
-inline Face& Face::operator=(const Face& f)
-{
-	Set(f.m_anVtx[0], f.m_anVtx[1], f.m_anVtx[2]);
-	return *this;
-}
-
-/*---------------------------------
-* operator==( ):
------------------------------------*/
-
-inline bool Face::operator==(const Face& f) const
-{
-	return m_anVtx[0] == f.m_anVtx[0] && m_anVtx[1] == f.m_anVtx[1] && m_anVtx[2] == f.m_anVtx[2];
-}
-
-/*---------------------------------
-* operator[ ]( ):
------------------------------------*/
-
-inline uint16& Face::operator[ ](int nPos)
-{
-	return m_anVtx[nPos];
-}
-
-inline const uint16& Face::operator[ ](int nPos) const
-{
-	return m_anVtx[nPos];
-}
+#include "Face.inl"

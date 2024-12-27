@@ -1,6 +1,5 @@
 #include "Platform.h"
 #include "error.h"
-#include "main.h"
 #include "Texture.h"
 #include "TextureFont.h"
 #include "config.h"
@@ -27,8 +26,8 @@ void Tripex::ShowStatusMsg(const char *sFormat, ...)
 	va_list pArg;
 	va_start( pArg, sFormat );
 
-	vsnprintf( sStatusMsg, sizeof( sStatusMsg ), sFormat, pArg );
-	dwStatusTime = timeGetTime( );
+	vsnprintf( status_msg, sizeof( status_msg ), sFormat, pArg );
+	status_time = timeGetTime( );
 }
 
 DWORD WINAPI Tripex::InitialiseThread(void *pParam)
@@ -43,8 +42,6 @@ DWORD WINAPI Tripex::InitialiseThread(void *pParam)
 			enabled_effects.push_back(effects[i]);
 		}
 	}
-
-	vpTexture.clear();
 
 	srand( timeGetTime( ) );
 
@@ -83,13 +80,12 @@ Error* Tripex::Startup()
 
 	enabled_effects.push_back(effects[0]);
 
-	vpTexture.clear();
-	fEffectFrames = 0.0f;
-	fFadePos = 0.0f;
-	sStatusMsg[ 0 ] = 0;
-	dwStatusTime = 0;
-	nEffect = 0;
-	nNextEffect = 0; 
+	effect_frames = 0.0f;
+	fade_pos = 0.0f;
+	status_msg[ 0 ] = 0;
+	status_time = 0;
+	effect_idx = 0;
+	next_effect_idx = 0; 
 
 //	txs[TXS_RENDER_FIRST] = true;
 	txs[TXS_STARTED] = true;
@@ -98,7 +94,7 @@ Error* Tripex::Startup()
 	LoadCfgItems();
 	UpdateCfgItems(true);
 
-	pAudio = std::make_unique<AudioData>( 512 );
+	audio = std::make_unique<AudioData>( 512 );
 
 	srand( timeGetTime( ) );
 
@@ -148,12 +144,6 @@ Error* Tripex::Startup()
 	
 	InitialiseThread( NULL );
 
-	for( int i = 0; i < (int)vpTexture.size(); i++)
-	{
-//		renderer.AddTexture( vpTexture[ i ].get( ) );
-//		g_pD3D->vpTexture.push_back(vpTexture[i].get());
-	}
-
 	id = (int)enabled_effects.size();
 
 	txs.set(TXS_CHANGE_EFFECT);
@@ -172,40 +162,40 @@ Error* Tripex::Render()
 	DWORD dwTime = timeGetTime( );
 	if(txs.test(TXS_RESET_TIMING))//bResetTiming)
 	{
-		dwLastTime = dwTime - 10000;
+		last_time = dwTime - 10000;
 		txs.reset(TXS_RESET_TIMING);
 //		bResetTiming = false;
 	}
 
 	static float fFrames = 0;
-	DWORD dwTimeChange = dwTime - dwLastTime;
+	DWORD dwTimeChange = dwTime - last_time;
 
 	fFrames += std::min(4.0f, dwTimeChange / (1000.0f / 15.0f));
-	dwLastTime = dwTime;
+	last_time = dwTime;
 //	AddFrameTime(false, dwTimeChange);
 
-	fEffectFrames += fFrames;
-	fFadePos += dwTimeChange; 
+	effect_frames += fFrames;
+	fade_pos += dwTimeChange; 
 
 	EffectHandler *ppDrawEffect[2];
 	if(txs.test(TXS_EFFECT_LEFT) || txs.test(TXS_EFFECT_RIGHT))//bEffectLeft || bEffectRight))
 	{
-		int nNewEffect = nEffect;
+		int nNewEffect = effect_idx;
 		if(txs.test(TXS_EFFECT_LEFT))
 		{
-			if(nEffect > 1) nNewEffect--;
+			if(effect_idx > 1) nNewEffect--;
 			txs.reset(TXS_EFFECT_LEFT);
 		}
 		else
 		{
-			if(nEffect < ( int )enabled_effects.size() - 1) nNewEffect++;
+			if(effect_idx < ( int )enabled_effects.size() - 1) nNewEffect++;
 			txs.reset(TXS_EFFECT_RIGHT);
 		}
 
-		if(nNewEffect != nEffect)
+		if(nNewEffect != effect_idx)
 		{
-			nEffect = nNewEffect;
-			ShowStatusMsg("Current Effect: %s", enabled_effects[nEffect]->sName.c_str());
+			effect_idx = nNewEffect;
+			ShowStatusMsg("Current Effect: %s", enabled_effects[effect_idx]->sName.c_str());
 
 //				if(bEffectLeft) nEffect--;
 //				else if(bEffectRight) nEffect++;
@@ -213,28 +203,28 @@ Error* Tripex::Render()
 
 			txs.reset(TXS_IN_FADE);
 //				bInFade = false;
-			fEffectFrames = 0;
+			effect_frames = 0;
 
-			Error* error = enabled_effects[nEffect]->Reconfigure(*pAudio.get(), texture_library);
+			Error* error = enabled_effects[effect_idx]->Reconfigure(*audio.get(), texture_library);
 			if(error) return TraceError(error); 
 		}
 	}
 	if(!txs.test(TXS_IN_FADE) && (!txs.test(TXS_HOLD) || txs.test(TXS_CHANGE_EFFECT)) && 
-		(nEffect == 0 || 
-		fEffectFrames > (enabled_effects[nEffect]->fChange * EFFECT_CHANGE_FRAMES)) && 
+		(effect_idx == 0 || 
+		effect_frames > (enabled_effects[effect_idx]->fChange * EFFECT_CHANGE_FRAMES)) && 
 		enabled_effects.size() > 1)
 	{
 		txs.reset(TXS_CHANGE_EFFECT);
 //				bChangeEffect = false;
-		nNextEffect = 0;
+		next_effect_idx = 0;
 
 		txs.set(TXS_IN_FADE);
 //				bInFade = true;
-		fEffectFrames = 0;
+		effect_frames = 0;
 
 		for(int i = 1; i < ( int )enabled_effects.size(); i++) 
 		{
-			enabled_effects[i]->bValid = (i != nEffect && enabled_effects[nEffect]->nDrawOrder != enabled_effects[i]->nDrawOrder);
+			enabled_effects[i]->bValid = (i != effect_idx && enabled_effects[effect_idx]->nDrawOrder != enabled_effects[i]->nDrawOrder);
 		}
 
 		float pt = 0;
@@ -259,12 +249,12 @@ Error* Tripex::Render()
 				enabled_effects[i]->fProb = 1.0f / (1.0f + expf(-weight / temperature));
 			}
 
-			enabled_effects[i]->fProb *= enabled_effects[i]->fPreference * std::max(0.1f, 1.0f - fabsf(pAudio->GetIntensity( ) - enabled_effects[i]->fActivity));
+			enabled_effects[i]->fProb *= enabled_effects[i]->fPreference * std::max(0.1f, 1.0f - fabsf(audio->GetIntensity( ) - enabled_effects[i]->fActivity));
 
 			pt += enabled_effects[i]->fProb;//vpEffect[i]->preference * p[i];
 		}
 
-		nNextEffect = 0;
+		next_effect_idx = 0;
 		if(pt > FLOAT_ZERO)
 		{
 			for (int i = 1; i < (int)enabled_effects.size(); i++)
@@ -273,21 +263,21 @@ Error* Tripex::Render()
 			}
 
 			double r = (rand() % 1000);
-			for(nNextEffect = 1; nNextEffect < ( int )enabled_effects.size() - 1; nNextEffect++)
+			for(next_effect_idx = 1; next_effect_idx < ( int )enabled_effects.size() - 1; next_effect_idx++)
 			{
-				r -= enabled_effects[nNextEffect]->fProb * 1000.0;
+				r -= enabled_effects[next_effect_idx]->fProb * 1000.0;
 				if(r < 0) break;
 			}
 		}
-		enabled_effects[nNextEffect]->nLastUsed = id;
+		enabled_effects[next_effect_idx]->nLastUsed = id;
 
-		fFadePos = 0;
+		fade_pos = 0;
 		txs.reset(TXS_RESET_TARGET);
 //				bResetTarget = false;
 	}
 	if(txs[TXS_RECONFIGURE])//bReconfigure)
 	{
-		Error* error = enabled_effects[nEffect]->Reconfigure(*pAudio.get(), texture_library);
+		Error* error = enabled_effects[effect_idx]->Reconfigure(*audio.get(), texture_library);
 		if(error) return TraceError(error);
 
 		txs.reset(TXS_IN_FADE);
@@ -297,30 +287,30 @@ Error* Tripex::Render()
 	if(txs.test(TXS_HOLD))//bEffectPref)
 	{
 		txs[TXS_IN_FADE] = false;
-		if(nEffect == 0) nEffect = nNextEffect;
+		if(effect_idx == 0) effect_idx = next_effect_idx;
 	}
 
-	float fOut = (nEffect == 0)? 0 : (fFadeOut * 5000.0f);
+	float fOut = (effect_idx == 0)? 0 : (fFadeOut * 5000.0f);
 	float fFadeLength = (fFadeIn * 5000.0f) + fOut - (fCrossfading * std::min((fFadeIn * 5000.0f), fOut));
 
-	float fBr = txs.test(TXS_IN_FADE)? std::min(1.0f, std::max(0.0f, 1.0f - (fFadePos / fOut))) : 1;
-	ppDrawEffect[0] = (fBr < FLOAT_ZERO)? pEffectBlank : enabled_effects[nEffect].get();
+	float fBr = txs.test(TXS_IN_FADE)? std::min(1.0f, std::max(0.0f, 1.0f - (fade_pos / fOut))) : 1;
+	ppDrawEffect[0] = (fBr < FLOAT_ZERO)? pEffectBlank : enabled_effects[effect_idx].get();
 	ppDrawEffect[0]->fBr = fBr;
 
-	fBr = txs.test(TXS_IN_FADE)? std::min(1.0f, std::max(0.0f, 1.0f - ((fFadeLength - fFadePos) / (fFadeIn * 5000.0f)))) : 0;
-	ppDrawEffect[1] = (fBr < FLOAT_ZERO)? pEffectBlank : enabled_effects[nNextEffect].get();
+	fBr = txs.test(TXS_IN_FADE)? std::min(1.0f, std::max(0.0f, 1.0f - ((fFadeLength - fade_pos) / (fFadeIn * 5000.0f)))) : 0;
+	ppDrawEffect[1] = (fBr < FLOAT_ZERO)? pEffectBlank : enabled_effects[next_effect_idx].get();
 	ppDrawEffect[1]->fBr = fBr;
 
 	if(ppDrawEffect[1]->fBr > FLOAT_ZERO && !txs[TXS_RESET_TARGET])
 	{
-		Error* error = ppDrawEffect[1]->Reconfigure(*pAudio.get(), texture_library);
+		Error* error = ppDrawEffect[1]->Reconfigure(*audio.get(), texture_library);
 		if(error) return TraceError(error);
 
 		txs[TXS_RESET_TARGET] = true;
 	}
 	if(ppDrawEffect[1]->fBr >= 1 - FLOAT_ZERO)
 	{
-		nEffect = nNextEffect;
+		effect_idx = next_effect_idx;
 		ppDrawEffect[0] = ppDrawEffect[1];
 		ppDrawEffect[1] = pEffectBlank;//&blank;
 		txs.reset(TXS_IN_FADE);
@@ -335,12 +325,12 @@ Error* Tripex::Render()
 		return nullptr;
 	}
 
-	pAudio->Update( fFrames, enabled_effects[nEffect]->fSensitivity );
+	audio->Update( fFrames, enabled_effects[effect_idx]->fSensitivity );
 //	UpdateBeat(fFrames);
 
 	for(int i = 0; i < 2; i++)
 	{
-		Error* error = ppDrawEffect[i]->Calculate( fFrames, *pAudio.get(), renderer );
+		Error* error = ppDrawEffect[i]->Calculate( fFrames, *audio.get(), renderer );
 		if(error) return TraceError(error);
 	}
 
@@ -390,13 +380,13 @@ Error* Tripex::Render()
 	float fMsgBr = 0.0f;
 
 	DWORD dwTick = timeGetTime( );
-	if(dwTick >= dwStatusTime && dwTick <= dwStatusTime + (MSG_DISPLAY_TIME + MSG_FADEOUT_TIME) && sStatusMsg[ 0 ] != 0)
+	if(dwTick >= status_time && dwTick <= status_time + (MSG_DISPLAY_TIME + MSG_FADEOUT_TIME) && status_msg[ 0 ] != 0)
 	{
-		sMsg = sStatusMsg;
-		if(dwTick < dwStatusTime + MSG_DISPLAY_TIME) fMsgBr = 1.0f;
+		sMsg = status_msg;
+		if(dwTick < status_time + MSG_DISPLAY_TIME) fMsgBr = 1.0f;
 		else
 		{
-			float fPos = (dwTick - (dwStatusTime + MSG_DISPLAY_TIME)) / (float)MSG_FADEOUT_TIME;
+			float fPos = (dwTick - (status_time + MSG_DISPLAY_TIME)) / (float)MSG_FADEOUT_TIME;
 			float fV = 1.0f - cos(fPos * 3.14159f / 2.0f);
 			fMsgBr = 1.0f - (fV * fV);//fPos;//fV;//1 - (fV * fV);//1.0f;
 		}
@@ -408,7 +398,7 @@ Error* Tripex::Render()
 
 	if(txs.test(TXS_VISIBLE_BEATS))
 	{
-		pAudio->Render(overlay_background, overlay_foreground);
+		audio->Render(overlay_background, overlay_foreground);
 	}
 
 //		ZSpriteBuffer sb;
@@ -462,7 +452,7 @@ void Tripex::Shutdown( )
 	if(!txs.test(TXS_STARTED)) return;
 	txs[TXS_STARTED] = false;
 
-	pAudio.reset();
+	audio.reset();
 
 //	gui = auto_ptr<ZTexture>(NULL);
 //	pcHUD = NULL;
@@ -473,6 +463,43 @@ void Tripex::Shutdown( )
 	}
 
 	SaveCfgItems();
+}
+
+void Tripex::SetAudioData(int num_channels, int sample_rate, int sample_bits, const void* data, size_t data_len)
+{
+	audio->SetDataFormat(num_channels, sample_rate, sample_bits);
+	audio->AddData(data, data_len);
+}
+
+void Tripex::ChangeEffect()
+{
+	txs[TXS_CHANGE_EFFECT] = true;
+}
+
+void Tripex::MoveToPrevEffect()
+{
+	txs[TXS_EFFECT_LEFT] = true;
+}
+
+void Tripex::MoveToNextEffect()
+{
+	txs[TXS_EFFECT_RIGHT] = true;
+}
+
+void Tripex::ReconfigureEffect()
+{
+	txs[TXS_RECONFIGURE] = true;
+}
+
+void Tripex::ToggleHoldingEffect()
+{
+	txs.flip(TXS_HOLD);
+	ShowStatusMsg("Effect %s", txs[TXS_HOLD] ? "held" : "not held");
+}
+
+void Tripex::ToggleAudioInfo()
+{
+	txs.flip(TXS_VISIBLE_BEATS);
 }
 
 int Tripex::GetClippedLineLength(const TextureFont& pFont, const char* sText, int nClipWidth)
@@ -648,7 +675,7 @@ void Tripex::CreateEffectList()
 ConfigItem* Tripex::AddCfgItem(ConfigItem* pItem)
 {
 	pppCfgItem->push_back(pItem);
-	(*pmpCfgItem)[pItem->GetKeyName()].push_back(pItem);
+	(*name_to_config_item)[pItem->GetKeyName()].push_back(pItem);
 	return pItem;
 }
 
@@ -657,7 +684,7 @@ void Tripex::CreateCfgItems()
 	if (pppCfgItem == NULL)
 	{
 		pppCfgItem = new std::vector<ConfigItem*>;
-		pmpCfgItem = new std::map< std::string, std::vector< ConfigItem* >, CI_STR_CMP >();
+		name_to_config_item = new std::map< std::string, std::vector< ConfigItem* >, CI_STR_CMP >();
 		psEffect = new std::string[effects.size()];
 
 		AddCfgItem(ConfigItem::Bool("MeshHQ", &bMeshHQ, true));
@@ -727,7 +754,7 @@ void Tripex::LoadCfgItems()
 	UpdateCfgItems();
 
 	std::map< std::string, std::vector< ConfigItem* >, CI_STR_CMP >::iterator it;
-	for (it = pmpCfgItem->begin(); it != pmpCfgItem->end(); it++)
+	for (it = name_to_config_item->begin(); it != name_to_config_item->end(); it++)
 	{
 		std::string sKey = it->first;
 		//			HKEY hKey = RegCreateKey(HKEY_CURRENT_USER, it->first.c_str(), KEY_READ);

@@ -5,23 +5,25 @@ template<class T> class Point
 public:
 	T x, y;
 
-	Point() : x(), y() {}
-	Point(T nX, T nY) { this->Set(nX, nY); }
-	Point(const Point<T>& p) { this->Set(p); }
+	Point();
+	Point(T nX, T nY);
+	Point(const Point<T>& p);
 
-	void Set(const Point<T>& other) { Set(other.x, other.y); }
-	void Set(T nX, T nY) { this->x = nX; this->y = nY; }
+	void Set(const Point<T>& other);
+	void Set(T x, T y);
 
-	Point<T> operator-() const { return Point<T>(-x, -y); }
-	Point<T> operator+() const { return Point<T>(+x, +y); }
-	Point<T> operator-(const Point<T>& p) const { return Point<T>(x - p.x, y - p.y); }
-	Point<T> operator+(const Point<T>& p) const { return Point<T>(x + p.x, y + p.y); }
-	Point<T>& operator-=(const Point<T>& p) { x -= p.x; y -= p.y; return *this; }
-	Point<T>& operator+=(const Point<T>& p) { x += p.x; y += p.y; return *this; }
-	Point<T>& operator=(const Point<T>& p) { Set(p); return *this; }
+	Point<T> operator-() const;
+	Point<T> operator+() const;
+	Point<T> operator-(const Point<T>& p) const;
+	Point<T> operator+(const Point<T>& p) const;
+	Point<T>& operator-=(const Point<T>& p);
+	Point<T>& operator+=(const Point<T>& p);
+	Point<T>& operator=(const Point<T>& p);
+	
+	bool operator==(const Point<T>& p) const;
+	bool operator!=(const Point<T>& p) const;
 
-	bool operator==(const Point<T>& p) const { return x == p.x && y == p.y; }
-	bool operator!=(const Point<T>& p) const { return !operator==(p); }
-
-	template < class U > operator Point<U>() { return Point<U>((U)x, (U)y); }
+	template<class U> operator Point<U>() const;
 };
+
+#include "Point.inl"

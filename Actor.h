@@ -7,11 +7,11 @@
 #include "Edge.h"
 #include "ColorRgb.h"
 
-#define WORD_INVALID_INDEX ((uint16)0x0ffff)
-
 class Actor
 {
 public:
+	static const uint16 WORD_INVALID_INDEX = ((uint16)0x0ffff);
+
 	static const int MAX_VERTICES = 32768;
 	static const float OBJECT_NORMAL_LENGTH;
 

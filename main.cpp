@@ -20,25 +20,6 @@ WAVEFORMATEX g_wfex;
 Tripex* g_pTripex;
 RendererDirect3d* g_direct3d;
 
-void AudioData(short* pAudioData, int iAudioDataLength, float* pFreqData, int iFreqDataLength)
-{
-	if (g_pTripex->pAudio != NULL)
-	{
-		g_pTripex->pAudio->SetDataFormat(2, 44100, 16);
-		g_pTripex->pAudio->AddData(pAudioData, iAudioDataLength);
-	}
-
-	//	for( int i = 0; i < 2; i++ )
-	//	{
-	//		for( int j = 0; j < 576; j++ )
-	//		{
-	//			g_pcSpectrum[ i ][ j ] = 0.6f * rand( ) / powf(j, 1.4f);
-	//			//	powf( rand( ), 1.0f + ( 4.0f * -j / 576.0f ) );
-	//			g_pcWaveform[ i ][ j ] = rand( );
-	//		}
-	//	}
-}
-
 /*---------------------------------
 * CreateD3D( )
 -----------------------------------*/
@@ -234,14 +215,13 @@ LRESULT CALLBACK TxWndProc(HWND hWnd, uint32 nMsg, WPARAM wParam, LPARAM lParam)
 			}
 #endif
 
-			void _cdecl AudioData(short* pAudioData, int iAudioDataLength, float* pFreqData, int iFreqDataLength);
-			AudioData((short*)g_aWaveHdr[nIdx].lpData, g_aWaveHdr[nIdx].dwBytesRecorded, NULL, 0);
+			g_pTripex->SetAudioData(2, 44100, 16, g_aWaveHdr[nIdx].lpData, g_aWaveHdr[nIdx].dwBytesRecorded);
 
 			AddWaveInBuffer(nIdx);
 		}
 		return FALSE;
 	case WM_TIMER:
-		if (wParam == 0x1234)
+		if (wParam == TICK_TIMER_ID)
 		{
 			Error* error = g_pTripex->Render();
 			if (error)
@@ -283,23 +263,22 @@ LRESULT CALLBACK TxWndProc(HWND hWnd, uint32 nMsg, WPARAM wParam, LPARAM lParam)
 			DestroyWindow(hWnd);
 			break;
 		case VK_F2:
-			g_pTripex->txs.flip(TXS_VISIBLE_BEATS);
+			g_pTripex->ToggleAudioInfo();
 			break;
 		case VK_LEFT:
-			g_pTripex->txs[TXS_EFFECT_LEFT] = true;
+			g_pTripex->MoveToPrevEffect();
 			break;
 		case VK_RIGHT:
-			g_pTripex->txs[TXS_EFFECT_RIGHT] = true;
+			g_pTripex->MoveToNextEffect();
 			break;
 		case 'R':
-			g_pTripex->txs[TXS_RECONFIGURE] = true;
+			g_pTripex->ReconfigureEffect();
 			break;
 		case 'E':
-			g_pTripex->txs[TXS_CHANGE_EFFECT] = true;
+			g_pTripex->ChangeEffect();
 			break;
 		case 'H':
-			g_pTripex->txs.flip(TXS_HOLD);
-			g_pTripex->ShowStatusMsg("Effect %s", g_pTripex->txs[TXS_HOLD] ? "held" : "not held");
+			g_pTripex->ToggleHoldingEffect();
 			break;
 		}
 		return FALSE;

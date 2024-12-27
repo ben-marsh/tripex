@@ -1,5 +1,4 @@
 #include "Platform.h"
-#include "main.h"
 #include "config.h"
 #include "error.h"
 #include "ConfigItem.h"
