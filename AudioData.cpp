@@ -24,8 +24,6 @@ void DrawHorizontalBar(GeometryBuffer& geom, int x, int y, int w, int h, float p
 }
 
 
-extern bool bAvoidBigReactions;
-
 /*---------------------------------------------
 * ZAudio:
 ---------------------------------------------*/
@@ -187,6 +185,7 @@ void AudioData::Update(float elapsed, float sensitivity)
 		intensity *= 1.0f / (intensity + 0.6f);
 		intensity = std::min(std::max(intensity, 0.0f), 1.0f);
 
+		const bool bAvoidBigReactions = false;
 		if (bAvoidBigReactions)
 		{
 			beat = 0.0f;
@@ -225,9 +224,9 @@ void AudioData::Update(float elapsed, float sensitivity)
 * Render( ):
 ---------------------------------------------*/
 
-void AudioData::Render(GeometryBuffer& overlay_back, GeometryBuffer& overlay) const
+void AudioData::Render(GeometryBuffer& overlay_back, GeometryBuffer& overlay, float overlay_back_mult) const
 {
-	overlay_back.AddSprite(Point<int>(10, 30), Rect<int>(0, 0, 600, 400), 1.0f - fHUDTransparency);
+	overlay_back.AddSprite(Point<int>(10, 30), Rect<int>(0, 0, 600, 400), overlay_back_mult);
 
 	DrawHorizontalBar(overlay, 20, 40, 256, 10, intensity);
 	DrawHorizontalBar(overlay, 20, 60, 256, 10, beat);

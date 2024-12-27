@@ -4,32 +4,8 @@
 #include <vector>
 #include <map>
 
-bool bMeshHQ;
-
-// config-effects.cpp
-float fFairness;
-std::string *psFlowmapSize;
-int nFlowmapSize;
-
-// config-display.cpp
-bool bShowProgress;
-bool bShowName;
-bool bShowNameStart;
-bool bShowNameEnd;
-bool bShowTime;
-bool bShowHUD;
-bool bShowHUDTitle;
-bool bShowMessages;
-float fHUDTransparency;
-
 // config-general.cpp
-bool bAvoidBigReactions;
-float fCrossfading;
-float fFadeIn;
-float fFadeOut;
-
-int nFlowmapW;
-int nFlowmapH;
+bool bAvoidBigReactions = false;
 
 #define HKEY_ROOT (HKEY_LOCAL_MACHINE)
 #define KEY_MAIN "Software\\-\\Tripex"

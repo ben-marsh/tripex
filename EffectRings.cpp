@@ -8,8 +8,6 @@
 #define RINGSEP 10
 #define RINGDELAY 2
 
-extern bool bMeshHQ;
-
 class EffectRings : public EffectBase
 {
 public:

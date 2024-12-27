@@ -23,7 +23,6 @@
 #define XM 0.55f //0.2
 #define YM 0.55f //0.2//5 //0.2
 
-extern bool bMeshHQ;
 extern std::vector< std::unique_ptr< Texture > > vpTexture;
 extern bool fBigBeat;
 
@@ -137,8 +136,7 @@ public:
 		tx = 0;
 		ty = 0;
 
-		if(bMeshHQ) MakeTentacles(obj, /*25*/ 160, 200, 8);
-		else MakeTentacles(obj, /*25*/ 80, 200, 8);
+		MakeTentacles(obj, /*25*/ 160, 200, 8);
 		obj.FindFaceOrder(Vector3::Origin());
 		obj.flags.set( Actor::F_DO_POSITION_DELAY );
 		obj.flags.set( Actor::F_DRAW_Z_BUFFER );

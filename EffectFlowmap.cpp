@@ -160,7 +160,8 @@ public:
 		ang = 0;
 		fStep = 1.0f;
 		fNextStep = 1.0f;
-		nFlowmapW = nFlowmapH = 2;
+		nFlowmapW = 2;
+		nFlowmapH = 2;
 		tflowmap = 0;
 		fOddFrame = true;
 		fadecolour = 1;

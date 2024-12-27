@@ -229,7 +229,8 @@ Error* Tripex::Render()
 
 		float pt = 0;
 		// fairness = (random)0-1(ordered)
-		float temperature = (1.0f / (fFairness)) - 1;
+		const float selection_fairness = 0.7f;
+		float temperature = (1.0f / selection_fairness) - 1;
 		// temperature = (random)+inf - 0(ordered)
 		for(int i = 1; i < ( int )enabled_effects.size(); i++)
 		{
@@ -289,6 +290,10 @@ Error* Tripex::Render()
 		txs[TXS_IN_FADE] = false;
 		if(effect_idx == 0) effect_idx = next_effect_idx;
 	}
+
+	const float fCrossfading = 0.934f;
+	const float fFadeIn = 0.241f;
+	const float fFadeOut = 0.353f;
 
 	float fOut = (effect_idx == 0)? 0 : (fFadeOut * 5000.0f);
 	float fFadeLength = (fFadeIn * 5000.0f) + fOut - (fCrossfading * std::min((fFadeIn * 5000.0f), fOut));
@@ -391,14 +396,17 @@ Error* Tripex::Render()
 			fMsgBr = 1.0f - (fV * fV);//fPos;//fV;//1 - (fV * fV);//1.0f;
 		}
 	}
-	if(sMsg.size() > 0 && bShowMessages)
+
+	const float overlay_back_mult = 0.65f;
+
+	if(sMsg.size() > 0)
 	{
-		DrawMessage(tef, 38, sMsg.c_str(), fMsgBr, 1 - fHUDTransparency);
+		DrawMessage(tef, 38, sMsg.c_str(), fMsgBr, overlay_back_mult);
 	}
 
 	if(txs.test(TXS_VISIBLE_BEATS))
 	{
-		audio->Render(overlay_background, overlay_foreground);
+		audio->Render(overlay_background, overlay_foreground, overlay_back_mult);
 	}
 
 	// Draw the overlay background
@@ -680,29 +688,6 @@ void Tripex::CreateCfgItems()
 		name_to_config_item = new std::map< std::string, std::vector< ConfigItem* >, CI_STR_CMP >();
 		psEffect = new std::string[effects.size()];
 
-		AddCfgItem(ConfigItem::Bool("MeshHQ", &bMeshHQ, true));
-
-		// Display
-		AddCfgItem(ConfigItem::Bool("ShowProgress", &bShowProgress));
-		AddCfgItem(ConfigItem::Bool("ShowName", &bShowName));
-		AddCfgItem(ConfigItem::Bool("ShowNameStart", &bShowNameStart));
-		AddCfgItem(ConfigItem::Bool("ShowNameEnd", &bShowNameEnd));
-		AddCfgItem(ConfigItem::Bool("ShowTime", &bShowTime));
-		AddCfgItem(ConfigItem::Bool("ShowHUD", &bShowHUD));
-		AddCfgItem(ConfigItem::Bool("ShowHUDTitle", &bShowHUDTitle));
-		AddCfgItem(ConfigItem::Bool("ShowMessages", &bShowMessages));
-		AddCfgItem(ConfigItem::Float("HUDTransparency", &fHUDTransparency));
-
-		// General
-		AddCfgItem(ConfigItem::Float("Crossfading", &fCrossfading));
-		AddCfgItem(ConfigItem::Float("FadeIn", &fFadeIn));
-		AddCfgItem(ConfigItem::Float("FadeOut", &fFadeOut));
-		AddCfgItem(ConfigItem::Bool("AvoidBigReactions", &bAvoidBigReactions));
-
-		// Effects
-		AddCfgItem(ConfigItem::Float("SelectionFairness", &fFairness));
-		AddCfgItem(ConfigItem::Int("FlowmapW", &nFlowmapW, true));
-		AddCfgItem(ConfigItem::Int("FlowmapH", &nFlowmapH, true));
 		for (int i = 0; i < (int)effects.size(); i++)
 		{
 			AddCfgItem(ConfigItem::String(effects[i]->GetCfgItemName().c_str(), &psEffect[i]));

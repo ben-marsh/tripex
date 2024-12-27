@@ -45,9 +45,8 @@ public:
 		accum = 1.1;
 		r = p = y = 0;
 		fNotRendered = true;
-		if(bMeshHQ) nSources = 100;
-		else nSources = 60;
-
+		nSources = 100;
+		
 		for(int i = 0; i < 4; i++) pvPosition[i].resize(nSources);
 		for(int i = 0; i < FRAMES; i++) length[i].resize(nSources);
 		position.resize(nSources);

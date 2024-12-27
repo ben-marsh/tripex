@@ -43,7 +43,7 @@ public:
 	void AddData(const void* data, size_t data_size);
 
 	void Update(float elapsed, float sensitivity);
-	void Render(GeometryBuffer& overlay_back, GeometryBuffer& overlay) const;
+	void Render(GeometryBuffer& overlay_back, GeometryBuffer& overlay, float overlay_back_mult) const;
 
 	float GetIntensity() const;
 	float GetBeat() const;
