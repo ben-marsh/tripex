@@ -98,12 +98,11 @@ Error* Tripex::Startup()
 
 	srand( timeGetTime( ) );
 
-	std::vector<PALETTEENTRY> pe;
+	std::vector<ColorRgb> pe;
 	pe.resize(256);
 	for( int i = 0; i < 256; i++ )
 	{
-		pe[i].peRed = pe[i].peGreen = pe[i].peBlue = i;
-		pe[i].peFlags = 0xff;
+		pe[i] = ColorRgb(i, i, i);
 	}
 
 //	{for( int i = 0; i < 256 * 256; i++ )

@@ -19,8 +19,7 @@ Canvas::Canvas(int width, int height)
 
 	for (int idx = 0; idx < 256; idx++)
 	{
-		palette[idx].peRed = palette[idx].peGreen = palette[idx].peBlue = idx;
-		palette[idx].peFlags = 0xff;
+		palette[idx] = ColorRgb(idx, idx, idx);
 	}
 }
 

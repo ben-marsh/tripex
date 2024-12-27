@@ -15,7 +15,7 @@ public:
 	const int stride;
 
 	ColorRgb color;
-	PALETTEENTRY palette[256];
+	ColorRgb palette[256];
 
 	Canvas(int width, int height);
 	Error* Create(Renderer& renderer);

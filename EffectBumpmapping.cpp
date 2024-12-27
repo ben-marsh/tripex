@@ -166,13 +166,9 @@ public:
 
 		int x, y, i;
 
-		ColorRgb colour[256];
 		for(i = 0; i < 256; i++)
 		{
-			pc.palette[ i ].peRed = i;
-			pc.palette[ i ].peGreen = i;
-			pc.palette[ i ].peBlue = i;
-			pc.palette[ i ].peFlags = 0xff;
+			pc.palette[i] = ColorRgb(i, i, i);
 		}
 //			colour[i] = ZColour(i, i, i);
 //		pc.SetPalette(colour);

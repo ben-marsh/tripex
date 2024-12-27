@@ -6,7 +6,7 @@
 #include <memory>
 #include "ComPtr.h"
 
-RendererDirect3d::TextureImpl::TextureImpl(int width, int height, TextureFormat format, const void* data, uint32 data_size, uint32 data_stride, const PALETTEENTRY* palette, TextureFlags flags)
+RendererDirect3d::TextureImpl::TextureImpl(int width, int height, TextureFormat format, const void* data, uint32 data_size, uint32 data_stride, const ColorRgb* palette, TextureFlags flags)
 	: Texture(width, height, format, flags)
 	, data(data)
 	, data_size(data_size)
@@ -197,7 +197,7 @@ D3DFORMAT RendererDirect3d::GetD3DFORMAT(TextureFormat format)
 	return D3DFMT_UNKNOWN;
 }
 
-Error* RendererDirect3d::CreateTexture(int width, int height, TextureFormat format, const void* data, uint32 data_size, uint32 data_stride, const PALETTEENTRY* palette, TextureFlags flags, std::shared_ptr<Texture>& out_texture)
+Error* RendererDirect3d::CreateTexture(int width, int height, TextureFormat format, const void* data, uint32 data_size, uint32 data_stride, const ColorRgb* palette, TextureFlags flags, std::shared_ptr<Texture>& out_texture)
 {
 	// Create the texture object, only retaining the data and palette pointers if it's a dynamic texture
 	std::shared_ptr<TextureImpl> texture;
@@ -223,14 +223,26 @@ Error* RendererDirect3d::CreateTexture(int width, int height, TextureFormat form
 	}
 
 	// Create the d3d texture instance
+	PALETTEENTRY palette_entries[256];
+	PALETTEENTRY* palette_entries_ptr = nullptr;
 	if (palette != nullptr)
 	{
-		device->SetPaletteEntries(0, palette);
+		palette_entries_ptr = palette_entries;
+
+		for (int idx = 0; idx < 256; idx++)
+		{
+			palette_entries[idx].peRed = palette[idx].r;
+			palette_entries[idx].peGreen = palette[idx].g;
+			palette_entries[idx].peBlue = palette[idx].b;
+			palette_entries[idx].peFlags = 0xff;
+		}
+
+		device->SetPaletteEntries(0, palette_entries_ptr);
 		device->SetCurrentTexturePalette(0);
 	}
 
 	// Upload the new data
-	Error* error = UploadTexture(texture->d3d_texture, width, height, d3dformat, data, data_size, data_stride, palette);
+	Error* error = UploadTexture(texture->d3d_texture, width, height, d3dformat, data, data_size, data_stride, palette_entries_ptr);
 	if (error) return TraceError(error);
 
 	out_texture = std::move(texture);

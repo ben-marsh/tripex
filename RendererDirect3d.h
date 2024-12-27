@@ -29,7 +29,7 @@ public:
 	Error* BeginFrame() override;
 	Error* EndFrame() override;
 
-	virtual Error* CreateTexture(int width, int height, TextureFormat format, const void* data, uint32 data_size, uint32 data_stride, const PALETTEENTRY* palette, TextureFlags flags, std::shared_ptr<Texture>& out_texture) override;
+	virtual Error* CreateTexture(int width, int height, TextureFormat format, const void* data, uint32 data_size, uint32 data_stride, const ColorRgb* palette, TextureFlags flags, std::shared_ptr<Texture>& out_texture) override;
 	virtual Error* CreateTextureFromImage(const void* data, uint32 data_size, std::shared_ptr<Texture>& out_texture) override;
 
 	using Renderer::DrawIndexedPrimitive;
@@ -46,12 +46,12 @@ private:
 		const void* const data;
 		const uint32 data_size;
 		const uint32 data_stride;
-		const PALETTEENTRY* const palette;
+		const ColorRgb* const palette;
 
 		ComPtr<IDirect3DTexture9> d3d_texture;
 		bool dirty;
 
-		TextureImpl(int width, int height, TextureFormat format, const void* data, uint32 data_size, uint32 data_stride, const PALETTEENTRY* palette, TextureFlags flags);
+		TextureImpl(int width, int height, TextureFormat format, const void* data, uint32 data_size, uint32 data_stride, const ColorRgb* palette, TextureFlags flags);
 		virtual ~TextureImpl() override;
 		virtual void SetDirty() override;
 		virtual Error* GetPixelData(std::vector<uint8>& buffer) const override;
