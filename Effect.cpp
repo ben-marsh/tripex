@@ -1,5 +1,5 @@
 #include "Platform.h"
-#include "ZDirect3D.h"
+#include "Renderer.h"
 #include "Effect.h"
 
 /******** ZEffectBase ************************************/

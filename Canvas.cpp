@@ -2,7 +2,7 @@
 #include "Canvas.h"
 #include "error.h"
 #include "Texture.h"
-#include "ZDirect3D.h"
+#include "Renderer.h"
 
 /*---------------------------------
 * Constructor:

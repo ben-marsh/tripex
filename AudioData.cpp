@@ -4,7 +4,7 @@
 
 
 ////////
-#include "ZDirect3D.h"
+#include "Renderer.h"
 #include "effect.h"
 #include "main.h"
 

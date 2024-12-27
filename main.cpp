@@ -4,6 +4,7 @@
 #include "stdafx.h"
 #include <mmeapi.h>
 #include "Tripex.h"
+#include "RendererDirect3d.h"
 #include "effect.h"
 
 #define USE_RANDOM_AUDIO 1
@@ -17,7 +18,7 @@ uint8* g_apnWaveBuf[2] = { NULL, };
 WAVEFORMATEX g_wfex;
 
 Tripex* g_pTripex;
-ZDirect3D* g_direct3d;
+RendererDirect3d* g_direct3d;
 
 void AudioData(short* pAudioData, int iAudioDataLength, float* pFreqData, int iFreqDataLength)
 {
@@ -195,7 +196,7 @@ LRESULT CALLBACK TxWndProc(HWND hWnd, uint32 nMsg, WPARAM wParam, LPARAM lParam)
 			}
 			else
 			{
-				g_direct3d = new ZDirect3D();
+				g_direct3d = new RendererDirect3d();
 
 				Error* error = g_direct3d->Open(hWnd);
 				if (error)

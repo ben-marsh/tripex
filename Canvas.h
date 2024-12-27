@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ZDirect3D.h"
+#include "Renderer.h"
 #include "ColorRgb.h"
 #include <memory>
 

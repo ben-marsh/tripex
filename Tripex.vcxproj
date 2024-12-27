@@ -237,7 +237,7 @@
     <ClCompile Include="AudioData.cpp" />
     <ClCompile Include="BezierCurve.cpp" />
     <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="ZDirect3d.cpp" />
+    <ClCompile Include="RendererDirect3d.cpp" />
     <ClCompile Include="Effect.cpp" />
     <ClCompile Include="Fourier.cpp" />
     <ClCompile Include="TexturedGrid.cpp" />
@@ -272,7 +272,7 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="ColorRgb.h" />
     <ClInclude Include="ColorHsv.h" />
-    <ClInclude Include="ZDirect3d.h" />
+    <ClInclude Include="RendererDirect3d.h" />
     <ClInclude Include="Edge.h" />
     <ClInclude Include="Face.h" />
     <ClInclude Include="Fourier.h" />

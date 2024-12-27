@@ -1,12 +1,12 @@
 #include "Platform.h"
-#include "ZDirect3d.h"
+#include "RendererDirect3d.h"
 #include <d3dx9.h>
 #include "Texture.h"
 #include "error.h"
 #include <memory>
 #include "ComPtr.h"
 
-ZDirect3D::TextureImpl::TextureImpl(int width, int height, D3DFORMAT format, const void* data, uint32 data_size, uint32 data_stride, const PALETTEENTRY* palette, TextureFlags flags)
+RendererDirect3d::TextureImpl::TextureImpl(int width, int height, D3DFORMAT format, const void* data, uint32 data_size, uint32 data_stride, const PALETTEENTRY* palette, TextureFlags flags)
 	: Texture(width, height, format, flags)
 	, data(data)
 	, data_size(data_size)
@@ -17,7 +17,7 @@ ZDirect3D::TextureImpl::TextureImpl(int width, int height, D3DFORMAT format, con
 	dirty = false;
 }
 
-ZDirect3D::TextureImpl::~TextureImpl()
+RendererDirect3d::TextureImpl::~TextureImpl()
 {
 	if (d3d_texture != nullptr)
 	{
@@ -26,12 +26,12 @@ ZDirect3D::TextureImpl::~TextureImpl()
 	}
 }
 
-void ZDirect3D::TextureImpl::SetDirty()
+void RendererDirect3d::TextureImpl::SetDirty()
 {
 	dirty = true;
 }
 
-Error* ZDirect3D::TextureImpl::GetPixelData(std::vector<uint8>& buffer) const
+Error* RendererDirect3d::TextureImpl::GetPixelData(std::vector<uint8>& buffer) const
 {
 	IDirect3DSurface9* pSurface;
 
@@ -95,7 +95,7 @@ void ZDirect3D::Direct3DTexture::SetSource(D3DFORMAT format, const void* data, u
 
 
 
-ZDirect3D::ZDirect3D()
+RendererDirect3d::RendererDirect3d()
 {
 	width = 0;
 	height = 0;
@@ -103,7 +103,7 @@ ZDirect3D::ZDirect3D()
 }
 
 
-Error* ZDirect3D::Open(HWND hwnd)
+Error* RendererDirect3d::Open(HWND hwnd)
 {
 	Close();
 
@@ -146,13 +146,13 @@ Error* ZDirect3D::Open(HWND hwnd)
 	return nullptr;
 }
 
-void ZDirect3D::Close()
+void RendererDirect3d::Close()
 {
 	device = nullptr;
 	d3d = nullptr;
 }
 
-Error* ZDirect3D::BeginFrame()
+Error* RendererDirect3d::BeginFrame()
 {
 	HRESULT hRes = device->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x00000000, 1.0f, 0);
 	if (FAILED(hRes)) return TraceError(hRes);
@@ -166,7 +166,7 @@ Error* ZDirect3D::BeginFrame()
 	return nullptr;
 }
 
-Error* ZDirect3D::EndFrame()
+Error* RendererDirect3d::EndFrame()
 {
 	HRESULT hRes = device->EndScene();
 	if (FAILED(hRes)) return TraceError(hRes);
@@ -177,12 +177,12 @@ Error* ZDirect3D::EndFrame()
 	return nullptr;
 }
 
-Rect<int> ZDirect3D::GetViewportRect() const
+Rect<int> RendererDirect3d::GetViewportRect() const
 {
 	return Rect<int>(0, 0, width, height);
 }
 
-Rect<float> ZDirect3D::GetClipRect() const
+Rect<float> RendererDirect3d::GetClipRect() const
 {
 	Rect<float> rect;
 	rect.left = std::min(-0.25f, caps.GuardBandLeft);
@@ -192,7 +192,7 @@ Rect<float> ZDirect3D::GetClipRect() const
 	return rect;
 }
 
-Error* ZDirect3D::CreateTexture(int width, int height, D3DFORMAT format, const void* data, uint32 data_size, uint32 data_stride, const PALETTEENTRY* palette, TextureFlags flags, std::shared_ptr<Texture>& out_texture)
+Error* RendererDirect3d::CreateTexture(int width, int height, D3DFORMAT format, const void* data, uint32 data_size, uint32 data_stride, const PALETTEENTRY* palette, TextureFlags flags, std::shared_ptr<Texture>& out_texture)
 {
 	// Create the texture object, only retaining the data and palette pointers if it's a dynamic texture
 	std::shared_ptr<TextureImpl> texture;
@@ -230,7 +230,7 @@ Error* ZDirect3D::CreateTexture(int width, int height, D3DFORMAT format, const v
 	return nullptr;
 }
 
-Error* ZDirect3D::CreateTextureFromImage(const void* data, uint32 data_size, std::shared_ptr<Texture>& out_texture)
+Error* RendererDirect3d::CreateTextureFromImage(const void* data, uint32 data_size, std::shared_ptr<Texture>& out_texture)
 {
 	ComPtr<IDirect3DTexture9> d3d_texture;
 
@@ -254,7 +254,7 @@ Error* ZDirect3D::CreateTextureFromImage(const void* data, uint32 data_size, std
 	return nullptr;
 }
 
-Error* ZDirect3D::DrawIndexedPrimitive(const RenderState& render_state, size_t num_vertices, const VertexTL* vertices, size_t num_faces, const Face* faces)
+Error* RendererDirect3d::DrawIndexedPrimitive(const RenderState& render_state, size_t num_vertices, const VertexTL* vertices, size_t num_faces, const Face* faces)
 {
 	_ASSERT(num_vertices < 32768);
 
@@ -344,7 +344,7 @@ Error* ZDirect3D::DrawIndexedPrimitive(const RenderState& render_state, size_t n
 	return nullptr;
 }
 
-Error* ZDirect3D::UploadTexture(IDirect3DTexture9* d3d_texture, int width, int height, D3DFORMAT format, const void* data, uint32 data_size, uint32 data_stride, const PALETTEENTRY* palette)
+Error* RendererDirect3d::UploadTexture(IDirect3DTexture9* d3d_texture, int width, int height, D3DFORMAT format, const void* data, uint32 data_size, uint32 data_stride, const PALETTEENTRY* palette)
 {
 	int32 num_mips = d3d_texture->GetLevelCount();
 	for (int32 i = 0; i < num_mips; i++)

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ZDirect3D.h"
+#include "Renderer.h"
 #include <vector>
 
 #define HKEY_ROOT (HKEY_LOCAL_MACHINE)

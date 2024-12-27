@@ -18,10 +18,10 @@
 class Texture;
 class ZPalette;
 
-class ZDirect3D : public Renderer
+class RendererDirect3d : public Renderer
 {
 public:
-	ZDirect3D();
+	RendererDirect3d();
 
 	Error* Open(HWND hwnd);
 	void Close();
