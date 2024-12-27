@@ -6,8 +6,8 @@
 TextureStage::TextureStage()
 {
 	texture = nullptr;
-	address_u = D3DTADDRESS_WRAP;
-	address_v = D3DTADDRESS_WRAP;
+	address_u = TextureAddress::Wrap;
+	address_v = TextureAddress::Wrap;
 };
 
 ////// RenderState //////
@@ -17,11 +17,8 @@ RenderState::RenderState()
 	enable_culling = true;
 	enable_shading = true;
 	enable_specular = false;
-	enable_zbuffer = true;
-	enable_zbuffer_write = true;
-	zfunc = D3DCMP_LESS;
-	src_blend = D3DBLEND_ONE;
-	dst_blend = D3DBLEND_ZERO;
+	depth_mode = DepthMode::Normal;
+	blend_mode = BlendMode::Replace;
 }
 
 ////// Renderer //////

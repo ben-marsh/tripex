@@ -400,7 +400,7 @@ public:
 
 			{
 				RenderState render_state;
-				render_state.enable_zbuffer = false;
+				render_state.depth_mode = DepthMode::Disable;
 				render_state.texture_stages[0].texture = texture;
 
 				error = grid.Render(params.renderer, render_state);
@@ -409,9 +409,9 @@ public:
 
 			{
 				RenderState render_state;
-				render_state.dst_blend = D3DBLEND_ONE;
+				render_state.blend_mode = BlendMode::Add;
+				render_state.depth_mode = DepthMode::Disable;
 				render_state.texture_stages[0].texture = pc.GetTexture(0, 0);
-				render_state.enable_zbuffer = false;
 
 				error = gridbm.Render(params.renderer, render_state);
 				if (error) return TraceError(error);
@@ -464,7 +464,7 @@ public:
 				{
 					pnCurrentBump = it->second.get();
 				}
-				else if(texture->width == 256 && texture->height == 256 && texture->format == D3DFMT_X8R8G8B8)
+				else if(texture->width == 256 && texture->height == 256 && texture->format == TextureFormat::X8R8G8B8)
 				{
 					std::vector<uint8> buffer;
 

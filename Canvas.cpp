@@ -35,7 +35,7 @@ Error* Canvas::Create(Renderer& renderer)
 
 			std::shared_ptr<Texture> texture;
 
-			Error* error = renderer.CreateTexture(256, 256, D3DFMT_P8, source_data, 256 * 256, stride, palette, TextureFlags::Dynamic | TextureFlags::Filter, texture);
+			Error* error = renderer.CreateTexture(256, 256, TextureFormat::P8, source_data, 256 * 256, stride, palette, TextureFlags::Dynamic | TextureFlags::Filter, texture);
 			if (error) return TraceError(error);
 
 			textures[texture_idx++] = std::move(texture);

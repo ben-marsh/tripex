@@ -16,7 +16,7 @@ struct Edge
 	Edge Reverse() const;
 	Edge OrderIndices() const;
 
-	bool Contains(uint16 nVtx) const;
+	bool Contains(uint16 vtx) const;
 
 	uint16 CommonIndex(const Edge& other) const;
 

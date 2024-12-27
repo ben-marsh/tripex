@@ -868,9 +868,9 @@ public:
 	Error* Render(const RenderParams& params) override
 	{
 		RenderState render_state;
-		render_state.dst_blend = D3DBLEND_ONE;
-		render_state.enable_zbuffer = false;
-		
+		render_state.blend_mode = BlendMode::Add;
+		render_state.depth_mode = DepthMode::Disable;
+
 		Error* error = pCanvas->Render(params.renderer, render_state);
 		if(error) return TraceError(error);
 

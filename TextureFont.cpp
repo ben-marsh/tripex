@@ -144,7 +144,7 @@ Error* TextureFont::Create(Renderer& renderer)
 {
 	if (texture.get() == NULL)
 	{
-		Error* error = renderer.CreateTexture(256, 256, D3DFMT_X8R8G8B8, GetBitmap(), 256 * 256 * 4, 256 * 4, nullptr, TextureFlags::None, texture);
+		Error* error = renderer.CreateTexture(256, 256, TextureFormat::X8R8G8B8, GetBitmap(), 256 * 256 * 4, 256 * 4, nullptr, TextureFlags::None, texture);
 		if (error) return TraceError(error);
 	}
 	return nullptr;

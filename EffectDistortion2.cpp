@@ -144,9 +144,9 @@ public:
 	Error* Render(const RenderParams& params) override
 	{
 		RenderState render_state;
-		render_state.dst_blend = D3DBLEND_ONE;
+		render_state.blend_mode = BlendMode::Add;
+		render_state.depth_mode = DepthMode::Disable;
 		render_state.enable_specular = true;
-		render_state.enable_zbuffer = false;
 		render_state.texture_stages[0].texture = tx;
 
 		Error* error = grid.Render(params.renderer, render_state);

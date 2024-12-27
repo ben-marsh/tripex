@@ -1,7 +1,7 @@
 #pragma once
 
-#include <d3d9.h>
 #include "Error.h"
+#include <vector>
 
 enum class TextureFlags
 {
@@ -11,15 +11,22 @@ enum class TextureFlags
 	Filter = 4,
 };
 
+enum class TextureFormat
+{
+	X8R8G8B8,
+	P8,
+	Unknown
+};
+
 class Texture
 {
 public:
 	const int width;
 	const int height;
-	const D3DFORMAT format;
+	const TextureFormat format;
 	const TextureFlags flags;
 
-	Texture(int width, int height, D3DFORMAT format, TextureFlags flags);
+	Texture(int width, int height, TextureFormat format, TextureFlags flags);
 	virtual ~Texture();
 	virtual void SetDirty() = 0;
 	virtual Error* GetPixelData(std::vector<uint8>& buffer) const = 0;

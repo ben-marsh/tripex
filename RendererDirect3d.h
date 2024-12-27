@@ -29,7 +29,7 @@ public:
 	Error* BeginFrame() override;
 	Error* EndFrame() override;
 
-	virtual Error* CreateTexture(int width, int height, D3DFORMAT format, const void* data, uint32 data_size, uint32 data_stride, const PALETTEENTRY* palette, TextureFlags flags, std::shared_ptr<Texture>& out_texture) override;
+	virtual Error* CreateTexture(int width, int height, TextureFormat format, const void* data, uint32 data_size, uint32 data_stride, const PALETTEENTRY* palette, TextureFlags flags, std::shared_ptr<Texture>& out_texture) override;
 	virtual Error* CreateTextureFromImage(const void* data, uint32 data_size, std::shared_ptr<Texture>& out_texture) override;
 
 	using Renderer::DrawIndexedPrimitive;
@@ -51,7 +51,7 @@ private:
 		ComPtr<IDirect3DTexture9> d3d_texture;
 		bool dirty;
 
-		TextureImpl(int width, int height, D3DFORMAT format, const void* data, uint32 data_size, uint32 data_stride, const PALETTEENTRY* palette, TextureFlags flags);
+		TextureImpl(int width, int height, TextureFormat format, const void* data, uint32 data_size, uint32 data_stride, const PALETTEENTRY* palette, TextureFlags flags);
 		virtual ~TextureImpl() override;
 		virtual void SetDirty() override;
 		virtual Error* GetPixelData(std::vector<uint8>& buffer) const override;
@@ -61,6 +61,11 @@ private:
 	ComPtr<IDirect3DDevice9> device;
 	D3DCAPS9 caps;
 	unsigned int width, height;
+
+	static D3DTEXTUREADDRESS GetD3DTEXTUREADDRESS(TextureAddress address);
+
+	static D3DFORMAT GetD3DFORMAT(TextureFormat format);
+	static TextureFormat GetTextureFormat(D3DFORMAT format);
 
 	Error* UploadTexture(IDirect3DTexture9* d3d_texture, int width, int height, D3DFORMAT format, const void* data, uint32 data_size, uint32 data_stride, const PALETTEENTRY* palette);
 };

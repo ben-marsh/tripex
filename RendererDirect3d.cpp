@@ -6,7 +6,7 @@
 #include <memory>
 #include "ComPtr.h"
 
-RendererDirect3d::TextureImpl::TextureImpl(int width, int height, D3DFORMAT format, const void* data, uint32 data_size, uint32 data_stride, const PALETTEENTRY* palette, TextureFlags flags)
+RendererDirect3d::TextureImpl::TextureImpl(int width, int height, TextureFormat format, const void* data, uint32 data_size, uint32 data_stride, const PALETTEENTRY* palette, TextureFlags flags)
 	: Texture(width, height, format, flags)
 	, data(data)
 	, data_size(data_size)
@@ -55,45 +55,7 @@ Error* RendererDirect3d::TextureImpl::GetPixelData(std::vector<uint8>& buffer) c
 	return nullptr;
 }
 
-/*
-void ZDirect3D::Direct3DTexture::SetFlags(uint32 flags)
-{
-	_ASSERT(d3d_texture == NULL);
-	this->flags = flags;
-}
-
-void ZDirect3D::Direct3DTexture::SetSource(const void* data, uint32 data_size)
-{
-	format = D3DFMT_UNKNOWN;
-	this->data = data;
-	this->data_size = data_size;
-	palette = NULL;
-}
-
-void ZDirect3D::Direct3DTexture::SetSource(const PALETTEENTRY* palette, const void* data, uint32 data_size, uint32 data_stride)
-{
-	format = D3DFMT_P8;
-	this->data = data;
-	this->data_size = data_size;
-	this->data_stride = data_stride;
-	this->palette = palette;
-}
-
-void ZDirect3D::Direct3DTexture::SetSource(D3DFORMAT format, const void* data, uint32 data_size, uint32 data_stride)
-{
-	_ASSERT(format != D3DFMT_P8);
-
-	this->format = format;
-	this->data = data;
-	this->data_size = data_size;
-	this->data_stride = data_stride;
-
-	palette = NULL;
-}
-*/
-
-
-
+/////// RendererDirect3d ///////
 
 RendererDirect3d::RendererDirect3d()
 {
@@ -101,7 +63,6 @@ RendererDirect3d::RendererDirect3d()
 	height = 0;
 	memset(&caps, 0, sizeof(caps));
 }
-
 
 Error* RendererDirect3d::Open(HWND hwnd)
 {
@@ -192,7 +153,51 @@ Rect<float> RendererDirect3d::GetClipRect() const
 	return rect;
 }
 
-Error* RendererDirect3d::CreateTexture(int width, int height, D3DFORMAT format, const void* data, uint32 data_size, uint32 data_stride, const PALETTEENTRY* palette, TextureFlags flags, std::shared_ptr<Texture>& out_texture)
+D3DTEXTUREADDRESS RendererDirect3d::GetD3DTEXTUREADDRESS(TextureAddress address)
+{
+	switch (address)
+	{
+	case TextureAddress::Clamp:
+		return D3DTADDRESS_CLAMP;
+	case TextureAddress::Wrap:
+		return D3DTADDRESS_WRAP;
+	}
+
+	_ASSERT(false);
+	return D3DTADDRESS_CLAMP;
+}
+
+TextureFormat RendererDirect3d::GetTextureFormat(D3DFORMAT format)
+{
+	switch (format)
+	{
+	case D3DFMT_R8G8B8:
+	case D3DFMT_X8R8G8B8:
+	case D3DFMT_A8R8G8B8:
+		return TextureFormat::X8R8G8B8;
+	case D3DFMT_P8:
+		return TextureFormat::P8;
+	}
+
+	_ASSERT(false);
+	return TextureFormat::Unknown;
+}
+
+D3DFORMAT RendererDirect3d::GetD3DFORMAT(TextureFormat format)
+{
+	switch (format)
+	{
+	case TextureFormat::X8R8G8B8:
+		return D3DFMT_X8R8G8B8;
+	case TextureFormat::P8:
+		return D3DFMT_P8;
+	}
+
+	_ASSERT(false);
+	return D3DFMT_UNKNOWN;
+}
+
+Error* RendererDirect3d::CreateTexture(int width, int height, TextureFormat format, const void* data, uint32 data_size, uint32 data_stride, const PALETTEENTRY* palette, TextureFlags flags, std::shared_ptr<Texture>& out_texture)
 {
 	// Create the texture object, only retaining the data and palette pointers if it's a dynamic texture
 	std::shared_ptr<TextureImpl> texture;
@@ -209,7 +214,9 @@ Error* RendererDirect3d::CreateTexture(int width, int height, D3DFORMAT format, 
 	uint32 nMipLevels = ((flags & TextureFlags::CreateMips) == TextureFlags::CreateMips) ? 0 : 1;
 	uint32 nUsage = 0;// ((flags & TextureFlags::Dynamic) == TextureFlags::Dynamic) ? D3DUSAGE_DYNAMIC : 0;
 
-	HRESULT hRes = D3DXCreateTexture(device, 256, 256, nMipLevels, nUsage, format, D3DPOOL_MANAGED, &texture->d3d_texture);
+	D3DFORMAT d3dformat = GetD3DFORMAT(format);
+
+	HRESULT hRes = D3DXCreateTexture(device, 256, 256, nMipLevels, nUsage, d3dformat, D3DPOOL_MANAGED, &texture->d3d_texture);
 	if (FAILED(hRes))
 	{
 		return TraceError(hRes);
@@ -223,7 +230,7 @@ Error* RendererDirect3d::CreateTexture(int width, int height, D3DFORMAT format, 
 	}
 
 	// Upload the new data
-	Error* error = UploadTexture(texture->d3d_texture, width, height, format, data, data_size, data_stride, palette);
+	Error* error = UploadTexture(texture->d3d_texture, width, height, d3dformat, data, data_size, data_stride, palette);
 	if (error) return TraceError(error);
 
 	out_texture = std::move(texture);
@@ -247,7 +254,9 @@ Error* RendererDirect3d::CreateTextureFromImage(const void* data, uint32 data_si
 	hRes = d3d_surface->GetDesc(&d3d_surface_desc);
 	if (FAILED(hRes)) return TraceError(hRes);
 
-	std::shared_ptr<TextureImpl> texture = std::make_shared<TextureImpl>(d3d_surface_desc.Width, d3d_surface_desc.Height, d3d_surface_desc.Format, nullptr, 0, 0, nullptr, TextureFlags::CreateMips | TextureFlags::Filter);
+	TextureFormat format = GetTextureFormat(d3d_surface_desc.Format);
+
+	std::shared_ptr<TextureImpl> texture = std::make_shared<TextureImpl>(d3d_surface_desc.Width, d3d_surface_desc.Height, format, nullptr, 0, 0, nullptr, TextureFlags::CreateMips | TextureFlags::Filter);
 	texture->d3d_texture = std::move(d3d_texture);
 
 	out_texture = std::move(texture);
@@ -261,18 +270,57 @@ Error* RendererDirect3d::DrawIndexedPrimitive(const RenderState& render_state, s
 	device->SetRenderState(D3DRS_CULLMODE, render_state.enable_culling? D3DCULL_CCW : D3DCULL_NONE);
 	device->SetRenderState(D3DRS_SHADEMODE, render_state.enable_shading ? D3DSHADE_GOURAUD : D3DSHADE_FLAT);
 	device->SetRenderState(D3DRS_SPECULARENABLE, render_state.enable_specular ? TRUE : FALSE);
-	device->SetRenderState(D3DRS_ZENABLE, render_state.enable_zbuffer? TRUE : FALSE);
-	device->SetRenderState(D3DRS_ZWRITEENABLE, render_state.enable_zbuffer_write? TRUE : FALSE);
 
-	if (render_state.dst_blend == D3DBLEND_ZERO && render_state.src_blend == D3DBLEND_ONE)
+	switch (render_state.depth_mode)
 	{
-		device->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
+	case DepthMode::Disable:
+		device->SetRenderState(D3DRS_ZENABLE, FALSE);
+		device->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
+		break;
+	case DepthMode::Normal:
+		device->SetRenderState(D3DRS_ZENABLE, TRUE);
+		device->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESS);
+		device->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
+		break;
+	case DepthMode::Stencil:
+		device->SetRenderState(D3DRS_ZENABLE, TRUE);
+		device->SetRenderState(D3DRS_ZFUNC, D3DCMP_EQUAL);
+		device->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
+		break;
 	}
-	else
+
+	switch (render_state.blend_mode)
 	{
-		device->SetRenderState(D3DRS_SRCBLEND, render_state.src_blend);
-		device->SetRenderState(D3DRS_DESTBLEND, render_state.dst_blend);
+	case BlendMode::NoOp:
 		device->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
+		device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ZERO);
+		device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
+		break;
+	case BlendMode::Replace:
+		device->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
+		break;
+	case BlendMode::Add:
+		device->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
+		device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ONE);
+		device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
+		break;
+	case BlendMode::Tint:
+		device->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
+		device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_DESTCOLOR);
+		device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
+		break;
+	case BlendMode::OverlayBackground:
+		device->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
+		device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ZERO);
+		device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCCOLOR);
+		break;
+	case BlendMode::OverlayForeground:
+		device->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
+		device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ONE);
+		device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCCOLOR);
+		break;
+	default:
+		_ASSERT(false);
 	}
 
 	for (int stage = 0; stage < RenderState::NUM_TEXTURE_STAGES; stage++)
@@ -286,7 +334,9 @@ Error* RendererDirect3d::DrawIndexedPrimitive(const RenderState& render_state, s
 		{
 			if (texture->dirty)
 			{
-				Error* error = UploadTexture(texture->d3d_texture, texture->width, texture->height, texture->format, texture->data, texture->data_size, texture->data_stride, (PALETTEENTRY*)texture->palette);
+				D3DFORMAT d3dformat = GetD3DFORMAT(texture->format);
+
+				Error* error = UploadTexture(texture->d3d_texture, texture->width, texture->height, d3dformat, texture->data, texture->data_size, texture->data_stride, (PALETTEENTRY*)texture->palette);
 				if (error) return TraceError(error);
 
 				texture->dirty = false;
@@ -334,8 +384,8 @@ Error* RendererDirect3d::DrawIndexedPrimitive(const RenderState& render_state, s
 			}
 		}
 
-		device->SetSamplerState(stage, D3DSAMP_ADDRESSU, render_state.texture_stages[stage].address_u);
-		device->SetSamplerState(stage, D3DSAMP_ADDRESSV, render_state.texture_stages[stage].address_v);
+		device->SetSamplerState(stage, D3DSAMP_ADDRESSU, GetD3DTEXTUREADDRESS(render_state.texture_stages[stage].address_u));
+		device->SetSamplerState(stage, D3DSAMP_ADDRESSV, GetD3DTEXTUREADDRESS(render_state.texture_stages[stage].address_v));
 	}
 
 	HRESULT hRes = device->DrawIndexedPrimitiveUP(D3DPT_TRIANGLELIST, 0, (UINT)num_vertices, (UINT)num_faces, faces, D3DFMT_INDEX16, vertices, sizeof(VertexTL));

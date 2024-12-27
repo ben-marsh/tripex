@@ -24,7 +24,7 @@ public:
 	float pitch, yaw, roll;
 
 	Camera();
-	void SetDir(const Vector3& vDir);
-	void SetTarget(const Vector3& vPosition);
+	void SetDir(const Vector3& dir);
+	void SetTarget(const Vector3& target);
 	Matrix44 GetTransform() const;
 };

@@ -113,7 +113,7 @@ Error* Tripex::Startup()
 //	}
 //	}
 
-	Error* error = renderer.CreateTexture(256, 256, D3DFMT_P8, &g_anTexRawGUI[ 1 ], 256 * 256, 256, pe.data(), TextureFlags::None, gui);
+	Error* error = renderer.CreateTexture(256, 256, TextureFormat::P8, &g_anTexRawGUI[ 1 ], 256 * 256, 256, pe.data(), TextureFlags::None, gui);
 	if (error) return TraceError(error);
 
 //	gui = auto_ptr< ZTexture >(new ZTexture(pc));//(ZColour*)g_anTexRawGUI ));//cGUI.GetPtr()));
@@ -401,16 +401,11 @@ Error* Tripex::Render()
 		audio->Render(overlay_background, overlay_foreground);
 	}
 
-//		ZSpriteBuffer sb;
-//		sb.AddSprite(ZPoint<int>(10, 30), d3d->vpTexture[3], g_pD3D->Shade, ZRect<int>(0, 0, 600, 400), 1.0f );
-//		sb.Flush( d3d.get( ) );
-
 	// Draw the overlay background
 	{
 		RenderState render_state;
-		render_state.src_blend = D3DBLEND_ZERO;
-		render_state.dst_blend = D3DBLEND_INVSRCCOLOR;
-		render_state.enable_zbuffer = false;
+		render_state.blend_mode = BlendMode::OverlayBackground;
+		render_state.depth_mode = DepthMode::Disable;
 
 		error = renderer.DrawIndexedPrimitive(render_state, overlay_background);
 		if (error) return TraceError(error);
@@ -419,9 +414,8 @@ Error* Tripex::Render()
 	// Draw the overlay text
 	{
 		RenderState render_state;
-		render_state.src_blend = D3DBLEND_ONE;
-		render_state.dst_blend = D3DBLEND_INVSRCCOLOR;
-		render_state.enable_zbuffer = false;
+		render_state.blend_mode = BlendMode::OverlayForeground;
+		render_state.depth_mode = DepthMode::Disable;
 		render_state.texture_stages[0].texture = tef.texture.get();
 
 		error = renderer.DrawIndexedPrimitive(render_state, overlay_text);
@@ -431,9 +425,8 @@ Error* Tripex::Render()
 	// Draw the overlay foreground
 	{
 		RenderState render_state;
-		render_state.src_blend = D3DBLEND_ONE;
-		render_state.dst_blend = D3DBLEND_INVSRCCOLOR;
-		render_state.enable_zbuffer = false;
+		render_state.blend_mode = BlendMode::OverlayForeground;
+		render_state.depth_mode = DepthMode::Disable;
 
 		error = renderer.DrawIndexedPrimitive(render_state, overlay_foreground);
 		if (error) return TraceError(error);

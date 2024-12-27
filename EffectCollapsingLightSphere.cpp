@@ -122,9 +122,8 @@ public:
 		if(pTint != nullptr)
 		{
 			RenderState render_state;
-			render_state.src_blend = D3DBLEND_DESTCOLOR;
-			render_state.dst_blend = D3DBLEND_ONE;
-			render_state.enable_zbuffer = false;
+			render_state.blend_mode = BlendMode::Tint;
+			render_state.depth_mode = DepthMode::Disable;
 			render_state.texture_stages[0].texture = pTint;
 
 			params.renderer.DrawSprite(render_state, Point<int>(0, 0), params.renderer.GetViewportRect(), ColorRgb::Grey(brt * 255.0));

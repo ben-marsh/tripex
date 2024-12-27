@@ -793,11 +793,11 @@ Error* Actor::Render(Renderer& renderer)
 			// build the state list
 			if (!flags.test(F_DRAW_Z_BUFFER))
 			{
-				render_state.enable_zbuffer = false;
+				render_state.depth_mode = DepthMode::Disable;
 			}
 			if (flags.test(F_DRAW_TRANSPARENT))
 			{
-				render_state.dst_blend = D3DBLEND_ONE;
+				render_state.blend_mode = BlendMode::Add;
 			}
 			if (flags.test(F_NO_CULL))
 			{
@@ -824,23 +824,21 @@ Error* Actor::Render(Renderer& renderer)
 		if (i == -1)
 		{
 			render_state.enable_specular = false;
-			render_state.src_blend = D3DBLEND_ZERO;
-			render_state.dst_blend = D3DBLEND_ONE;
+			render_state.blend_mode = BlendMode::NoOp;
 		}
 		else
 		{
 			if (stencil_z)
 			{
-				render_state.zfunc = D3DCMP_EQUAL;
-				render_state.enable_zbuffer_write = false;
+				render_state.depth_mode = DepthMode::Stencil;
 			}
 
 			render_state.texture_stages[0].texture = textures[0].texture;
 
 			if (textures[0].type == TextureType::Envmap || textures[0].type == TextureType::Lightmap)
 			{
-				render_state.texture_stages[0].address_u = D3DTADDRESS_CLAMP;
-				render_state.texture_stages[0].address_v = D3DTADDRESS_CLAMP;
+				render_state.texture_stages[0].address_u = TextureAddress::Clamp;
+				render_state.texture_stages[0].address_v = TextureAddress::Clamp;
 			}
 		}
 
