@@ -1,5 +1,5 @@
 #include "Platform.h"
-#include "TexturedGrid.h"
+#include "VertexGrid.h"
 #include "effect.h"
 #include "error.h"
 #include "BezierCurve.h"
@@ -20,7 +20,7 @@ public:
 
 	bool fSetTexture;
 
-	TexturedGrid grid;
+	VertexGrid grid;
 	float xp, yp, t, fac;
 	int angle;
 	double pdHeight[GRW][GRH];

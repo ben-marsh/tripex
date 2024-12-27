@@ -13,6 +13,8 @@ struct Vertex
 	ColorRgb diffuse;
 	ColorRgb specular;
 	Point<float> tex_coord[MAX_TEXTURES];
+
+	Vertex();
 };
 
 struct VertexTL // Transformed and lit vertex
@@ -22,4 +24,6 @@ struct VertexTL // Transformed and lit vertex
 	ColorRgb diffuse;
 	ColorRgb specular;
 	Point<float> tex_coords[MAX_TEXTURES];
+
+	VertexTL();
 };

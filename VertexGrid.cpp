@@ -1,9 +1,9 @@
 #include "Platform.h"
-#include "TexturedGrid.h"
+#include "VertexGrid.h"
 #include "error.h"
 #include <memory>
 
-TexturedGrid::TexturedGrid(int width, int height)//, DWORD dwVertexFormat)//, GridCoordCallbackFunction callback)
+VertexGrid::VertexGrid(int width, int height)//, DWORD dwVertexFormat)//, GridCoordCallbackFunction callback)
 {
 	pos_x = 0.0f;
 	pos_y = 0.0f;
@@ -100,7 +100,7 @@ HRESULT ZGrid::Calculate()
 //{
 //	callback = fn;
 //}
-Error* TexturedGrid::Render(Renderer& renderer, const RenderState& render_state)
+Error* VertexGrid::Render(Renderer& renderer, const RenderState& render_state)
 {
 	int new_scr_width = renderer.GetWidth();
 	int new_scr_height = renderer.GetHeight();

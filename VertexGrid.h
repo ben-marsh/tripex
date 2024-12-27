@@ -2,7 +2,7 @@
 
 #include "Renderer.h"
 
-class TexturedGrid
+class VertexGrid
 {
 private:
 	int scr_width, scr_height;
@@ -15,6 +15,6 @@ public:
 	float pos_x, pos_y;
 	bool update_edges;
 
-	TexturedGrid(int width, int height);
+	VertexGrid(int width, int height);
 	Error* Render(Renderer& renderer, const RenderState& render_state);
 };

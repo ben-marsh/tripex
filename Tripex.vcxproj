@@ -240,7 +240,8 @@
     <ClCompile Include="RendererDirect3d.cpp" />
     <ClCompile Include="Effect.cpp" />
     <ClCompile Include="Fourier.cpp" />
-    <ClCompile Include="TexturedGrid.cpp" />
+    <ClCompile Include="Vertex.cpp" />
+    <ClCompile Include="VertexGrid.cpp" />
     <ClCompile Include="Matrix44.cpp" />
     <ClCompile Include="Actor.cpp" />
     <ClCompile Include="Canvas.cpp" />
@@ -275,7 +276,7 @@
     <ClInclude Include="Edge.h" />
     <ClInclude Include="Face.h" />
     <ClInclude Include="Fourier.h" />
-    <ClInclude Include="TexturedGrid.h" />
+    <ClInclude Include="VertexGrid.h" />
     <ClInclude Include="Matrix44.h" />
     <ClInclude Include="Actor.h" />
     <ClInclude Include="Canvas.h" />

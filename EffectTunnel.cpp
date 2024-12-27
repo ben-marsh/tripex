@@ -1,5 +1,5 @@
 #include "Platform.h"
-#include "TexturedGrid.h"
+#include "VertexGrid.h"
 #include "Actor.h"
 #include "BezierCurve.h"
 #include "effect.h"

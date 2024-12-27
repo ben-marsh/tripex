@@ -1,5 +1,5 @@
 #include "Platform.h"
-#include "TexturedGrid.h"
+#include "VertexGrid.h"
 #include "effect.h"
 #include "error.h"
 #include "Canvas.h"
@@ -95,8 +95,8 @@ public:
 
 	Canvas pc;
 
-	TexturedGrid grid;
-	TexturedGrid gridbm;
+	VertexGrid grid;
+	VertexGrid gridbm;
 	float tx, ty;
 	unsigned char lightmap[256 * 256];
 	unsigned char pnBuf[256 * 256];

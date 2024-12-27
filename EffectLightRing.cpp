@@ -2,7 +2,7 @@
 #include "Actor.h"
 #include "Effect.h"
 #include "BezierCurve.h"
-#include "TexturedGrid.h"
+#include "VertexGrid.h"
 
 #define SOURCES 40//40//35//50
 #define FRAMES 12

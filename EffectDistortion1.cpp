@@ -1,5 +1,5 @@
 #include "Platform.h"
-#include "TexturedGrid.h"
+#include "VertexGrid.h"
 #include "AudioData.h"
 #include "effect.h"
 #include "error.h"
@@ -13,7 +13,7 @@ class EffectDistortion1 : public EffectBase
 {
 public:
 	bool fSetTexture;
-	TexturedGrid grid;//(GRW, GRH);//, D3DFVF_DIFFUSE | D3DFVF_TEX1);
+	VertexGrid grid;//(GRW, GRH);//, D3DFVF_DIFFUSE | D3DFVF_TEX1);
 	float xp, yp, t, fac;
 	int angle;
 	float precalc_atan[(GRW + 1) * (GRH + 1)];
