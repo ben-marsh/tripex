@@ -33,7 +33,6 @@ private:
 
 	enum
 	{
-		TXS_STARTED,
 		TXS_VISIBLE_BEATS,
 		TXS_RESET_TIMING,
 		TXS_CHANGE_EFFECT,
@@ -50,7 +49,7 @@ private:
 	std::bitset<TXS_LAST> txs;
 	std::unique_ptr<AudioData> audio;
 
-	Effect* pEffectBlank;
+	Effect* blank_effect;
 
 	TextureLibrary texture_library;
 
@@ -68,16 +67,16 @@ private:
 	int next_effect_idx;
 	std::shared_ptr<Texture> gui;
 	DWORD last_time;
+	float frames = 0.0f;
 
 	std::vector<std::shared_ptr<Effect>> effects;
 	std::vector<std::shared_ptr<Effect>> enabled_effects;
 
 	void ShowStatusMsg(const char* format, ...);
-	DWORD WINAPI InitialiseThread(void* param);
 
 	void DrawMessage(const TextureFont& font, int y, const char* text, float brightness, float back_brightness);
 	int GetClippedLineLength(const TextureFont& font, const char* text, int clip_width);
 
 	void AddEffect(std::shared_ptr<Effect>(*fn)(), const char* name, int draw_order, float startup_weight, int preference, int change, int sensitivity, int activity, int speed);
-	void CreateEffectList();
+	void CreateEffects();
 };
