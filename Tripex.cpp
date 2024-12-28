@@ -4,11 +4,36 @@
 #include "TextureFont.h"
 #include "TextureData.h"
 #include "AudioData.h"
-//#include "mmsystem.h"
 #include <algorithm>
 #include <assert.h>
-#include "config-defaults.h"
 #include "Tripex.h"
+
+IMPORT_EFFECT(Blank);
+IMPORT_EFFECT(BezierCube);
+IMPORT_EFFECT(CollapsingLightSphere);
+IMPORT_EFFECT(Distortion1);
+IMPORT_EFFECT(Distortion2);
+IMPORT_EFFECT(Distortion2Col);
+IMPORT_EFFECT(DotStar);
+IMPORT_EFFECT(Flowmap);
+IMPORT_EFFECT(Tunnel);
+IMPORT_EFFECT(WaterGlobe);
+IMPORT_EFFECT(Tube);
+IMPORT_EFFECT(Sun);
+IMPORT_EFFECT(Bumpmapping);
+IMPORT_EFFECT(Spectrum);
+IMPORT_EFFECT(Rings);
+IMPORT_EFFECT(Phased);
+IMPORT_EFFECT(MotionBlur1);
+IMPORT_EFFECT(MotionBlur2);
+IMPORT_EFFECT(MotionBlur3);
+IMPORT_EFFECT(MotionBlur3Alt);
+IMPORT_EFFECT(MorphingSphere);
+IMPORT_EFFECT(Metaballs);
+IMPORT_EFFECT(LightTentacles);
+IMPORT_EFFECT(LightStar);
+IMPORT_EFFECT(LightSphere);
+IMPORT_EFFECT(LightRing);
 
 /****** constants *****/
 
@@ -16,7 +41,6 @@ Tripex::Tripex(Renderer& renderer)
 	: renderer(renderer)
 {
 	CreateEffectList();
-	CreateCfgItems();
 }
 
 Tripex::~Tripex()
@@ -91,10 +115,6 @@ Error* Tripex::Startup()
 	//	txs[TXS_RENDER_FIRST] = true;
 	txs[TXS_STARTED] = true;
 
-	//	InitBeats();
-	LoadCfgItems();
-	UpdateCfgItems(true);
-
 	audio = std::make_unique<AudioData>(512);
 
 	srand(timeGetTime());
@@ -157,8 +177,6 @@ Error* Tripex::Startup()
 }
 Error* Tripex::Render()
 {
-	UpdateCfgItems();
-
 	DWORD dwTime = timeGetTime();
 	if (txs.test(TXS_RESET_TIMING))//bResetTiming)
 	{
@@ -470,8 +488,6 @@ void Tripex::Shutdown()
 
 	enabled_effects.clear();
 	effects.clear();
-
-	SaveCfgItems();
 }
 
 void Tripex::SetAudioData(int num_channels, int sample_rate, int sample_bits, const void* data, size_t data_len)
@@ -589,51 +605,30 @@ void Tripex::DrawMessage(const TextureFont& font, int y, const char* text, float
 	}
 }
 
-IMPORT_EFFECT(Blank);
-IMPORT_EFFECT(BezierCube);
-IMPORT_EFFECT(CollapsingLightSphere);
-IMPORT_EFFECT(Distortion1);
-IMPORT_EFFECT(Distortion2);
-IMPORT_EFFECT(Distortion2Col);
-IMPORT_EFFECT(DotStar);
-IMPORT_EFFECT(Flowmap);
-IMPORT_EFFECT(Tunnel);
-IMPORT_EFFECT(WaterGlobe);
-IMPORT_EFFECT(Tube);
-IMPORT_EFFECT(Sun);
-IMPORT_EFFECT(Bumpmapping);
-IMPORT_EFFECT(Spectrum);
-IMPORT_EFFECT(Rings);
-IMPORT_EFFECT(Phased);
-IMPORT_EFFECT(MotionBlur1);
-IMPORT_EFFECT(MotionBlur2);
-IMPORT_EFFECT(MotionBlur3);
-IMPORT_EFFECT(MotionBlur3Alt);
-IMPORT_EFFECT(MorphingSphere);
-IMPORT_EFFECT(Metaballs);
-IMPORT_EFFECT(LightTentacles);
-IMPORT_EFFECT(LightStar);
-IMPORT_EFFECT(LightSphere);
-IMPORT_EFFECT(LightRing);
-
-void Tripex::AddEffect(std::shared_ptr<Effect>(*fn)(), const char* name, int draw_order, float startup_weight)
+void Tripex::AddEffect(std::shared_ptr<Effect>(*fn)(), const char* name, int draw_order, float startup_weight, int preference, int change, int sensitivity, int activity, int speed)
 {
-	std::shared_ptr<Effect> pEffect = fn();
-	pEffect->name = name;
-	pEffect->draw_order = draw_order;
-	pEffect->startup_weight = startup_weight;
+	std::shared_ptr<Effect> effect = fn();
+	effect->name = name;
+	effect->draw_order = draw_order;
+	effect->startup_weight = startup_weight;
+
+	effect->preference = preference / 1000.0f;
+	effect->change = change / 1000.0f;
+	effect->sensitivity = sensitivity / 1000.0f;
+	effect->activity = activity / 1000.0f;
+	effect->speed = speed / 1000.0f;
 
 	if (effects.size() == 0)
 	{
-		effects.push_back(pEffect);
+		effects.push_back(effect);
 	}
 	else
 	{
 		for (int i = 1;; i++)
 		{
-			if (i == effects.size() || _stricmp(pEffect->name.c_str(), effects[i]->name.c_str()) < 0)
+			if (i == effects.size() || _stricmp(effect->name.c_str(), effects[i]->name.c_str()) < 0)
 			{
-				effects.insert(effects.begin() + i, pEffect);
+				effects.insert(effects.begin() + i, effect);
 				break;
 			}
 		}
@@ -642,151 +637,32 @@ void Tripex::AddEffect(std::shared_ptr<Effect>(*fn)(), const char* name, int dra
 
 void Tripex::CreateEffectList()
 {
-	AddEffect(&CreateEffect_Blank, "Blank", ZORDER_BLANK, 1.0f);
+	AddEffect(&CreateEffect_Blank, "Blank", ZORDER_BLANK, 1.0f, 0, 0, 0, 0, 0);
 
 	pEffectBlank = effects[0].get();
 
-	AddEffect(&CreateEffect_Tunnel, "Tunnel", ZORDER_TUNNEL, 1.0f);
-	AddEffect(&CreateEffect_WaterGlobe, "WaterGlobe", ZORDER_WATERGLOBE, 10.0f);
-	AddEffect(&CreateEffect_Tube, "Tube", ZORDER_TUBE, 1.0f);
-	AddEffect(&CreateEffect_Sun, "Sun", ZORDER_SUN, 1.0f);
-	AddEffect(&CreateEffect_Bumpmapping, "Bumpmapping", ZORDER_BUMPMAPPING, 8.0f);
-	AddEffect(&CreateEffect_Spectrum, "Spectrum", ZORDER_ANALYSER, 1.0f);
-	AddEffect(&CreateEffect_Rings, "ConcentricRings", ZORDER_RINGS, 1.0f);
-	AddEffect(&CreateEffect_Phased, "Phased", ZORDER_PHASED, 1.0f);
-	AddEffect(&CreateEffect_MotionBlur1, "MotionBlur1", ZORDER_MOTIONBLUR, 1.0f);
-	AddEffect(&CreateEffect_MotionBlur2, "MotionBlur2", ZORDER_MOTIONBLUR2, 1.0f);
-	AddEffect(&CreateEffect_MotionBlur3, "MotionBlur3", ZORDER_MOTIONBLUR3, 1.0f);
-	AddEffect(&CreateEffect_MotionBlur3Alt, "MotionBlur3(Alt)", ZORDER_MOTIONBLUR3ALT, 1.0f);
-	AddEffect(&CreateEffect_MorphingSphere, "MorphingSphere", ZORDER_MORPHINGSPHERE, 1.0f);
-	AddEffect(&CreateEffect_LightTentacles, "LightTentacles", ZORDER_LIGHTTENTACLES, 1.0f);
-	AddEffect(&CreateEffect_LightStar, "LightStar", ZORDER_LIGHTSTAR, 1.0f);
-	AddEffect(&CreateEffect_LightSphere, "LightSphere", ZORDER_LIGHTSPHERE, 1.0f);
-	AddEffect(&CreateEffect_LightRing, "LightRing", ZORDER_LIGHTRING, 1.0f);
-	AddEffect(&CreateEffect_Flowmap, "Flowmap", ZORDER_FLOWMAP, 10.0f);
-	AddEffect(&CreateEffect_DotStar, "DotStar", ZORDER_DOTSTAR, 1.0f);
-	AddEffect(&CreateEffect_Distortion2, "Distortion2", ZORDER_DISTORTION2, 1.0f);
-	AddEffect(&CreateEffect_Distortion2Col, "Distortion2(Lit)", ZORDER_DISTORTION2COL, 1.0f);
-	AddEffect(&CreateEffect_CollapsingLightSphere, "CollapsingLightSphere", ZORDER_COLLAPSINGSPHERE, 1.0f);
-	AddEffect(&CreateEffect_BezierCube, "BezierCube", ZORDER_BEZIERCUBE, 1.0f);
-	AddEffect(&CreateEffect_Distortion1, "Distortion1", ZORDER_DISTORTION, 1.0f);
-}
-
-ConfigItem* Tripex::AddCfgItem(ConfigItem* pItem)
-{
-	pppCfgItem->push_back(pItem);
-	(*name_to_config_item)[pItem->GetKeyName()].push_back(pItem);
-	return pItem;
-}
-
-void Tripex::CreateCfgItems()
-{
-	if (pppCfgItem == NULL)
-	{
-		pppCfgItem = new std::vector<ConfigItem*>;
-		name_to_config_item = new std::map< std::string, std::vector< ConfigItem* >, CI_STR_CMP >();
-		psEffect = new std::string[effects.size()];
-
-		for (int i = 0; i < (int)effects.size(); i++)
-		{
-			AddCfgItem(ConfigItem::String(effects[i]->GetCfgItemName().c_str(), &psEffect[i]));
-		}
-	}
-}
-
-void Tripex::UpdateCfgItems(bool bInit)
-{
-	for (unsigned int i = 0; i < pppCfgItem->size(); i++)
-	{
-		(*pppCfgItem)[i]->Update(bInit);
-	}
-	for (unsigned int i = 0; i < effects.size(); i++)
-	{
-		float settings[5] = { 0.0f };
-
-		ConfigItem* pItem = FindCfgItem(effects[i]->GetCfgItemName().c_str());
-		pItem->GetFloatArray(5, settings);
-
-		effects[i]->preference = settings[0];
-		effects[i]->change = settings[1];
-		effects[i]->sensitivity = settings[2];
-		effects[i]->activity = settings[3];
-		effects[i]->speed = settings[4];
-	}
-	// filtering -> num
-}
-
-ConfigItem* Tripex::FindCfgItem(const char* sName)
-{
-	for (unsigned int i = 0; i < pppCfgItem->size(); i++)
-	{
-		if (!_stricmp((*pppCfgItem)[i]->sName.c_str(), sName)) return (*pppCfgItem)[i];
-	}
-	//	assert(false);
-	return NULL;
-}
-
-static bool bLoadedCfg = false;
-void Tripex::LoadCfgItems()
-{
-	if (bLoadedCfg) return;
-
-	UpdateCfgItems();
-
-	std::map< std::string, std::vector< ConfigItem* >, CI_STR_CMP >::iterator it;
-	for (it = name_to_config_item->begin(); it != name_to_config_item->end(); it++)
-	{
-		std::string sKey = it->first;
-		//			HKEY hKey = RegCreateKey(HKEY_CURRENT_USER, it->first.c_str(), KEY_READ);
-		for (int j = 0; j < (int)it->second.size(); j++)
-		{
-			ConfigItem* pItem = it->second[j];
-			//				if(!pItem->Load(hKey))
-			//				{
-			switch (pItem->nType)
-			{
-			case ConfigItem::CIT_INT:
-				pItem->SetInt(GetDefaultInt(pItem->sName.c_str()));
-				break;
-			case ConfigItem::CIT_BOOL:
-				pItem->SetBool(!!GetDefaultInt(pItem->sName.c_str()));
-				break;
-			case ConfigItem::CIT_FLOAT:
-				pItem->SetFloat(GetDefaultInt(pItem->sName.c_str()) / 1000.0f);
-				break;
-			case ConfigItem::CIT_STRING:
-				pItem->SetString(GetDefaultStr(pItem->sName.c_str()));
-				break;
-			default:
-				assert(false);
-				break;
-			}
-			pItem->bSave = false;
-			//				}
-		}
-		//			RegCloseKey(hKey);
-	}
-
-	bLoadedCfg = true;
-}
-
-void Tripex::SaveCfgItems()
-{
-	if (!bLoadedCfg) return;
-	UpdateCfgItems(false);
-
-	//		for(map< string, vector< auto_ptr< CCfgItem > > >::iterator it = mpCfgItem.begin(); it != mpCfgItem.end(); it++)
-	//		{
-	//			string s = it->first;
-	//			HKEY hKey = NULL;
-	//			for(int j = 0; j < it->second.size(); j++)
-	//			{
-	//				if(it->second[j]->bSave && hKey == NULL)
-	//				{
-	//					hKey = RegCreateKey(HKEY_CURRENT_USER, it->first.c_str(), KEY_WRITE);
-	//				}
-	//				it->second[j]->Save(hKey);
-	//			}
-	//			RegCloseKey(hKey);
-	//		}
+	AddEffect(&CreateEffect_Tunnel, "Tunnel", ZORDER_TUNNEL, 1.0f, 750, 750, 840, 620, 560);
+	AddEffect(&CreateEffect_WaterGlobe, "WaterGlobe", ZORDER_WATERGLOBE, 10.0f, 100, 200, 260, 390, 500);
+	AddEffect(&CreateEffect_Tube, "Tube", ZORDER_TUBE, 1.0f, 230, 310, 450, 500, 480);
+	AddEffect(&CreateEffect_Sun, "Sun", ZORDER_SUN, 1.0f, 80, 70, 280, 390, 500);
+	AddEffect(&CreateEffect_Bumpmapping, "Bumpmapping", ZORDER_BUMPMAPPING, 8.0f, 800, 500, 900, 500, 570);
+	AddEffect(&CreateEffect_Spectrum, "Spectrum", ZORDER_ANALYSER, 1.0f, 880, 660, 510, 510, 510);
+	AddEffect(&CreateEffect_Rings, "ConcentricRings", ZORDER_RINGS, 1.0f, 660, 250, 590, 1000, 1000);
+	AddEffect(&CreateEffect_Phased, "Phased", ZORDER_PHASED, 1.0f, 60, 100, 300, 270, 480);
+	AddEffect(&CreateEffect_MotionBlur1, "MotionBlur1", ZORDER_MOTIONBLUR, 1.0f, 120, 80, 100, 490, 490);
+	AddEffect(&CreateEffect_MotionBlur2, "MotionBlur2", ZORDER_MOTIONBLUR2, 1.0f, 50, 110, 940, 500, 450);
+	AddEffect(&CreateEffect_MotionBlur3, "MotionBlur3", ZORDER_MOTIONBLUR3, 1.0f, 420, 370, 590, 490, 940);
+	AddEffect(&CreateEffect_MotionBlur3Alt, "MotionBlur3(Alt)", ZORDER_MOTIONBLUR3ALT, 1.0f, 1000, 600, 580, 790, 840);
+	AddEffect(&CreateEffect_MorphingSphere, "MorphingSphere", ZORDER_MORPHINGSPHERE, 1.0f, 400, 170, 850, 590, 500);
+	AddEffect(&CreateEffect_LightTentacles, "LightTentacles", ZORDER_LIGHTTENTACLES, 1.0f, 410, 560, 660, 610, 460);
+	AddEffect(&CreateEffect_LightStar, "LightStar", ZORDER_LIGHTSTAR, 1.0f, 60, 60, 500, 500, 570);
+	AddEffect(&CreateEffect_LightSphere, "LightSphere", ZORDER_LIGHTSPHERE, 1.0f, 470, 370, 340, 420, 500);
+	AddEffect(&CreateEffect_LightRing, "LightRing", ZORDER_LIGHTRING, 1.0f, 340, 420, 880, 690, 460);
+	AddEffect(&CreateEffect_Flowmap, "Flowmap", ZORDER_FLOWMAP, 10.0f, 920, 800, 690, 580, 520);
+	AddEffect(&CreateEffect_DotStar, "DotStar", ZORDER_DOTSTAR, 1.0f, 90, 280, 310, 390, 1000);
+	AddEffect(&CreateEffect_Distortion2, "Distortion2", ZORDER_DISTORTION2, 1.0f, 550, 320, 500, 500, 460);
+	AddEffect(&CreateEffect_Distortion2Col, "Distortion2(Lit)", ZORDER_DISTORTION2COL, 1.0f, 550, 320, 500, 500, 460);
+	AddEffect(&CreateEffect_CollapsingLightSphere, "CollapsingLightSphere", ZORDER_COLLAPSINGSPHERE, 1.0f, 180, 280, 500, 310, 500);
+	AddEffect(&CreateEffect_BezierCube, "BezierCube", ZORDER_BEZIERCUBE, 1.0f, 140, 40, 140, 480, 70);
+	AddEffect(&CreateEffect_Distortion1, "Distortion1", ZORDER_DISTORTION, 1.0f, 210, 80, 640, 260, 520);
 }

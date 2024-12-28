@@ -1,6 +1,5 @@
 #pragma once
 
-#include "ConfigItem.h"
 #include "TextureFont.h"
 #include "AudioData.h"
 #include "Effect.h"
@@ -53,10 +52,6 @@ private:
 
 	Effect* pEffectBlank;
 
-	std::vector< ConfigItem* >* pppCfgItem = NULL;
-
-	std::string* psEffect;
-
 	TextureLibrary texture_library;
 
 	GeometryBuffer overlay_background;
@@ -77,33 +72,12 @@ private:
 	std::vector<std::shared_ptr<Effect>> effects;
 	std::vector<std::shared_ptr<Effect>> enabled_effects;
 
-	class CI_STR_CMP : public std::less<std::string>
-	{
-	public:
-		bool operator()(const std::string& s1, const std::string& s2) const
-		{
-			return _stricmp(s1.c_str(), s2.c_str()) < 0;
-		}
-	};
-
-	// TODO: make sure these CfgItems are free'd
-	std::map< std::string, std::vector< ConfigItem* >, CI_STR_CMP >* name_to_config_item = NULL;
-
 	void ShowStatusMsg(const char* format, ...);
 	DWORD WINAPI InitialiseThread(void* param);
 
 	void DrawMessage(const TextureFont& font, int y, const char* text, float brightness, float back_brightness);
 	int GetClippedLineLength(const TextureFont& font, const char* text, int clip_width);
 
-	void AddEffect(std::shared_ptr<Effect>(*fn)(), const char* name, int draw_order, float startup_weight);
+	void AddEffect(std::shared_ptr<Effect>(*fn)(), const char* name, int draw_order, float startup_weight, int preference, int change, int sensitivity, int activity, int speed);
 	void CreateEffectList();
-
-	ConfigItem* AddCfgItem(ConfigItem* item);
-	void CreateCfgItems();
-	void UpdateCfgItems(bool init = false);
-	ConfigItem* FindCfgItem(const char* name);
-
-	bool bLoadedCfg = false;
-	void LoadCfgItems();
-	void SaveCfgItems();
 };

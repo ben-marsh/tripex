@@ -1,7 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="config-defaults.cpp" />
     <ClCompile Include="error.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Misc.cpp" />
@@ -9,7 +8,6 @@
     <ClCompile Include="AudioData.cpp" />
     <ClCompile Include="Effect.cpp" />
     <ClCompile Include="Fourier.cpp" />
-    <ClCompile Include="ConfigItem.cpp" />
     <ClCompile Include="EffectBezierCube.cpp" />
     <ClCompile Include="EffectBlank.cpp" />
     <ClCompile Include="EffectBumpmapping.cpp" />
@@ -57,7 +55,6 @@
     <ClCompile Include="VertexGrid.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="config-defaults.h" />
     <ClInclude Include="Effect.h" />
     <ClInclude Include="Error.h" />
     <ClInclude Include="Misc.h" />
@@ -65,7 +62,6 @@
     <ClInclude Include="AudioData.h" />
     <ClInclude Include="Fourier.h" />
     <ClInclude Include="Platform.h" />
-    <ClInclude Include="ConfigItem.h" />
     <ClInclude Include="Vector3.h" />
     <ClInclude Include="BezierCurve.h" />
     <ClInclude Include="Camera.h" />

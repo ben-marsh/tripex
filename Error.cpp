@@ -1,6 +1,5 @@
 #include "Platform.h"
 #include "error.h"
-#include "ConfigItem.h"
 
 Error::Error(HRESULT hRes)
 {

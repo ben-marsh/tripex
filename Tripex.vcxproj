@@ -194,8 +194,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ColorHsv.cpp" />
-    <ClCompile Include="ConfigItem.cpp" />
-    <ClCompile Include="config-defaults.cpp" />
     <ClCompile Include="GeometryBuffer.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="StarModel.cpp" />
@@ -249,8 +247,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ComPtr.h" />
-    <ClInclude Include="ConfigItem.h" />
-    <ClInclude Include="config-defaults.h" />
     <ClInclude Include="GeometryBuffer.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="TextureLibrary.h" />
