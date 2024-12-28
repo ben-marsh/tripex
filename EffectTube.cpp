@@ -1,5 +1,6 @@
 #include "Platform.h"
 #include "Actor.h"
+#include "TextureData.h"
 #include "effect.h"
 
 #define PTDIST 15
@@ -18,6 +19,12 @@
 class EffectTube : public EffectBase
 {
 public:
+	const TextureClass envmap_texture_class =
+	{
+		"EnvMap",
+		{ g_anTexAlienEgg, g_anTexShinySand }
+	};
+
 	float height[PTLENGTH][PTCIRCUM];
 	bool fRefresh;
 	float accwf[PTCIRCUM];
@@ -26,6 +33,7 @@ public:
 	Camera cCamera;
 
 	EffectTube()
+		: EffectBase({ &envmap_texture_class })
 	{
 		int i, j;
 		coil.vertices.resize(CLENGTH * 4);
@@ -226,7 +234,7 @@ public:
 	}
 	Error* Reconfigure(const ReconfigureParams& params) override
 	{
-		Texture *tx = params.texture_library.Find(TextureClass::TubeEnvMap);
+		Texture *tx = params.texture_library.Find(envmap_texture_class);
 		coil.textures[0].Set(Actor::TextureType::Envmap, tx);
 		obj.textures[0].Set(Actor::TextureType::Envmap, tx);
 

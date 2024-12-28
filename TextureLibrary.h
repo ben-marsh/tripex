@@ -6,96 +6,19 @@
 #include <vector>
 #include <memory>
 
-enum class TextureClass
+struct TextureClass
 {
-	Invalid = -1,
-	Gui = 0,
-
-	// bezier cube
-	BezierCubeSprite = 1,
-	BezierCubeBackground = 2,
-
-	// collapsing sphere
-	CollapsingSphereSprite = 3,
-	CollapsingSphereBackground = 4,
-
-	// distortion
-	DistortionBackground = 5,
-
-	// distortion 2
-	Distortion2Background = 6,
-
-	// dot star
-	DotStarSprite = 7,
-	DotStarBackground = 8,
-
-	// light ring
-	LightRingSprite = 9,
-	LightRingBackground = 10,
-
-	// light sphere
-	LightSphereSprite = 11,
-	LightSphereBackground = 12,
-
-	// light star
-	LightStarSprite = 13,
-	LightStarBackground = 14,
-
-	// light tentacles
-	LightTentaclesSprite = 15,
-	LightTentaclesBackground = 16,
-
-	// metaballs
-	MetaballsEnvMap = 17,
-
-	// morphing sphere
-	MorphingSphereEnvMap = 18,
-
-	// motion blur
-	MotionBlurEnvMap = 19,
-
-	// motion blur 2
-	MotionBlur2EnvMap = 20,
-
-	// phased
-	PhasedSprite = 21,
-
-	// rings
-	RingsEnvMap = 22,
-
-	// bumpmapping
-	BumpMapBackground = 23,
-	BumpMapTentaclesEnvMap = 24,
-
-	// tube
-	TubeEnvMap = 25,
-
-	// tunnel
-	TunnelBackground = 26,
-
-	// water globe
-	WaterGlobeEnvMap = 27,
-
-	// spectrum
-	AnalyzerEnvMap = 28,
-
-	// motion blur 3
-	MotionBlur3EnvMap = 29,
-
-	// motion blur 3 alt
-	MotionBlur3AltEnvMap = 30,
-
-	// distortion 2 col
-	Distortion2ColBackground = 31,
+	const char* name;
+	std::vector<const uint32*> internal_textures;
 };
 
 class TextureLibrary
 {
 public:
-	void Add(TextureClass tc, std::shared_ptr<Texture> texture);
-	Texture* Find(TextureClass tc) const;
+	void Add(const TextureClass& tc, std::shared_ptr<Texture> texture);
+	Texture* Find(const TextureClass& tc) const;
+	void Reset();
 
 private:
-	std::set<Texture*> textures;
-	std::map<TextureClass, std::vector<std::shared_ptr<Texture>>> textures_by_class;
+	std::map<const TextureClass*, std::vector<std::shared_ptr<Texture>>> textures_by_class;
 };

@@ -7,6 +7,11 @@ EffectBase::EffectBase()
 {
 	pEffectPtr = nullptr;
 }
+EffectBase::EffectBase(std::initializer_list<const TextureClass*> textures)
+	: textures(textures)
+{
+	pEffectPtr = nullptr;
+}
 EffectBase::~EffectBase()
 {
 }

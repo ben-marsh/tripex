@@ -2,6 +2,7 @@
 #include "effect.h"
 #include "error.h"
 #include "Actor.h"
+#include "TextureData.h"
 #include "BezierCurve.h"
 
 //static ZObject pObj[RINGS];//, *o2, *o3;
@@ -14,6 +15,12 @@
 template < bool bAltBlur > class EffectMotionBlur3T : public EffectBase
 {
 public:
+	const TextureClass envmap_texture_class =
+	{
+		"EnvMap",
+		{ g_anTexAlienEgg, g_anTexShinySand }
+	};
+
 	Camera camera;
 	Actor pObj[9];
 	Actor obj;
@@ -34,7 +41,9 @@ public:
 	ContainedBezierCurve<2> bz;
 	Camera cam;
 
-	EffectMotionBlur3T() : bz(Vector3(20, 20, 20), -Vector3(20, 20, 20))//, cam(0)
+	EffectMotionBlur3T()
+		: EffectBase({ &envmap_texture_class })
+		, bz(Vector3(20, 20, 20), -Vector3(20, 20, 20))//, cam(0)
 	{
 		cam.flags.set( Camera::F_SCREEN_TRANSFORM, false );
 
@@ -205,7 +214,7 @@ public:
 		fAvTime = 16;
 		fAvTotal = params.audio_data.GetIntensity( ) * fAvTime;
 		bReset = true;
-		Texture *t = params.texture_library.Find(bAltBlur? TextureClass::MotionBlur3AltEnvMap : TextureClass::MotionBlur3EnvMap);
+		Texture *t = params.texture_library.Find(envmap_texture_class);
 		for(int i = 0; i < 9; i++) pObj[i].textures[0].texture = t;
 		bFirstCalc = true;
 		return nullptr;

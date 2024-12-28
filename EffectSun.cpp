@@ -193,4 +193,5 @@ public:
 	//	return scene->render(d3d);
 	}
 };
+
 EXPORT_EFFECT(Sun, EffectSun)

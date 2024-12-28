@@ -12,6 +12,8 @@ class Tripex
 {
 public:
 	Tripex(Renderer& renderer);
+	~Tripex();
+
 	Error* Startup();
 	Error* Render();
 	void Shutdown();

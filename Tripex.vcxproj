@@ -196,12 +196,10 @@
     <ClCompile Include="ColorHsv.cpp" />
     <ClCompile Include="ConfigItem.cpp" />
     <ClCompile Include="config-defaults.cpp" />
-    <ClCompile Include="Config.cpp" />
     <ClCompile Include="GeometryBuffer.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="StarModel.cpp" />
     <ClCompile Include="TextureLibrary.cpp" />
-    <ClCompile Include="TextureSource.cpp" />
     <ClCompile Include="EffectBezierCube.cpp" />
     <ClCompile Include="EffectBlank.cpp" />
     <ClCompile Include="EffectBumpmapping.cpp" />
@@ -253,11 +251,9 @@
     <ClInclude Include="ComPtr.h" />
     <ClInclude Include="ConfigItem.h" />
     <ClInclude Include="config-defaults.h" />
-    <ClInclude Include="Config.h" />
     <ClInclude Include="GeometryBuffer.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="TextureLibrary.h" />
-    <ClInclude Include="TextureSource.h" />
     <ClInclude Include="Effect.h" />
     <ClInclude Include="Error.h" />
     <ClInclude Include="Misc.h" />

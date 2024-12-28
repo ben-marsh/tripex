@@ -3,6 +3,7 @@
 #include "Actor.h"
 #include "error.h"
 #include <algorithm>
+#include "TextureData.h"
 
 #define RINGS 10//6//10//12 //7
 
@@ -11,6 +12,12 @@
 class EffectMotionBlur1 : public EffectBase
 {
 public:
+	const TextureClass envmap_texture_class =
+	{
+		"EnvMap",
+		{ g_anTexAlienEgg, g_anTexShinySand }
+	};
+
 	bool fSetTexture;
 	Camera camera;
 	Actor pObj[RINGS];//, *o2, *o3;
@@ -21,6 +28,7 @@ public:
 	double accum;
 
 	EffectMotionBlur1()
+		: EffectBase({ &envmap_texture_class })
 	{
 		accum = 1.5;
 		fFirstCalc = false;
@@ -76,7 +84,7 @@ public:
 	}
 	Error* Reconfigure(const ReconfigureParams& params) override
 	{
-		Texture *t = params.texture_library.Find(TextureClass::MotionBlurEnvMap);
+		Texture *t = params.texture_library.Find(envmap_texture_class);
 		for (int i = 0; i < RINGS; i++)
 		{
 			pObj[i].textures[0].texture = t;

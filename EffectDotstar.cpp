@@ -5,8 +5,8 @@
 #include "StarModel.h"
 #include "Actor.h"
 #include "BezierCurve.h"
+#include "TextureData.h"
 #include <algorithm>
-
 
 #define NUMBEZ 10
 #define MAX_TILT (20.0 * 3.14159 / 180.0)
@@ -18,6 +18,18 @@
 class EffectDotStar : public EffectBase
 {
 public:
+	const TextureClass sprite_texture_class =
+	{
+		"Sprite",
+		{ g_anTexBrightLight }
+	};
+
+	const TextureClass tint_texture_class =
+	{
+		"Tint",
+		{ g_anTexEyes, g_anTexFlesh, g_anTexForest, g_anTexShinySand }
+	};
+
 	// 256x256
 	class ZDotVertex
 	{
@@ -52,9 +64,10 @@ public:
 	float fTotalElapsed;
 	double brt;
 
-	EffectDotStar() : //: camera(0),
-		b(Vector3(-100, -100, 120), Vector3(100, 100, 140)),
-		b2(Vector3(-20, -20, -20), Vector3(20, 20, 20))
+	EffectDotStar()
+		: EffectBase({ &sprite_texture_class, &tint_texture_class }) //: camera(0),
+		, b(Vector3(-100, -100, 120), Vector3(100, 100, 140))
+		, b2(Vector3(-20, -20, -20), Vector3(20, 20, 20))
 	{
 		camera.flags.set( Camera::F_SCREEN_TRANSFORM, false );
 
@@ -248,8 +261,8 @@ public:
 	Error* Reconfigure(const ReconfigureParams& params) override
 	{
 		fSpeed = params.audio_data.GetIntensity( );
-		pTexture = params.texture_library.Find(TextureClass::DotStarSprite);
-		pTint = params.texture_library.Find(TextureClass::DotStarBackground);
+		pTexture = params.texture_library.Find(sprite_texture_class);
+		pTint = params.texture_library.Find(tint_texture_class);
 		return nullptr;
 	}
 	Error* Render(const RenderParams& params) override

@@ -2,6 +2,7 @@
 #include "effect.h"
 #include "Actor.h"
 #include "Camera.h"
+#include "TextureData.h"
 #include "error.h"
 
 #define ACCELER 1.0f
@@ -22,6 +23,12 @@
 class EffectSpectrum : public EffectBase
 {
 public:
+	const TextureClass envmap_texture_class =
+	{
+		"EnvMap",
+		{ g_anTexAlienEgg, g_anTexShinySand }
+	};
+
 	float m_fBrAng;
 	Camera m_cCamera;
 	Actor m_pObj[TRAIL_H];
@@ -39,6 +46,7 @@ public:
 	---------------------------------------------*/
 
 	EffectSpectrum( )
+		: EffectBase({ &envmap_texture_class })
 	{
 		m_fAng = 0.0f;
 		m_fr = true;
@@ -245,7 +253,7 @@ public:
 	Error* Reconfigure(const ReconfigureParams& params) override
 	{
 		static Texture *pTexture;
-		pTexture = params.texture_library.Find(TextureClass::AnalyzerEnvMap);
+		pTexture = params.texture_library.Find(envmap_texture_class);
 		for(int i = 0; i < TRAIL_H; i++)
 		{
 			m_pObj[i].textures[0].Set(Actor::TextureType::Envmap, pTexture);

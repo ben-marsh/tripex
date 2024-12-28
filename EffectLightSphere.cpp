@@ -3,6 +3,7 @@
 #include "Actor.h"
 #include "error.h"
 #include "effect.h"
+#include "TextureData.h"
 
 //#define SOURCES 65//180//65//80
 #define FRAMES 10
@@ -16,6 +17,18 @@ extern bool bMeshHQ;
 class EffectLightSphere : public EffectBase
 {
 public:
+	const TextureClass sprite_texture_class =
+	{
+		"Sprite",
+		{ g_anTexLight }
+	};
+
+	const TextureClass tint_texture_class =
+	{
+		"Tint",
+		{ g_anTexEyes, g_anTexFlesh, g_anTexForest, g_anTexShinySand }
+	};
+
 	Actor obj;
 	Camera camera;
 
@@ -40,7 +53,9 @@ public:
 	double dBrBack;
 	Texture *pTint;
 
-	EffectLightSphere() : b(4)
+	EffectLightSphere()
+		: EffectBase({ &sprite_texture_class, &tint_texture_class })
+		, b(4)
 	{
 		accum = 1.1;
 		r = p = y = 0;
@@ -135,9 +150,9 @@ public:
 			fNotRendered = false;
 		}
 
-		obj.textures[0].Set(Actor::TextureType::Sprite, params.texture_library.Find(TextureClass::LightSphereSprite));
+		obj.textures[0].Set(Actor::TextureType::Sprite, params.texture_library.Find(sprite_texture_class));
 
-		pTint = params.texture_library.Find(TextureClass::LightSphereBackground);
+		pTint = params.texture_library.Find(tint_texture_class);
 		return nullptr;
 	}
 	Error* Render(const RenderParams& params) override
@@ -161,5 +176,6 @@ public:
 		return (dElapsed > 0.2);
 	}
 };
+
 EXPORT_EFFECT( LightSphere, EffectLightSphere )
 

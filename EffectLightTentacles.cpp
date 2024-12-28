@@ -3,6 +3,7 @@
 #include "BezierCurve.h"
 #include "effect.h"
 #include "error.h"
+#include "TextureData.h"
 
 #define NMPOINTS 30//50//30
 #define LENGTH 50//40
@@ -12,6 +13,18 @@
 class EffectLightTentacles : public EffectBase
 {
 public:
+	const TextureClass sprite_texture_class =
+	{
+		"Sprite",
+		{ g_anTexLight }
+	};
+
+	const TextureClass tint_texture_class =
+	{
+		"Tint",
+		{ g_anTexEyes, g_anTexFlesh, g_anTexForest, g_anTexShinySand }
+	};
+
 	Actor obj;
 	Camera camera;
 //static double p[3], v[3], a[3];
@@ -20,7 +33,9 @@ public:
 	double brt;
 	Texture *ptTint;
 
-	EffectLightTentacles() : b(4)
+	EffectLightTentacles()
+		: EffectBase({ &sprite_texture_class, &tint_texture_class })
+		, b(4)
 	{
 		Actor sphere;
 		sphere.CreateGeosphere(1.0, NMPOINTS);
@@ -111,8 +126,8 @@ public:
 	Error* Reconfigure(const ReconfigureParams& params) override
 	{
 		obj.textures[0].type = Actor::TextureType::Sprite;
-		obj.textures[0].texture = params.texture_library.Find(TextureClass::LightTentaclesSprite);
-		ptTint = params.texture_library.Find(TextureClass::LightTentaclesBackground);
+		obj.textures[0].texture = params.texture_library.Find(sprite_texture_class);
+		ptTint = params.texture_library.Find(tint_texture_class);
 		return nullptr;
 	}
 };

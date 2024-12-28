@@ -2,6 +2,7 @@
 #include "Actor.h"
 #include "error.h"
 #include "effect.h"
+#include "TextureData.h"
 #include <algorithm>
 
 #define accelFac 0.9
@@ -19,11 +20,19 @@
 
 class EffectWaterGlobe : public EffectBase
 {
+private:
+	const TextureClass envmap_texture_class =
+	{
+		"EnvMap",
+		{ g_anTexAlienEgg, g_anTexShinySand }
+	};
+
 	class ZGeoEdge : public Edge
 	{
 	public:
 		int nSplit;
 	};
+
 	class WaterObj : public Actor
 	{
 	public:
@@ -147,6 +156,7 @@ public:
 	Camera camera;
 
 	EffectWaterGlobe()
+		: EffectBase({ &envmap_texture_class })
 	{
 		nPos = 0;
 
@@ -212,7 +222,7 @@ public:
 	}
 	Error* Reconfigure(const ReconfigureParams& params) override
 	{
-		obj.textures[0].Set(Actor::TextureType::Envmap, params.texture_library.Find(TextureClass::WaterGlobeEnvMap));
+		obj.textures[0].Set(Actor::TextureType::Envmap, params.texture_library.Find(envmap_texture_class));
 		return nullptr;
 	}
 	Error* Render(const RenderParams& params) override

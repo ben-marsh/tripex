@@ -2,6 +2,7 @@
 #include "Actor.h"
 #include "effect.h"
 #include "error.h"
+#include "TextureData.h"
 
 #define DEPTH 8
 #define MAG 20
@@ -13,6 +14,12 @@
 class EffectPhased : public EffectBase
 {
 public:
+	const TextureClass sprite_texture_class =
+	{
+		"Sprite",
+		{ g_anTexLight }
+	};
+
 	Actor obj;
 	Camera camera;
 
@@ -22,6 +29,7 @@ public:
 	double a;
 
 	EffectPhased()
+		: EffectBase({ &sprite_texture_class })
 	{
 		a = 0;
 		lastbeat = 0;
@@ -78,7 +86,7 @@ public:
 	}
 	Error* Reconfigure(const ReconfigureParams& params) override
 	{
-		Texture *tx = params.texture_library.Find(TextureClass::PhasedSprite);
+		Texture *tx = params.texture_library.Find(sprite_texture_class);
 		obj.textures[0].Set(Actor::TextureType::Sprite, tx);
 		return nullptr;
 	}

@@ -2,12 +2,25 @@
 #include "effect.h"
 #include "Actor.h"
 #include "error.h"
+#include "TextureData.h"
 
 #define SOURCES 512
 
 class EffectLightStar : public EffectBase
 {
 public:
+	const TextureClass sprite_texture_class =
+	{
+		"Sprite",
+		{ g_anTexLight }
+	};
+
+	const TextureClass tint_texture_class =
+	{
+		"Tint",
+		{ g_anTexEyes, g_anTexFlesh, g_anTexForest, g_anTexShinySand }
+	};
+
 	Actor obj;
 	Camera camera;
 	float brt;
@@ -21,6 +34,7 @@ public:
 	int nSpikes;
 
 	EffectLightStar()
+		: EffectBase({ &sprite_texture_class, &tint_texture_class })
 	{
 		dRadAng = 2 * 3.14159 * 2.0;
 		dViewAng = 0;
@@ -102,9 +116,10 @@ public:
 	}
 	Error* Reconfigure(const ReconfigureParams& params) override
 	{
-		obj.textures[0].texture = params.texture_library.Find(TextureClass::LightStarSprite);
-		pTint = params.texture_library.Find(TextureClass::LightStarBackground);
+		obj.textures[0].texture = params.texture_library.Find(sprite_texture_class);
+		pTint = params.texture_library.Find(tint_texture_class);
 		return nullptr;
 	}
 };
+
 EXPORT_EFFECT( LightStar, EffectLightStar )

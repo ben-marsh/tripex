@@ -3,6 +3,7 @@
 #include "AudioData.h"
 #include "effect.h"
 #include "error.h"
+#include "TextureData.h"
 //#include "tripex2.h"
 
 #define GRW 80
@@ -12,6 +13,12 @@
 class EffectDistortion1 : public EffectBase
 {
 public:
+	const TextureClass background_texture_class =
+	{
+		"Background",
+		{ g_anTexFlesh, g_anTexForest }
+	};
+
 	bool fSetTexture;
 	VertexGrid grid;//(GRW, GRH);//, D3DFVF_DIFFUSE | D3DFVF_TEX1);
 	float xp, yp, t, fac;
@@ -23,7 +30,9 @@ public:
 	double average;
 	Texture *tx;
 
-	EffectDistortion1() : grid(GRW, GRH)
+	EffectDistortion1()
+		: EffectBase({ &background_texture_class })
+		, grid(GRW, GRH)
 	{
 		xp = yp = 0;
 		t = 0;
@@ -91,7 +100,7 @@ public:
 	}
 	Error* Reconfigure(const ReconfigureParams& params) override
 	{
-		tx = params.texture_library.Find(TextureClass::DistortionBackground);
+		tx = params.texture_library.Find(background_texture_class);
 //	grid->SetTexture(d3d->Select(TC_WRAPTEXTURE));//TC_ENVIRONMENTMAP));
 		return nullptr;
 	}

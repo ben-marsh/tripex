@@ -2,6 +2,7 @@
 #include "Actor.h"
 #include "Effect.h"
 #include "BezierCurve.h"
+#include "TextureData.h"
 #include "VertexGrid.h"
 
 #define SOURCES 40//40//35//50
@@ -19,6 +20,18 @@
 class EffectLightRing : public EffectBase
 {
 public:
+	const TextureClass sprite_texture_class =
+	{
+		"Sprite",
+		{ g_anTexLight }
+	};
+
+	const TextureClass tint_texture_class =
+	{
+		"Tint",
+		{ g_anTexEyes, g_anTexFlesh, g_anTexForest, g_anTexShinySand }
+	};
+
 	BezierCurve b;
 	Vector3 ls[SOURCES][4];
 	double position[SOURCES];
@@ -40,6 +53,7 @@ public:
 	double br;
 
 	EffectLightRing()
+		: EffectBase({ &sprite_texture_class, &tint_texture_class })
 	{
 		fSetTexture = true;
 		fNotRendered = true;
@@ -103,8 +117,8 @@ public:
 	}
 	Error* Reconfigure(const ReconfigureParams& params) override
 	{
-		tx = params.texture_library.Find(TextureClass::LightRingSprite);
-		ptTint = params.texture_library.Find(TextureClass::LightRingBackground);
+		tx = params.texture_library.Find(sprite_texture_class);
+		ptTint = params.texture_library.Find(tint_texture_class);
 		return nullptr;
 	}
 	Error* Render(const RenderParams& params) override
@@ -130,4 +144,5 @@ public:
 		return (dElapsed > 0.1);//1.0);
 	}
 };
+
 EXPORT_EFFECT( LightRing, EffectLightRing )

@@ -3,6 +3,7 @@
 #include "effect.h"
 #include "error.h"
 #include "BezierCurve.h"
+#include "TextureData.h"
 //#include "tripex2.h"
 
 #define GRW 80
@@ -15,6 +16,12 @@
 template < bool bLight > class EffectDistortion2T : public EffectBase
 {
 public:
+	const TextureClass background_texture_class =
+	{
+		"Background",
+		bLight ? std::vector<const uint32*>{ g_anTexFlesh } : std::vector<const uint32*>{ g_anTexEyes, g_anTexFlesh, g_anTexForest }
+	};
+
 	BezierCurve pb[NCENTRES];
 	double pdPos[NCENTRES];
 
@@ -32,7 +39,9 @@ public:
 	double br;
 	Texture *tx;
 
-	EffectDistortion2T() : grid(GRW, GRH)
+	EffectDistortion2T()
+		: EffectBase({ &background_texture_class })
+		, grid(GRW, GRH)
 	{
 		xp = yp = 0;
 		t = 0;
@@ -156,12 +165,12 @@ public:
 	}
 	Error* Reconfigure(const ReconfigureParams& params) override
 	{
-		tx = params.texture_library.Find(bLight? TextureClass::Distortion2ColBackground : TextureClass::Distortion2Background);
+		tx = params.texture_library.Find(background_texture_class);
 		return nullptr;
 	}
 };
 
-EXPORT_EFFECT( Distortion2, EffectDistortion2T< false > )
+EXPORT_EFFECT(Distortion2, EffectDistortion2T< false >)
 EXPORT_EFFECT( Distortion2Col, EffectDistortion2T< true > )
 
 //	typedef ZEffectDistortion2T<true> ZEffectDistortion2Col;

@@ -49,6 +49,8 @@ enum
 class EffectBase
 {
 public:
+	const std::vector<const TextureClass*> textures;
+
 	struct CalculateParams
 	{
 		float brightness;
@@ -90,6 +92,7 @@ public:
 	class EffectHandler* pEffectPtr;
 
 	EffectBase();
+	EffectBase(std::initializer_list<const TextureClass*> textures);
 	virtual ~EffectBase();
 
 	virtual Error* Calculate(const CalculateParams& params) = 0;
@@ -100,7 +103,7 @@ public:
 
 class EffectHandler
 {
-protected:
+public:
 	std::unique_ptr<EffectBase> pEffect;
 
 public:
@@ -149,6 +152,18 @@ public:
 		pEffect->pEffectPtr = this;
 	}
 };
+
+struct EffectDecl
+{
+	const char* name;
+	std::vector<const TextureClass*> texture_classes;
+	std::shared_ptr<EffectHandler>(*create)();
+};
+
+template<class T> std::shared_ptr<EffectHandler> CreateEffect()
+{
+	return std::make_shared<EffectHandlerT<T>>();
+}
 
 #define IMPORT_EFFECT(name) extern std::shared_ptr<EffectHandler> CreateEffect_##name( );
 #define EXPORT_EFFECT(name, type) std::shared_ptr<EffectHandler> CreateEffect_##name( ){ return std::make_shared<EffectHandlerT<type>>(); }

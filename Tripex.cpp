@@ -2,9 +2,6 @@
 #include "error.h"
 #include "Texture.h"
 #include "TextureFont.h"
-#include "config.h"
-#include "TextureSource.h"
-#include "config.h"
 #include "TextureData.h"
 #include "AudioData.h"
 //#include "mmsystem.h"
@@ -22,6 +19,11 @@ Tripex::Tripex(Renderer& renderer)
 	CreateCfgItems();
 }
 
+Tripex::~Tripex()
+{
+	texture_library.Reset();
+}
+
 void Tripex::ShowStatusMsg(const char *sFormat, ...)
 {
 	va_list pArg;
@@ -33,9 +35,6 @@ void Tripex::ShowStatusMsg(const char *sFormat, ...)
 
 DWORD WINAPI Tripex::InitialiseThread(void *pParam)
 {
-	std::vector< TextureSource* > texture_sources;
-	LoadTextureSettings(texture_sources);
-
 	for(int i = 1; i < (int)effects.size(); i++)
 	{
 		if(effects[i]->fPreference > FLOAT_ZERO)
@@ -46,32 +45,38 @@ DWORD WINAPI Tripex::InitialiseThread(void *pParam)
 
 	srand( timeGetTime( ) );
 
-	assert(num_internal_textures >= 1);
-
-	for(TextureSource* texture_source : texture_sources)
-	{
-		const uint32* pnTexData = internal_textures[texture_source->internal_id];
-
-		std::shared_ptr<Texture> texture;
-
-		if (!texture_source->internal || texture_source->internal_id != 1)
-		{
-			Error* error = renderer.CreateTextureFromImage(pnTexData + 1, *pnTexData, texture);
-			assert(error == nullptr);
-
-			texture_source->texture = texture.get();
-		}
-
-		for (TextureClass texture_class : texture_source->classes)
-		{
-			texture_library.Add(texture_class, texture);
-		}
-	}
-
-	for(int i = 0; i < enabled_effects.size(); i++)
+	for (int i = 0; i < enabled_effects.size(); i++)
 	{
 		enabled_effects[i]->Create();
 	}
+
+	std::map<const uint32*, std::shared_ptr<Texture>> data_to_texture;
+
+	for (const std::shared_ptr<EffectHandler>& effect_handler : enabled_effects)
+	{
+		EffectBase& effect = *effect_handler->pEffect.get();
+		for (const TextureClass* texture_class : effect.textures)
+		{
+			for (const uint32* internal_texture : texture_class->internal_textures)
+			{
+				std::map<const uint32*, std::shared_ptr<Texture>>::const_iterator it = data_to_texture.find(internal_texture);
+				if (it == data_to_texture.find(internal_texture))
+				{
+					std::shared_ptr<Texture> texture;
+
+					if (internal_texture != g_anTexBlank)
+					{
+						Error* error = renderer.CreateTextureFromImage(internal_texture + 1, *internal_texture, texture);
+						assert(error == nullptr);
+					}
+
+					it = data_to_texture.insert(std::make_pair(internal_texture, std::move(texture))).first;
+				}
+				texture_library.Add(*texture_class, it->second);
+			}
+		}
+	}
+
 	return 0;
 }
 

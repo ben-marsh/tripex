@@ -1,6 +1,7 @@
 #include "Platform.h"
 #include "effect.h"
 #include "Actor.h"
+#include "TextureData.h"
 #include "error.h"
 
 #define	RINGS 25
@@ -11,6 +12,12 @@
 class EffectRings : public EffectBase
 {
 public:
+	const TextureClass envmap_texture_class =
+	{
+		"EnvMap",
+		{ g_anTexAlienEgg, g_anTexShinySand }
+	};
+
 	bool fSetTexture;
 	Actor pObj[RINGS];
 	Camera camera;
@@ -29,6 +36,7 @@ public:
 	double pos;
 
 	EffectRings()
+		: EffectBase({ &envmap_texture_class })
 	{
 		fFirstCalc = true;
 		accum = 1.5;
@@ -111,7 +119,7 @@ public:
 	}
 	Error* Reconfigure(const ReconfigureParams& params) override
 	{
-		Texture *tx = params.texture_library.Find(TextureClass::RingsEnvMap);
+		Texture *tx = params.texture_library.Find(envmap_texture_class);
 		for (int i = 0; i < RINGS; i++)
 		{
 			pObj[i].textures[0].Set(Actor::TextureType::Envmap, tx);

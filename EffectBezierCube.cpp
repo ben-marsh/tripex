@@ -6,6 +6,7 @@
 #include "effect.h"
 #include <conio.h>
 #include "error.h"
+#include "TextureData.h"
 
 #define BEZIERS 5
 #define BEZIERPOINTS 50
@@ -26,6 +27,18 @@
 class EffectBezierCube : public EffectBase
 {
 public:
+	const TextureClass sprite_texture_class =
+	{
+		"Sprite",
+		{ g_anTexLight }
+	};
+
+	const TextureClass tint_texture_class =
+	{
+		"Tint",
+		{ g_anTexEyes, g_anTexFlesh, g_anTexForest }
+	};
+
 	int nCornerIndex[BEZIERS];
 
 	Texture *pTexture, *pTint;
@@ -44,7 +57,9 @@ public:
 	double dAng, dAngX, dAngY, dAngZ;
 	double dMult;
 
-	EffectBezierCube() : bcEdge(TWISTPLANES)
+	EffectBezierCube()
+		: EffectBase({ &sprite_texture_class, &tint_texture_class })
+		, bcEdge(TWISTPLANES)
 	{
 		brt = 0.0;
 		pTexture = nullptr;
@@ -249,7 +264,7 @@ public:
 	}
 	Error* Reconfigure(const ReconfigureParams& params) override
 	{
-		pTexture = params.texture_library.Find(TextureClass::BezierCubeSprite);
+		pTexture = params.texture_library.Find(sprite_texture_class);
 		testobj.textures[0].texture = pTexture;
 		obj.textures[0].texture = pTexture;
 		for(int i = 0; i < TWISTPLANES; i++)
@@ -261,7 +276,7 @@ public:
 			pObj[i].textures[0].texture = pTexture;
 		}
 
-		pTint = params.texture_library.Find(TextureClass::BezierCubeBackground);
+		pTint = params.texture_library.Find(tint_texture_class);
 		return nullptr;
 	}
 };

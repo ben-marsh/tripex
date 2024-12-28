@@ -2,6 +2,7 @@
 #include "effect.h"
 #include "Actor.h"
 #include "BezierCurve.h"
+#include "TextureData.h"
 #include "error.h"
 
 #define HILLSZ 0.1
@@ -12,13 +13,21 @@
 class EffectMorphingSphere : public EffectBase
 {
 public:
+	const TextureClass envmap_texture_class =
+	{
+		"EnvMap",
+		{ g_anTexAlienEgg, g_anTexShinySand }
+	};
+
 	Actor pObj[NOBJ + 1];
 	Camera camera;
 	std::vector<float> pfAng;
 	ContainedBezierCurve<1> b;
 	float fBezPos;
 	
-	EffectMorphingSphere() : b(Vector3(-100, -100, -600), Vector3(100, 100, -200))
+	EffectMorphingSphere()
+		: EffectBase({ &envmap_texture_class })
+		, b(Vector3(-100, -100, -600), Vector3(100, 100, -200))
 	{
 		fBezPos = 0;
 		pObj[NOBJ].CreateTetrahedronGeosphere(1.0, 4);
@@ -92,7 +101,7 @@ public:
 	}
 	Error* Reconfigure(const ReconfigureParams& params) override
 	{
-		Texture *tx = params.texture_library.Find(TextureClass::MorphingSphereEnvMap);
+		Texture *tx = params.texture_library.Find(envmap_texture_class);
 		for(int i = 0; i < NOBJ; i++)
 		{
 			pObj[i].textures[0].Set(Actor::TextureType::Envmap, tx);
@@ -110,4 +119,5 @@ public:
 		return nullptr;
 	}
 };
+
 EXPORT_EFFECT(MorphingSphere, EffectMorphingSphere)

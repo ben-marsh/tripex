@@ -4,6 +4,7 @@
 #include "error.h"
 #include "Canvas.h"
 #include "Texture.h"
+#include "TextureData.h"
 #include "Actor.h"
 
 //#define USE_ASM_BUMPMAPPING
@@ -83,23 +84,35 @@ void MakeTentacles(Actor &obj, int segs, float l, float r)
 class EffectBumpmapping : public EffectBase
 {
 public:
-	class BumpmapData
+	const TextureClass background_texture_class =
 	{
-	public:
-		Texture *pTexture;
-		std::vector<unsigned char> pBumpmap;
+		"Background",
+		{ g_anTexBlank, g_anTexFlesh }
 	};
 
-	Texture *light, *texture;
+	const TextureClass tentacles_texture_class =
+	{
+		"Tentacles",
+		{ g_anTexAlienEgg }
+	};
+
+	struct BumpmapData
+	{
+		Texture *texture;
+		std::vector<unsigned char> bumpmap;
+	};
+
+	Texture* light = nullptr;
+	Texture* texture = nullptr;
 
 	Canvas pc;
 
 	VertexGrid grid;
 	VertexGrid gridbm;
 	float tx, ty;
-	unsigned char lightmap[256 * 256];
-	unsigned char pnBuf[256 * 256];
-	unsigned short *pnCurrentBump;
+	unsigned char lightmap[256 * 256]{ };
+	unsigned char pnBuf[256 * 256]{ };
+	unsigned short *pnCurrentBump = nullptr;
 
 	std::map<Texture*, std::unique_ptr<unsigned short[]>> mpBumpIndex;
 
@@ -110,10 +123,10 @@ public:
 	float precalc_v[GRIDW+1][GRIDH+1];
 	float precalc_c[GRIDW+1][GRIDH+1];
 
-	float br;
+	float br = 0.0f;
 	bool fInBrighten;
-	float brangle;
-	float brcolour;
+	float brangle = 0.0f;
+	float brcolour = 0.0f;
 	bool fStarted;
 	float ya;
 	float angle;
@@ -123,7 +136,11 @@ public:
 	float fMoveSpeed;
 	float accum;
 
-	EffectBumpmapping() : grid(GRIDW, GRIDH), gridbm(GRIDW, GRIDH), pc( 256, 256 )
+	EffectBumpmapping()
+		: EffectBase({ &background_texture_class, &tentacles_texture_class })
+		, grid(GRIDW, GRIDH)
+		, gridbm(GRIDW, GRIDH)
+		, pc(256, 256)
 	{
 		fTentacleAng = 0.0f;
 		fTentacleDir = 1.0f;
@@ -444,13 +461,13 @@ public:
 	Error* Reconfigure(const ReconfigureParams& params) override
 	{
 		obj.textures[0].type = Actor::TextureType::Envmap;
-		obj.textures[0].texture = params.texture_library.Find(TextureClass::BumpMapTentaclesEnvMap);//ENVIRONMENTMAP));
+		obj.textures[0].texture = params.texture_library.Find(tentacles_texture_class);//ENVIRONMENTMAP));
 		fMoveSpeed = 1.0f + (rand() * 4.0f / RAND_MAX);
 
 //		if(pBump.GetLength() == 0) texture = pBlankTexture;
 //		else
 //		{
-			texture = params.texture_library.Find(TextureClass::BumpMapBackground);
+			texture = params.texture_library.Find(background_texture_class);
 			if (texture != nullptr)
 			{
 				std::map< Texture*, std::unique_ptr< unsigned short[] > >::iterator it = mpBumpIndex.find(texture);

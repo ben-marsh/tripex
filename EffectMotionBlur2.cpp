@@ -2,6 +2,7 @@
 #include "effect.h"
 #include "Actor.h"
 #include "BezierCurve.h"
+#include "TextureData.h"
 #include "error.h"
 
 #define PIPE_RADIUS 10.0
@@ -20,6 +21,12 @@ static const int nVertices = PIPE_LENGTH * PIPE_CIRCUMPOINTS;
 class EffectMotionBlur2 : public EffectBase
 {
 public:
+	const TextureClass envmap_texture_class =
+	{
+		"EnvMap",
+		{ g_anTexAlienEgg, g_anTexShinySand }
+	};
+
 	Actor pObj[PIPES];
 	Camera camera;//World *pScene;
 	ContainedBezierCurve<1> b;
@@ -28,7 +35,9 @@ public:
 	float pf[2][3], pfa[3];
 	float fChange;
 
-	EffectMotionBlur2() : b(Vector3(-100, -100, -20), Vector3(100, 100, 100))
+	EffectMotionBlur2()
+		: EffectBase({ &envmap_texture_class })
+		, b(Vector3(-100, -100, -20), Vector3(100, 100, 100))
 	{
 		for(int i = 0; i < 3; i++) pf[1][i] = 0.0f;
 
@@ -118,7 +127,7 @@ public:
 	}
 	Error* Reconfigure(const ReconfigureParams& params) override
 	{
-		Texture *pTexture = params.texture_library.Find(TextureClass::MotionBlur2EnvMap);//2);
+		Texture *pTexture = params.texture_library.Find(envmap_texture_class);//2);
 		for(int i = 0; i < PIPES; i++)
 		{
 			pObj[i].textures[0].type = Actor::TextureType::Lightmap;

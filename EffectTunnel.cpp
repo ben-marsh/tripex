@@ -3,6 +3,7 @@
 #include "Actor.h"
 #include "BezierCurve.h"
 #include "effect.h"
+#include "TextureData.h"
 #include "error.h"
 
 static const int nTunnelR1 = 50;
@@ -30,6 +31,12 @@ const float RANDCH_R2 = 100.0f;
 class EffectTunnel : public EffectBase
 {
 public:
+	const TextureClass background_texture_class =
+	{
+		"Background",
+		{ g_anTexFlesh, g_anTexForest }
+	};
+
 	float fPos;
 	float fLenPos;
 	BezierCurve b[2][nBeziers];
@@ -57,6 +64,7 @@ public:
 
 	
 	EffectTunnel()
+		: EffectBase({ &background_texture_class })
 	{
 		fPos = 0.9f;
 		fPrevAng = 0;
@@ -267,7 +275,7 @@ public:
 	}
 	Error* Reconfigure(const ReconfigureParams& params) override
 	{
-		tx = params.texture_library.Find(TextureClass::TunnelBackground);
+		tx = params.texture_library.Find(background_texture_class);
 		pObj[0].textures[0].Set(Actor::TextureType::Normal, tx);//SetTexture(tx);
 		pObj[1].textures[0].Set(Actor::TextureType::Normal, tx);///.pTexture = tx;//SetTexture(tx);
 		return nullptr;

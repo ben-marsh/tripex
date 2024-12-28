@@ -1,19 +1,15 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="Config.cpp" />
     <ClCompile Include="config-defaults.cpp" />
     <ClCompile Include="error.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Misc.cpp" />
     <ClCompile Include="StdAfx.cpp" />
     <ClCompile Include="AudioData.cpp" />
-    <ClCompile Include="ZDirect3d.cpp" />
     <ClCompile Include="Effect.cpp" />
     <ClCompile Include="Fourier.cpp" />
-    <ClCompile Include="TexturedGrid.cpp" />
     <ClCompile Include="ConfigItem.cpp" />
-    <ClCompile Include="TextureSource.cpp" />
     <ClCompile Include="EffectBezierCube.cpp" />
     <ClCompile Include="EffectBlank.cpp" />
     <ClCompile Include="EffectBumpmapping.cpp" />
@@ -56,23 +52,20 @@
     <ClCompile Include="GeometryBuffer.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="TextureLibrary.cpp" />
+    <ClCompile Include="RendererDirect3d.cpp" />
+    <ClCompile Include="Vertex.cpp" />
+    <ClCompile Include="VertexGrid.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Config.h" />
     <ClInclude Include="config-defaults.h" />
     <ClInclude Include="Effect.h" />
     <ClInclude Include="Error.h" />
-    <ClInclude Include="main.h" />
     <ClInclude Include="Misc.h" />
     <ClInclude Include="StdAfx.h" />
-    <ClInclude Include="ZArray.h" />
     <ClInclude Include="AudioData.h" />
-    <ClInclude Include="ZDirect3d.h" />
     <ClInclude Include="Fourier.h" />
-    <ClInclude Include="TexturedGrid.h" />
     <ClInclude Include="Platform.h" />
     <ClInclude Include="ConfigItem.h" />
-    <ClInclude Include="TextureSource.h" />
     <ClInclude Include="Vector3.h" />
     <ClInclude Include="BezierCurve.h" />
     <ClInclude Include="Camera.h" />
@@ -99,6 +92,8 @@
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="TextureLibrary.h" />
     <ClInclude Include="ComPtr.h" />
+    <ClInclude Include="RendererDirect3d.h" />
+    <ClInclude Include="VertexGrid.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Fourier.inl" />
@@ -107,6 +102,10 @@
     <None Include=".gitignore" />
     <None Include="Vector3.inl" />
     <None Include="Matrix44.inl" />
+    <None Include="Edge.inl" />
+    <None Include="Face.inl" />
+    <None Include="Point.inl" />
+    <None Include="Rect.inl" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Data">

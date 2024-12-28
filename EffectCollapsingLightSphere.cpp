@@ -3,6 +3,7 @@
 #include <conio.h>
 #include "Actor.h"
 #include "error.h"
+#include "TextureData.h"
 #include <algorithm>
 
 #define SOURCES 512
@@ -23,6 +24,18 @@
 class EffectCollapsingLightSphere : public EffectBase
 {
 public:
+	const TextureClass sprite_texture_class =
+	{
+		"Sprite",
+		{ g_anTexLight }
+	};
+
+	const TextureClass tint_texture_class =
+	{
+		"Tint",
+		{ g_anTexEyes, g_anTexFlesh, g_anTexForest, g_anTexShinySand }
+	};
+
 	double pdAng[SOURCES];
 	double pdYPos[SOURCES];
 	double pdTilt[SOURCES];
@@ -42,6 +55,7 @@ public:
 	double brt;
 
 	EffectCollapsingLightSphere()
+		: EffectBase({ &sprite_texture_class, &tint_texture_class })
 	{
 		dWaitTime = 0;
 		dTilt = 0;
@@ -132,10 +146,11 @@ public:
 	}
 	Error* Reconfigure(const ReconfigureParams& params) override
 	{
-		obj.textures[0].Set(Actor::TextureType::Sprite, params.texture_library.Find(TextureClass::CollapsingSphereSprite));
-		pTint = params.texture_library.Find(TextureClass::CollapsingSphereBackground);
+		obj.textures[0].Set(Actor::TextureType::Sprite, params.texture_library.Find(sprite_texture_class));
+		pTint = params.texture_library.Find(tint_texture_class);
 		return nullptr;
 	}
 };
+
 EXPORT_EFFECT( CollapsingLightSphere, EffectCollapsingLightSphere )
 

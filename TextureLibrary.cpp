@@ -1,18 +1,18 @@
 #include "TextureLibrary.h"
 
-void TextureLibrary::Add(TextureClass tc, std::shared_ptr<Texture> texture)
+void TextureLibrary::Add(const TextureClass& tc, std::shared_ptr<Texture> texture)
 {
-	std::map<TextureClass, std::vector<std::shared_ptr<Texture>>>::iterator it = textures_by_class.find(tc);
+	std::map<const TextureClass*, std::vector<std::shared_ptr<Texture>>>::iterator it = textures_by_class.find(&tc);
 	if (it == textures_by_class.end())
 	{
-		it = textures_by_class.emplace(tc, std::vector<std::shared_ptr<Texture>>()).first;
+		it = textures_by_class.emplace(&tc, std::vector<std::shared_ptr<Texture>>()).first;
 	}
 	it->second.push_back(std::move(texture));
 }
 
-Texture* TextureLibrary::Find(TextureClass tc) const
+Texture* TextureLibrary::Find(const TextureClass& tc) const
 {
-	std::map<TextureClass, std::vector<std::shared_ptr<Texture>>>::const_iterator it = textures_by_class.find(tc);
+	std::map<const TextureClass*, std::vector<std::shared_ptr<Texture>>>::const_iterator it = textures_by_class.find(&tc);
 	if (it == textures_by_class.end())
 	{
 		return nullptr;
@@ -22,4 +22,9 @@ Texture* TextureLibrary::Find(TextureClass tc) const
 	int index = (int)(((long long)rand() * textures.size()) / (RAND_MAX + 1));
 
 	return textures[index].get();
+}
+
+void TextureLibrary::Reset()
+{
+	textures_by_class.clear();
 }

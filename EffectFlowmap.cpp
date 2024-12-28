@@ -871,4 +871,5 @@ public:
 		return (dElapsed >= fStep);//(dElapsed >= 1.0);//(dElapsed >= 0.8);//1);
 	}
 };
+
 EXPORT_EFFECT(Flowmap, EffectFlowmap)
