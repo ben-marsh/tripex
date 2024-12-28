@@ -2,7 +2,7 @@
 #include "Effect.h"
 #include <d3d9.h>
 
-class EffectBlank : public EffectBase
+class EffectBlank : public Effect
 {
 public:
 	Error* Calculate(const CalculateParams& params) override

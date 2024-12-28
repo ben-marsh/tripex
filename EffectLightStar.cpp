@@ -6,7 +6,7 @@
 
 #define SOURCES 512
 
-class EffectLightStar : public EffectBase
+class EffectLightStar : public Effect
 {
 public:
 	const TextureClass sprite_texture_class =
@@ -34,7 +34,7 @@ public:
 	int nSpikes;
 
 	EffectLightStar()
-		: EffectBase({ &sprite_texture_class, &tint_texture_class })
+		: Effect({ &sprite_texture_class, &tint_texture_class })
 	{
 		dRadAng = 2 * 3.14159 * 2.0;
 		dViewAng = 0;

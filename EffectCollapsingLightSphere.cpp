@@ -21,7 +21,7 @@
 #define SPEEDSPREAD 20
 #define FOREGROUNDBR 0.5
 
-class EffectCollapsingLightSphere : public EffectBase
+class EffectCollapsingLightSphere : public Effect
 {
 public:
 	const TextureClass sprite_texture_class =
@@ -55,7 +55,7 @@ public:
 	double brt;
 
 	EffectCollapsingLightSphere()
-		: EffectBase({ &sprite_texture_class, &tint_texture_class })
+		: Effect({ &sprite_texture_class, &tint_texture_class })
 	{
 		dWaitTime = 0;
 		dTilt = 0;
@@ -83,9 +83,9 @@ public:
 	Error* Calculate(const CalculateParams& params) override
 	{
 		brt = params.brightness;
-		if(nStage == 0) dWaitTime += params.elapsed * params.audio_data.GetDampenedBand( pEffectPtr->fSensitivity, 0.0f, 1.0f);
+		if(nStage == 0) dWaitTime += params.elapsed * params.audio_data.GetDampenedBand( sensitivity, 0.0f, 1.0f);
 		else if(nStage == 1) dTilt += params.elapsed * 1.5 * g_fDegToRad;
-		else if(nStage == 2) dWaitTime += params.elapsed * params.audio_data.GetDampenedBand(pEffectPtr->fSensitivity, 0.0f, 1.0f);
+		else if(nStage == 2) dWaitTime += params.elapsed * params.audio_data.GetDampenedBand(sensitivity, 0.0f, 1.0f);
 		else if(nStage == 3) dTilt -= params.elapsed * 1.5 * g_fDegToRad;
 
 		if((dTilt < 0) || (dTilt > 3.141592 / 2.0) || (dWaitTime > 40.0 && params.audio_data.GetIntensity( ) > 0.6))

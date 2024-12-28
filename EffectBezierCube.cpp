@@ -24,7 +24,7 @@
 #define bcCubeRadius 30	// radius of the container cylinder of the cube
 #define bcCubeHeight 80	// height of the cube
 
-class EffectBezierCube : public EffectBase
+class EffectBezierCube : public Effect
 {
 public:
 	const TextureClass sprite_texture_class =
@@ -58,7 +58,7 @@ public:
 	double dMult;
 
 	EffectBezierCube()
-		: EffectBase({ &sprite_texture_class, &tint_texture_class })
+		: Effect({ &sprite_texture_class, &tint_texture_class })
 		, bcEdge(TWISTPLANES)
 	{
 		brt = 0.0;
@@ -147,7 +147,7 @@ public:
 	}
 	Error* Calculate(const CalculateParams& params) override
 	{
-		double dMultDest = 1 - params.audio_data.GetDampenedBand(pEffectPtr->fSensitivity, 0.0f, 1.0f);//average;
+		double dMultDest = 1 - params.audio_data.GetDampenedBand(sensitivity, 0.0f, 1.0f);//average;
 		camera.position.z = -110;//pScene->camera.z = -110;//60;
 		double sm = 1.3 * params.elapsed;
 
@@ -157,7 +157,7 @@ public:
 		if(dMultDest > dMult) dMult = std::min(dMultDest, dMult + 0.01);
 
 		double dTwistAng = PI * sin(dAng) / 2.0;
-		dAng += sm * params.audio_data.GetDampenedBand(pEffectPtr->fSensitivity, 0, 0.5f) * 0.25 * 4 * g_fDegToRad;
+		dAng += sm * params.audio_data.GetDampenedBand(sensitivity, 0, 0.5f) * 0.25 * 4 * g_fDegToRad;
 
 		double dCentre = (TWISTPLANES - 1.0) / 2.0;
 		for(int i = 0; i < TWISTPLANES; i++)
@@ -212,11 +212,11 @@ public:
 		}
 		obj.Calculate(params.renderer, &camera, params.elapsed);
 
-		dMult = params.audio_data.GetDampenedBand(pEffectPtr->fSensitivity, 0, 1.0f);//average;
+		dMult = params.audio_data.GetDampenedBand(sensitivity, 0, 1.0f);//average;
 		dAngX += sm * dMult * 9 * g_fDegToRad;
 
-		dAngY += sm * params.audio_data.GetDampenedBand(pEffectPtr->fSensitivity, 0/16.0f, 3/16.0f) * 3.4 * g_fDegToRad;
-		dAngZ += sm * params.audio_data.GetDampenedBand(pEffectPtr->fSensitivity, 3/16.0f, 9/16.0f) * 4.2 * g_fDegToRad;
+		dAngY += sm * params.audio_data.GetDampenedBand(sensitivity, 0/16.0f, 3/16.0f) * 3.4 * g_fDegToRad;
+		dAngZ += sm * params.audio_data.GetDampenedBand(sensitivity, 3/16.0f, 9/16.0f) * 4.2 * g_fDegToRad;
 		while(dAngX > PI2) dAngX -= PI2;
 		while(dAngY > PI2) dAngY -= PI2;
 		while(dAngZ > PI2) dAngZ -= PI2;

@@ -17,7 +17,7 @@
 //static unsigned int buffersize = 0;
 //static D3DTLVERTEX *vb = NULL;
 
-class EffectLightRing : public EffectBase
+class EffectLightRing : public Effect
 {
 public:
 	const TextureClass sprite_texture_class =
@@ -53,7 +53,7 @@ public:
 	double br;
 
 	EffectLightRing()
-		: EffectBase({ &sprite_texture_class, &tint_texture_class })
+		: Effect({ &sprite_texture_class, &tint_texture_class })
 	{
 		fSetTexture = true;
 		fNotRendered = true;

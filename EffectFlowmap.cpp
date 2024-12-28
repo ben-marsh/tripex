@@ -75,7 +75,7 @@ public:
 	}
 };
 */
-class EffectFlowmap : public EffectBase
+class EffectFlowmap : public Effect
 {
 public:
 	typedef struct

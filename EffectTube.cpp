@@ -16,7 +16,7 @@
 #define CLENGTH 100
 #define CDIFF (PTLENGTH * PTDIST / CLENGTH)
 
-class EffectTube : public EffectBase
+class EffectTube : public Effect
 {
 public:
 	const TextureClass envmap_texture_class =
@@ -33,7 +33,7 @@ public:
 	Camera cCamera;
 
 	EffectTube()
-		: EffectBase({ &envmap_texture_class })
+		: Effect({ &envmap_texture_class })
 	{
 		int i, j;
 		coil.vertices.resize(CLENGTH * 4);

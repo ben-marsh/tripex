@@ -9,7 +9,7 @@
 #define RINGSEP 10
 #define RINGDELAY 2
 
-class EffectRings : public EffectBase
+class EffectRings : public Effect
 {
 public:
 	const TextureClass envmap_texture_class =
@@ -36,7 +36,7 @@ public:
 	double pos;
 
 	EffectRings()
-		: EffectBase({ &envmap_texture_class })
+		: Effect({ &envmap_texture_class })
 	{
 		fFirstCalc = true;
 		accum = 1.5;

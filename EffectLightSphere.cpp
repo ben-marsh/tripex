@@ -14,7 +14,7 @@ extern bool bMeshHQ;
 
 //extern EFFECT lightsphere;
 
-class EffectLightSphere : public EffectBase
+class EffectLightSphere : public Effect
 {
 public:
 	const TextureClass sprite_texture_class =
@@ -54,7 +54,7 @@ public:
 	Texture *pTint;
 
 	EffectLightSphere()
-		: EffectBase({ &sprite_texture_class, &tint_texture_class })
+		: Effect({ &sprite_texture_class, &tint_texture_class })
 		, b(4)
 	{
 		accum = 1.1;

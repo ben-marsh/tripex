@@ -18,7 +18,7 @@ static const int nVertices = PIPE_LENGTH * PIPE_CIRCUMPOINTS;
 #define UPDATETIME 60
 #define ANG (5.0 * 3.14159 / 180.0)
 
-class EffectMotionBlur2 : public EffectBase
+class EffectMotionBlur2 : public Effect
 {
 public:
 	const TextureClass envmap_texture_class =
@@ -36,7 +36,7 @@ public:
 	float fChange;
 
 	EffectMotionBlur2()
-		: EffectBase({ &envmap_texture_class })
+		: Effect({ &envmap_texture_class })
 		, b(Vector3(-100, -100, -20), Vector3(100, 100, 100))
 	{
 		for(int i = 0; i < 3; i++) pf[1][i] = 0.0f;

@@ -28,7 +28,7 @@ const float RANDCH_R2 = 100.0f;
 
 //static double dPos = 0.9; // start position in the first bezier
 
-class EffectTunnel : public EffectBase
+class EffectTunnel : public Effect
 {
 public:
 	const TextureClass background_texture_class =
@@ -64,7 +64,7 @@ public:
 
 	
 	EffectTunnel()
-		: EffectBase({ &background_texture_class })
+		: Effect({ &background_texture_class })
 	{
 		fPos = 0.9f;
 		fPrevAng = 0;

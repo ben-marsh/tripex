@@ -12,7 +12,7 @@
 //static int nEffect, nNewEffect = -1;
 
 
-template < bool bAltBlur > class EffectMotionBlur3T : public EffectBase
+template < bool bAltBlur > class EffectMotionBlur3T : public Effect
 {
 public:
 	const TextureClass envmap_texture_class =
@@ -42,7 +42,7 @@ public:
 	Camera cam;
 
 	EffectMotionBlur3T()
-		: EffectBase({ &envmap_texture_class })
+		: Effect({ &envmap_texture_class })
 		, bz(Vector3(20, 20, 20), -Vector3(20, 20, 20))//, cam(0)
 	{
 		cam.flags.set( Camera::F_SCREEN_TRANSFORM, false );
@@ -190,7 +190,7 @@ public:
 				pObj[i].position = GetPos(nEffect, i);
 			}	
 
-			float fSpeed = params.audio_data.GetDampenedBand( pEffectPtr->fSensitivity, i / 10.0, (i + 1) / 10.0);
+			float fSpeed = params.audio_data.GetDampenedBand( sensitivity, i / 10.0, (i + 1) / 10.0);
 			pObj[i].roll += params.elapsed * 4.0 * 3.14159 / 180.0;
 			pObj[i].pitch += params.audio_data.GetIntensity( ) * params.elapsed * 10.0 * 3.14159 / 180.0;
 			pObj[i].yaw += (params.audio_data.GetIntensity( ) + params.audio_data.GetBeat( ) ) * params.elapsed * 7 * 3.14159 / 180.0;

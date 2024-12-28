@@ -46,11 +46,9 @@ enum
 	ZORDER_BLANK,
 };
 
-class EffectBase
+class Effect
 {
 public:
-	const std::vector<const TextureClass*> textures;
-
 	struct CalculateParams
 	{
 		float brightness;
@@ -89,24 +87,6 @@ public:
 		}
 	};
 
-	class EffectHandler* pEffectPtr;
-
-	EffectBase();
-	EffectBase(std::initializer_list<const TextureClass*> textures);
-	virtual ~EffectBase();
-
-	virtual Error* Calculate(const CalculateParams& params) = 0;
-	virtual Error* Reconfigure(const ReconfigureParams& params);
-	virtual Error* Render(const RenderParams& params) = 0;
-	virtual bool CanRender(float fElapsed);
-};
-
-class EffectHandler
-{
-public:
-	std::unique_ptr<EffectBase> pEffect;
-
-public:
 	float fBr;
 	bool bValid;
 	int nLastUsed;
@@ -116,54 +96,28 @@ public:
 	int draw_order;
 	float startup_weight;
 
-	union
-	{
-		float pfSetting[5];
-		struct
-		{
-			float fPreference;
-			float fChange;
-			float fSensitivity;
-			float fActivity;
-			float fSpeed;
-		};
-	};
+	float preference;
+	float change;
+	float sensitivity;
+	float activity;
+	float speed;
 
-	EffectHandler();
-	~EffectHandler();
-	virtual void Create() = 0;
-	virtual void Destroy();
+	const std::vector<const TextureClass*> textures;
 
-	Error* Calculate(float elapsed, AudioData& audio_data, Renderer& renderer);
-	Error* Reconfigure(const AudioData& audio_data, const TextureLibrary& texture_library);
-	Error* Render(Renderer& renderer);
-	bool CanRender(float fElapsed);
+	Effect();
+	Effect(std::initializer_list<const TextureClass*> textures);
+	virtual ~Effect();
+
+	virtual Error* Calculate(const CalculateParams& params) = 0;
+	virtual Error* Reconfigure(const ReconfigureParams& params);
+	virtual Error* Render(const RenderParams& params) = 0;
+	virtual bool CanRender(float elapsed);
+
+	bool CanRenderMain(float fFrames);
 
 	float GetElapsed(float fFrames);
 	std::string GetCfgItemName() const;
 };
 
-template < class T > class EffectHandlerT : public EffectHandler
-{
-public:
-	void Create()
-	{
-		pEffect = std::make_unique<T>();
-		pEffect->pEffectPtr = this;
-	}
-};
-
-struct EffectDecl
-{
-	const char* name;
-	std::vector<const TextureClass*> texture_classes;
-	std::shared_ptr<EffectHandler>(*create)();
-};
-
-template<class T> std::shared_ptr<EffectHandler> CreateEffect()
-{
-	return std::make_shared<EffectHandlerT<T>>();
-}
-
-#define IMPORT_EFFECT(name) extern std::shared_ptr<EffectHandler> CreateEffect_##name( );
-#define EXPORT_EFFECT(name, type) std::shared_ptr<EffectHandler> CreateEffect_##name( ){ return std::make_shared<EffectHandlerT<type>>(); }
+#define IMPORT_EFFECT(name) extern std::shared_ptr<Effect> CreateEffect_##name( );
+#define EXPORT_EFFECT(name, type) std::shared_ptr<Effect> CreateEffect_##name( ){ return std::make_shared<type>(); }

@@ -81,7 +81,7 @@ void MakeTentacles(Actor &obj, int segs, float l, float r)
 	obj.FindVertexNormals();
 }
 
-class EffectBumpmapping : public EffectBase
+class EffectBumpmapping : public Effect
 {
 public:
 	const TextureClass background_texture_class =
@@ -137,7 +137,7 @@ public:
 	float accum;
 
 	EffectBumpmapping()
-		: EffectBase({ &background_texture_class, &tentacles_texture_class })
+		: Effect({ &background_texture_class, &tentacles_texture_class })
 		, grid(GRIDW, GRIDH)
 		, gridbm(GRIDW, GRIDH)
 		, pc(256, 256)

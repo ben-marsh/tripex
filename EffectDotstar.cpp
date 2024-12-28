@@ -15,7 +15,7 @@
 #define SAMPLESHIFT 2
 #define TRISIZE 30.0
 
-class EffectDotStar : public EffectBase
+class EffectDotStar : public Effect
 {
 public:
 	const TextureClass sprite_texture_class =
@@ -65,7 +65,7 @@ public:
 	double brt;
 
 	EffectDotStar()
-		: EffectBase({ &sprite_texture_class, &tint_texture_class }) //: camera(0),
+		: Effect({ &sprite_texture_class, &tint_texture_class }) //: camera(0),
 		, b(Vector3(-100, -100, 120), Vector3(100, 100, 140))
 		, b2(Vector3(-20, -20, -20), Vector3(20, 20, 20))
 	{

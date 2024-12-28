@@ -9,7 +9,7 @@
 
 #define NFR 50
 
-class EffectMotionBlur1 : public EffectBase
+class EffectMotionBlur1 : public Effect
 {
 public:
 	const TextureClass envmap_texture_class =
@@ -28,7 +28,7 @@ public:
 	double accum;
 
 	EffectMotionBlur1()
-		: EffectBase({ &envmap_texture_class })
+		: Effect({ &envmap_texture_class })
 	{
 		accum = 1.5;
 		fFirstCalc = false;

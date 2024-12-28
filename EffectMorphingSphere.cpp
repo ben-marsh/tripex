@@ -10,7 +10,7 @@
 
 #define NOBJ 4
 
-class EffectMorphingSphere : public EffectBase
+class EffectMorphingSphere : public Effect
 {
 public:
 	const TextureClass envmap_texture_class =
@@ -26,7 +26,7 @@ public:
 	float fBezPos;
 	
 	EffectMorphingSphere()
-		: EffectBase({ &envmap_texture_class })
+		: Effect({ &envmap_texture_class })
 		, b(Vector3(-100, -100, -600), Vector3(100, 100, -200))
 	{
 		fBezPos = 0;

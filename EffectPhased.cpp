@@ -11,7 +11,7 @@
 
 #define AVERAGES 10
 
-class EffectPhased : public EffectBase
+class EffectPhased : public Effect
 {
 public:
 	const TextureClass sprite_texture_class =
@@ -29,7 +29,7 @@ public:
 	double a;
 
 	EffectPhased()
-		: EffectBase({ &sprite_texture_class })
+		: Effect({ &sprite_texture_class })
 	{
 		a = 0;
 		lastbeat = 0;

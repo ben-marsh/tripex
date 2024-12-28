@@ -10,7 +10,7 @@
 #define STEPSIZE 4//1
 // 60 3
 
-class EffectLightTentacles : public EffectBase
+class EffectLightTentacles : public Effect
 {
 public:
 	const TextureClass sprite_texture_class =
@@ -34,7 +34,7 @@ public:
 	Texture *ptTint;
 
 	EffectLightTentacles()
-		: EffectBase({ &sprite_texture_class, &tint_texture_class })
+		: Effect({ &sprite_texture_class, &tint_texture_class })
 		, b(4)
 	{
 		Actor sphere;

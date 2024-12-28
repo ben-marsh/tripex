@@ -3,29 +3,12 @@
 #include "Effect.h"
 
 /******** ZEffectBase ************************************/
-EffectBase::EffectBase()
+Effect::Effect()
+	: Effect({})
 {
-	pEffectPtr = nullptr;
 }
-EffectBase::EffectBase(std::initializer_list<const TextureClass*> textures)
+Effect::Effect(std::initializer_list<const TextureClass*> textures)
 	: textures(textures)
-{
-	pEffectPtr = nullptr;
-}
-EffectBase::~EffectBase()
-{
-}
-Error* EffectBase::Reconfigure(const ReconfigureParams& params)
-{
-	return nullptr;
-}
-bool EffectBase::CanRender(float fElapsed)
-{
-	return true;
-}
-
-/******** ZEffectPtr **************************************/
-EffectHandler::EffectHandler()
 {
 	bValid = false;
 	fBr = 0.0f;
@@ -34,17 +17,56 @@ EffectHandler::EffectHandler()
 	draw_order = 0;
 	nLastUsed = 0;
 
-
-
-	memset(pfSetting, 0, sizeof(pfSetting));
+	preference = 0.0f;
+	change = 0.0f;
+	sensitivity = 0.0f;
+	activity = 0.0f;
+	speed = 0.0f;
 }
-EffectHandler::~EffectHandler()
+
+Effect::~Effect()
 {
 }
-void EffectHandler::Destroy()
+
+Error* Effect::Reconfigure(const ReconfigureParams& params)
 {
-	pEffect.reset();
+	return nullptr;
 }
+
+bool Effect::CanRender(float fElapsed)
+{
+	return true;
+}
+
+bool Effect::CanRenderMain(float fFrames)
+{
+	if (fFrames > 3.8)
+	{
+		return true;
+	}
+	else
+	{
+		return CanRender(GetElapsed(fFrames));
+	}
+}
+
+float Effect::GetElapsed(float fFrames)
+{
+	return fFrames * ((1.8f * speed) + 0.1f);
+}
+
+std::string Effect::GetCfgItemName() const
+{
+	std::string sCfgName = "Effects\\";
+	for (int i = 0; name[i] != 0; i++)
+	{
+		if (isalnum(name[i])) sCfgName += name[i];
+	}
+	return sCfgName;
+}
+
+#if false
+/******** ZEffectPtr **************************************/
 Error* EffectHandler::Calculate(float fElapsed, AudioData& audio_data, Renderer& renderer)
 {
 	assert(pEffect != NULL);
@@ -56,13 +78,6 @@ Error* EffectHandler::Calculate(float fElapsed, AudioData& audio_data, Renderer&
 
 	audio_data.SetIntensityBeatScale( 0.0f );
 	return error;
-}
-Error* EffectHandler::Reconfigure(const AudioData& audio_data, const TextureLibrary& texture_library)
-{
-	assert(pEffect != NULL);
-
-	EffectBase::ReconfigureParams params(audio_data, texture_library);
-	return pEffect->Reconfigure(params);
 }
 Error* EffectHandler::Render(Renderer& renderer)
 {
@@ -78,16 +93,4 @@ bool EffectHandler::CanRender(float fFrames)
 	if(fFrames > 3.8) return true;
 	else return pEffect->CanRender(GetElapsed(fFrames));
 }
-float EffectHandler::GetElapsed(float fFrames)
-{
-	return fFrames * ((1.8f * fSpeed) + 0.1f);
-}
-std::string EffectHandler::GetCfgItemName() const
-{
-	std::string sCfgName = "Effects\\";
-	for(int i = 0; name[i] != 0; i++)
-	{
-		if(isalnum(name[i])) sCfgName += name[i];
-	}
-	return sCfgName;
-}
+#endif

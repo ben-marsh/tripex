@@ -20,7 +20,7 @@
 #define BAR_SIZE 5.0f
 #define LIMITER_H 15//10
 
-class EffectSpectrum : public EffectBase
+class EffectSpectrum : public Effect
 {
 public:
 	const TextureClass envmap_texture_class =
@@ -46,7 +46,7 @@ public:
 	---------------------------------------------*/
 
 	EffectSpectrum( )
-		: EffectBase({ &envmap_texture_class })
+		: Effect({ &envmap_texture_class })
 	{
 		m_fAng = 0.0f;
 		m_fr = true;

@@ -10,7 +10,7 @@
 #define GRH 50
 #define SPIKES 15
 
-class EffectDistortion1 : public EffectBase
+class EffectDistortion1 : public Effect
 {
 public:
 	const TextureClass background_texture_class =
@@ -31,7 +31,7 @@ public:
 	Texture *tx;
 
 	EffectDistortion1()
-		: EffectBase({ &background_texture_class })
+		: Effect({ &background_texture_class })
 		, grid(GRW, GRH)
 	{
 		xp = yp = 0;
@@ -52,15 +52,15 @@ public:
 	Error* Calculate(const CalculateParams& params) override
 	{
 		br = params.brightness;
-		xp += 0.015/*08*/ * params.audio_data.GetDampenedBand(pEffectPtr->fSensitivity, 0, 0.25f) * params.elapsed;
-		yp += 0.02/*08*/ * params.audio_data.GetDampenedBand(pEffectPtr->fSensitivity, 0.25f, 0.5f) * params.elapsed;
-		t += params.elapsed * std::max(0.5, params.audio_data.GetDampenedBand(pEffectPtr->fSensitivity, 2/16.0f, 5/16.0f) + (3.0 * params.audio_data.GetDampenedBand(pEffectPtr->fSensitivity, 7/16.0f, 12/16.0f))) * 20 * 3.14159 / 180.0;
+		xp += 0.015/*08*/ * params.audio_data.GetDampenedBand(sensitivity, 0, 0.25f) * params.elapsed;
+		yp += 0.02/*08*/ * params.audio_data.GetDampenedBand(sensitivity, 0.25f, 0.5f) * params.elapsed;
+		t += params.elapsed * std::max(0.5, params.audio_data.GetDampenedBand(sensitivity, 2/16.0f, 5/16.0f) + (3.0 * params.audio_data.GetDampenedBand(sensitivity, 7/16.0f, 12/16.0f))) * 20 * 3.14159 / 180.0;
 
 		angle += 1 * params.elapsed;
 		fac = 0.5 + (0.15 * cos(angle * 3.14159 / 256.0));
 
 		int x, y, i = 0;
-		double av = std::max(0.4f, params.audio_data.GetDampenedBand(pEffectPtr->fSensitivity, 0, 1.0f));
+		double av = std::max(0.4f, params.audio_data.GetDampenedBand(sensitivity, 0, 1.0f));
 		double fx, fy;
 		double w2 = grid.width / 2.0, h2 = grid.height / 2.0;
 		double rw = 1.0 / grid.width, rh = 1.0 / grid.height;

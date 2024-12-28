@@ -13,7 +13,7 @@
 #define NSPIKES 8//15
 #define NCENTRES 5
 
-template < bool bLight > class EffectDistortion2T : public EffectBase
+template < bool bLight > class EffectDistortion2T : public Effect
 {
 public:
 	const TextureClass background_texture_class =
@@ -40,7 +40,7 @@ public:
 	Texture *tx;
 
 	EffectDistortion2T()
-		: EffectBase({ &background_texture_class })
+		: Effect({ &background_texture_class })
 		, grid(GRW, GRH)
 	{
 		xp = yp = 0;
@@ -64,9 +64,9 @@ public:
 		float elapsed = params.elapsed * 1.5;
 
 		br = params.brightness;
-		xp += 0.008 * std::max(0.1f, params.audio_data.GetDampenedBand( pEffectPtr->fSensitivity, 0, 0.2f ) ) * elapsed;
-		yp += 0.008 * std::max(0.1f, params.audio_data.GetDampenedBand(pEffectPtr->fSensitivity, 0.15f, 0.5f ) + params.audio_data.GetBeat( ) ) * elapsed;
-		t += elapsed * std::max(0.5f, params.audio_data.GetDampenedBand(pEffectPtr->fSensitivity, 0, 1.0f)) * 20 * 3.14159 / 180.0;
+		xp += 0.008 * std::max(0.1f, params.audio_data.GetDampenedBand( sensitivity, 0, 0.2f ) ) * elapsed;
+		yp += 0.008 * std::max(0.1f, params.audio_data.GetDampenedBand(sensitivity, 0.15f, 0.5f ) + params.audio_data.GetBeat( ) ) * elapsed;
+		t += elapsed * std::max(0.5f, params.audio_data.GetDampenedBand(sensitivity, 0, 1.0f)) * 20 * 3.14159 / 180.0;
 
 		angle += 1 * elapsed;
 		fac = 0.5 + (0.15 * cos(angle * 3.14159 / 256.0));

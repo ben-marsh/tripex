@@ -24,37 +24,32 @@ Tripex::~Tripex()
 	texture_library.Reset();
 }
 
-void Tripex::ShowStatusMsg(const char *sFormat, ...)
+void Tripex::ShowStatusMsg(const char* sFormat, ...)
 {
 	va_list pArg;
-	va_start( pArg, sFormat );
+	va_start(pArg, sFormat);
 
-	vsnprintf( status_msg, sizeof( status_msg ), sFormat, pArg );
-	status_time = timeGetTime( );
+	vsnprintf(status_msg, sizeof(status_msg), sFormat, pArg);
+	status_time = timeGetTime();
 }
 
-DWORD WINAPI Tripex::InitialiseThread(void *pParam)
+DWORD WINAPI Tripex::InitialiseThread(void* pParam)
 {
-	for(int i = 1; i < (int)effects.size(); i++)
+	for (int i = 1; i < (int)effects.size(); i++)
 	{
-		if(effects[i]->fPreference > FLOAT_ZERO)
+		if (effects[i]->preference > FLOAT_ZERO)
 		{
 			enabled_effects.push_back(effects[i]);
 		}
 	}
 
-	srand( timeGetTime( ) );
-
-	for (int i = 0; i < enabled_effects.size(); i++)
-	{
-		enabled_effects[i]->Create();
-	}
+	srand(timeGetTime());
 
 	std::map<const uint32*, std::shared_ptr<Texture>> data_to_texture;
 
-	for (const std::shared_ptr<EffectHandler>& effect_handler : enabled_effects)
+	for (const std::shared_ptr<Effect>& effect_handler : enabled_effects)
 	{
-		EffectBase& effect = *effect_handler->pEffect.get();
+		Effect& effect = *effect_handler.get();
 		for (const TextureClass* texture_class : effect.textures)
 		{
 			for (const uint32* internal_texture : texture_class->internal_textures)
@@ -88,75 +83,75 @@ Error* Tripex::Startup()
 
 	effect_frames = 0.0f;
 	fade_pos = 0.0f;
-	status_msg[ 0 ] = 0;
+	status_msg[0] = 0;
 	status_time = 0;
 	effect_idx = 0;
-	next_effect_idx = 0; 
+	next_effect_idx = 0;
 
-//	txs[TXS_RENDER_FIRST] = true;
+	//	txs[TXS_RENDER_FIRST] = true;
 	txs[TXS_STARTED] = true;
 
-//	InitBeats();
+	//	InitBeats();
 	LoadCfgItems();
 	UpdateCfgItems(true);
 
-	audio = std::make_unique<AudioData>( 512 );
+	audio = std::make_unique<AudioData>(512);
 
-	srand( timeGetTime( ) );
+	srand(timeGetTime());
 
 	std::vector<ColorRgb> pe;
 	pe.resize(256);
-	for( int i = 0; i < 256; i++ )
+	for (int i = 0; i < 256; i++)
 	{
 		pe[i] = ColorRgb(i, i, i);
 	}
 
-//	{for( int i = 0; i < 256 * 256; i++ )
-//	{
-//		unsigned char c = ((uint8*)&g_anTexRawGUI[ 1 ])[ i ];
-//		pc[ i ] = ZColour( c,c,c);
-//	}
-//	}
+	//	{for( int i = 0; i < 256 * 256; i++ )
+	//	{
+	//		unsigned char c = ((uint8*)&g_anTexRawGUI[ 1 ])[ i ];
+	//		pc[ i ] = ZColour( c,c,c);
+	//	}
+	//	}
 
-	Error* error = renderer.CreateTexture(256, 256, TextureFormat::P8, &g_anTexRawGUI[ 1 ], 256 * 256, 256, pe.data(), TextureFlags::None, gui);
+	Error* error = renderer.CreateTexture(256, 256, TextureFormat::P8, &g_anTexRawGUI[1], 256 * 256, 256, pe.data(), TextureFlags::None, gui);
 	if (error) return TraceError(error);
 
-//	gui = auto_ptr< ZTexture >(new ZTexture(pc));//(ZColour*)g_anTexRawGUI ));//cGUI.GetPtr()));
-//	gui->m_nFlags.set(ZTexture::F_POINT_FILTER);
+	//	gui = auto_ptr< ZTexture >(new ZTexture(pc));//(ZColour*)g_anTexRawGUI ));//cGUI.GetPtr()));
+	//	gui->m_nFlags.set(ZTexture::F_POINT_FILTER);
 
-	// TEXTURE
-//	renderer.AddTexture( gui.get( ) );
-//	g_pD3D->vpTexture.push_back(gui.get());//auto_ptr< ZTexture >(gui);
+		// TEXTURE
+	//	renderer.AddTexture( gui.get( ) );
+	//	g_pD3D->vpTexture.push_back(gui.get());//auto_ptr< ZTexture >(gui);
 
-	tef.Add( ( uint8* )&g_anTexRawFont[ 1 ] );
+	tef.Add((uint8*)&g_anTexRawFont[1]);
 	tef.FindGlyph(' ')->end = 2;
-	
+
 	error = tef.Create(renderer);
 	if (error) return TraceError(error);
 
-//	renderer.AddTexture( tef.GetTexture( ) );
-//	g_pD3D->vpTexture.push_back(tef.GetTexture());
+	//	renderer.AddTexture( tef.GetTexture( ) );
+	//	g_pD3D->vpTexture.push_back(tef.GetTexture());
 
-//	pcBuffer.SetLength(1024 * 16);
+	//	pcBuffer.SetLength(1024 * 16);
 
-//	pcHUD = new ZPaletteCanvas;
-//	pcHUD->Create(true, 1024, 16);
-//	ZColour c[256];
-//	for(int i = 0; i < 256; i++) c[i] = ZColour::Grey(i);
-//	pcHUD->SetPalette(c);
+	//	pcHUD = new ZPaletteCanvas;
+	//	pcHUD->Create(true, 1024, 16);
+	//	ZColour c[256];
+	//	for(int i = 0; i < 256; i++) c[i] = ZColour::Grey(i);
+	//	pcHUD->SetPalette(c);
 
-	srand( timeGetTime( ) );
-	
-	InitialiseThread( NULL );
+	srand(timeGetTime());
+
+	InitialiseThread(NULL);
 
 	id = (int)enabled_effects.size();
 
 	txs.set(TXS_CHANGE_EFFECT);
 
-	txs.set( TXS_RESET_TIMING );
+	txs.set(TXS_RESET_TIMING);
 
-//	hRes = pcHUD->Initialise(d3d.get());
-//	if(FAILED(hRes)) return TraceError(hRes);
+	//	hRes = pcHUD->Initialise(d3d.get());
+	//	if(FAILED(hRes)) return TraceError(hRes);
 
 	return nullptr;
 }
@@ -164,12 +159,12 @@ Error* Tripex::Render()
 {
 	UpdateCfgItems();
 
-	DWORD dwTime = timeGetTime( );
-	if(txs.test(TXS_RESET_TIMING))//bResetTiming)
+	DWORD dwTime = timeGetTime();
+	if (txs.test(TXS_RESET_TIMING))//bResetTiming)
 	{
 		last_time = dwTime - 10000;
 		txs.reset(TXS_RESET_TIMING);
-//		bResetTiming = false;
+		//		bResetTiming = false;
 	}
 
 	static float fFrames = 0;
@@ -177,57 +172,59 @@ Error* Tripex::Render()
 
 	fFrames += std::min(4.0f, dwTimeChange / (1000.0f / 15.0f));
 	last_time = dwTime;
-//	AddFrameTime(false, dwTimeChange);
+	//	AddFrameTime(false, dwTimeChange);
 
 	effect_frames += fFrames;
-	fade_pos += dwTimeChange; 
+	fade_pos += dwTimeChange;
 
-	EffectHandler *ppDrawEffect[2];
-	if(txs.test(TXS_EFFECT_LEFT) || txs.test(TXS_EFFECT_RIGHT))//bEffectLeft || bEffectRight))
+	Effect* ppDrawEffect[2];
+	if (txs.test(TXS_EFFECT_LEFT) || txs.test(TXS_EFFECT_RIGHT))//bEffectLeft || bEffectRight))
 	{
 		int nNewEffect = effect_idx;
-		if(txs.test(TXS_EFFECT_LEFT))
+		if (txs.test(TXS_EFFECT_LEFT))
 		{
-			if(effect_idx > 1) nNewEffect--;
+			if (effect_idx > 1) nNewEffect--;
 			txs.reset(TXS_EFFECT_LEFT);
 		}
 		else
 		{
-			if(effect_idx < ( int )enabled_effects.size() - 1) nNewEffect++;
+			if (effect_idx < (int)enabled_effects.size() - 1) nNewEffect++;
 			txs.reset(TXS_EFFECT_RIGHT);
 		}
 
-		if(nNewEffect != effect_idx)
+		if (nNewEffect != effect_idx)
 		{
 			effect_idx = nNewEffect;
 			ShowStatusMsg("Current Effect: %s", enabled_effects[effect_idx]->name.c_str());
 
-//				if(bEffectLeft) nEffect--;
-//				else if(bEffectRight) nEffect++;
-//				bEffectLeft = bEffectRight = false;
+			//				if(bEffectLeft) nEffect--;
+			//				else if(bEffectRight) nEffect++;
+			//				bEffectLeft = bEffectRight = false;
 
 			txs.reset(TXS_IN_FADE);
-//				bInFade = false;
+			//				bInFade = false;
 			effect_frames = 0;
 
-			Error* error = enabled_effects[effect_idx]->Reconfigure(*audio.get(), texture_library);
-			if(error) return TraceError(error); 
+			Effect::ReconfigureParams params(*audio.get(), texture_library);
+
+			Error* error = enabled_effects[effect_idx]->Reconfigure(params);
+			if (error) return TraceError(error);
 		}
 	}
-	if(!txs.test(TXS_IN_FADE) && (!txs.test(TXS_HOLD) || txs.test(TXS_CHANGE_EFFECT)) && 
-		(effect_idx == 0 || 
-		effect_frames > (enabled_effects[effect_idx]->fChange * EFFECT_CHANGE_FRAMES)) && 
+	if (!txs.test(TXS_IN_FADE) && (!txs.test(TXS_HOLD) || txs.test(TXS_CHANGE_EFFECT)) &&
+		(effect_idx == 0 ||
+			effect_frames > (enabled_effects[effect_idx]->change * EFFECT_CHANGE_FRAMES)) &&
 		enabled_effects.size() > 1)
 	{
 		txs.reset(TXS_CHANGE_EFFECT);
-//				bChangeEffect = false;
+		//				bChangeEffect = false;
 		next_effect_idx = 0;
 
 		txs.set(TXS_IN_FADE);
-//				bInFade = true;
+		//				bInFade = true;
 		effect_frames = 0;
 
-		for(int i = 1; i < ( int )enabled_effects.size(); i++) 
+		for (int i = 1; i < (int)enabled_effects.size(); i++)
 		{
 			enabled_effects[i]->bValid = (i != effect_idx && enabled_effects[effect_idx]->draw_order != enabled_effects[i]->draw_order);
 		}
@@ -237,31 +234,31 @@ Error* Tripex::Render()
 		const float selection_fairness = 0.7f;
 		float temperature = (1.0f / selection_fairness) - 1;
 		// temperature = (random)+inf - 0(ordered)
-		for(int i = 1; i < ( int )enabled_effects.size(); i++)
+		for (int i = 1; i < (int)enabled_effects.size(); i++)
 		{
 			float weight = (float(id - enabled_effects[i]->nLastUsed) / (enabled_effects.size() - 1)) - 1;
 			// weight = small (last used) - large (not used)
 
-			if(!enabled_effects[i]->bValid)
+			if (!enabled_effects[i]->bValid)
 			{
 				enabled_effects[i]->fProb = 0.0f;
 			}
-			else if(temperature < FLOAT_ZERO)
+			else if (temperature < FLOAT_ZERO)
 			{
-				enabled_effects[i]->fProb = (weight >= 0)? 0.5f : 0.0f;
+				enabled_effects[i]->fProb = (weight >= 0) ? 0.5f : 0.0f;
 			}
-			else 
+			else
 			{
 				enabled_effects[i]->fProb = 1.0f / (1.0f + expf(-weight / temperature));
 			}
 
-			enabled_effects[i]->fProb *= enabled_effects[i]->fPreference * std::max(0.1f, 1.0f - fabsf(audio->GetIntensity( ) - enabled_effects[i]->fActivity));
+			enabled_effects[i]->fProb *= enabled_effects[i]->preference * std::max(0.1f, 1.0f - fabsf(audio->GetIntensity() - enabled_effects[i]->activity));
 
 			pt += enabled_effects[i]->fProb;//vpEffect[i]->preference * p[i];
 		}
 
 		next_effect_idx = 0;
-		if(pt > FLOAT_ZERO)
+		if (pt > FLOAT_ZERO)
 		{
 			for (int i = 1; i < (int)enabled_effects.size(); i++)
 			{
@@ -269,56 +266,60 @@ Error* Tripex::Render()
 			}
 
 			double r = (rand() % 1000);
-			for(next_effect_idx = 1; next_effect_idx < ( int )enabled_effects.size() - 1; next_effect_idx++)
+			for (next_effect_idx = 1; next_effect_idx < (int)enabled_effects.size() - 1; next_effect_idx++)
 			{
 				r -= enabled_effects[next_effect_idx]->fProb * 1000.0;
-				if(r < 0) break;
+				if (r < 0) break;
 			}
 		}
 		enabled_effects[next_effect_idx]->nLastUsed = id;
 
 		fade_pos = 0;
 		txs.reset(TXS_RESET_TARGET);
-//				bResetTarget = false;
+		//				bResetTarget = false;
 	}
-	if(txs[TXS_RECONFIGURE])//bReconfigure)
+	if (txs[TXS_RECONFIGURE])//bReconfigure)
 	{
-		Error* error = enabled_effects[effect_idx]->Reconfigure(*audio.get(), texture_library);
-		if(error) return TraceError(error);
+		Effect::ReconfigureParams params(*audio.get(), texture_library);
+
+		Error* error = enabled_effects[effect_idx]->Reconfigure(params);
+		if (error) return TraceError(error);
 
 		txs.reset(TXS_IN_FADE);
 		txs.reset(TXS_RECONFIGURE);
 	}
 
-	if(txs.test(TXS_HOLD))//bEffectPref)
+	if (txs.test(TXS_HOLD))//bEffectPref)
 	{
 		txs[TXS_IN_FADE] = false;
-		if(effect_idx == 0) effect_idx = next_effect_idx;
+		if (effect_idx == 0) effect_idx = next_effect_idx;
 	}
 
 	const float fCrossfading = 0.934f;
 	const float fFadeIn = 0.241f;
 	const float fFadeOut = 0.353f;
 
-	float fOut = (effect_idx == 0)? 0 : (fFadeOut * 5000.0f);
+	float fOut = (effect_idx == 0) ? 0 : (fFadeOut * 5000.0f);
 	float fFadeLength = (fFadeIn * 5000.0f) + fOut - (fCrossfading * std::min((fFadeIn * 5000.0f), fOut));
 
-	float fBr = txs.test(TXS_IN_FADE)? std::min(1.0f, std::max(0.0f, 1.0f - (fade_pos / fOut))) : 1;
-	ppDrawEffect[0] = (fBr < FLOAT_ZERO)? pEffectBlank : enabled_effects[effect_idx].get();
+	float fBr = txs.test(TXS_IN_FADE) ? std::min(1.0f, std::max(0.0f, 1.0f - (fade_pos / fOut))) : 1;
+	ppDrawEffect[0] = (fBr < FLOAT_ZERO) ? pEffectBlank : enabled_effects[effect_idx].get();
 	ppDrawEffect[0]->fBr = fBr;
 
-	fBr = txs.test(TXS_IN_FADE)? std::min(1.0f, std::max(0.0f, 1.0f - ((fFadeLength - fade_pos) / (fFadeIn * 5000.0f)))) : 0;
-	ppDrawEffect[1] = (fBr < FLOAT_ZERO)? pEffectBlank : enabled_effects[next_effect_idx].get();
+	fBr = txs.test(TXS_IN_FADE) ? std::min(1.0f, std::max(0.0f, 1.0f - ((fFadeLength - fade_pos) / (fFadeIn * 5000.0f)))) : 0;
+	ppDrawEffect[1] = (fBr < FLOAT_ZERO) ? pEffectBlank : enabled_effects[next_effect_idx].get();
 	ppDrawEffect[1]->fBr = fBr;
 
-	if(ppDrawEffect[1]->fBr > FLOAT_ZERO && !txs[TXS_RESET_TARGET])
+	if (ppDrawEffect[1]->fBr > FLOAT_ZERO && !txs[TXS_RESET_TARGET])
 	{
-		Error* error = ppDrawEffect[1]->Reconfigure(*audio.get(), texture_library);
-		if(error) return TraceError(error);
+		Effect::ReconfigureParams params(*audio.get(), texture_library);
+
+		Error* error = ppDrawEffect[1]->Reconfigure(params);
+		if (error) return TraceError(error);
 
 		txs[TXS_RESET_TARGET] = true;
 	}
-	if(ppDrawEffect[1]->fBr >= 1 - FLOAT_ZERO)
+	if (ppDrawEffect[1]->fBr >= 1 - FLOAT_ZERO)
 	{
 		effect_idx = next_effect_idx;
 		ppDrawEffect[0] = ppDrawEffect[1];
@@ -326,22 +327,28 @@ Error* Tripex::Render()
 		txs.reset(TXS_IN_FADE);
 	}
 
-	if(ppDrawEffect[1]->draw_order < ppDrawEffect[0]->draw_order)
+	if (ppDrawEffect[1]->draw_order < ppDrawEffect[0]->draw_order)
 	{
-		std::swap( ppDrawEffect[1], ppDrawEffect[0] );
+		std::swap(ppDrawEffect[1], ppDrawEffect[0]);
 	}
-	if((!ppDrawEffect[0]->CanRender(fFrames) || ppDrawEffect[0] == pEffectBlank) && (!ppDrawEffect[1]->CanRender(fFrames) || ppDrawEffect[1] == pEffectBlank) && !(ppDrawEffect[0] == pEffectBlank && ppDrawEffect[1] == pEffectBlank && fFrames > 1.0f))
+	if ((!ppDrawEffect[0]->CanRenderMain(fFrames) || ppDrawEffect[0] == pEffectBlank) && (!ppDrawEffect[1]->CanRenderMain(fFrames) || ppDrawEffect[1] == pEffectBlank) && !(ppDrawEffect[0] == pEffectBlank && ppDrawEffect[1] == pEffectBlank && fFrames > 1.0f))
 	{
 		return nullptr;
 	}
 
-	audio->Update( fFrames, enabled_effects[effect_idx]->fSensitivity );
-//	UpdateBeat(fFrames);
+	audio->Update(fFrames, enabled_effects[effect_idx]->sensitivity);
+	//	UpdateBeat(fFrames);
 
-	for(int i = 0; i < 2; i++)
+	for (int i = 0; i < 2; i++)
 	{
-		Error* error = ppDrawEffect[i]->Calculate( fFrames, *audio.get(), renderer );
-		if(error) return TraceError(error);
+		audio->SetIntensityBeatScale(ppDrawEffect[i]->sensitivity * 3.0f);
+
+		Effect::CalculateParams params(ppDrawEffect[i]->fBr, ppDrawEffect[i]->GetElapsed(fFrames), *audio.get(), renderer);
+
+		Error* error = ppDrawEffect[i]->Calculate(params);
+		if (error) return TraceError(error);
+
+		audio->SetIntensityBeatScale(0.0f);
 	}
 
 	// lock the back
@@ -352,48 +359,46 @@ Error* Tripex::Render()
 	Error* error = renderer.BeginFrame();
 	if (error) return TraceError(error);
 
-//	g_pD3D->SetTexture(0, gui.get());
-/*
-	Transparent = (1 << 0L),
-	Multiply = (1 << 1L),
-	Perspective = (1 << 2L),
-	Shade = (1 << 3L),
-	ZBuffer = (1 << 4L),
-	PerspectiveCorrect = (1 << 5L),
-	LuminanceOpacity = (1 << 6L),
-	InverseMultiply = (1 << 7L),
-*/
+	//	g_pD3D->SetTexture(0, gui.get());
+	/*
+		Transparent = (1 << 0L),
+		Multiply = (1 << 1L),
+		Perspective = (1 << 2L),
+		Shade = (1 << 3L),
+		ZBuffer = (1 << 4L),
+		PerspectiveCorrect = (1 << 5L),
+		LuminanceOpacity = (1 << 6L),
+		InverseMultiply = (1 << 7L),
+	*/
 
-// D3DRS_CLIPPING is not supported in the XBox DX8 SDK ...
-	//g_pD3D->SetRenderState(D3DRS_CLIPPING, false);
-	// ... Forza.
+	// D3DRS_CLIPPING is not supported in the XBox DX8 SDK ...
+		//g_pD3D->SetRenderState(D3DRS_CLIPPING, false);
+		// ... Forza.
 
-	for(int i = 0; i < 2; i++)
+	for (int i = 0; i < 2; i++)
 	{
-		DWORD dwStartTick = timeGetTime( );
-
 		error = ppDrawEffect[i]->Render(renderer);
-		if(error) return TraceError(error);
+		if (error) return TraceError(error);
 	}
 
 	overlay_background.Clear();
 	overlay_text.Clear();
 	overlay_foreground.Clear();
 
-//	int nX = d3d->GetWidth() * 0.06;
-//	int nY = d3d->GetHeight() - 63;
+	//	int nX = d3d->GetWidth() * 0.06;
+	//	int nY = d3d->GetHeight() - 63;
 
-//	DebugBreak();
-//	g_pD3D->SetTexture(0, gui.get());
+	//	DebugBreak();
+	//	g_pD3D->SetTexture(0, gui.get());
 
 	std::string sMsg;
 	float fMsgBr = 0.0f;
 
-	DWORD dwTick = timeGetTime( );
-	if(dwTick >= status_time && dwTick <= status_time + (MSG_DISPLAY_TIME + MSG_FADEOUT_TIME) && status_msg[ 0 ] != 0)
+	DWORD dwTick = timeGetTime();
+	if (dwTick >= status_time && dwTick <= status_time + (MSG_DISPLAY_TIME + MSG_FADEOUT_TIME) && status_msg[0] != 0)
 	{
 		sMsg = status_msg;
-		if(dwTick < status_time + MSG_DISPLAY_TIME) fMsgBr = 1.0f;
+		if (dwTick < status_time + MSG_DISPLAY_TIME) fMsgBr = 1.0f;
 		else
 		{
 			float fPos = (dwTick - (status_time + MSG_DISPLAY_TIME)) / (float)MSG_FADEOUT_TIME;
@@ -404,12 +409,12 @@ Error* Tripex::Render()
 
 	const float overlay_back_mult = 0.65f;
 
-	if(sMsg.size() > 0)
+	if (sMsg.size() > 0)
 	{
 		DrawMessage(tef, 38, sMsg.c_str(), fMsgBr, overlay_back_mult);
 	}
 
-	if(txs.test(TXS_VISIBLE_BEATS))
+	if (txs.test(TXS_VISIBLE_BEATS))
 	{
 		audio->Render(overlay_background, overlay_foreground, overlay_back_mult);
 	}
@@ -448,25 +453,23 @@ Error* Tripex::Render()
 	error = renderer.EndFrame();
 	if (error) return TraceError(error);
 
-//	AddFrameTime(true, clock() - dwRenderStartClock);
+	//	AddFrameTime(true, clock() - dwRenderStartClock);
 
 	fFrames = 0;
 	return 0;
 }
-void Tripex::Shutdown( )
+void Tripex::Shutdown()
 {
-	if(!txs.test(TXS_STARTED)) return;
+	if (!txs.test(TXS_STARTED)) return;
 	txs[TXS_STARTED] = false;
 
 	audio.reset();
 
-//	gui = auto_ptr<ZTexture>(NULL);
-//	pcHUD = NULL;
+	//	gui = auto_ptr<ZTexture>(NULL);
+	//	pcHUD = NULL;
 
-	for(int i = 0; i < ( int )enabled_effects.size(); i++)
-	{
-		enabled_effects[i]->Destroy();
-	}
+	enabled_effects.clear();
+	effects.clear();
 
 	SaveCfgItems();
 }
@@ -613,9 +616,9 @@ IMPORT_EFFECT(LightStar);
 IMPORT_EFFECT(LightSphere);
 IMPORT_EFFECT(LightRing);
 
-void Tripex::AddEffect(std::shared_ptr<EffectHandler> (*fn)(), const char* name, int draw_order, float startup_weight)
+void Tripex::AddEffect(std::shared_ptr<Effect>(*fn)(), const char* name, int draw_order, float startup_weight)
 {
-	std::shared_ptr<EffectHandler> pEffect = fn();
+	std::shared_ptr<Effect> pEffect = fn();
 	pEffect->name = name;
 	pEffect->draw_order = draw_order;
 	pEffect->startup_weight = startup_weight;
@@ -699,13 +702,16 @@ void Tripex::UpdateCfgItems(bool bInit)
 	}
 	for (unsigned int i = 0; i < effects.size(); i++)
 	{
-		for (int j = 0; j < 5; j++)
-		{
-			effects[i]->pfSetting[j] = 0.0f;
-		}
+		float settings[5] = { 0.0f };
 
 		ConfigItem* pItem = FindCfgItem(effects[i]->GetCfgItemName().c_str());
-		pItem->GetFloatArray(5, effects[i]->pfSetting);
+		pItem->GetFloatArray(5, settings);
+
+		effects[i]->preference = settings[0];
+		effects[i]->change = settings[1];
+		effects[i]->sensitivity = settings[2];
+		effects[i]->activity = settings[3];
+		effects[i]->speed = settings[4];
 	}
 	// filtering -> num
 }

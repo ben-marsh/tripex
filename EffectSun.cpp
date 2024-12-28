@@ -18,7 +18,7 @@
 #define OUTER (INNER + 30)
 #define ANGSZ (20.0f * g_fDegToRad)
 
-class EffectSun : public EffectBase
+class EffectSun : public Effect
 {
 public:
 	Actor pObj[RINGS];
@@ -143,20 +143,20 @@ public:
 				if((i % 3) == 0)
 				{
 					pObj[i].roll += 0.1f * as[i][0][0];
-					pObj[i].pitch += params.audio_data.GetDampenedBand( pEffectPtr->fSensitivity, 3.0f/16.0f, 4.0f/16.0f) * as[i][1][0];
-					pObj[i].yaw += params.audio_data.GetDampenedBand( pEffectPtr->fSensitivity, 4.0f/16.0f, 5.0f/16.0f) * as[i][2][0];
+					pObj[i].pitch += params.audio_data.GetDampenedBand( sensitivity, 3.0f/16.0f, 4.0f/16.0f) * as[i][1][0];
+					pObj[i].yaw += params.audio_data.GetDampenedBand( sensitivity, 4.0f/16.0f, 5.0f/16.0f) * as[i][2][0];
 					pObj[i].pitch = Bound<float>(pObj[i].pitch, -ANGSZ, ANGSZ);
 					pObj[i].yaw = Bound<float>(pObj[i].yaw, -ANGSZ, ANGSZ);
 				}
 				if((i % 3) == 1)
 				{
-					pObj[i].roll += params.audio_data.GetDampenedBand(pEffectPtr->fSensitivity, 2.0f/16.0f, 3.0f/16.0f) * as[i][0][0];
+					pObj[i].roll += params.audio_data.GetDampenedBand(sensitivity, 2.0f/16.0f, 3.0f/16.0f) * as[i][0][0];
 					pObj[i].pitch += 0.1f * as[i][1][0];
-					pObj[i].yaw += 1.5f * params.audio_data.GetDampenedBand(pEffectPtr->fSensitivity, 2.0f/16.0f, 4.0f/16.0f) * as[i][2][0];
+					pObj[i].yaw += 1.5f * params.audio_data.GetDampenedBand(sensitivity, 2.0f/16.0f, 4.0f/16.0f) * as[i][2][0];
 				}
 				if((i % 3) == 2) 
 				{
-					pObj[i].roll += params.audio_data.GetDampenedBand(pEffectPtr->fSensitivity, 1/16.0f, 2/16.0f) * as[i][0][0];
+					pObj[i].roll += params.audio_data.GetDampenedBand(sensitivity, 1/16.0f, 2/16.0f) * as[i][0][0];
 					pObj[i].pitch += params.audio_data.GetIntensity( ) * as[i][1][0];
 					pObj[i].yaw += 0.1f * as[i][2][0];
 				}

@@ -51,7 +51,7 @@ private:
 	std::bitset<TXS_LAST> txs;
 	std::unique_ptr<AudioData> audio;
 
-	EffectHandler* pEffectBlank;
+	Effect* pEffectBlank;
 
 	std::vector< ConfigItem* >* pppCfgItem = NULL;
 
@@ -74,8 +74,8 @@ private:
 	std::shared_ptr<Texture> gui;
 	DWORD last_time;
 
-	std::vector<std::shared_ptr<EffectHandler>> effects;
-	std::vector<std::shared_ptr<EffectHandler>> enabled_effects;
+	std::vector<std::shared_ptr<Effect>> effects;
+	std::vector<std::shared_ptr<Effect>> enabled_effects;
 
 	class CI_STR_CMP : public std::less<std::string>
 	{
@@ -95,7 +95,7 @@ private:
 	void DrawMessage(const TextureFont& font, int y, const char* text, float brightness, float back_brightness);
 	int GetClippedLineLength(const TextureFont& font, const char* text, int clip_width);
 
-	void AddEffect(std::shared_ptr<EffectHandler>(*fn)(), const char* name, int draw_order, float startup_weight);
+	void AddEffect(std::shared_ptr<Effect>(*fn)(), const char* name, int draw_order, float startup_weight);
 	void CreateEffectList();
 
 	ConfigItem* AddCfgItem(ConfigItem* item);

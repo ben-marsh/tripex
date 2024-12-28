@@ -18,7 +18,7 @@
 
 #define DAMPCHANGE 0.001
 
-class EffectWaterGlobe : public EffectBase
+class EffectWaterGlobe : public Effect
 {
 private:
 	const TextureClass envmap_texture_class =
@@ -156,7 +156,7 @@ public:
 	Camera camera;
 
 	EffectWaterGlobe()
-		: EffectBase({ &envmap_texture_class })
+		: Effect({ &envmap_texture_class })
 	{
 		nPos = 0;
 
