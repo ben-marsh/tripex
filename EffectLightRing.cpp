@@ -5,11 +5,6 @@
 #include "TextureData.h"
 #include "VertexGrid.h"
 
-#define SOURCES 40//40//35//50
-#define FRAMES 12
-#define LENGTH 1
-#define BUFFERSTEP 100
-
 //static ZObject::Transformed *pFirst;
 
 //static double linearity = 0;
@@ -23,14 +18,19 @@ public:
 	const TextureClass sprite_texture_class =
 	{
 		"Sprite",
-		{ g_anTexLight }
+		{ tex_light }
 	};
 
 	const TextureClass tint_texture_class =
 	{
 		"Tint",
-		{ g_anTexEyes, g_anTexFlesh, g_anTexForest, g_anTexShinySand }
+		{ tex_eyes, tex_flesh, tex_forest, tex_shiny_sand }
 	};
+
+	static const int SOURCES = 40;//40//35//50
+	static const int FRAMES = 12;
+	static const int LENGTH = 1;
+	static const int BUFFERSTEP = 100;
 
 	BezierCurve b;
 	Vector3 ls[SOURCES][4];

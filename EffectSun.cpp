@@ -5,22 +5,22 @@
 #include "BezierCurve.h"
 #include "effect.h"
 
-#define RINGS 5//3
-#define EXPOSURE 3//5//7//9//15//4//3//7//9
-#define EXPDIV 5//4.5//5//7
-#define EXPFRAMES 2//4//10//6//3
-
-#define TRI 10
-//#define PI 3.141592
-#define PI2 (PI * 2)
-#define LAYERS 3
-#define INNER 30
-#define OUTER (INNER + 30)
-#define ANGSZ (20.0f * g_fDegToRad)
-
 class EffectSun : public Effect
 {
 public:
+	static const int RINGS = 5;//3
+	static const int EXPOSURE = 3;//5//7//9//15//4//3//7//9
+	const float EXPDIV = 5.0f;//4.5//5//7
+	static const int EXPFRAMES = 2;//4//10//6//3
+
+	static const int TRI = 10;
+	//#define PI 3.141592
+	const float PI2 = (PI * 2);
+	static const int LAYERS = 3;
+	static const int INNER = 30;
+	static const int OUTER = (INNER + 30);
+	const float ANGSZ = (20.0f * g_fDegToRad);
+
 	Actor pObj[RINGS];
 	Camera cCamera;
 	float as[RINGS][3][2], ps[RINGS][2], ys[RINGS][2];

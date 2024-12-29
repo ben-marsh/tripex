@@ -5,14 +5,14 @@
 #include "ColorRgb.h"
 #include <memory>
 
-#define TF_FADE_IN_START 8
-#define TF_FADE_IN_FINISH 0 // default
-#define TF_FADE_OUT_START 0 // default
-#define TF_FADE_OUT_FINISH 16
-
 class TextureFont
 {
 public:
+	static const int TF_FADE_IN_START = 8;
+	static const int TF_FADE_IN_FINISH = 0; // default
+	static const int TF_FADE_OUT_START = 0; // default
+	static const int TF_FADE_OUT_FINISH = 16;
+
 	static const int LETTER_APPEAR_FRAMES = 200;
 	static const int LETTER_DIFF_FRAMES = 10;
 

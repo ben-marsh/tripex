@@ -3,27 +3,28 @@
 #include "TextureData.h"
 #include "effect.h"
 
-#define PTDIST 15
-#define PTCIRCUM 40
-#define PTLENGTH 20
-
-#define HEIGHTST 30
-#define HEIGHTM 0.08f
-
-#define CIRADIUS 40.0f
-#define CORADIUS 50.0f
-#define CANGDIFF (5.0f * g_fDegToRad)
-#define CLENGTH 100
-#define CDIFF (PTLENGTH * PTDIST / CLENGTH)
-
 class EffectTube : public Effect
 {
 public:
 	const TextureClass envmap_texture_class =
 	{
 		"EnvMap",
-		{ g_anTexAlienEgg, g_anTexShinySand }
+		{ tex_alien_egg, tex_shiny_sand }
 	};
+
+	const float PTDIST = 15;
+	static const int PTCIRCUM = 40;
+	static const int PTLENGTH = 20;
+
+	const float HEIGHTST = 30;
+	const float HEIGHTM = 0.08f;
+
+	const float CIRADIUS = 40.0f;
+	const float CORADIUS = 50.0f;
+	const float CANGDIFF = (5.0f * g_fDegToRad);
+	static const int CLENGTH = 100;
+
+	const float CDIFF = (PTLENGTH * PTDIST / CLENGTH);
 
 	float height[PTLENGTH][PTCIRCUM];
 	bool fRefresh;

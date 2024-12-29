@@ -146,7 +146,7 @@ public:
 	float pitch, yaw, roll;
 	Vector3 position;
 
-	TextureEntry textures[MAX_TEXTURES];
+	TextureEntry textures[Vertex::MAX_TEXTURES];
 	std::vector<Light> lights;
 
 	std::vector<Vertex> vertices;
@@ -183,6 +183,7 @@ public:
 	void CreateTetrahedronGeosphere(float fRadius, int nIterations);
 	void CreateTorus(float fRadius, float fTubeRadius, int nPoints, int nTubePoints);
 	void CreateTetrahedron(float fRadius);
+	void CreateTentacles(int segs, float l, float r);
 
 protected:
 	static const Point<float> sprite_tex_coords[4];

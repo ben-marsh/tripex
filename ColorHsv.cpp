@@ -1,37 +1,37 @@
 #include "ColorHsv.h"
 
-void ColorHsv::Set(const ColorRgb& c, float fDefH, float fDefS)
+void ColorHsv::Set(const ColorRgb& c, float default_hue, float default_sat)
 {
 	// sat = 0, hue doesn't matter (grey) (min = max)
 	// light = 0, sat + hue doesn't matter (black) (min = max = 0)
 
-	int nMin = std::min(c.r, std::min(c.g, c.b));
-	int nMax = std::max(c.r, std::max(c.g, c.b));
-	float fRange = nMax - nMin;
+	int min_component = std::min(c.r, std::min(c.g, c.b));
+	int max_component = std::max(c.r, std::max(c.g, c.b));
+	float range = max_component - min_component;
 
 	// lightness
-	value = nMax / 255.0f;
+	value = max_component / 255.0f;
 
 	// saturation
-	if (nMax == 0) saturation = fDefS;
-	else saturation = fRange / nMax;
+	if (max_component == 0) saturation = default_sat;
+	else saturation = range / max_component;
 
 	// hue
-	if (nMax == nMin)
+	if (max_component == min_component)
 	{
-		hue = fDefH;
+		hue = default_hue;
 	}
 	else
 	{
-		float fRangeRecip = 1.0f / fRange;
+		float range_recip = 1.0f / range;
 
-		float fDiffR = (nMax - c.r) * fRangeRecip;
-		float fDiffG = (nMax - c.g) * fRangeRecip;
-		float fDiffB = (nMax - c.b) * fRangeRecip;
+		float diff_r = (max_component - c.r) * range_recip;
+		float diff_g = (max_component - c.g) * range_recip;
+		float diff_b = (max_component - c.b) * range_recip;
 
-		if (nMin == c.r)		hue = 1.0f - fDiffG + fDiffR;
-		else if (nMin == c.r)	hue = 3.0f - fDiffB + fDiffG;
-		else					hue = 5.0f - fDiffR + fDiffB;
+		if (min_component == c.r)		hue = 1.0f - diff_g + diff_r;
+		else if (min_component == c.r)	hue = 3.0f - diff_b + diff_g;
+		else					hue = 5.0f - diff_r + diff_b;
 
 		hue = -PI + (hue * (PI / 3.0f));
 	}
@@ -42,14 +42,14 @@ WideColorRgb ColorHsv::ToWideColorRgb() const
 	ColorHsv c = *this;
 	c.CorrectRange();
 
-	float fPos = (c.hue + PI) / (PI / 3.0f);
-	float fSpread = c.saturation * c.value * 255.0f;
-	float fMin = c.value * 255.0f - fSpread;
+	float pos = (c.hue + PI) / (PI / 3.0f);
+	float spread = c.saturation * c.value * 255.0f;
+	float min = c.value * 255.0f - spread;
 
-	float fR = fMin + Bound< float >(-1 + fabsf(fPos - 3.0f), 0.0f, 1.0f) * fSpread;
-	float fG = fMin + Bound< float >(+2 - fabsf(fPos - 2.0f), 0.0f, 1.0f) * fSpread;
-	float fB = fMin + Bound< float >(+2 - fabsf(fPos - 4.0f), 0.0f, 1.0f) * fSpread;
-	return WideColorRgb((int32)fR, (int32)fG, (int32)fB);
+	float r = min + Bound< float >(-1 + fabsf(pos - 3.0f), 0.0f, 1.0f) * spread;
+	float g = min + Bound< float >(+2 - fabsf(pos - 2.0f), 0.0f, 1.0f) * spread;
+	float b = min + Bound< float >(+2 - fabsf(pos - 4.0f), 0.0f, 1.0f) * spread;
+	return WideColorRgb((int32)r, (int32)g, (int32)b);
 }
 
 void ColorHsv::CorrectRange()

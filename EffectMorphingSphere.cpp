@@ -5,19 +5,19 @@
 #include "TextureData.h"
 #include "error.h"
 
-#define HILLSZ 0.1
-#define LANDSCAPEITER 2000
-
-#define NOBJ 4
-
 class EffectMorphingSphere : public Effect
 {
 public:
 	const TextureClass envmap_texture_class =
 	{
 		"EnvMap",
-		{ g_anTexAlienEgg, g_anTexShinySand }
+		{ tex_alien_egg, tex_shiny_sand }
 	};
+
+	const float HILLSZ = 0.1f;
+	static const int LANDSCAPEITER = 2000;
+
+	static const int NOBJ = 4;
 
 	Actor pObj[NOBJ + 1];
 	Camera camera;

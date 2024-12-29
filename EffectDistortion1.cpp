@@ -6,18 +6,18 @@
 #include "TextureData.h"
 //#include "tripex2.h"
 
-#define GRW 80
-#define GRH 50
-#define SPIKES 15
-
 class EffectDistortion1 : public Effect
 {
 public:
 	const TextureClass background_texture_class =
 	{
 		"Background",
-		{ g_anTexFlesh, g_anTexForest }
+		{ tex_flesh, tex_forest }
 	};
+
+	static const int GRW = 80;
+	static const int GRH = 50;
+	static const int SPIKES = 15;
 
 	bool fSetTexture;
 	VertexGrid grid;//(GRW, GRH);//, D3DFVF_DIFFUSE | D3DFVF_TEX1);

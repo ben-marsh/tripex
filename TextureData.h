@@ -1,12 +1,12 @@
 #pragma once
 
-extern const uint32 g_anTexRawGUI[ ];
-extern const uint32 g_anTexRawFont[ ];
-extern const uint32 g_anTexBlank[ ];
-extern const uint32 g_anTexAlienEgg[ ];
-extern const uint32 g_anTexBrightLight[ ];
-extern const uint32 g_anTexEyes[ ];
-extern const uint32 g_anTexFlesh[ ];
-extern const uint32 g_anTexForest[ ];
-extern const uint32 g_anTexLight[ ];
-extern const uint32 g_anTexShinySand[ ];
+extern const uint32 tex_raw_gui[ ];
+extern const uint32 tex_raw_font[ ];
+extern const uint32 tex_blank[ ];
+extern const uint32 tex_alien_egg[ ];
+extern const uint32 tex_bright_light[ ];
+extern const uint32 tex_eyes[ ];
+extern const uint32 tex_flesh[ ];
+extern const uint32 tex_forest[ ];
+extern const uint32 tex_light[ ];
+extern const uint32 tex_shiny_sand[ ];

@@ -5,29 +5,30 @@
 #include "TextureData.h"
 #include "error.h"
 
-#define ACCELER 1.0f
-
-#define CUBE_H 4//10
-#define TRAIL_W 30//10//30//20
-#define TRAIL_H 30
-#define TRAIL_XS 20//20//20//40
-#define CUBE_SIZE 10
-#define SPIN_RADIUS 600
-#define SPIN_HEIGHT -300
-#define CYLINDER_RADIUS 1200 //500
-#define TRAIL_ANGS ( 2.0f * g_fDegToRad )
-#define ANG_OFFSET ( 10.0f * g_fDegToRad )
-#define BAR_SIZE 5.0f
-#define LIMITER_H 15//10
-
 class EffectSpectrum : public Effect
 {
 public:
 	const TextureClass envmap_texture_class =
 	{
 		"EnvMap",
-		{ g_anTexAlienEgg, g_anTexShinySand }
+		{ tex_alien_egg, tex_shiny_sand }
 	};
+
+	const float ACCELER = 1.0f;
+	static const int CUBE_H = 4;//10
+
+	static const int TRAIL_W = 30;//10//30//20
+	static const int TRAIL_H = 30;
+
+	const float TRAIL_XS = 20;//20//20//40
+	const float CUBE_SIZE = 10;
+	const float SPIN_RADIUS = 600;
+	const float SPIN_HEIGHT = -300;
+	const float CYLINDER_RADIUS = 1200; //500
+	const float TRAIL_ANGS = (2.0f * g_fDegToRad);
+	const float ANG_OFFSET = (10.0f * g_fDegToRad);
+	const float BAR_SIZE = 5.0f;
+	static const int LIMITER_H = 15;//10
 
 	float m_fBrAng;
 	Camera m_cCamera;

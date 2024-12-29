@@ -6,8 +6,6 @@
 #include "TextureData.h"
 #include <algorithm>
 
-#define SOURCES 512
-
 //static ZObject *pObj;
 
 //double dRadAng = 2 * 3.14159 * 2.0;
@@ -16,10 +14,6 @@
 //Texture *pTint;
 
 //#define alNumLS 512
-#define SPREAD 50
-#define RADIUS 160
-#define SPEEDSPREAD 20
-#define FOREGROUNDBR 0.5
 
 class EffectCollapsingLightSphere : public Effect
 {
@@ -27,14 +21,21 @@ public:
 	const TextureClass sprite_texture_class =
 	{
 		"Sprite",
-		{ g_anTexLight }
+		{ tex_light }
 	};
 
 	const TextureClass tint_texture_class =
 	{
 		"Tint",
-		{ g_anTexEyes, g_anTexFlesh, g_anTexForest, g_anTexShinySand }
+		{ tex_eyes, tex_flesh, tex_forest, tex_shiny_sand }
 	};
+
+	static const int SOURCES = 512;
+
+	const float SPREAD = 50;
+	const float RADIUS = 160;
+	const float SPEEDSPREAD = 20;
+	const float FOREGROUNDBR = 0.5f;
 
 	double pdAng[SOURCES];
 	double pdYPos[SOURCES];

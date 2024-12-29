@@ -5,26 +5,13 @@
 #include "TextureData.h"
 #include <algorithm>
 
-#define accelFac 0.9
-
-#define iPoints 10
-#define MINHEIGHT 0.0f
-#define BEHEIGHT  50.0f //30, 50, 80 are nice
-#define MAXHEIGHT 80.0f
-
-#define MINSZ -0.8f
-#define MAXSZ 0.4f
-#define AVSZ 1.0f
-
-#define DAMPCHANGE 0.001
-
 class EffectWaterGlobe : public Effect
 {
 private:
 	const TextureClass envmap_texture_class =
 	{
 		"EnvMap",
-		{ g_anTexAlienEgg, g_anTexShinySand }
+		{ tex_alien_egg, tex_shiny_sand }
 	};
 
 	class ZGeoEdge : public Edge
@@ -33,9 +20,23 @@ private:
 		int nSplit;
 	};
 
+	const float accelFac = 0.9f;
+
+	static const int iPoints = 10;
+	const float MINHEIGHT = 0.0f;
+	const float BEHEIGHT = 50.0f; //30, 50, 80 are nice
+	const float MAXHEIGHT = 80.0f;
+
+	const float AVSZ = 1.0f;
+
+	const float DAMPCHANGE = 0.001f;
+
 	class WaterObj : public Actor
 	{
 	public:
+		const float MINSZ = -0.8f;
+		const float MAXSZ = 0.4f;
+
 		int nPos;
 		float fDamping;
 		std::vector<Vector3> pvDir;

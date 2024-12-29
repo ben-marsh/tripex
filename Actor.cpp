@@ -48,7 +48,7 @@ Actor::Actor()
 	roll = pitch = yaw = 0.0f;
 	position = Vector3(0, 0, 0);
 	exposure = 1;
-//	transformed_vertices.nStep = 1000;
+	//	transformed_vertices.nStep = 1000;
 	delay_history = 0;
 	//	pClippedFace.nStep = 50;
 	reflectivity = 1.0;
@@ -277,7 +277,7 @@ void Actor::Calculate(const Renderer& renderer, Camera* camera, float elapsed)
 	}
 	else
 	{
-		for (int i = 0; i < MAX_TEXTURES; i++)
+		for (int i = 0; i < Vertex::MAX_TEXTURES; i++)
 		{
 			switch (textures[i].type)
 			{
@@ -395,76 +395,89 @@ void Actor::Calculate(const Renderer& renderer, Camera* camera, float elapsed)
 
 	std::vector<ExposureData> exp_base;
 	std::vector<Matrix44> exposure_matrix;
-	for (int nExp = 0; nExp < exposure; nExp++)
+	for (int exp_idx = 0; exp_idx < exposure; exp_idx++)
 	{
-		if (nExp == 0)
+		if (exp_idx == 0)
 		{
-			ExposureData& pData = exp_base.emplace_back();
-			pData.time = 0;
-			pData.frame = 0;
-			pData.pos = 0;
+			ExposureData& exp_data = exp_base.emplace_back();
+			exp_data.time = 0;
+			exp_data.frame = 0;
+			exp_data.pos = 0;
 		}
 		else
 		{
-			float fTime = nExp * (frame_history - delay_history) / (exposure - 1);
-			float fTotalElapsed = 0;
+			float time = exp_idx * (frame_history - delay_history) / (exposure - 1);
+			float total_elapsed = 0;
 			int k;
 			for (k = 0; ; k++)
 			{
-				if (!(k + 1 < frames.size())) break;
-				float fNextElapsed = fTotalElapsed + frames[k]->elapsed;
-				if (fNextElapsed > fTime)
+				if (!(k + 1 < frames.size()))
 				{
-					ExposureData& pData = exp_base.emplace_back();
-					pData.time = fTime;
-					pData.frame = k;
-					pData.pos = (pData.time - fTotalElapsed) / frames[k]->elapsed;
+					break;
+				}
+
+				float next_elapsed = total_elapsed + frames[k]->elapsed;
+				if (next_elapsed > time)
+				{
+					ExposureData& exp_data = exp_base.emplace_back();
+					exp_data.time = time;
+					exp_data.frame = k;
+					exp_data.pos = (exp_data.time - total_elapsed) / frames[k]->elapsed;
 					if (flags.test(F_DO_ROTATION_HISTORY))
 					{
-						float fThisYaw = (frames[k]->yaw * (1 - pData.pos)) + (frames[k + 1]->yaw * pData.pos);
-						float fThisPitch = (frames[k]->pitch * (1 - pData.pos)) + (frames[k + 1]->pitch * pData.pos);
-						float fThisRoll = (frames[k]->roll * (1 - pData.pos)) + (frames[k + 1]->roll * pData.pos);
-						pData.transform = Matrix44::Rotate(fThisYaw, fThisPitch, fThisRoll) * Matrix44::Translate(position) * camera->GetTransform();
+						float this_yaw = (frames[k]->yaw * (1 - exp_data.pos)) + (frames[k + 1]->yaw * exp_data.pos);
+						float this_pitch = (frames[k]->pitch * (1 - exp_data.pos)) + (frames[k + 1]->pitch * exp_data.pos);
+						float this_roll = (frames[k]->roll * (1 - exp_data.pos)) + (frames[k + 1]->roll * exp_data.pos);
+						exp_data.transform = Matrix44::Rotate(this_yaw, this_pitch, this_roll) * Matrix44::Translate(position) * camera->GetTransform();
 					}
 					break;
 				}
-				fTotalElapsed = fNextElapsed;
+				total_elapsed = next_elapsed;
 			}
-			if (!(k + 1 < frames.size())) break;
+			if (!(k + 1 < frames.size()))
+			{
+				break;
+			}
 		}
 	}
 
-	if (vertices.size() == 0) return;
+	if (vertices.size() == 0)
+	{
+		return;
+	}
 
 	int max_history_length = MAX_VERTICES / (4 * (int)vertices.size());
 
 	// transform
 	for (int i = 0; i < vertices.size(); i++)
 	{
-		VertexTL& pVert = transformed_vertices.emplace_back();
+		VertexTL& vertex = transformed_vertices.emplace_back();
 		if (flags.test(F_NO_TRANSFORM))
 		{
-			pVert.position = vertices[i].position;
+			vertex.position = vertices[i].position;
 		}
 		else
 		{
-			pVert.position = vertices[i].position * mTransform;
+			vertex.position = vertices[i].position * mTransform;
 		}
 
 		if (store_frame)
 		{
-			store_frame->positions[i] = pVert.position;
+			store_frame->positions[i] = vertex.position;
 		}
 	}
 
-	if (exposure == 0) return;
+	if (exposure == 0)
+	{
+		return;
+	}
 
 	// light
 	if (lights.size() > 0)
 	{
 		for (int i = 0; i < vertices.size(); i++)
 		{
-			WideColorRgb wcLight = ambient_light_color;
+			WideColorRgb total_light = ambient_light_color;
 			for (const Light& light : lights)
 			{
 				switch (light.type)
@@ -474,7 +487,7 @@ void Actor::Calculate(const Renderer& renderer, Camera* camera, float elapsed)
 					angle = 4.0f * vertices[i].normal.Dot(trans_direction);
 					if (angle > 0)
 					{
-						wcLight += light.color * angle;
+						total_light += light.color * angle;
 					}
 					break;
 				case LightType::Point:
@@ -491,13 +504,13 @@ void Actor::Calculate(const Renderer& renderer, Camera* camera, float elapsed)
 						{
 							angle /= fDistance;
 						}
-						wcLight += light.color * angle;
+						total_light += light.color * angle;
 					}
 					break;
 				}
 			}
-			transformed_vertices[i].diffuse = wcLight;
-			transformed_vertices[i].specular = wcLight - ColorRgb(255, 255, 255);
+			transformed_vertices[i].diffuse = total_light;
+			transformed_vertices[i].specular = total_light - ColorRgb(255, 255, 255);
 		}
 	}
 	else
@@ -614,14 +627,13 @@ void Actor::Calculate(const Renderer& renderer, Camera* camera, float elapsed)
 				{
 					for (; position < frames[j]->distances[i]; position += sprite_history_length)
 					{
-						float fMult = position / frames[j]->distances[i];
-						Vector3 vPos = (frames[j]->positions[i] * (1 - fMult)) + (frames[j + 1]->positions[i] * fMult);
+						float mult = position / frames[j]->distances[i];
 
-						VertexTL& pVert = transformed_vertices.emplace_back();
-						pVert.position = vPos;
-						pVert.diffuse = diffuse;
-						pVert.specular = specular;
-						pVert.tex_coords[0] = sprite_tex_coords[0];
+						VertexTL& vertex = transformed_vertices.emplace_back();
+						vertex.position = (frames[j]->positions[i] * (1 - mult)) + (frames[j + 1]->positions[i] * mult);
+						vertex.diffuse = diffuse;
+						vertex.specular = specular;
+						vertex.tex_coords[0] = sprite_tex_coords[0];
 
 						//						AddSprite(pCamera, vPos, cDiffuse, cSpecular, pvSprite);
 						diffuse = diffuse + exposure_light_delta;
@@ -775,10 +787,10 @@ Error* Actor::Render(Renderer& renderer)
 		return nullptr;
 	}
 
-//	ZDirect3D::TextureStage tsDefault;
-	//	tsDisable.AddState(D3DTSS_COLOROP, D3DTOP_DISABLE);
+	//	ZDirect3D::TextureStage tsDefault;
+		//	tsDisable.AddState(D3DTSS_COLOROP, D3DTOP_DISABLE);
 
-	//	assert(pTransVertex.GetLength() < 16384 * 3);
+		//	assert(pTransVertex.GetLength() < 16384 * 3);
 	assert(clipped_faces.size() * 3 < 0x0ffff);//D3DMAXNUMVERTICES);//16384);
 	//	assert(pClippedEdge.GetLength() < 16384);
 
@@ -814,13 +826,13 @@ Error* Actor::Render(Renderer& renderer)
 		}
 
 
-//		g_pD3D->ResetRenderState();
-//		for (std::map< D3DRENDERSTATETYPE, DWORD >::iterator it = state.begin(); it != state.end(); it++)
-//		{
-//			g_pD3D->SetRenderState(it->first, it->second);
-//		}
+		//		g_pD3D->ResetRenderState();
+		//		for (std::map< D3DRENDERSTATETYPE, DWORD >::iterator it = state.begin(); it != state.end(); it++)
+		//		{
+		//			g_pD3D->SetRenderState(it->first, it->second);
+		//		}
 
-//		g_pD3D->ResetTextureState();
+		//		g_pD3D->ResetTextureState();
 		if (i == -1)
 		{
 			render_state.enable_specular = false;
@@ -925,7 +937,7 @@ void Actor::Clip(const Renderer& renderer, std::vector<Face>& faces, uint16 plan
 		}
 	}
 
-	size_t nFirstClip = output_faces.size();
+	size_t first_clip = output_faces.size();
 
 	uint16 face_vertex_index[3];
 	bool is_out[3];
@@ -1014,7 +1026,7 @@ void Actor::Clip(const Renderer& renderer, std::vector<Face>& faces, uint16 plan
 		}
 	}
 
-	for (size_t i = nFirstClip; i < output_faces.size(); i++)
+	for (size_t i = first_clip; i < output_faces.size(); i++)
 	{
 		for (int j = 0; j < 3; j++)
 		{
@@ -1477,4 +1489,60 @@ void Actor::CreateTetrahedronGeosphere(float radius, int num_iterations)
 	}
 
 	flags.set(F_VALID_VERTEX_NORMALS);
+}
+
+void Actor::CreateTentacles(int segs, float l, float r)
+{
+	static const int TARMS = 6;
+	static const int TTEMP = 4;
+
+	Vector3 dv[TARMS] = { Vector3(1, 0, 0), Vector3(-1, 0, 0), Vector3(0, 1, 0), Vector3(0,-1, 0), Vector3(0, 0, 1), Vector3(0, 0, -1) };
+	Vector3 mu[TARMS] = { Vector3(0, 1, 0), Vector3(0, 1, 0), Vector3(1, 0, 0), Vector3(1, 0, 0), Vector3(1, 0, 0), Vector3(1, 0, 0) };
+	Vector3 mv[TARMS] = { Vector3(0, 0, 1), Vector3(0, 0, 1), Vector3(0, 0, 1), Vector3(0, 0, 1), Vector3(0, 1, 0), Vector3(0, 1, 0) };
+
+	float u[TTEMP] = { r,-r,-r, r }, v[TTEMP] = { r, r,-r,-r };
+
+	vertices.resize(TARMS * (((segs - 1) * TTEMP) + 1));
+	faces.clear();
+
+	int vn = 0, fn = 0;
+	for (int i = 0; i < 6; i++) // each arm
+	{
+		Vector3 center, direction;
+		for (int j = 0; j < segs; j++) // dont put one at the base
+		{
+			float f = j * l / segs;
+
+			center = dv[i] * f;
+
+			if (j < segs - 1)
+			{
+				for (int k = 0; k < TTEMP; k++)
+				{
+					if (j == segs - 2)
+					{
+						faces.push_back(Face(vn + k, vn + ((k + 1) % TTEMP), vn + TTEMP));
+					}
+					else
+					{
+						faces.push_back(Face(vn + k, vn + k + TTEMP, vn + ((k + 1) % TTEMP)));
+						faces.push_back(Face(vn + ((k + 1) % TTEMP), vn + k + TTEMP, vn + TTEMP + ((k + 1) % TTEMP)));
+					}
+				}
+				for (int k = 0; k < TTEMP; k++)
+				{
+					Vector3 vDir = Vector3((mu[i].x * u[k]) + (mv[i].x * v[k]), (mu[i].y * u[k]) + (mv[i].y * v[k]), (mu[i].z * u[k]) + (mv[i].z * v[k]));
+					vertices[vn].position = center + (vDir * ((segs - 1.0f - j) / (segs - 1.0f)));
+					vn++;
+				}
+			}
+			else
+			{
+				vertices[vn].position = center;
+				vn++;
+			}
+		}
+	}
+	FindFaceOrder(Vector3::Origin());
+	FindVertexNormals();
 }

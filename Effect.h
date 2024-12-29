@@ -8,10 +8,6 @@
 #include "Renderer.h"
 #include "TextureLibrary.h"
 
-#define EFFECT_MAX_TEXTURES 2
-
-#define EFFECT_CHANGE_FRAMES 400.0f
-
 enum
 {
 	// z buffering
@@ -111,12 +107,14 @@ public:
 	virtual Error* Calculate(const CalculateParams& params) = 0;
 	virtual Error* Reconfigure(const ReconfigureParams& params);
 	virtual Error* Render(const RenderParams& params) = 0;
-	virtual bool CanRender(float elapsed);
 
-	bool CanRenderMain(float fFrames);
+	bool CanRender(float fFrames);
 
 	float GetElapsed(float fFrames);
 	std::string GetCfgItemName() const;
+
+protected:
+	virtual bool CanRenderImpl(float elapsed);
 };
 
 #define IMPORT_EFFECT(name) extern std::shared_ptr<Effect> CreateEffect_##name( );

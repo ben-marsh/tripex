@@ -4,19 +4,19 @@
 #include "TextureData.h"
 #include "error.h"
 
-#define	RINGS 25
-#define RINGSTART 50.0f
-#define RINGSEP 10
-#define RINGDELAY 2
-
 class EffectRings : public Effect
 {
 public:
 	const TextureClass envmap_texture_class =
 	{
 		"EnvMap",
-		{ g_anTexAlienEgg, g_anTexShinySand }
+		{ tex_alien_egg, tex_shiny_sand }
 	};
+
+	static const int RINGS = 25;
+	const float RINGSTART = 50.0f;
+	const float RINGSEP = 10.0f;
+	static const int RINGDELAY = 2;
 
 	bool fSetTexture;
 	Actor pObj[RINGS];

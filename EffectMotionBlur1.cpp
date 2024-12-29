@@ -5,18 +5,18 @@
 #include <algorithm>
 #include "TextureData.h"
 
-#define RINGS 10//6//10//12 //7
-
-#define NFR 50
-
 class EffectMotionBlur1 : public Effect
 {
 public:
 	const TextureClass envmap_texture_class =
 	{
 		"EnvMap",
-		{ g_anTexAlienEgg, g_anTexShinySand }
+		{ tex_alien_egg, tex_shiny_sand }
 	};
+
+	static const int RINGS = 10;//6//10//12 //7
+
+	static const int NFR = 50;
 
 	bool fSetTexture;
 	Camera camera;
@@ -56,7 +56,7 @@ public:
 			ys[i] = (0.5 + (0.5 * i / RINGS)) * 0.6 * ((rand() - (RAND_MAX/2)) * 3.14592 / 22.0) / (RAND_MAX / 2);
 		}
 	}
-	bool CanRender(float fElapsed)
+	bool CanRenderImpl(float fElapsed)
 	{
 		return (fElapsed > 0.5);
 	}

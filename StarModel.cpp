@@ -1,7 +1,7 @@
 #include "Platform.h"
 #include "StarModel.h"
 
-float pfStarVertex[] =
+const float star_vertices[] =
 {
 	-95.000000f, 0.000000f, 0.000000f,
 	-60.052170f, 24.874422f, -0.000002f,
@@ -133,7 +133,7 @@ float pfStarVertex[] =
 	-36.394753f, -15.075200f, 10.606603f
 };
 
-extern uint16 pwStarFace[] =
+const uint16 star_faces[] =
 {
 	0, 1, 2,
 	2, 3, 0,
@@ -394,5 +394,5 @@ extern uint16 pwStarFace[] =
 	8, 124, 123
 };
 
-extern const int nStarVertices = sizeof(pfStarVertex) / (sizeof(float) * 3);
-extern const int nStarFaces = sizeof(pwStarFace) / (sizeof(uint16) * 3);
+extern const int num_star_vertices = sizeof(star_vertices) / (sizeof(float) * 3);
+extern const int num_star_faces = sizeof(star_faces) / (sizeof(uint16) * 3);

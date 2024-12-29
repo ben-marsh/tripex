@@ -185,8 +185,8 @@ void AudioData::Update(float elapsed, float sensitivity)
 		intensity *= 1.0f / (intensity + 0.6f);
 		intensity = std::min(std::max(intensity, 0.0f), 1.0f);
 
-		const bool bAvoidBigReactions = false;
-		if (bAvoidBigReactions)
+		const bool disable_beats = false;
+		if (disable_beats)
 		{
 			beat = 0.0f;
 		}

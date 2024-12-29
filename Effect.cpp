@@ -33,12 +33,12 @@ Error* Effect::Reconfigure(const ReconfigureParams& params)
 	return nullptr;
 }
 
-bool Effect::CanRender(float fElapsed)
+bool Effect::CanRenderImpl(float fElapsed)
 {
 	return true;
 }
 
-bool Effect::CanRenderMain(float fFrames)
+bool Effect::CanRender(float fFrames)
 {
 	if (fFrames > 3.8)
 	{
@@ -46,7 +46,7 @@ bool Effect::CanRenderMain(float fFrames)
 	}
 	else
 	{
-		return CanRender(GetElapsed(fFrames));
+		return CanRenderImpl(GetElapsed(fFrames));
 	}
 }
 

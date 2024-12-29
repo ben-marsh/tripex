@@ -4,21 +4,21 @@
 #include "error.h"
 #include "TextureData.h"
 
-#define DEPTH 8
-#define MAG 20
-
-#define FRAMEFAC 50
-
-#define AVERAGES 10
-
 class EffectPhased : public Effect
 {
 public:
 	const TextureClass sprite_texture_class =
 	{
 		"Sprite",
-		{ g_anTexLight }
+		{ tex_light }
 	};
+
+	static const int DEPTH = 8;
+	static const int MAG = 20;
+
+	static const int FRAMEFAC = 50;
+
+	static const int AVERAGES = 10;
 
 	Actor obj;
 	Camera camera;
@@ -97,7 +97,7 @@ public:
 
 		return nullptr;
 	}
-	bool CanRender(float fElapsed)
+	bool CanRenderImpl(float fElapsed)
 	{
 		return fElapsed > 0.5f;//(fElapsed > 0.5f);
 	}

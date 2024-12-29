@@ -2,8 +2,8 @@
 
 #include "Platform.h"
 
-extern float pfStarVertex[];
-extern uint16 pwStarFace[];
+extern const float star_vertices[];
+extern const uint16 star_faces[];
 
-extern const int nStarVertices;
-extern const int nStarFaces;
+extern const int num_star_vertices;
+extern const int num_star_faces;

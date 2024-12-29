@@ -5,27 +5,28 @@
 #include "TextureData.h"
 #include "error.h"
 
-#define PIPE_RADIUS 10.0
-#define PIPE_CIRCUMPOINTS 6
-#define PIPE_TWISTS 3
-#define PIPE_LENGTH 50
-#define PIPE_TWISTRADIUS 30.0
-#define PIPES 3
-#define CIRCLE_RADIUS 60.0
-
-static const int nVertices = PIPE_LENGTH * PIPE_CIRCUMPOINTS;
-
-#define UPDATETIME 60
-#define ANG (5.0 * 3.14159 / 180.0)
-
 class EffectMotionBlur2 : public Effect
 {
 public:
 	const TextureClass envmap_texture_class =
 	{
 		"EnvMap",
-		{ g_anTexAlienEgg, g_anTexShinySand }
+		{ tex_alien_egg, tex_shiny_sand }
 	};
+
+
+	const float PIPE_RADIUS = 10.0f;
+	static const int PIPE_CIRCUMPOINTS = 6;
+	static const int PIPE_TWISTS = 3;
+	static const int PIPE_LENGTH = 50;
+	const float PIPE_TWISTRADIUS = 30.0f;
+	static const int PIPES = 3;
+	const float CIRCLE_RADIUS = 60.0f;
+
+	static const int nVertices = PIPE_LENGTH * PIPE_CIRCUMPOINTS;
+
+	const float UPDATETIME = 60.0f;
+	const float ANG = (5.0f * 3.14159f / 180.0f);
 
 	Actor pObj[PIPES];
 	Camera camera;//World *pScene;

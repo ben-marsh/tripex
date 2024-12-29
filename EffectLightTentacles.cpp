@@ -5,9 +5,6 @@
 #include "error.h"
 #include "TextureData.h"
 
-#define NMPOINTS 30//50//30
-#define LENGTH 50//40
-#define STEPSIZE 4//1
 // 60 3
 
 class EffectLightTentacles : public Effect
@@ -16,14 +13,18 @@ public:
 	const TextureClass sprite_texture_class =
 	{
 		"Sprite",
-		{ g_anTexLight }
+		{ tex_light }
 	};
 
 	const TextureClass tint_texture_class =
 	{
 		"Tint",
-		{ g_anTexEyes, g_anTexFlesh, g_anTexForest, g_anTexShinySand }
+		{ tex_eyes, tex_flesh, tex_forest, tex_shiny_sand }
 	};
+
+	static const int NMPOINTS = 30;//50//30
+	static const int LENGTH = 50;//40
+	static const int STEPSIZE = 4;//1
 
 	Actor obj;
 	Camera camera;

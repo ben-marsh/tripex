@@ -1,6 +1,6 @@
 #include "Platform.h"
 
-extern const uint32 g_anTexRawGUI[ ] =
+extern const uint32 tex_raw_gui[ ] =
 {
 	13855,
 	0x38464947, 0x01006139, 0x00f70100, 0x00000000, 0x08ff0000, 0x00100808, 0x10081000, 0x18101010, 
@@ -438,7 +438,7 @@ extern const uint32 g_anTexRawGUI[ ] =
 	0x2ceede9d, 0xaf13e23c, 0xbe33c5f8, 0x3c7f8ef1, 0xf92f23e4, 0xf2be53c9, 0x406a4f96, 0xcd3b0000, 
 };
 
-extern const uint32 g_anTexRawFont[ ] =
+extern const uint32 tex_raw_font[ ] =
 {
 	27012,
 	0x0000000e, 0x00000010, 0x00000078, 0x43424120, 0x47464544, 0x4b4a4948, 0x4f4e4d4c, 0x53525150, 
@@ -1288,7 +1288,7 @@ extern const uint32 g_anTexRawFont[ ] =
 	0x00000000, 
 };
 
-extern const uint32 g_anTexBlank[ ] =
+extern const uint32 tex_blank[ ] =
 {
 	668,
 	0xe0ffd8ff, 0x464a1000, 0x01004649, 0x48000101, 0x00004800, 0x4300dbff, 0x01010200, 0x02010101, 
@@ -1314,7 +1314,7 @@ extern const uint32 g_anTexBlank[ ] =
 	0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0xd9ff1f00, 
 };
 
-extern const uint32 g_anTexAlienEgg[ ] =
+extern const uint32 tex_alien_egg[ ] =
 {
 	4893,
 	0xe0ffd8ff, 0x464a1000, 0x01004649, 0x48000101, 0x00004800, 0x4300dbff, 0x04040500, 0x05030404, 
@@ -1472,7 +1472,7 @@ extern const uint32 g_anTexAlienEgg[ ] =
 	0x92469ea6, 0xba59fc46, 0x2a0efb95, 0x61de54ef, 0xeb1c4208, 0x42801042, 0xff7f8010, 0xcdcdcdd9, 
 };
 
-extern const uint32 g_anTexBrightLight[ ] =
+extern const uint32 tex_bright_light[ ] =
 {
 	3626,
 	0xe0ffd8ff, 0x464a1000, 0x01004649, 0x48000101, 0x00004800, 0x4300dbff, 0x04040500, 0x05030404, 
@@ -1591,7 +1591,7 @@ extern const uint32 g_anTexBrightLight[ ] =
 	0xf73e7d8f, 0x3f909fd3, 0xcdcdd9ff, 
 };
 
-extern const uint32 g_anTexEyes[ ] =
+extern const uint32 tex_eyes[ ] =
 {
 	14377,
 	0xe0ffd8ff, 0x464a1000, 0x01004649, 0x48000102, 0x00004800, 0xb801edff, 0x746f6850, 0x6f68736f, 
@@ -2046,7 +2046,7 @@ extern const uint32 g_anTexEyes[ ] =
 	0x75347b69, 0xff4bb011, 0xcdcdcdd9, 
 };
 
-extern const uint32 g_anTexFlesh[ ] =
+extern const uint32 tex_flesh[ ] =
 {
 	13297,
 	0xe0ffd8ff, 0x464a1000, 0x01004649, 0x48000102, 0x00004800, 0xb801edff, 0x746f6850, 0x6f68736f, 
@@ -2467,7 +2467,7 @@ extern const uint32 g_anTexFlesh[ ] =
 	0x32cb5c1a, 0x24933e98, 0x3a488428, 0xffd548f4, 0xcdcdcdd9, 
 };
 
-extern const uint32 g_anTexForest[ ] =
+extern const uint32 tex_forest[ ] =
 {
 	13613,
 	0xe0ffd8ff, 0x464a1000, 0x01004649, 0x48000102, 0x00004800, 0xb801edff, 0x746f6850, 0x6f68736f, 
@@ -2898,7 +2898,7 @@ extern const uint32 g_anTexForest[ ] =
 	0x649470aa, 0x8605bf44, 0xff218832, 0xcdcdcdd9, 
 };
 
-extern const uint32 g_anTexLight[ ] =
+extern const uint32 tex_light[ ] =
 {
 	2766,
 	0xe0ffd8ff, 0x464a1000, 0x01004649, 0x48000101, 0x00004800, 0x4300dbff, 0x04030500, 0x05030404, 
@@ -2990,7 +2990,7 @@ extern const uint32 g_anTexLight[ ] =
 	0x41c52379, 0x11015165, 0x01111110, 0xcdcdd9ff, 
 };
 
-extern const uint32 g_anTexShinySand[ ] =
+extern const uint32 tex_shiny_sand[ ] =
 {
 	6256,
 	0xe0ffd8ff, 0x464a1000, 0x01004649, 0x48000101, 0x00004800, 0x4300dbff, 0x04040500, 0x05030404, 

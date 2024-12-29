@@ -4,10 +4,10 @@
 #include "ColorRgb.h"
 #include "Point.h"
 
-#define MAX_TEXTURES 1
-
 struct Vertex
 {
+	static const int MAX_TEXTURES = 1;
+
 	Vector3 position;
 	Vector3 normal;
 	ColorRgb diffuse;
@@ -19,6 +19,8 @@ struct Vertex
 
 struct VertexTL // Transformed and lit vertex
 {
+	static const int MAX_TEXTURES = 1;
+
 	Vector3 position;
 	float rhw{};
 	ColorRgb diffuse;

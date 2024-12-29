@@ -39,9 +39,9 @@ Vector3 &BezierCurve::GetPoint(int index)
 	return points[index];
 }
 
-Vector3 &BezierCurve::operator[](int nPos)
+Vector3 &BezierCurve::operator[](int idx)
 {
-	return GetPoint(nPos);
+	return GetPoint(idx);
 }
 
 int BezierCurve::Binomial(int level, int index)
@@ -57,14 +57,14 @@ int BezierCurve::Binomial(int level, int index)
 	}
 }
 
-Vector3 BezierCurve::Calculate(float fPos)
+Vector3 BezierCurve::Calculate(float pos)
 {
-	assert(fPos >= 0 && fPos <= 1);
+	assert(pos >= 0 && pos <= 1);
 
 	Vector3 v(0, 0, 0);
 	for(int i = 0; i < points.size(); i++)
 	{
-		v += (float)(coefficients[i] * pow(fPos, i) * pow(1 - fPos, (points.size() - 1) - i)) * points[i];
+		v += (float)(coefficients[i] * pow(pos, i) * pow(1 - pos, (points.size() - 1) - i)) * points[i];
 	}
 	return v;
 }

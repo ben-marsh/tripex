@@ -29,59 +29,46 @@ enum
 	FM_SPINRINGS,
 	FLOWMAPS
 };
+
 const int pnFlowPref[] =
 {
 	FM_BLOCKS, 35,
 	FM_SPIRALS, 50,
 	FM_RANDEXPLODE, 40,
 	FM_TUNNEL, 60,
-	//	FM_BLOCKS, 111111, //35, 
-		FM_CENTRESPIRAL, 40,
-		FM_STAR, 40,
-		FM_EXPANDTORINGS, 60,
-		FM_EXPANDTOTOPBOTTOM, 30,
-		FM_SPINRINGS, 60,
-		-1,
+	FM_CENTRESPIRAL, 40,
+	FM_STAR, 40,
+	FM_EXPANDTORINGS, 60,
+	FM_EXPANDTOTOPBOTTOM, 30,
+	FM_SPINRINGS, 60,
+	-1,
 };
 
-#define MAX_CALC_TIME 0.02 * CLOCKS_PER_SEC//02
-
-#define PRECISION 8 //4 //8
-
-#define CALCDIVISIONS 4
-#define CALCLINES (4 * CALCDIVISIONS)//3//2
-#define PALECOLOURS 300
-
-#define WIDTH 10
-#define LENGTH 50
-
-#define RSZ 15.0
-
-#define CIRCLES 5
-#define CENTRES 12
-#define BLOCKS_X 64
-#define BLOCKS_Y 32
-
-
-/*
-template < class T, int n > class ZStaticArray
-{
-public:
-	T pEntry[n];
-	T &operator[](int i)
-	{
-		assert(i >= 0 && i < n);
-		return pEntry[i];
-	}
-};
-*/
 class EffectFlowmap : public Effect
 {
 public:
-	typedef struct
+	struct FlowmapPoint
 	{
 		float x, y;
-	} FlowmapPoint;
+	};
+
+	const float MAX_CALC_TIME = 0.02f * CLOCKS_PER_SEC;//02
+
+	static const int PRECISION = 8; //4 //8
+
+	static const int CALCDIVISIONS = 4;
+	static const int CALCLINES = (4 * CALCDIVISIONS);//3//2
+	static const int PALECOLOURS = 300;
+
+	static const int WIDTH = 10;
+	static const int LENGTH = 50;
+
+	const float RSZ = 15.0f;
+
+	static const int CIRCLES = 5;
+	static const int CENTRES = 12;
+	static const int BLOCKS_X = 64;
+	static const int BLOCKS_Y = 32;
 
 	int pnIndexToBr[256];
 	int pnBrToIndex[256];
@@ -866,7 +853,7 @@ public:
 
 		return nullptr;
 	}
-	bool CanRender(float dElapsed)
+	bool CanRenderImpl(float dElapsed)
 	{
 		return (dElapsed >= fStep);//(dElapsed >= 1.0);//(dElapsed >= 0.8);//1);
 	}

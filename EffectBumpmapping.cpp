@@ -9,91 +9,19 @@
 
 //#define USE_ASM_BUMPMAPPING
 
-#define MIN_FRAME_TIME 0.3f //1.0//0.4//25
-#define GRIDW 30
-#define GRIDH 40
-
-#define ARROWHEADS 25
-#define WIDTH (10.0 * g_fDegToRad)
-#define DENT (3.0 * g_fDegToRad)
-#define HEIGHT 6.0
-#define RADIUS 100.0
-#define COLOUR D3DRGB(0.2,0.2,0.2)
-
-#define VPDISTANCE 0.15f//2
-#define XM 0.55f //0.2
-#define YM 0.55f //0.2//5 //0.2
-
-extern std::vector< std::unique_ptr< Texture > > vpTexture;
-extern bool fBigBeat;
-
-void MakeTentacles(Actor &obj, int segs, float l, float r)
-{
-#define TARMS 6
-#define TTEMP 4
-	Vector3 dv[TARMS] = { Vector3(1, 0, 0), Vector3(-1, 0, 0), Vector3(0, 1, 0), Vector3(0,-1, 0), Vector3(0, 0, 1), Vector3(0, 0, -1) };
-	Vector3 mu[TARMS] = { Vector3(0, 1, 0), Vector3(0, 1, 0), Vector3(1, 0, 0), Vector3(1, 0, 0), Vector3(1, 0, 0), Vector3(1, 0, 0) };
-	Vector3 mv[TARMS] = { Vector3(0, 0, 1), Vector3(0, 0, 1), Vector3(0, 0, 1), Vector3(0, 0, 1), Vector3(0, 1, 0), Vector3(0, 1, 0) };
-
-	float u[TTEMP] = { r,-r,-r, r }, v[TTEMP] = { r, r,-r,-r };
-
-	obj.vertices.resize(TARMS * (((segs - 1) * TTEMP) + 1));
-
-	int vn = 0, fn = 0;
-	for(int i = 0; i < 6; i++) // each arm
-	{
-		Vector3 center, direction;
-		for(int j = 0; j < segs; j++) // dont put one at the base
-		{
-			float f = j * l / segs;
-
-			center = dv[i] * f;
-
-			if(j < segs - 1)
-			{
-				for(int k = 0; k < TTEMP; k++)
-				{
-					if(j == segs - 2)
-					{
-						obj.faces.push_back(Face(vn + k, vn + ((k + 1) % TTEMP), vn + TTEMP));
-					}
-					else
-					{
-						obj.faces.push_back(Face(vn + k, vn + k + TTEMP, vn + ((k + 1) % TTEMP)));
-						obj.faces.push_back(Face(vn + ((k + 1) % TTEMP), vn + k + TTEMP, vn + TTEMP + ((k + 1) % TTEMP)));
-					}
-				}
-				for(int k = 0; k < TTEMP; k++)
-				{
-					Vector3 vDir = Vector3((mu[i].x * u[k]) + (mv[i].x * v[k]), (mu[i].y * u[k]) + (mv[i].y * v[k]), (mu[i].z * u[k]) + (mv[i].z * v[k]));
-					obj.vertices[vn].position = center + (vDir * ((segs - 1.0f - j) / (segs - 1.0f)));
-					vn++;
-				}
-			}
-			else 
-			{
-				obj.vertices[vn].position = center;
-				vn++;
-			}
-		}
-	}
-	obj.FindFaceOrder(Vector3::Origin());
-	obj.FindVertexNormals();
-}
-
 class EffectBumpmapping : public Effect
 {
 public:
 	const TextureClass background_texture_class =
 	{
 		"Background",
-		{ g_anTexBlank, g_anTexFlesh }
+		{ tex_blank, tex_flesh }
 	};
 
 	const TextureClass tentacles_texture_class =
 	{
 		"Tentacles",
-		{ g_anTexAlienEgg }
+		{ tex_alien_egg }
 	};
 
 	struct BumpmapData
@@ -101,6 +29,14 @@ public:
 		Texture *texture;
 		std::vector<unsigned char> bumpmap;
 	};
+
+	const float MIN_FRAME_TIME = 0.3f; //1.0//0.4//25
+	static const int GRIDW = 30;
+	static const int GRIDH = 40;
+
+	const float VPDISTANCE = 0.15f;//2
+	const float XM = 0.55f; //0.2
+	const float YM = 0.55f; //0.2//5 //0.2
 
 	Texture* light = nullptr;
 	Texture* texture = nullptr;
@@ -153,7 +89,7 @@ public:
 		tx = 0;
 		ty = 0;
 
-		MakeTentacles(obj, /*25*/ 160, 200, 8);
+		obj.CreateTentacles(/*25*/ 160, 200, 8);
 		obj.FindFaceOrder(Vector3::Origin());
 		obj.flags.set( Actor::F_DO_POSITION_DELAY );
 		obj.flags.set( Actor::F_DRAW_Z_BUFFER );

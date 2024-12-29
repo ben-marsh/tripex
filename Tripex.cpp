@@ -90,7 +90,7 @@ Error* Tripex::Startup()
 	//	}
 	//	}
 
-	Error* error = renderer.CreateTexture(256, 256, TextureFormat::P8, &g_anTexRawGUI[1], 256 * 256, 256, pe.data(), TextureFlags::None, gui);
+	Error* error = renderer.CreateTexture(256, 256, TextureFormat::P8, &tex_raw_gui[1], 256 * 256, 256, pe.data(), TextureFlags::None, gui);
 	if (error) return TraceError(error);
 
 	//	gui = auto_ptr< ZTexture >(new ZTexture(pc));//(ZColour*)g_anTexRawGUI ));//cGUI.GetPtr()));
@@ -100,7 +100,7 @@ Error* Tripex::Startup()
 	//	renderer.AddTexture( gui.get( ) );
 	//	g_pD3D->vpTexture.push_back(gui.get());//auto_ptr< ZTexture >(gui);
 
-	tef.Add((uint8*)&g_anTexRawFont[1]);
+	tef.Add((uint8*)&tex_raw_font[1]);
 	tef.FindGlyph(' ')->end = 2;
 
 	error = tef.Create(renderer);
@@ -143,7 +143,7 @@ Error* Tripex::Startup()
 				{
 					std::shared_ptr<Texture> texture;
 
-					if (internal_texture != g_anTexBlank)
+					if (internal_texture != tex_blank)
 					{
 						Error* error = renderer.CreateTextureFromImage(internal_texture + 1, *internal_texture, texture);
 						assert(error == nullptr);
@@ -211,6 +211,8 @@ Error* Tripex::Render()
 			if (error) return TraceError(error);
 		}
 	}
+
+	const float EFFECT_CHANGE_FRAMES = 400.0f;
 	if (!txs.test(TXS_IN_FADE) && (!txs.test(TXS_HOLD) || txs.test(TXS_CHANGE_EFFECT)) &&
 		(effect_idx == 0 ||
 			effect_frames > (enabled_effects[effect_idx]->change * EFFECT_CHANGE_FRAMES)) &&
@@ -328,7 +330,7 @@ Error* Tripex::Render()
 	{
 		std::swap(draw_effects[1], draw_effects[0]);
 	}
-	if ((!draw_effects[0]->CanRenderMain(frames) || draw_effects[0] == blank_effect) && (!draw_effects[1]->CanRenderMain(frames) || draw_effects[1] == blank_effect) && !(draw_effects[0] == blank_effect && draw_effects[1] == blank_effect && frames > 1.0f))
+	if ((!draw_effects[0]->CanRender(frames) || draw_effects[0] == blank_effect) && (!draw_effects[1]->CanRender(frames) || draw_effects[1] == blank_effect) && !(draw_effects[0] == blank_effect && draw_effects[1] == blank_effect && frames > 1.0f))
 	{
 		return nullptr;
 	}

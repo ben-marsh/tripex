@@ -6,12 +6,6 @@
 #include "TextureData.h"
 
 //#define SOURCES 65//180//65//80
-#define FRAMES 10
-#define LENGTH 1
-#define BUFFERSTEP 100
-
-extern bool bMeshHQ;
-
 //extern EFFECT lightsphere;
 
 class EffectLightSphere : public Effect
@@ -20,14 +14,18 @@ public:
 	const TextureClass sprite_texture_class =
 	{
 		"Sprite",
-		{ g_anTexLight }
+		{ tex_light }
 	};
 
 	const TextureClass tint_texture_class =
 	{
 		"Tint",
-		{ g_anTexEyes, g_anTexFlesh, g_anTexForest, g_anTexShinySand }
+		{ tex_eyes, tex_flesh, tex_forest, tex_shiny_sand }
 	};
+
+	static const int FRAMES = 10;
+	static const int LENGTH = 1;
+	static const int BUFFERSTEP = 100;
 
 	Actor obj;
 	Camera camera;

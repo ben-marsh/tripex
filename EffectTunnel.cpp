@@ -6,26 +6,6 @@
 #include "TextureData.h"
 #include "error.h"
 
-static const int nTunnelR1 = 50;
-static const int nTunnelR2 = 45;
-static const int nBeziers = 2;
-static const int nTunnelL = 30;
-static const int nCrossSection = 10;
-static const float fSepZ = 200.0f;
-//#define TRADIUS 50//50//50
-//#define TRADIUS2 45//45//45
-//#define nBeziers 2
-//#define nTunnelL 30
-//#define nCrossSection 10
-//#define ZSEP 200.0
-//50.0//100.0
-
-const float RANDCH_A1 = (2.0f * 3.14159f / 2.0f);//5.0)
-const float RANDCH_R1 = 900.0f;//400.0
-
-const float RANDCH_A2 = (3.14159f / 10.0f);
-const float RANDCH_R2 = 100.0f;
-
 //static double dPos = 0.9; // start position in the first bezier
 
 class EffectTunnel : public Effect
@@ -34,8 +14,28 @@ public:
 	const TextureClass background_texture_class =
 	{
 		"Background",
-		{ g_anTexFlesh, g_anTexForest }
+		{ tex_flesh, tex_forest }
 	};
+
+	static const int nTunnelR1 = 50;
+	static const int nTunnelR2 = 45;
+	static const int nBeziers = 2;
+	static const int nTunnelL = 30;
+	static const int nCrossSection = 10;
+	const float fSepZ = 200.0f;
+	//#define TRADIUS 50//50//50
+	//#define TRADIUS2 45//45//45
+	//#define nBeziers 2
+	//#define nTunnelL 30
+	//#define nCrossSection 10
+	//#define ZSEP 200.0
+	//50.0//100.0
+
+	const float RANDCH_A1 = (2.0f * 3.14159f / 2.0f);//5.0)
+	const float RANDCH_R1 = 900.0f;//400.0
+
+	const float RANDCH_A2 = (3.14159f / 10.0f);
+	const float RANDCH_R2 = 100.0f;
 
 	float fPos;
 	float fLenPos;

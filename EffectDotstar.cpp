@@ -8,26 +8,19 @@
 #include "TextureData.h"
 #include <algorithm>
 
-#define NUMBEZ 10
-#define MAX_TILT (20.0 * 3.14159 / 180.0)
-
-#define SAMPLESIZE 8
-#define SAMPLESHIFT 2
-#define TRISIZE 30.0
-
 class EffectDotStar : public Effect
 {
 public:
 	const TextureClass sprite_texture_class =
 	{
 		"Sprite",
-		{ g_anTexBrightLight }
+		{ tex_bright_light }
 	};
 
 	const TextureClass tint_texture_class =
 	{
 		"Tint",
-		{ g_anTexEyes, g_anTexFlesh, g_anTexForest, g_anTexShinySand }
+		{ tex_eyes, tex_flesh, tex_forest, tex_shiny_sand }
 	};
 
 	// 256x256
@@ -37,6 +30,11 @@ public:
 		Vector3 vPosition;
 		float fRHW;
 	};
+
+	static const int NUMBEZ = 10;
+	const float MAX_TILT = (20.0f * 3.14159f / 180.0f);
+
+	const float TRISIZE = 30.0;
 
 	Texture *pTexture, *pTint;
 	std::vector<VertexTL> pTargetVertex;
@@ -92,17 +90,17 @@ public:
 		}
 
 		int nIndex = 0;
-		obj.vertices.resize(nStarVertices);
-		for(int i = 0; i < nStarVertices; i++)
+		obj.vertices.resize(num_star_vertices);
+		for(int i = 0; i < num_star_vertices; i++)
 		{
-			obj.vertices[i].position = Vector3(pfStarVertex[nIndex], pfStarVertex[nIndex + 1], pfStarVertex[nIndex + 2]);
+			obj.vertices[i].position = Vector3(star_vertices[nIndex], star_vertices[nIndex + 1], star_vertices[nIndex + 2]);
 			nIndex += 3;
 		}
 		nIndex = 0;
-		obj.faces.resize(nStarFaces);
-		for(int i = 0; i < nStarFaces; i++)
+		obj.faces.resize(num_star_faces);
+		for(int i = 0; i < num_star_faces; i++)
 		{
-			obj.faces[i] = Face(pwStarFace[nIndex], pwStarFace[nIndex + 1], pwStarFace[nIndex + 2]);
+			obj.faces[i] = Face(star_faces[nIndex], star_faces[nIndex + 1], star_faces[nIndex + 2]);
 			nIndex += 3;
 		}
 

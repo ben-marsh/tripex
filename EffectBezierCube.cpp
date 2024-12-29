@@ -8,40 +8,42 @@
 #include "error.h"
 #include "TextureData.h"
 
-#define BEZIERS 5
-#define BEZIERPOINTS 50
-#define BEZIERHEIGHT 80
-
-#define TWISTPLANES 4
-#define TWISTPLANEEDGE 20
-#define TWISTPLANECORNERS (BEZIERS * TWISTPLANEEDGE)
-#define TWISTPLANERADIUS 30.0
-
-//#define bcTwistPlanes 4			// >= 2
-//#define bcTwistPlaneCorners 4
-#define bcBezierPoints 50	//100
-#define bcCornerLinePoints 10 //20
-#define bcCubeRadius 30	// radius of the container cylinder of the cube
-#define bcCubeHeight 80	// height of the cube
-
 class EffectBezierCube : public Effect
 {
 public:
 	const TextureClass sprite_texture_class =
 	{
 		"Sprite",
-		{ g_anTexLight }
+		{ tex_light }
 	};
 
 	const TextureClass tint_texture_class =
 	{
 		"Tint",
-		{ g_anTexEyes, g_anTexFlesh, g_anTexForest }
+		{ tex_eyes, tex_flesh, tex_forest }
 	};
+
+	static const int BEZIERS = 5;
+	static const int BEZIERPOINTS = 50;
+	static const int BEZIERHEIGHT = 80;
+
+	static const int TWISTPLANES = 4;
+	static const int TWISTPLANEEDGE = 20;
+	static const int TWISTPLANECORNERS = (BEZIERS * TWISTPLANEEDGE);
+
+	const float TWISTPLANERADIUS = 30.0f;
+
+	//#define bcTwistPlanes 4			// >= 2
+	//#define bcTwistPlaneCorners 4
+	static const int bcBezierPoints = 50;	//100
+	static const int bcCornerLinePoints = 10; //20
+	static const int bcCubeRadius = 30;	// radius of the container cylinder of the cube
+	static const int bcCubeHeight = 80;	// height of the cube
 
 	int nCornerIndex[BEZIERS];
 
-	Texture *pTexture, *pTint;
+	Texture* sprite_texture;
+	Texture* tint_texture;
 	Actor obj;
 	Actor pObj[BEZIERS];
 	Actor pObjPlane[TWISTPLANES];
@@ -62,8 +64,8 @@ public:
 		, bcEdge(TWISTPLANES)
 	{
 		brt = 0.0;
-		pTexture = nullptr;
-		pTint = nullptr;
+		sprite_texture = nullptr;
+		tint_texture = nullptr;
 
 		memset(pfRS, 0, sizeof(pfRS));
 		memset(pfPS, 0, sizeof(pfPS));
@@ -250,12 +252,12 @@ public:
 	//	hRes = pScene->render(d3d);
 	//	if(FAILED(hRes)) return hRes;
 
-		if(pTint != nullptr)
+		if(tint_texture != nullptr)
 		{
 			RenderState render_state;
 			render_state.blend_mode = BlendMode::Tint;
 			render_state.depth_mode = DepthMode::Disable;
-			render_state.texture_stages[0].texture = pTint;
+			render_state.texture_stages[0].texture = tint_texture;
 
 			error = params.renderer.DrawSprite(render_state, Point<int>(0, 0), Rect<int>(0, 0, params.renderer.GetWidth(), params.renderer.GetHeight()), ColorRgb::Grey(brt * 255.0));
 			if(error) return TraceError(error);
@@ -264,19 +266,19 @@ public:
 	}
 	Error* Reconfigure(const ReconfigureParams& params) override
 	{
-		pTexture = params.texture_library.Find(sprite_texture_class);
-		testobj.textures[0].texture = pTexture;
-		obj.textures[0].texture = pTexture;
+		sprite_texture = params.texture_library.Find(sprite_texture_class);
+		testobj.textures[0].texture = sprite_texture;
+		obj.textures[0].texture = sprite_texture;
 		for(int i = 0; i < TWISTPLANES; i++)
 		{
-			pObjPlane[i].textures[0].texture = pTexture;
+			pObjPlane[i].textures[0].texture = sprite_texture;
 		}
 		for(int i = 0; i < BEZIERS; i++)
 		{
-			pObj[i].textures[0].texture = pTexture;
+			pObj[i].textures[0].texture = sprite_texture;
 		}
 
-		pTint = params.texture_library.Find(tint_texture_class);
+		tint_texture = params.texture_library.Find(tint_texture_class);
 		return nullptr;
 	}
 };

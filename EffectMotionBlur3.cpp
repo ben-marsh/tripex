@@ -5,20 +5,13 @@
 #include "TextureData.h"
 #include "BezierCurve.h"
 
-//static ZObject pObj[RINGS];//, *o2, *o3;
-//static World *scene;
-
-//static float fChange, fShown = 0;
-//static int nEffect, nNewEffect = -1;
-
-
 template < bool bAltBlur > class EffectMotionBlur3T : public Effect
 {
 public:
 	const TextureClass envmap_texture_class =
 	{
 		"EnvMap",
-		{ g_anTexAlienEgg, g_anTexShinySand }
+		{ tex_alien_egg, tex_shiny_sand }
 	};
 
 	Camera camera;

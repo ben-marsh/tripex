@@ -6,21 +6,21 @@
 #include "TextureData.h"
 //#include "tripex2.h"
 
-#define GRW 80
-#define GRH 50
-#define SPIKES 15
-
-#define NSPIKES 8//15
-#define NCENTRES 5
-
 template < bool bLight > class EffectDistortion2T : public Effect
 {
 public:
 	const TextureClass background_texture_class =
 	{
 		"Background",
-		bLight ? std::vector<const uint32*>{ g_anTexFlesh } : std::vector<const uint32*>{ g_anTexEyes, g_anTexFlesh, g_anTexForest }
+		bLight ? std::vector<const uint32*>{ tex_flesh } : std::vector<const uint32*>{ tex_eyes, tex_flesh, tex_forest }
 	};
+
+	static const int GRW = 80;
+	static const int GRH = 50;
+	static const int SPIKES = 15;
+
+	static const int NSPIKES = 8;//15
+	static const int NCENTRES = 5;
 
 	BezierCurve pb[NCENTRES];
 	double pdPos[NCENTRES];
