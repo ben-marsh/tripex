@@ -158,7 +158,8 @@ public:
 	std::vector<Edge> edges;
 	std::vector<Edge> clipped_edges;
 
-	std::vector<uint16*> vertex_face_list;
+	std::unique_ptr<uint16[]> vertex_face_buffer;
+	std::vector<const uint16*> vertex_face_list;
 	std::vector<float> vertex_delay_factor;
 
 	Actor();

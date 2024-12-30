@@ -68,10 +68,6 @@ Actor::Actor()
 
 Actor::~Actor()
 {
-	for (int i = 0; i < vertex_face_list.size(); i++)
-	{
-		free(vertex_face_list[i]);
-	}
 }
 
 Vector3 Actor::GetCentre()
@@ -108,41 +104,53 @@ void Actor::FindFaceOrder(const Vector3& vIntPoint)
 
 void Actor::FindVertexFaceList()
 {
-	for (int i = 0; i < vertex_face_list.size(); i++)
-	{
-		free(vertex_face_list[i]);
-	}
+	// Allocate a buffer to contain the list of faces for each vertex (= (number of faces * 3) + one sentinel for each vertex)
 	vertex_face_list.resize(vertices.size());
-	for (int i = 0; i < vertices.size(); i++)
-	{
-		vertex_face_list[i] = NULL;
-	}
-	for (int i = 0; i < faces.size(); i++)
-	{
-		for (int j = 0; j < 3; j++)
-		{
-			uint16*& face_list = vertex_face_list[faces[i][j]];
 
-			int k = 0;
-			if (face_list == NULL)
-			{
-				face_list = (uint16*)malloc(4 * sizeof(uint16));
-			}
-			else
-			{
-				while (face_list[k] != WORD_INVALID_INDEX)
-				{
-					k++;
-				}
-				if (k >= 3)
-				{
-					face_list = (uint16*)realloc(face_list, (k + 2) * sizeof(uint16));
-				}
-			}
-			face_list[k] = i;
-			face_list[k + 1] = WORD_INVALID_INDEX;
+	size_t total_vertex_face_count = (faces.size() * 3) + vertices.size();
+	vertex_face_buffer = std::make_unique<uint16[]>(total_vertex_face_count);
+
+	// Find the number of faces that each vertex belongs to
+	std::vector<int> vertex_output_count(vertices.size(), 0);
+	for (const Face& face : faces)
+	{
+		for (int i = 0; i < 3; i++)
+		{
+			int vertex_idx = face[i];
+			vertex_output_count[vertex_idx]++;
 		}
 	}
+
+	// Write all the face indices into the output buffer
+	std::vector<uint16*> vertex_output;
+	vertex_output.resize(vertices.size());
+
+	int next_output_idx = 0;
+	for (size_t vertex_idx = 0; vertex_idx < vertices.size(); vertex_idx++)
+	{
+		uint16* output_ptr = vertex_face_buffer.get() + next_output_idx;
+		vertex_output[vertex_idx] = output_ptr;
+		vertex_face_list[vertex_idx] = output_ptr;
+
+		next_output_idx += vertex_output_count[vertex_idx] + 1;
+	}
+
+	for (uint16 face_idx = 0; face_idx < faces.size(); face_idx++)
+	{
+		const Face& face = faces[face_idx];
+		for (int idx = 0; idx < 3; idx++)
+		{
+			int vertex_idx = face[idx];
+			*(vertex_output[vertex_idx]++) = face_idx;
+		}
+	}
+
+	// Write the sentinels
+	for (size_t vertex_idx = 0; vertex_idx < vertices.size(); vertex_idx++)
+	{
+		*vertex_output[vertex_idx] = WORD_INVALID_INDEX;
+	}
+
 	flags.set(F_VALID_VERTEX_FACE_LIST);
 }
 
@@ -168,7 +176,7 @@ void Actor::FindVertexNormals()
 	{
 		Vector3 normal = Vector3(0, 0, 0);
 
-		uint16* face_list = vertex_face_list[i];
+		const uint16* face_list = vertex_face_list[i];
 		for (int j = 0; face_list[j] != WORD_INVALID_INDEX; j++)
 		{
 			normal += face_normals[face_list[j]];
