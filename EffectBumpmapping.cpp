@@ -7,8 +7,6 @@
 #include "TextureData.h"
 #include "Actor.h"
 
-//#define USE_ASM_BUMPMAPPING
-
 class EffectBumpmapping : public Effect
 {
 public:
@@ -26,8 +24,8 @@ public:
 
 	struct BumpmapData
 	{
-		Texture *texture;
-		std::vector<unsigned char> bumpmap;
+		Texture* texture;
+		std::vector<uint8> bumpmap;
 	};
 
 	const float MIN_FRAME_TIME = 0.3f; //1.0//0.4//25
@@ -42,34 +40,33 @@ public:
 	Texture* texture = nullptr;
 
 	Canvas pc;
+	bool pc_initialized = false;
 
 	VertexGrid grid;
 	VertexGrid gridbm;
 	float tx, ty;
-	unsigned char lightmap[256 * 256]{ };
-	unsigned char pnBuf[256 * 256]{ };
-	unsigned short *pnCurrentBump = nullptr;
+	uint8 lightmap[256 * 256]{ };
+	uint16* current_bumpmap = nullptr;
 
-	std::map<Texture*, std::unique_ptr<unsigned short[]>> mpBumpIndex;
+	std::map<Texture*, std::unique_ptr<uint16[]>> texture_to_bumpmap;
 
 	Actor obj;
 	Camera camera;
 
-	float precalc_u[GRIDW+1][GRIDH+1];
-	float precalc_v[GRIDW+1][GRIDH+1];
-	float precalc_c[GRIDW+1][GRIDH+1];
+	float precalc_u[GRIDW + 1][GRIDH + 1];
+	float precalc_v[GRIDW + 1][GRIDH + 1];
+	float precalc_c[GRIDW + 1][GRIDH + 1];
 
 	float br = 0.0f;
-	bool fInBrighten;
+	bool in_brighten = 0.0f;
 	float brangle = 0.0f;
 	float brcolour = 0.0f;
-	bool fStarted;
 	float ya;
 	float angle;
 
-	float fTentacleAng;
-	float fTentacleDir;
-	float fMoveSpeed;
+	float tentacle_ang;
+	float tentacle_dir;
+	float move_speed = 0.0f;
 	float accum;
 
 	EffectBumpmapping()
@@ -78,12 +75,10 @@ public:
 		, gridbm(GRIDW, GRIDH)
 		, pc(256, 256)
 	{
-		fTentacleAng = 0.0f;
-		fTentacleDir = 1.0f;
+		tentacle_ang = 0.0f;
+		tentacle_dir = 1.0f;
 
 		accum = 10;
-
-		fStarted = false;
 
 		ya = 0;
 		tx = 0;
@@ -91,260 +86,152 @@ public:
 
 		obj.CreateTentacles(/*25*/ 160, 200, 8);
 		obj.FindFaceOrder(Vector3::Origin());
-		obj.flags.set( Actor::F_DO_POSITION_DELAY );
-		obj.flags.set( Actor::F_DRAW_Z_BUFFER );
+		obj.flags.set(Actor::F_DO_POSITION_DELAY);
+		obj.flags.set(Actor::F_DRAW_Z_BUFFER);
 		obj.frame_history = 12.0f;
 		obj.delay_history = 12.0f;
 		obj.frame_time = MIN_FRAME_TIME;//0.2;
 		obj.FindDelayValues();
-//	obj->fDelay(96, 8);
 
 		camera.position.z = -240;
 
-//	scene->vpObject.Add(obj);
-//	scene->camera.z = -240;
-
 		angle = rand() * 2000.0f / RAND_MAX;
 
-
-//		envmap.SetLength(256 * 256);
-//		pBumpX.SetLength(256 * 256);
-//		pBumpY.SetLength(256 * 256);
-//		pBumpIndex.SetLength(256 * 256);
-//		pBuf.SetLength(256 * 256);
-
-//		pc.Create(1, 1);
-
-		int x, y, i;
-
-		for(i = 0; i < 256; i++)
+		for (int i = 0; i < 256; i++)
 		{
 			pc.palette[i] = ColorRgb(i, i, i);
 		}
-//			colour[i] = ZColour(i, i, i);
-//		pc.SetPalette(colour);
 
-		i = 0;
-		for(y = 0; y < 256; y++)
+		int lightmap_idx = 0;
+		for (int y = 0; y < 256; y++)
 		{
-			for(x = 0; x < 256; x++)
+			for (int x = 0; x < 256; x++)
 			{
 				float nx = (x - 128.0f) / 128.0f;
 				float ny = (y - 128.0f) / 128.0f;
-				float nz = 1.0f - sqrtf(nx*nx + ny*ny);
-				int br = (int)( (nz + (nz * nz * nz * nz)) * 256.0f );
-				lightmap[i++] = std::min(std::max(br, 0), 255);
+				float nz = 1.0f - sqrtf(nx * nx + ny * ny);
+				int br = (int)((nz + (nz * nz * nz * nz)) * 256.0f);
+				lightmap[lightmap_idx++] = std::min(std::max(br, 0), 255);
 			}
 		}
 
-		for(y = 0; y < GRIDH+1; y++)
+		for (int y = 0; y < GRIDH + 1; y++)
 		{
-			for(x = 0; x < GRIDW+1; x++)
+			for (int x = 0; x < GRIDW + 1; x++)
 			{
-				float xc = float(x - (GRIDW/2.0f)) / GRIDW;
-				float yc = float(y - (GRIDH/2.0f)) / GRIDH;
+				float xc = float(x - (GRIDW / 2.0f)) / GRIDW;
+				float yc = float(y - (GRIDH / 2.0f)) / GRIDH;
 
-				// xc, yc = -0.5 ... 0.5
-
-				Vector3 d = Vector3(xc, yc, VPDISTANCE).Normal( );//Normalize(1.0f);
-//			d = Normalize(d);
+				Vector3 d = Vector3(xc, yc, VPDISTANCE).Normal();
 
 				float xp = atan2f(xc, VPDISTANCE);
-				float yp = asinf(yc / sqrt((xc*xc)+(yc*yc)+(VPDISTANCE*VPDISTANCE)));
-
-				// xp = -pi/2...pi/2
-				// yp = -pi/2...pi/2
+				float yp = asinf(yc / sqrt((xc * xc) + (yc * yc) + (VPDISTANCE * VPDISTANCE)));
 
 				float xpp = xp / PI;
 				float ypp = yp / PI;
-				float dp = /*1.3 - */1.0f - sqrtf(xpp * xpp + ypp * ypp);//(xp / 3.14159)*(xp / 3.14159) + (yp / (2 * 3.14159))*(yp / (2 * 3.14159)));
+				float dp = /*1.3 - */1.0f - sqrtf(xpp * xpp + ypp * ypp);
 
 				precalc_u[x][y] = (XM * xp);
 				precalc_v[x][y] = (YM * yp);
 				precalc_c[x][y] = std::min(std::max(dp, 0.0f), 1.0f);
 			}
 		}
+	}
 
-//	grid = new Grid(GRIDW, GRIDH);//, doFDS);
-//	gridbm = new Grid(GRIDW, GRIDH);//, doFDSbm);
-
-		std::vector< Texture* > vpBumpmap;
-//		for(unsigned int i = 0; i < vpTexture.size(); i++)
-		{
-//			if(vpTexture[i]->m_snType.count(TC_WTBUMPMAPBACK) > 0 && vpTexture[i]->m_vnData.size() == (256 * 256 * sizeof(ZColour)) && vpTexture[i].get() != pBlankTexture)
-//			{
-//				vpBumpmap.push_back(vpTexture[i].get());
-//			}
-		}
-
-/*		for(i = 0; i < vpBumpmap.size(); i++)
-		{
-			auto_ptr< unsigned short > pb = auto_ptr< unsigned short >(new unsigned short[256*256]);
-
-			ZColour *pcSrc = (ZColour*)vpBumpmap[i]->m_vnData.begin();
-			unsigned char pbBump[256 * 256];
-			unsigned char *pbDst = pbBump;
-			for(int nY = 0; nY < 256; nY++)
-			{
-				for(int nX = 0; nX < 256; nX++)
-				{
-					*(pbDst++) = (unsigned int(pcSrc->m_nR) + unsigned int(pcSrc->m_nG) + unsigned int(pcSrc->m_nB)) / 3;
-					pcSrc++;
-				}
-			}
-
-			int nIndex = 0;
-			for(nY = 0; nY < 256; nY++)
-			{
-				for(int nX = 0; nX < 256; nX++)
-				{
-					//pBumpX[nIndex] = 
-					int nBumpX = (int)pbBump[(nIndex + 1) & 0xffff] - (int)pbBump[(nIndex - 1) & 0xffff] + 128 - nX;
-					int nBumpY = (int)pbBump[(nIndex + 256) & 0xffff] - (int)pbBump[(nIndex - 256) & 0xffff] + 128 - nY;
-					pb.get()[nIndex] = (((unsigned char)nBumpY) << 8) | ((unsigned char)nBumpX);
-					nIndex++;
-				}
-			}
-
-			mpBumpIndex[vpBumpmap[i]] = pb;
-		}
-*/	}
 	Error* Calculate(const CalculateParams& params) override
 	{
 		Error* error;
 		br = params.brightness;
 
-		tx += /*4*/1 * params.elapsed;//average * 20.0;
+		tx += /*4*/1 * params.elapsed;
 		ty += params.elapsed * sinf(ya) * cosf(ya * 1.2f) * sinf(ya * 1.5f) * 0.4f;
 
 		ya += params.elapsed * DEG_TO_RAD;
 
-		if(texture != nullptr)
+		if (texture != nullptr)
 		{
-			if(!fStarted)
+			if (!pc_initialized)
 			{
-				error = pc.Create(params.renderer);//.Initialise( );
-				if(error) return TraceError(error);
-				fStarted = true;
+				error = pc.Create(params.renderer);
+				if (error) return TraceError(error);
+
+				pc_initialized = true;
 			}
 
-			int x, y, i = 0;
-			for(x = 0; x <= grid.width; x++)
+			int index = 0;
+			for (int x = 0; x <= grid.width; x++)
 			{
-				for(y = 0; y <= grid.height; y++)
+				for (int y = 0; y <= grid.height; y++)
 				{
-					grid.vertices[i].tex_coords[0].x = gridbm.vertices[i].tex_coords[0].x = precalc_u[x][y] + (tx / 256.0f);
-					grid.vertices[i].tex_coords[0].y = gridbm.vertices[i].tex_coords[0].y = precalc_v[x][y] + (ty / 256.0f);
+					grid.vertices[index].tex_coords[0].x = gridbm.vertices[index].tex_coords[0].x = precalc_u[x][y] + (tx / 256.0f);
+					grid.vertices[index].tex_coords[0].y = gridbm.vertices[index].tex_coords[0].y = precalc_v[x][y] + (ty / 256.0f);
 
-					float brav = precalc_c[x][y] * br * params.audio_data.GetIntensity( );//min(average, 1);
+					float brav = precalc_c[x][y] * br * params.audio_data.GetIntensity();//min(average, 1);
 					brav *= 1.6f;
-					gridbm.vertices[i].diffuse = ColorRgb::Grey((int)(255.0f * br));//max(0.2, min(brav, 1)) * 255.0);//gridbm->vertex[i].color = D3DRGB(brav, brav, brav);
-					grid.vertices[i].diffuse = ColorRgb::Grey((int)(br * precalc_c[(int)(x + tx) % GRIDW][y % GRIDH] * 255.0f));
-					i++;
+					gridbm.vertices[index].diffuse = ColorRgb::Grey((int)(255.0f * br));//max(0.2, min(brav, 1)) * 255.0);//gridbm->vertex[i].color = D3DRGB(brav, brav, brav);
+					grid.vertices[index].diffuse = ColorRgb::Grey((int)(br * precalc_c[(int)(x + tx) % GRIDW][y % GRIDH] * 255.0f));
+					index++;
 				}
 			}
 
-#ifdef USE_ASM_BUMPMAPPING
-			unsigned short nOffset = ((unsigned short)((unsigned char)ty) << 8) | (unsigned short)((unsigned char)tx);
-			unsigned char *pEnv = pnLightMap;//envmap.GetBuffer();
-			unsigned short *pBmp = pnCurrentBump;//pBumpIndex.GetBuffer();
-			unsigned char *pInd = pnBuf;//.GetBuffer(256 * 256);
-			__asm
-			{
-				push esi
-				push edi
-				//push ebp
-
-				mov dx, nOffset
-				mov esi, pEnv
-				mov edi, pInd
-				mov eax, pBmp // do last because other vars are on stack (relative to ebp)
-
-				xor ebx, ebx
-				mov ecx, 256*256
-			}
-	rendloop:
-			__asm
-			{
-				// bx = pBumpIndex[i] + txPos = [ebp] + dx
-				mov bx, [eax]
-				add bx, dx
-				// pind[i] = envmap[(e)bx]
-				mov bl, [esi + ebx]
-				mov [edi], bl	
-
-				add eax, 2
-				inc edi
-				dec ecx
-				jnz rendloop
-
-//				pop ebp
-				pop edi
-				pop esi
-			}
-#else
 			uint8* data = pc.GetDataPtr();
-			if (pnCurrentBump == nullptr)
+			if (current_bumpmap == nullptr)
 			{
 				memset(data, 0, 256 * 256);
 			}
 			else
 			{
 				unsigned char lx = (unsigned char)tx;
-				for(i = 0; i < 256*256; i++)
+				for (index = 0; index < 256 * 256; index++)
 				{
-					data[i] = lightmap[(unsigned short)(pnCurrentBump[i] + lx)];
+					data[index] = lightmap[(unsigned short)(current_bumpmap[index] + lx)];
 				}
 			}
-#endif
 
 			error = pc.UploadTextures(params.renderer);
-			if( error ) return TraceError( error );
-//			hRes = pc.Calculate(pnBuf);
-//			if(FAILED(hRes)) return TraceError(hRes);
+			if (error) return TraceError(error);
 		}
 
-//	hRes = light->GetSurface()->Unlock(nullptr);
-//	if(FAILED(hRes)) return hRes;
-
-		/** TENTACLES **********/
+		// TENTACLES
 		obj.ambient_light_color = ColorRgb::Grey((int)(params.brightness * 205.0f));
-		if( params.audio_data.IsBeat( ) && params.audio_data.GetBeat( ) > 0.9f) fTentacleDir = -fTentacleDir;
-		for(float fPos = 0;;)
+		if (params.audio_data.IsBeat() && params.audio_data.GetBeat() > 0.9f)
 		{
-			float fNext = fPos + MIN_FRAME_TIME;
-			bool bLast = fNext > params.elapsed;
+			tentacle_dir = -tentacle_dir;
+		}
 
-			float fThis = std::min(MIN_FRAME_TIME, params.elapsed - fPos);
-			obj.roll += fThis * fTentacleDir * DEG_TO_RAD * 5.0f * (params.audio_data.GetIntensity( ) + 0.1f);
-			obj.pitch += fThis * fTentacleDir * DEG_TO_RAD * 20.0f * params.audio_data.GetIntensity( );
-			obj.yaw += fThis * fTentacleDir * DEG_TO_RAD * 10.0f * (params.audio_data.GetIntensity( ) + 0.1f);
-			angle += params.audio_data.GetIntensity( ) * fMoveSpeed * fThis * DEG_TO_RAD;
+		for (float pos = 0;;)
+		{
+			float next = pos + MIN_FRAME_TIME;
+			bool is_last = next > params.elapsed;
+
+			float spd = std::min(MIN_FRAME_TIME, params.elapsed - pos);
+			obj.roll += spd * tentacle_dir * DEG_TO_RAD * 5.0f * (params.audio_data.GetIntensity() + 0.1f);
+			obj.pitch += spd * tentacle_dir * DEG_TO_RAD * 20.0f * params.audio_data.GetIntensity();
+			obj.yaw += spd * tentacle_dir * DEG_TO_RAD * 10.0f * (params.audio_data.GetIntensity() + 0.1f);
+			angle += params.audio_data.GetIntensity() * move_speed * spd * DEG_TO_RAD;
+
 			obj.position.x = 200.0f * cosf(angle) * sinf(angle * 1.3f) * cosf(angle * 2.3f) * sinf(angle * 0.6f);
 			obj.position.y = 100.0f * cosf(angle * 0.2f) * sinf(angle * 1.1f) * cosf(angle * 1.6f) * sinf(angle * 1.2f);
 			obj.position.z = 150.0f * cosf(angle * 1.6f) * sinf(angle * 0.5f) * cosf(angle * 1.1f) * sinf(angle * 1.2f);
-			if(texture == nullptr) obj.position.z = (obj.position.z / 2) - 50;
-			obj.exposure = bLast? 1 : 0;
-			obj.Calculate(params.renderer, &camera, fThis);
 
-			if(bLast) break;
-			fPos = fNext;
+			if (texture == nullptr) obj.position.z = (obj.position.z / 2) - 50;
+
+			obj.exposure = is_last ? 1 : 0;
+			obj.Calculate(params.renderer, &camera, spd);
+
+			if (is_last) break;
+			pos = next;
 		}
 		return nullptr;
 	}
+
 	Error* Render(const RenderParams& params) override
 	{
 		Error* error;
 		static double angle = 0;
 
-		if(texture == nullptr)
+		if (texture != nullptr)
 		{
-		}
-		else
-		{
-			//			hRes = d3d->SetState(ZDirect3D::Shade);//D3DRS_SHADE);
-//			if(FAILED(hRes)) return TraceError(hRes);
-
 			{
 				RenderState render_state;
 				render_state.depth_mode = DepthMode::Disable;
@@ -364,117 +251,69 @@ public:
 				if (error) return TraceError(error);
 			}
 		}
-//	d3d->lpd3dDevice->SetTexture(0, texture->GetSurface());
-//	d3d->lpd3dDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
-//	d3d->lpd3dDevice->SetTexture(1, pc->GetTexture(0)->GetSurface());
-//	d3d->lpd3dDevice->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_ADD);
-//	hRes = grid->Render(d3d);
-//	if(FAILED(hRes)) return hRes;
-//
-//	d3d->lpd3dDevice->SetTexture(0, pc->GetSurface());
-//	d3d->lpd3dDevice->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_ADD);
-//	hRes = grid->Render(d3d);
-//	if(FAILED(hRes)) return hRes;
 
-/*	grid->SetTexture(texture);
-	hRes = grid->Render(d3d);
-	if(FAILED(hRes)) return hRes;
-
-	d3d->lpd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND, D3DBLEND_ONE);
-	d3d->lpd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE);
-	d3d->lpd3dDevice->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, true);
-	d3d->lpd3dDevice->SetRenderState(D3DRENDERSTATE_TEXTUREMAPBLEND, D3DTBLEND_MODULATE); //D3DTBLEND_DECAL);
-	d3d->lpd3dDevice->SetRenderState(D3DRENDERSTATE_SHADEMODE, D3DSHADE_FLAT);
-	gridbm->SetTexture(pc->GetTexture(0));//light);
-	hRes = gridbm->Render(d3d);
-	if(FAILED(hRes)) return hRes;
-*/	
-		error = obj.Render(params.renderer);//scene->render(d3d);
-		if(error) return TraceError(error);
+		error = obj.Render(params.renderer);
+		if (error) return TraceError(error);
 
 		return nullptr;
 	}
+
 	Error* Reconfigure(const ReconfigureParams& params) override
 	{
 		obj.textures[0].type = Actor::TextureType::Envmap;
 		obj.textures[0].texture = params.texture_library.Find(tentacles_texture_class);//ENVIRONMENTMAP));
-		fMoveSpeed = 1.0f + (rand() * 4.0f / RAND_MAX);
+		move_speed = 1.0f + (rand() * 4.0f / RAND_MAX);
 
-//		if(pBump.GetLength() == 0) texture = pBlankTexture;
-//		else
-//		{
-			texture = params.texture_library.Find(background_texture_class);
-			if (texture != nullptr)
+		texture = params.texture_library.Find(background_texture_class);
+		if (texture != nullptr)
+		{
+			std::map<Texture*, std::unique_ptr<uint16[]>>::iterator it = texture_to_bumpmap.find(texture);
+			if (it != texture_to_bumpmap.end())
 			{
-				std::map< Texture*, std::unique_ptr< unsigned short[] > >::iterator it = mpBumpIndex.find(texture);
-				if(it != mpBumpIndex.end())
+				current_bumpmap = it->second.get();
+			}
+			else if (texture->width == 256 && texture->height == 256 && texture->format == TextureFormat::X8R8G8B8)
+			{
+				std::vector<uint8> pixel_data;
+
+				Error* error = texture->GetPixelData(pixel_data);
+				if (error) return TraceError(error);
+
+				// Compute the average intensity of each pixel
+				std::unique_ptr<uint8[]> intensity(new uint8[256 * 256]);
+
+				unsigned char* pixel_in = (unsigned char*)pixel_data.data();
+				unsigned char* intensity_out = intensity.get();
+				for (int y = 0; y < 256; y++)
 				{
-					pnCurrentBump = it->second.get();
-				}
-				else if(texture->width == 256 && texture->height == 256 && texture->format == TextureFormat::X8R8G8B8)
-				{
-					std::vector<uint8> buffer;
-
-					Error* error = texture->GetPixelData(buffer);
-					if (error) return TraceError(error);
-
-					std::unique_ptr< unsigned short[] > pb(new unsigned short[256 * 256]);
-
-					unsigned char* pcSrc = (unsigned char*)buffer.data();
-					unsigned char pbBump[256 * 256];
-					unsigned char* pbDst = pbBump;
-					for (int nY = 0; nY < 256; nY++)
+					for (int x = 0; x < 256; x++)
 					{
-						for (int nX = 0; nX < 256; nX++)
-						{
-							*(pbDst++) = ((unsigned)pcSrc[0] + (unsigned)pcSrc[1] + (unsigned)pcSrc[2]) / 3;// unsigned int(pcSrc->m_nR) + unsigned int(pcSrc->m_nG) + unsigned int(pcSrc->m_nB)) / 3;
-							pcSrc += 4;
-						}
-					}
-
-					int nIndex = 0;
-					for (int nY = 0; nY < 256; nY++)
-					{
-						for (int nX = 0; nX < 256; nX++)
-						{
-							int nBumpX = (int)pbBump[(nIndex + 1) & 0xffff] - (int)pbBump[(nIndex - 1) & 0xffff] + 128 - nX;
-							int nBumpY = (int)pbBump[(nIndex + 256) & 0xffff] - (int)pbBump[(nIndex - 256) & 0xffff] + 128 - nY;
-							pb.get()[nIndex] = (((unsigned char)nBumpY) << 8) | ((unsigned char)nBumpX);
-							nIndex++;
-						}
-					}
-					pnCurrentBump = pb.get(); 
-					mpBumpIndex[texture] = std::move(pb);
-				}
-
-/*				for(int i = 0;;i++)
-				{
-					if(pBump[i]->pTexture == nullptr) return TraceError(E_BUMPMAPNOTFOUND);
-					else if(pBump[i]->pTexture == texture)
-					{
-						pCurrentBumpmap = &pBump[i]->pBumpmap;
-						break;
-					}
-				}	
-
-				unsigned char cX, cY;
-				int nIndex = 0;//, sx, sy;
-				for(int y = 0; y < 256; y++)
-				{
-					for(int x = 0; x < 256; x++)
-					{
-						//pBumpX[nIndex] = 
-						cX = int(pCurrentBumpmap->operator[]((unsigned short)(nIndex + 1)) - pCurrentBumpmap->operator[]((unsigned short)(nIndex - 1)) + 128 - x) & 255;
-						//pBumpY[nIndex] = 
-						cY = int(pCurrentBumpmap->operator[]((unsigned short)(nIndex + 256)) - pCurrentBumpmap->operator[]((unsigned short)(nIndex - 256)) + 128 - y) & 255;
-						pBumpIndex[nIndex] = (cY << 8) | cX;
-						nIndex++;
+						*(intensity_out++) = ((unsigned)pixel_in[0] + (unsigned)pixel_in[1] + (unsigned)pixel_in[2]) / 3;
+						pixel_in += 4;
 					}
 				}
-*///			}
+
+				// Create the bumpmap from that
+				std::unique_ptr<uint16[]> pb(new uint16[256 * 256]);
+
+				int index = 0;
+				for (int y = 0; y < 256; y++)
+				{
+					for (int x = 0; x < 256; x++)
+					{
+						int bump_x = (int)intensity[(index + 1) & 0xffff] - (int)intensity[(index - 1) & 0xffff] + 128 - x;
+						int bump_y = (int)intensity[(index + 256) & 0xffff] - (int)intensity[(index - 256) & 0xffff] + 128 - y;
+						pb[index] = (((unsigned char)bump_y) << 8) | ((unsigned char)bump_x);
+						index++;
+					}
+				}
+
+				current_bumpmap = pb.get();
+				texture_to_bumpmap[texture] = std::move(pb);
+			}
 		}
 		return nullptr;
 	}
 };
 
-EXPORT_EFFECT( Bumpmapping, EffectBumpmapping )
+EXPORT_EFFECT(Bumpmapping, EffectBumpmapping)
