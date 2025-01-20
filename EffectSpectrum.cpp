@@ -25,8 +25,8 @@ public:
 	const float SPIN_RADIUS = 600;
 	const float SPIN_HEIGHT = -300;
 	const float CYLINDER_RADIUS = 1200; //500
-	const float TRAIL_ANGS = (2.0f * g_fDegToRad);
-	const float ANG_OFFSET = (10.0f * g_fDegToRad);
+	const float TRAIL_ANGS = (2.0f * DEG_TO_RAD);
+	const float ANG_OFFSET = (10.0f * DEG_TO_RAD);
 	const float BAR_SIZE = 5.0f;
 	static const int LIMITER_H = 15;//10
 
@@ -52,7 +52,7 @@ public:
 		m_fAng = 0.0f;
 		m_fr = true;
 		m_fBrAng = 0;
-		m_fRotAng = 45.0f * g_fDegToRad;
+		m_fRotAng = 45.0f * DEG_TO_RAD;
 		m_cCamera.perspective = 300;
 
 		for(int i = 0; i < TRAIL_H; i++)
@@ -125,10 +125,10 @@ public:
 
 	Error* Calculate( const CalculateParams& params ) override
 	{
-		m_fRotAng += params.elapsed * ( 2.0f * g_fDegToRad );
-		m_fBrAng += params.elapsed * ( 2.0f * g_fDegToRad );
+		m_fRotAng += params.elapsed * ( 2.0f * DEG_TO_RAD );
+		m_fBrAng += params.elapsed * ( 2.0f * DEG_TO_RAD );
 
-		m_fAng += params.elapsed * ( 1.0f * g_fDegToRad );
+		m_fAng += params.elapsed * ( 1.0f * DEG_TO_RAD );
 		m_cCamera.position.x = -30 + ( SPIN_RADIUS * cosf( m_fRotAng ) );
 		m_cCamera.position.y = SPIN_HEIGHT;
 		m_cCamera.position.z = SPIN_RADIUS * sinf( m_fRotAng );

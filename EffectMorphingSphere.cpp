@@ -49,11 +49,11 @@ public:
 			{
 				if(pObj[NOBJ].vertices[j].position.Dot(v) < 0)
 				{
-					pfAng[j] += 2.0f * g_fDegToRad;
+					pfAng[j] += 2.0f * DEG_TO_RAD;
 				}
 				else 
 				{
-					pfAng[j] -= 2.0f * g_fDegToRad;
+					pfAng[j] -= 2.0f * DEG_TO_RAD;
 				}
 			}
 		}

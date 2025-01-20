@@ -72,7 +72,7 @@ public:
 
 			while(dRadAng > 3.14159 * 2.0) dRadAng -= 3.14159 * 2.0;
 		}
-		obj.yaw += 1.0f * g_fDegToRad;
+		obj.yaw += 1.0f * DEG_TO_RAD;
 
 		dViewAng += 3.14159 / 180.0;
 		camera.position.z = -50;

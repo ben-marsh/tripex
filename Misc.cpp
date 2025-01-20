@@ -1,5 +1,11 @@
 #include "Platform.h"
 #include "Misc.h"
+#include <Windows.h>
+
+extern const float PI = 3.1415926535897932384626433832795f;//3.141592f;
+extern const float PI2 = 6.283185307179586476925286766559f;//2.0f * PI;
+extern const float DEG_TO_RAD = 0.017453292519943295769236907684886f;//PI / 180.0f;
+extern const float FLOAT_ZERO = 0.00001f;
 
 const unsigned char g_anBitReverse[ 256 ] =
 {
@@ -20,6 +26,11 @@ const unsigned char g_anBitReverse[ 256 ] =
 	0x07, 0x87, 0x47, 0xc7, 0x27, 0xa7, 0x67, 0xe7, 0x17, 0x97, 0x57, 0xd7, 0x37, 0xb7, 0x77, 0xf7,
 	0x0f, 0x8f, 0x4f, 0xcf, 0x2f, 0xaf, 0x6f, 0xef, 0x1f, 0x9f, 0x5f, 0xdf, 0x3f, 0xbf, 0x7f, 0xff
 };
+
+uint32 GetSystemTimestampMs()
+{
+	return (uint32)GetTickCount64();
+}
 
 /*---------------------------------------------
 * Wrap( ):

@@ -472,9 +472,9 @@ public:
 	inline void Calculate(int nBuf, int nMin, int nMax, int nMinTime)//int nLine, int n)
 	{
 		float fPixelStep = 1.0f / fMagnify;
-		DWORD nStart = timeGetTime();
+		DWORD nStart = GetSystemTimestampMs();
 		float xo, yo;
-		for (int nThisPixels = 0; nThisPixels < nMax && (nThisPixels < nMin || (timeGetTime() - nStart) < (DWORD)nMinTime); nThisPixels++)
+		for (int nThisPixels = 0; nThisPixels < nMax && (nThisPixels < nMin || (GetSystemTimestampMs() - nStart) < (DWORD)nMinTime); nThisPixels++)
 		{
 			// calc x,y, nCalcPixel
 			Calculate();
@@ -626,7 +626,7 @@ public:
 		}
 		else accum = params.elapsed;
 
-		DWORD dwStartTime = timeGetTime();
+		DWORD dwStartTime = GetSystemTimestampMs();
 
 		dOscFade += 0.1 * params.elapsed;
 
@@ -828,7 +828,7 @@ public:
 		//		hRes = pc.Calculate((fOddFrame? bf2 : bf1).GetBuffer());
 		if (error) return TraceError(error);
 
-		DWORD dwTime = timeGetTime() - dwStartTime;
+		DWORD dwTime = GetSystemTimestampMs() - dwStartTime;
 		if (dwTimeTotal < 1000000 && dwTime < 1000000)
 		{
 			dwTimeTotal += dwTime;

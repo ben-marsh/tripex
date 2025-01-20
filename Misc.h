@@ -4,12 +4,12 @@
 #include <algorithm>
 #include <assert.h>
 
-#pragma warning(disable: 4786)
-#pragma runtime_checks( "",off )
+extern const float PI;
+extern const float PI2;
+extern const float DEG_TO_RAD;
+extern const float FLOAT_ZERO;
 
-#define FLOAT_ZERO 0.00001
-
-// Wrap( ):
+uint32 GetSystemTimestampMs();
 float Wrap(float fValue, float fMin, float fMax);
 
 template< class T > inline T Bound(T x, T a, T b)

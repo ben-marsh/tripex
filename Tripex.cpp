@@ -54,7 +54,7 @@ void Tripex::ShowStatusMsg(const char* format, ...)
 	va_start(arg_list, format);
 
 	vsnprintf(status_msg, sizeof(status_msg), format, arg_list);
-	status_time = timeGetTime();
+	status_time = GetSystemTimestampMs();
 
 	va_end(arg_list);
 }
@@ -74,7 +74,7 @@ Error* Tripex::Startup()
 
 	audio = std::make_unique<AudioData>(512);
 
-	srand(timeGetTime());
+	srand(GetSystemTimestampMs());
 
 	std::vector<ColorRgb> pe;
 	pe.resize(256);
@@ -117,7 +117,7 @@ Error* Tripex::Startup()
 	//	for(int i = 0; i < 256; i++) c[i] = ZColour::Grey(i);
 	//	pcHUD->SetPalette(c);
 
-	srand(timeGetTime());
+	srand(GetSystemTimestampMs());
 
 	for (int i = 1; i < (int)effects.size(); i++)
 	{
@@ -127,7 +127,7 @@ Error* Tripex::Startup()
 		}
 	}
 
-	srand(timeGetTime());
+	srand(GetSystemTimestampMs());
 
 	std::map<const uint32*, std::shared_ptr<Texture>> data_to_texture;
 
@@ -167,7 +167,7 @@ Error* Tripex::Startup()
 
 Error* Tripex::Render()
 {
-	DWORD time = timeGetTime();
+	DWORD time = GetSystemTimestampMs();
 	if (txs.test(TXS_RESET_TIMING))//bResetTiming)
 	{
 		last_time = time - 10000;
@@ -365,7 +365,7 @@ Error* Tripex::Render()
 	std::string msg;
 	float msg_brightness = 0.0f;
 
-	DWORD dwTick = timeGetTime();
+	DWORD dwTick = GetSystemTimestampMs();
 	if (dwTick >= status_time && dwTick <= status_time + (MSG_DISPLAY_TIME + MSG_FADEOUT_TIME) && status_msg[0] != 0)
 	{
 		msg = status_msg;

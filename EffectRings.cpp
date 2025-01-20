@@ -78,9 +78,9 @@ public:
 			{
 				brightness[i] = brightness[i-1] * 0.9f;//min(brightness[i-1], 1.5 * double(i) / (nRings * 0.7));
 			}
-			roll[0] += (0.8f + params.audio_data.GetIntensity( )) * fSpeedR * g_fDegToRad;
-			pitch[0] += (0.8f + params.audio_data.GetIntensity( )) * fSpeedP * g_fDegToRad;
-			yaw[0] += (0.8f + params.audio_data.GetIntensity( )) * fSpeedY * g_fDegToRad;
+			roll[0] += (0.8f + params.audio_data.GetIntensity( )) * fSpeedR * DEG_TO_RAD;
+			pitch[0] += (0.8f + params.audio_data.GetIntensity( )) * fSpeedP * DEG_TO_RAD;
+			yaw[0] += (0.8f + params.audio_data.GetIntensity( )) * fSpeedY * DEG_TO_RAD;
 
 			brightness[0] = 0.6f + (0.3f * ((params.audio_data.GetIntensity( ) * 1.4f) + params.audio_data.GetBeat( )));
 
@@ -95,7 +95,7 @@ public:
 
 			for(int i = 0; i < RINGS; i++)
 			{
-				pObj[i].roll += 1.0f * g_fDegToRad;//3.14159 / 180.0;//= roll[i * ringDelay];
+				pObj[i].roll += 1.0f * DEG_TO_RAD;//3.14159 / 180.0;//= roll[i * ringDelay];
 				pObj[i].pitch = pitch[i * RINGDELAY];
 				pObj[i].yaw = yaw[i * RINGDELAY];
 	

@@ -217,7 +217,7 @@ public:
 		tx += /*4*/1 * params.elapsed;//average * 20.0;
 		ty += params.elapsed * sinf(ya) * cosf(ya * 1.2f) * sinf(ya * 1.5f) * 0.4f;
 
-		ya += params.elapsed * g_fDegToRad;
+		ya += params.elapsed * DEG_TO_RAD;
 
 		if(texture != nullptr)
 		{
@@ -316,10 +316,10 @@ public:
 			bool bLast = fNext > params.elapsed;
 
 			float fThis = std::min(MIN_FRAME_TIME, params.elapsed - fPos);
-			obj.roll += fThis * fTentacleDir * g_fDegToRad * 5.0f * (params.audio_data.GetIntensity( ) + 0.1f);
-			obj.pitch += fThis * fTentacleDir * g_fDegToRad * 20.0f * params.audio_data.GetIntensity( );
-			obj.yaw += fThis * fTentacleDir * g_fDegToRad * 10.0f * (params.audio_data.GetIntensity( ) + 0.1f);
-			angle += params.audio_data.GetIntensity( ) * fMoveSpeed * fThis * g_fDegToRad;
+			obj.roll += fThis * fTentacleDir * DEG_TO_RAD * 5.0f * (params.audio_data.GetIntensity( ) + 0.1f);
+			obj.pitch += fThis * fTentacleDir * DEG_TO_RAD * 20.0f * params.audio_data.GetIntensity( );
+			obj.yaw += fThis * fTentacleDir * DEG_TO_RAD * 10.0f * (params.audio_data.GetIntensity( ) + 0.1f);
+			angle += params.audio_data.GetIntensity( ) * fMoveSpeed * fThis * DEG_TO_RAD;
 			obj.position.x = 200.0f * cosf(angle) * sinf(angle * 1.3f) * cosf(angle * 2.3f) * sinf(angle * 0.6f);
 			obj.position.y = 100.0f * cosf(angle * 0.2f) * sinf(angle * 1.1f) * cosf(angle * 1.6f) * sinf(angle * 1.2f);
 			obj.position.z = 150.0f * cosf(angle * 1.6f) * sinf(angle * 0.5f) * cosf(angle * 1.1f) * sinf(angle * 1.2f);

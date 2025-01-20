@@ -19,7 +19,7 @@ public:
 	static const int LAYERS = 3;
 	static const int INNER = 30;
 	static const int OUTER = (INNER + 30);
-	const float ANGSZ = (20.0f * g_fDegToRad);
+	const float ANGSZ = (20.0f * DEG_TO_RAD);
 
 	Actor pObj[RINGS];
 	Camera cCamera;
@@ -123,7 +123,7 @@ public:
 			{
 				for(int j = 0; j < 3; j++)
 				{
-					as[i][j][0] = (float)_copysign(1.0f,as[i][j][0]) * (4.0f + (rand() * 4.0f / RAND_MAX)) * g_fDegToRad;
+					as[i][j][0] = (float)_copysign(1.0f,as[i][j][0]) * (4.0f + (rand() * 4.0f / RAND_MAX)) * DEG_TO_RAD;
 					if(rand() > RAND_MAX * 0.75f) as[i][j][0] = -as[i][j][0];
 //					as[i][j][1] = 0.0;
 				}

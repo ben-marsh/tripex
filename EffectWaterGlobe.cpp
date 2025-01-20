@@ -120,7 +120,7 @@ private:
 				pfPos[i] += pfVel[i];
 				pfPos[i] *= fDamping;
 			}
-			pfPos[nPos] = sinf(fAngle * g_fDegToRad) * fSize;
+			pfPos[nPos] = sinf(fAngle * DEG_TO_RAD) * fSize;
 		}
 		void Create()
 		{
@@ -203,8 +203,8 @@ public:
 //			pObj->ResetPoint(0);
 			//	obj->textureMap(waTexture);
 	
-			obj.pitch += 2.0f * g_fDegToRad;
-			obj.yaw += 1.5f * g_fDegToRad;
+			obj.pitch += 2.0f * DEG_TO_RAD;
+			obj.yaw += 1.5f * DEG_TO_RAD;
 			obj.ambient_light_color = ColorRgb::Grey((int)(255.0f * params.brightness));
 
 //			angle += average;

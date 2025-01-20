@@ -75,7 +75,7 @@ public:
 		for(int i = 0; i < SOURCES; i++)
 		{
 			pdAng[i] = rand() * PI2 / RAND_MAX;
-			pdSpeed[i] = SPEEDSPREAD * (rand() * (SPEEDSPREAD / 2.0) * g_fDegToRad / RAND_MAX);
+			pdSpeed[i] = SPEEDSPREAD * (rand() * (SPEEDSPREAD / 2.0) * DEG_TO_RAD / RAND_MAX);
 			pdTilt[i] = rand() * PI2 / RAND_MAX;
 			pdRadius[i] = rand() * RADIUS / RAND_MAX;
 			pdYPos[i] = (SPREAD / 2.0) - (double(rand()) * SPREAD / RAND_MAX);
@@ -85,9 +85,9 @@ public:
 	{
 		brt = params.brightness;
 		if(nStage == 0) dWaitTime += params.elapsed * params.audio_data.GetDampenedBand( sensitivity, 0.0f, 1.0f);
-		else if(nStage == 1) dTilt += params.elapsed * 1.5 * g_fDegToRad;
+		else if(nStage == 1) dTilt += params.elapsed * 1.5 * DEG_TO_RAD;
 		else if(nStage == 2) dWaitTime += params.elapsed * params.audio_data.GetDampenedBand(sensitivity, 0.0f, 1.0f);
-		else if(nStage == 3) dTilt -= params.elapsed * 1.5 * g_fDegToRad;
+		else if(nStage == 3) dTilt -= params.elapsed * 1.5 * DEG_TO_RAD;
 
 		if((dTilt < 0) || (dTilt > 3.141592 / 2.0) || (dWaitTime > 40.0 && params.audio_data.GetIntensity( ) > 0.6))
 		{

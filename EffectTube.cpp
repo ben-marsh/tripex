@@ -21,7 +21,7 @@ public:
 
 	const float CIRADIUS = 40.0f;
 	const float CORADIUS = 50.0f;
-	const float CANGDIFF = (5.0f * g_fDegToRad);
+	const float CANGDIFF = (5.0f * DEG_TO_RAD);
 	static const int CLENGTH = 100;
 
 	const float CDIFF = (PTLENGTH * PTDIST / CLENGTH);
@@ -191,10 +191,10 @@ public:
 				}
 			}	
 
-			obj.pitch += 2.0f * g_fDegToRad;//2 * 3.14159 / 180.0;
-			obj.yaw += 1.5f * g_fDegToRad;//1.5 * 3.14159 / 180.0;
-			coil.pitch += 2.0f * g_fDegToRad;//2 * 3.14159 / 180.0;
-			coil.yaw += 1.5f * g_fDegToRad;//1.5 * 3.14159 / 180.0;
+			obj.pitch += 2.0f * DEG_TO_RAD;//2 * 3.14159 / 180.0;
+			obj.yaw += 1.5f * DEG_TO_RAD;//1.5 * 3.14159 / 180.0;
+			coil.pitch += 2.0f * DEG_TO_RAD;//2 * 3.14159 / 180.0;
+			coil.yaw += 1.5f * DEG_TO_RAD;//1.5 * 3.14159 / 180.0;
 
 			accum--;
 			obj.flags.set(Actor::F_VALID_VERTEX_NORMALS, false);

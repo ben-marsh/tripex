@@ -158,7 +158,7 @@ public:
 		if(dMultDest < dMult) dMult = std::max(dMultDest, dMult - 0.01);
 		if(dMultDest > dMult) dMult = std::min(dMultDest, dMult + 0.01);
 
-		dAng += sm * params.audio_data.GetDampenedBand(sensitivity, 0, 0.5f) * 0.25 * 4 * g_fDegToRad;
+		dAng += sm * params.audio_data.GetDampenedBand(sensitivity, 0, 0.5f) * 0.25 * 4 * DEG_TO_RAD;
 
 		double dCentre = (TWISTPLANES - 1.0) / 2.0;
 		for(int i = 0; i < TWISTPLANES; i++)
@@ -166,9 +166,9 @@ public:
 			pfPos[i] += pfSpeed[i];
 			if(pfPos[i] > 1.0)
 			{
-				pfRS[i] = (3 + (rand() * 10.0 / RAND_MAX)) * g_fDegToRad;
-				pfPS[i] = (3 + (rand() / RAND_MAX)) * g_fDegToRad;
-				pfYS[i] = (3 + (rand() / RAND_MAX)) * g_fDegToRad;
+				pfRS[i] = (3 + (rand() * 10.0 / RAND_MAX)) * DEG_TO_RAD;
+				pfPS[i] = (3 + (rand() / RAND_MAX)) * DEG_TO_RAD;
+				pfYS[i] = (3 + (rand() / RAND_MAX)) * DEG_TO_RAD;
 				pfPos[i] = pfPos[i] - (int)pfPos[i];
 			}
 
@@ -205,7 +205,7 @@ public:
 		fel += params.elapsed;
 		for(; fel > 1.0; fel--)
 		{
-			fAng += 8.0f * g_fDegToRad;
+			fAng += 8.0f * DEG_TO_RAD;
 			obj.vertices.resize(1);
 			obj.vertices[0].position.x = 5 * cos(fAng);//pObj[0].pVertex[0].GetPosition();
 			obj.vertices[0].position.y = 5 * sin(fAng);//pObj[0].pVertex[0].GetPosition();
@@ -214,15 +214,15 @@ public:
 		obj.Calculate(params.renderer, &camera, params.elapsed);
 
 		dMult = params.audio_data.GetDampenedBand(sensitivity, 0, 1.0f);//average;
-		dAngX += sm * dMult * 9 * g_fDegToRad;
+		dAngX += sm * dMult * 9 * DEG_TO_RAD;
 
-		dAngY += sm * params.audio_data.GetDampenedBand(sensitivity, 0/16.0f, 3/16.0f) * 3.4 * g_fDegToRad;
-		dAngZ += sm * params.audio_data.GetDampenedBand(sensitivity, 3/16.0f, 9/16.0f) * 4.2 * g_fDegToRad;
+		dAngY += sm * params.audio_data.GetDampenedBand(sensitivity, 0/16.0f, 3/16.0f) * 3.4 * DEG_TO_RAD;
+		dAngZ += sm * params.audio_data.GetDampenedBand(sensitivity, 3/16.0f, 9/16.0f) * 4.2 * DEG_TO_RAD;
 		while(dAngX > PI2) dAngX -= PI2;
 		while(dAngY > PI2) dAngY -= PI2;
 		while(dAngZ > PI2) dAngZ -= PI2;
 
-		camera.roll += sm * params.audio_data.GetIntensity( ) * 4 * g_fDegToRad;
+		camera.roll += sm * params.audio_data.GetIntensity( ) * 4 * DEG_TO_RAD;
 	//	pScene->camera.turn(sm * average * 4 * 3.14159 / 180.0, 0, 0);
 		return nullptr;
 	}

@@ -318,7 +318,7 @@ void Actor::Calculate(const Renderer& renderer, Camera* camera, float elapsed)
 	Frame* store_frame = NULL;
 	for (int i = 0; i < unused_frames.size();)
 	{
-		if (unused_frames[i]->time_to_live > timeGetTime())
+		if (unused_frames[i]->time_to_live > GetSystemTimestampMs())
 		{
 			delete unused_frames[i];
 			unused_frames.erase(unused_frames.begin() + i);
@@ -345,7 +345,7 @@ void Actor::Calculate(const Renderer& renderer, Camera* camera, float elapsed)
 					while (frames.size() > i + 1)
 					{
 						int frame_index = (int)frames.size() - 1;
-						frames[frame_index]->time_to_live = timeGetTime() + FRAME_TTL;
+						frames[frame_index]->time_to_live = GetSystemTimestampMs() + FRAME_TTL;
 						unused_frames.push_back(frames[frame_index]);
 						frames.erase(frames.begin() + frame_index);
 					}
