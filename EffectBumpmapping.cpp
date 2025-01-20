@@ -110,8 +110,8 @@ public:
 				float nx = (x - 128.0f) / 128.0f;
 				float ny = (y - 128.0f) / 128.0f;
 				float nz = 1.0f - sqrtf(nx * nx + ny * ny);
-				int br = (int)((nz + (nz * nz * nz * nz)) * 256.0f);
-				lightmap[lightmap_idx++] = std::min(std::max(br, 0), 255);
+				int lightmap_br = (int)((nz + (nz * nz * nz * nz)) * 256.0f);
+				lightmap[lightmap_idx++] = std::min(std::max(lightmap_br, 0), 255);
 			}
 		}
 
@@ -228,7 +228,6 @@ public:
 	Error* Render(const RenderParams& params) override
 	{
 		Error* error;
-		static double angle = 0;
 
 		if (texture != nullptr)
 		{

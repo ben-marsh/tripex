@@ -16,7 +16,7 @@ typedef unsigned int uint32;
 	#define  _CRT_SECURE_NO_WARNINGS
 
 	#pragma warning(disable:4100) // unreferenced formal parameter
-	#pragma warning(disable:4458) // declaration of X hides class member
+//	#pragma warning(disable:4458) // declaration of X hides class member
 	#pragma warning(disable:4244)
 
 #else

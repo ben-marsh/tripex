@@ -108,9 +108,9 @@ public:
 			{
 				grid_pos_y += delta;
 
-				float br = 0;
-				float xp = grid_pos_x;
-				float yp = grid_pos_y;
+				float locbr = 0;
+				float tex_xp = grid_pos_x;
+				float tex_yp = grid_pos_y;
 
 				WideColorRgb cCol(0, 0, 0);
 				for (int j = 0; j < NCENTRES; j++)
@@ -120,26 +120,26 @@ public:
 					float norm_x = pos_x * mul_x;//(1.0f / GRW);
 					float norm_y = pos_y * mul_y;//(1.0f / GRH);
 
-					float fRad = std::min(1.0, 100.0 / fabs(pos_x * pos_x + pos_y * pos_y));
-					br += fRad;
-					float fAng = atan2(norm_y, norm_x);
-					float fLen = fRad * (0.75 + (0.5 * cos((fAng * NSPIKES) + t + centre_ang[j])));
-					xp += fLen * norm_x;
-					yp += fLen * norm_y;
+					float rad = std::min(1.0, 100.0 / fabs(pos_x * pos_x + pos_y * pos_y));
+					locbr += rad;
+					float ang = atan2(norm_y, norm_x);
+					float len = rad * (0.75 + (0.5 * cos((ang * NSPIKES) + t + centre_ang[j])));
+					tex_xp += len * norm_x;
+					tex_yp += len * norm_y;
 
-					float fColMult = params.brightness * 0.5 * std::max(0.0f, 1.0f - (sqrtf(pos_x * pos_x + pos_y * pos_y) / 30.0f));
-					cCol.r += pc[j].r * fColMult;
-					cCol.g += pc[j].g * fColMult;
-					cCol.b += pc[j].b * fColMult;
+					float col_mult = params.brightness * 0.5 * std::max(0.0f, 1.0f - (sqrtf(pos_x * pos_x + pos_y * pos_y) / 30.0f));
+					cCol.r += pc[j].r * col_mult;
+					cCol.g += pc[j].g * col_mult;
+					cCol.b += pc[j].b * col_mult;
 				}
 
-				grid.vertices[i].tex_coords[0].x = xp;
-				grid.vertices[i].tex_coords[0].y = yp;
+				grid.vertices[i].tex_coords[0].x = tex_xp;
+				grid.vertices[i].tex_coords[0].y = tex_yp;
 
-				ColorRgb cGrey = ColorRgb::Grey(std::min(1.0f, params.brightness * br) * 255.0);
+				ColorRgb cGrey = ColorRgb::Grey(std::min(1.0f, params.brightness * locbr) * 255.0);
 				if (WITH_LIGHTS)
 				{
-					grid.vertices[i].specular = cCol * params.brightness * br * 0.5;
+					grid.vertices[i].specular = cCol * params.brightness * locbr * 0.5;
 					grid.vertices[i].diffuse = ColorRgb::Blend(cGrey, (ColorRgb)cCol, 0.2f);//ZColour::Grey(255);
 				}
 				else
