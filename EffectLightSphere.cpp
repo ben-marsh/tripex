@@ -43,7 +43,7 @@ public:
 	double accum;
 	double r, p, y;
 	double br_back = 0;
-	Texture* tint;
+	Texture* tint = nullptr;
 
 	EffectLightSphere()
 		: Effect({ &sprite_texture_class, &tint_texture_class })

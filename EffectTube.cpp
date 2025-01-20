@@ -44,7 +44,7 @@ public:
 		coil.flags.set(Actor::F_NO_CULL);
 
 		int v = 0;
-		for(int i = 0; i < CLENGTH; i++)
+		for (int i = 0; i < CLENGTH; i++)
 		{
 			float angle = i * 4.0f * PI2 / CLENGTH;
 
@@ -70,9 +70,9 @@ public:
 		}
 
 		int f = 0;
-		for(int i = 0; i < CLENGTH - 1; i++)
+		for (int i = 0; i < CLENGTH - 1; i++)
 		{
-			for(int j = 0; j < 4; j++)
+			for (int j = 0; j < 4; j++)
 			{
 				coil.faces[f][0] = (i * 4) + j;
 				coil.faces[f][2] = ((i + 1) * 4) + j;
@@ -89,13 +89,13 @@ public:
 
 		obj.vertices.resize(PTCIRCUM * PTLENGTH);
 		obj.faces.resize((PTCIRCUM * 2) * (PTLENGTH - 1));
-		obj.flags.set( Actor::F_DRAW_Z_BUFFER );
-		obj.flags.set( Actor::F_DRAW_TRANSPARENT );
+		obj.flags.set(Actor::F_DRAW_Z_BUFFER);
+		obj.flags.set(Actor::F_DRAW_TRANSPARENT);
 
 		f = 0;
-		for(int i = 0; i < PTLENGTH - 1; i++)
+		for (int i = 0; i < PTLENGTH - 1; i++)
 		{
-			for(int j = 0; j < PTCIRCUM; j++)
+			for (int j = 0; j < PTCIRCUM; j++)
 			{
 				obj.faces[f][0] = (i * PTCIRCUM) + j;
 				obj.faces[f][2] = ((i + 1) * PTCIRCUM) + j;//(i + 1) * PTCIRCUM) + j;
@@ -109,10 +109,10 @@ public:
 			}
 		}
 
-		for(int i = 0; i < PTLENGTH; i++)
+		for (int i = 0; i < PTLENGTH; i++)
 		{
 			float br = std::min(1.0f, sinf(i * PI / PTLENGTH) * 1);
-			for(int j = 0; j < PTCIRCUM; j++)
+			for (int j = 0; j < PTCIRCUM; j++)
 			{
 				obj.vertices[(i * PTCIRCUM) + j].diffuse = ColorRgb::Grey((int)(br * 255.0f));
 			}
@@ -127,34 +127,34 @@ public:
 
 	Error* Calculate(const CalculateParams& params) override
 	{
-		for(int i = 0; i < 128; i++)
+		for (int i = 0; i < 128; i++)
 		{
-			accwf[i * PTCIRCUM / 128] += params.audio_data.GetSample(i*4) * 128.0f * 4.0f * params.elapsed * (PTCIRCUM / 128.0f);
+			accwf[i * PTCIRCUM / 128] += params.audio_data.GetSample(i * 4) * 128.0f * 4.0f * params.elapsed * (PTCIRCUM / 128.0f);
 		}
 
 		accum += params.elapsed;
 
-		while(accum > 1.0)
+		while (accum > 1.0)
 		{
-			for(int i = 0; i < CLENGTH; i++)
+			for (int i = 0; i < CLENGTH; i++)
 			{
 				double br = std::min(1.0, sin(i * 3.14159 / CLENGTH) * 5) * params.brightness;
-				for(int j = 0; j < 4; j++)
+				for (int j = 0; j < 4; j++)
 				{
 					coil.vertices[(i * 4) + j].diffuse = ColorRgb::Grey((int)(255.0f * br));
 				}
 			}
-			for(int i = 0; i < PTLENGTH; i++)
+			for (int i = 0; i < PTLENGTH; i++)
 			{
 				double br = std::min(1.0, sin(i * 3.14159 / PTLENGTH) * 1) * params.brightness;
-	
-				for(int j = 0; j < PTCIRCUM; j++)
+
+				for (int j = 0; j < PTCIRCUM; j++)
 				{
 					obj.vertices[(i * PTCIRCUM) + j].diffuse = ColorRgb::Grey((int)(255.0f * br));
 				}
 			}
 
-			for(int i = PTLENGTH - 1; i > 0; i--)
+			for (int i = PTLENGTH - 1; i > 0; i--)
 			{
 				for (int j = 0; j < PTCIRCUM; j++)
 				{
@@ -168,21 +168,21 @@ public:
 			}
 
 			int k = 0;
-			for(int i = 0; i < PTLENGTH; i++)
+			for (int i = 0; i < PTLENGTH; i++)
 			{
 				float fPos = 1.0f - fabs(((PTLENGTH / 2) - i) / (PTLENGTH / 2.0f));
 				float fLenMult = 0.8f + 0.4f * sin(fPos * PI / 2.0f);
-				for(int j = 0; j < PTCIRCUM; j++)
+				for (int j = 0; j < PTCIRCUM; j++)
 				{
 					float angle = j * PI2 / PTCIRCUM;
 
-					obj.vertices[k].position.x = (i - (PTLENGTH*0.5f)) * PTDIST;
-					obj.vertices[k].position.y = height[i][j] * fLenMult * sinf(angle);	
+					obj.vertices[k].position.x = (i - (PTLENGTH * 0.5f)) * PTDIST;
+					obj.vertices[k].position.y = height[i][j] * fLenMult * sinf(angle);
 					obj.vertices[k].position.z = height[i][j] * fLenMult * cosf(angle);
 
 					k++;
 				}
-			}	
+			}
 
 			obj.pitch += 2.0f * DEG_TO_RAD;//2 * 3.14159 / 180.0;
 			obj.yaw += 1.5f * DEG_TO_RAD;//1.5 * 3.14159 / 180.0;
@@ -208,21 +208,21 @@ public:
 		Error* error;
 
 		error = obj.Render(params.renderer);
-		if(error) return TraceError(error);
+		if (error) return TraceError(error);
 
 		error = coil.Render(params.renderer);
-		if(error) return TraceError(error);
+		if (error) return TraceError(error);
 
 		return nullptr;
 	}
 
 	Error* Reconfigure(const ReconfigureParams& params) override
 	{
-		Texture *texture = params.texture_library.Find(envmap_texture_class);
+		Texture* texture = params.texture_library.Find(envmap_texture_class);
 		coil.textures[0].Set(Actor::TextureType::Envmap, texture);
 		obj.textures[0].Set(Actor::TextureType::Envmap, texture);
 
-		for(int i = 0; i < PTLENGTH; i++)
+		for (int i = 0; i < PTLENGTH; i++)
 		{
 			for (int j = 0; j < PTCIRCUM; j++)
 			{

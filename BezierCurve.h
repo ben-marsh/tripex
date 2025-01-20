@@ -23,10 +23,10 @@ private:
 	int Binomial(int level, int index);
 };
 
-template<int num_curves> class ContainedBezierCurve : public BezierCurve
+template<int NUM_CURVES> class ContainedBezierCurve : public BezierCurve
 {
 protected:
-	BezierCurve curves[num_curves];
+	BezierCurve curves[NUM_CURVES];
 
 public:
 	Vector3 bound1, bound2;
@@ -35,45 +35,47 @@ public:
 	virtual void GetNewPoints(BezierCurve& b);
 };
 
-template<int num_curves> ContainedBezierCurve<num_curves>::ContainedBezierCurve(Vector3 bound1, Vector3 bound2)
+template<int NUM_CURVES> ContainedBezierCurve<NUM_CURVES>::ContainedBezierCurve(Vector3 bound1, Vector3 bound2)
 {
 	this->bound1 = bound1;
 	this->bound2 = bound2;
-	for (int i = 0; i < num_curves; i++)
+	for (int i = 0; i < NUM_CURVES; i++)
 	{
 		curves[i].Create(4);
 	}
-	curves[num_curves - 1][2] = Vector3::Origin();
-	curves[num_curves - 1][3] = Vector3::Origin();
+	curves[NUM_CURVES - 1][2] = Vector3::Origin();
+	curves[NUM_CURVES - 1][3] = Vector3::Origin();
 
-	float fPos = num_curves + 1.5;
+	float fPos = NUM_CURVES + 1.5;
 	Calculate(fPos);
 }
-template<int num_curves> Vector3 ContainedBezierCurve<num_curves>::Calculate(float& pos)
+
+template<int NUM_CURVES> Vector3 ContainedBezierCurve<NUM_CURVES>::Calculate(float& pos)
 {
-	while (pos >= num_curves)
+	while (pos >= NUM_CURVES)
 	{
-		for (int i = 0; i < num_curves - 1; i++)
+		assert(NUM_CURVES > 0);
+		for (int i = 0; i + 1 < NUM_CURVES; i++)
 		{
 			for (int j = 0; j < 4; j++)
 			{
 				curves[i][j] = curves[i + 1][j];
 			}
 		}
-		curves[num_curves - 1][0] = curves[num_curves - 1][3];
-		curves[num_curves - 1][1] = curves[num_curves - 1][0] + (curves[num_curves - 1][3] - curves[num_curves - 1][2]);
-		GetNewPoints(curves[num_curves - 1]);
+		curves[NUM_CURVES - 1][0] = curves[NUM_CURVES - 1][3];
+		curves[NUM_CURVES - 1][1] = curves[NUM_CURVES - 1][0] + (curves[NUM_CURVES - 1][3] - curves[NUM_CURVES - 1][2]);
+		GetNewPoints(curves[NUM_CURVES - 1]);
 		pos--;
 	}
 
 	float use = pos;
 	for (int i = 0;; use--)
 	{
-		assert(i < num_curves);
+		assert(i < NUM_CURVES);
 		if (use <= 1) return curves[i].Calculate(use);
 	}
 }
-template<int num_curves> void ContainedBezierCurve<num_curves>::GetNewPoints(BezierCurve& b)
+template<int NUM_CURVES> void ContainedBezierCurve<NUM_CURVES>::GetNewPoints(BezierCurve& b)
 {
 	b[2].x = bound1.x + ((float(rand()) / RAND_MAX) * (bound2.x - bound1.x));
 	b[2].y = bound1.y + ((float(rand()) / RAND_MAX) * (bound2.y - bound1.y));
