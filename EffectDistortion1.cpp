@@ -4,7 +4,6 @@
 #include "effect.h"
 #include "error.h"
 #include "TextureData.h"
-//#include "tripex2.h"
 
 class EffectDistortion1 : public Effect
 {
@@ -19,16 +18,15 @@ public:
 	static const int GRH = 50;
 	static const int SPIKES = 15;
 
-	bool fSetTexture;
-	VertexGrid grid;//(GRW, GRH);//, D3DFVF_DIFFUSE | D3DFVF_TEX1);
+	VertexGrid grid;
 	float xp, yp, t, fac;
 	int angle;
 	float precalc_atan[(GRW + 1) * (GRH + 1)];
-	double br;
-	bool fBigBeat;
-	double bigbeat;
-	double average;
-	Texture *tx;
+	double br = 0.0;
+	bool is_bigbeat = false;
+	double bigbeat = 0.0;
+	double average = 0.0;
+	Texture *tx = nullptr;
 
 	EffectDistortion1()
 		: Effect({ &background_texture_class })
@@ -49,6 +47,7 @@ public:
 			}
 		}
 	}
+
 	Error* Calculate(const CalculateParams& params) override
 	{
 		br = params.brightness;
@@ -59,17 +58,17 @@ public:
 		angle += 1 * params.elapsed;
 		fac = 0.5 + (0.15 * cos(angle * 3.14159 / 256.0));
 
-		int x, y, i = 0;
 		double av = std::max(0.4f, params.audio_data.GetDampenedBand(sensitivity, 0, 1.0f));
 		double fx, fy;
 		double w2 = grid.width / 2.0, h2 = grid.height / 2.0;
 		double rw = 1.0 / grid.width, rh = 1.0 / grid.height;
 
-		i = 0;
-		ColorRgb cColour = ColorRgb::Grey(255.0 * params.brightness);
-		for(x = 0; x <= grid.width; x++)
+		ColorRgb color = ColorRgb::Grey(255.0 * params.brightness);
+
+		int i = 0;
+		for(int x = 0; x <= grid.width; x++)
 		{
-			for(y = 0; y <= grid.height; y++)
+			for(int y = 0; y <= grid.height; y++)
 			{
 				fx = (x - w2) * rw;
 				fy = (y - h2) * rh;
@@ -78,7 +77,7 @@ public:
 
 				grid.vertices[i].tex_coords[0].x = (len * fx) + xp;
 				grid.vertices[i].tex_coords[0].y = (len * fy) + yp;
-				grid.vertices[i].diffuse = cColour;
+				grid.vertices[i].diffuse = color;
 				i++;
 			}
 		}
@@ -86,6 +85,7 @@ public:
 		grid.update_edges = true;
 		return nullptr;
 	}
+
 	Error* Render(const RenderParams& params) override
 	{
 		RenderState render_state;
@@ -98,10 +98,10 @@ public:
 
 		return nullptr;
 	}
+
 	Error* Reconfigure(const ReconfigureParams& params) override
 	{
 		tx = params.texture_library.Find(background_texture_class);
-//	grid->SetTexture(d3d->Select(TC_WRAPTEXTURE));//TC_ENVIRONMENTMAP));
 		return nullptr;
 	}
 };
