@@ -30,257 +30,240 @@ public:
 	const float BAR_SIZE = 5.0f;
 	static const int LIMITER_H = 15;//10
 
-	float m_fBrAng;
-	Camera m_cCamera;
-	Actor m_pObj[TRAIL_H];
-	Actor m_pLimit[LIMITER_H];
-	float m_fAng;
-	float m_fRotAng;
-	float m_pfHeight[TRAIL_H][TRAIL_W];
-	float m_pfCubeHeight[LIMITER_H][TRAIL_W];
-	float m_pfCubeTop[LIMITER_H][TRAIL_W];
-	float m_pfCubeTime[LIMITER_H][TRAIL_W];
-	bool m_fr;
+	float br_ang;
+	Camera camera;
+	Actor objects[TRAIL_H];
+	Actor limiters[LIMITER_H];
+	float ang;
+	float rot_ang;
+	float heights[TRAIL_H][TRAIL_W];
+	float cube_heights[LIMITER_H][TRAIL_W];
+	float cube_tops[LIMITER_H][TRAIL_W];
+	float cube_times[LIMITER_H][TRAIL_W];
 
-	/*---------------------------------------------
-	* Constructor:
-	---------------------------------------------*/
+	Texture* texture = nullptr;
 
-	EffectSpectrum( )
+	EffectSpectrum()
 		: Effect({ &envmap_texture_class })
 	{
-		m_fAng = 0.0f;
-		m_fr = true;
-		m_fBrAng = 0;
-		m_fRotAng = 45.0f * DEG_TO_RAD;
-		m_cCamera.perspective = 300;
+		ang = 0.0f;
+		br_ang = 0;
+		rot_ang = 45.0f * DEG_TO_RAD;
+		camera.perspective = 300;
 
-		for(int i = 0; i < TRAIL_H; i++)
+		for (int i = 0; i < TRAIL_H; i++)
 		{
-			m_pObj[i].vertices.resize(TRAIL_W * 4);
-			m_pObj[i].faces.resize((TRAIL_W - 1) * 8);
-			m_pObj[i].flags.set(Actor::F_DRAW_TRANSPARENT);
-			m_pObj[i].flags.set( Actor::F_DRAW_Z_BUFFER, false );
+			objects[i].vertices.resize(TRAIL_W * 4);
+			objects[i].faces.resize((TRAIL_W - 1) * 8);
+			objects[i].flags.set(Actor::F_DRAW_TRANSPARENT);
+			objects[i].flags.set(Actor::F_DRAW_Z_BUFFER, false);
+
 			uint16 v = 0, f = 0;
-			for(int j = 0; j < TRAIL_W; j++)
+			for (int j = 0; j < TRAIL_W; j++)
 			{
 				int n = j * 4;
-				static const float s = 0.5f / sqrtf( 2.0f );
-				m_pObj[ i ].vertices[ n + 0 ].normal = Vector3( 0.0f, -s, -s );
-				m_pObj[ i ].vertices[ n + 1 ].normal = Vector3( 0.0f, +s, -s );
-				m_pObj[ i ].vertices[ n + 2 ].normal = Vector3( 0.0f, +s, +s );
-				m_pObj[ i ].vertices[ n + 3 ].normal = Vector3( 0.0f, -s, +s );
+				static const float s = 0.5f / sqrtf(2.0f);
+				objects[i].vertices[n + 0].normal = Vector3(0.0f, -s, -s);
+				objects[i].vertices[n + 1].normal = Vector3(0.0f, +s, -s);
+				objects[i].vertices[n + 2].normal = Vector3(0.0f, +s, +s);
+				objects[i].vertices[n + 3].normal = Vector3(0.0f, -s, +s);
 
-				if(j < TRAIL_W - 1)
+				if (j < TRAIL_W - 1)
 				{
-					Face *pFace;
-					for(uint16 k = 0; k < 4; k++ )
+					Face* face;
+					for (uint16 k = 0; k < 4; k++)
 					{
-						pFace = &m_pObj[ i ].faces[ f + k * 2 ];
-						( *pFace )[ 0 ] = (uint16)( v + k );
-						( *pFace )[ 1 ] = (uint16)( v + k + 4 );
-						( *pFace )[ 2 ] = (uint16)( v + ( ( k + 1 ) % 4 ) );
+						face = &objects[i].faces[f + k * 2];
+						(*face)[0] = (uint16)(v + k);
+						(*face)[1] = (uint16)(v + k + 4);
+						(*face)[2] = (uint16)(v + ((k + 1) % 4));
 
-						pFace = &m_pObj[ i ].faces[ f + k * 2 + 1 ];
-						( *pFace )[ 0 ] = (uint16)( v + ( ( k + 1 ) % 4 ) );
-						( *pFace )[ 1 ] = (uint16)( v + k + 4 );
-						( *pFace )[ 2 ] = (uint16)( v + 4 + ( ( k + 1 ) % 4 ) );
+						face = &objects[i].faces[f + k * 2 + 1];
+						(*face)[0] = (uint16)(v + ((k + 1) % 4));
+						(*face)[1] = (uint16)(v + k + 4);
+						(*face)[2] = (uint16)(v + 4 + ((k + 1) % 4));
 					}
 					f += 8;
 				}
 				v += 4;
 			}
 		}
-		for(int i = 0; i < LIMITER_H; i++)
+		for (int i = 0; i < LIMITER_H; i++)
 		{
-			m_pLimit[i].vertices.resize(TRAIL_W);
-			m_pLimit[i].flags.set(Actor::F_DRAW_TRANSPARENT);
-			m_pLimit[i].flags.set(Actor::F_DRAW_Z_BUFFER, false );
-			m_pLimit[i].flags.set(Actor::F_DRAW_VERTEX_SPRITES);
-			m_pLimit[i].sprite_size = 9.0f;//fRenderAsLights(15.0);
+			limiters[i].vertices.resize(TRAIL_W);
+			limiters[i].flags.set(Actor::F_DRAW_TRANSPARENT);
+			limiters[i].flags.set(Actor::F_DRAW_Z_BUFFER, false);
+			limiters[i].flags.set(Actor::F_DRAW_VERTEX_SPRITES);
+			limiters[i].sprite_size = 9.0f;//fRenderAsLights(15.0);
 
-//			float dMult = ((sin((CUBE_H + i + (dAng / TRAIL_ANGS)) * 3.14159 / TRAIL_H) * 0.7) + 0.8) * TRAIL_XS;
-			float fMult = ((sinf((CUBE_H + i) * PI / TRAIL_H) * 0.7f) + 0.8f) * TRAIL_XS;
-			for(int j = 0; j < TRAIL_W; j++)
+			float mult = ((sinf((CUBE_H + i) * PI / TRAIL_H) * 0.7f) + 0.8f) * TRAIL_XS;
+			for (int j = 0; j < TRAIL_W; j++)
 			{
-				m_pLimit[i].vertices[j].position.x = (j - (TRAIL_W / 2.0f)) * fMult;
-				m_pfCubeTime[i][j] = 0;
-				m_pfCubeTop[i][j] = 0.0;
-				m_pfCubeHeight[i][j] = 0.0;
+				limiters[i].vertices[j].position.x = (j - (TRAIL_W / 2.0f)) * mult;
+				cube_times[i][j] = 0;
+				cube_tops[i][j] = 0.0;
+				cube_heights[i][j] = 0.0;
 			}
 		}
-		m_fAng = 0;
-		for(int i = 0; i < TRAIL_H; i++)
+		ang = 0;
+		for (int i = 0; i < TRAIL_H; i++)
 		{
-			for(int j = 0; j < TRAIL_W; j++)
+			for (int j = 0; j < TRAIL_W; j++)
 			{
-				m_pfHeight[i][j] = 0;
+				heights[i][j] = 0;
 			}
 		}
 	}
 
-	/*---------------------------------------------
-	* Calculate( ):
-	---------------------------------------------*/
-
-	Error* Calculate( const CalculateParams& params ) override
+	Error* Calculate(const CalculateParams& params) override
 	{
-		m_fRotAng += params.elapsed * ( 2.0f * DEG_TO_RAD );
-		m_fBrAng += params.elapsed * ( 2.0f * DEG_TO_RAD );
+		rot_ang += params.elapsed * (2.0f * DEG_TO_RAD);
+		br_ang += params.elapsed * (2.0f * DEG_TO_RAD);
 
-		m_fAng += params.elapsed * ( 1.0f * DEG_TO_RAD );
-		m_cCamera.position.x = -30 + ( SPIN_RADIUS * cosf( m_fRotAng ) );
-		m_cCamera.position.y = SPIN_HEIGHT;
-		m_cCamera.position.z = SPIN_RADIUS * sinf( m_fRotAng );
+		ang += params.elapsed * (1.0f * DEG_TO_RAD);
+		camera.position.x = -30 + (SPIN_RADIUS * cosf(rot_ang));
+		camera.position.y = SPIN_HEIGHT;
+		camera.position.z = SPIN_RADIUS * sinf(rot_ang);
 
-		Vector3 vDir = Vector3::Origin() - m_cCamera.position;
-		m_cCamera.pitch = vDir.GetPitch();
-		m_cCamera.yaw = vDir.GetYaw();
+		Vector3 dir = Vector3::Origin() - camera.position;
+		camera.pitch = dir.GetPitch();
+		camera.yaw = dir.GetYaw();
 
-		while( m_fAng >= TRAIL_ANGS )
+		while (ang >= TRAIL_ANGS)
 		{
-			for( int i = TRAIL_H - 1; i >= 1; i-- )
+			for (int i = TRAIL_H - 1; i >= 1; i--)
 			{
-				for( int j = 0; j < TRAIL_W; j++ )
+				for (int j = 0; j < TRAIL_W; j++)
 				{
-					m_pfHeight[ i ][ j ] = m_pfHeight[ i - 1 ][ j ];
+					heights[i][j] = heights[i - 1][j];
 				}
 			}
-			for( int i = 0; i < TRAIL_W; i++ )
+			for (int i = 0; i < TRAIL_W; i++)
 			{
-				m_pfHeight[ 0 ][ i ] = 0.0f;
+				heights[0][i] = 0.0f;
 			}
-			for( int i = 0; i < 256; i++ )
+			for (int i = 0; i < 256; i++)
 			{
-				int nTarget = i * TRAIL_W / 256;
-				m_pfHeight[ 0 ][ nTarget ] = std::max( m_pfHeight[ 0 ][ nTarget ], params.audio_data.GetBand( i ) );
+				int target = i * TRAIL_W / 256;
+				heights[0][target] = std::max(heights[0][target], params.audio_data.GetBand(i));
 			}
-			for( int i = 0; i < TRAIL_W; i++ )
+			for (int i = 0; i < TRAIL_W; i++)
 			{
-				m_pfHeight[ 0 ][ i ] = 300.0f * sinf( ( PI * 0.5f ) * m_pfHeight[ 0 ][ i ] );
+				heights[0][i] = 300.0f * sinf((PI * 0.5f) * heights[0][i]);
 			}
-			m_fAng -= TRAIL_ANGS;
+			ang -= TRAIL_ANGS;
 		}
 
-		for( int j = 0; j < LIMITER_H; j++ )
+		for (int j = 0; j < LIMITER_H; j++)
 		{
-			for( int i = 0; i < TRAIL_W; i++ )
+			for (int i = 0; i < TRAIL_W; i++)
 			{
-				m_pfCubeTime[ j ][ i ] += params.elapsed;
-				m_pfCubeHeight[ j ][ i ] = m_pfCubeTop[ j ][ i ] - ( ACCELER * ( m_pfCubeTime[ j ][ i ] * m_pfCubeTime[ j ][ i ] ) / 2.0f );
-				if(m_pfHeight[ CUBE_H + j ][ i ] > m_pfCubeHeight[ j ][ i ])
+				cube_times[j][i] += params.elapsed;
+				cube_heights[j][i] = cube_tops[j][i] - (ACCELER * (cube_times[j][i] * cube_times[j][i]) / 2.0f);
+				if (heights[CUBE_H + j][i] > cube_heights[j][i])
 				{
-					m_pfCubeTop[ j ][ i ] = m_pfHeight[ CUBE_H + j ][ i ];
-					m_pfCubeTime[ j ][ i ] = 0.0;
-					m_pfCubeHeight[ j ][ i ] = m_pfCubeTop[ j ][ i ] - ( ACCELER * ( m_pfCubeTime[ j ][ i ] * m_pfCubeTime[ j ][ i ] ) / 2.0f );
+					cube_tops[j][i] = heights[CUBE_H + j][i];
+					cube_times[j][i] = 0.0;
+					cube_heights[j][i] = cube_tops[j][i] - (ACCELER * (cube_times[j][i] * cube_times[j][i]) / 2.0f);
 				}
-				m_pfCubeHeight[ j ][ i ] = std::max( m_pfCubeHeight[ j ][ i ], 0.0f );
+				cube_heights[j][i] = std::max(cube_heights[j][i], 0.0f);
 			}
 		}
 
-		float fPosYMax = -CYLINDER_RADIUS + ( CYLINDER_RADIUS * cosf( TRAIL_ANGS * ( TRAIL_H * 0.5f ) + ANG_OFFSET ) );
-		for(int i = 0; i < TRAIL_H; i++)
+		float pos_y_max = -CYLINDER_RADIUS + (CYLINDER_RADIUS * cosf(TRAIL_ANGS * (TRAIL_H * 0.5f) + ANG_OFFSET));
+		for (int i = 0; i < TRAIL_H; i++)
 		{
-			float fThisAng = ( ( i - ( TRAIL_H * 0.5f ) ) * TRAIL_ANGS ) + m_fAng + ANG_OFFSET;
-			float fCos = cosf( fThisAng );
-			float fSin = sinf( fThisAng );
-			float fPosY = CYLINDER_RADIUS - ( CYLINDER_RADIUS * fCos );
-			float fPosZ = ( CYLINDER_RADIUS * fSin );
+			float this_ang = ((i - (TRAIL_H * 0.5f)) * TRAIL_ANGS) + ang + ANG_OFFSET;
+			float this_cos = cosf(this_ang);
+			float this_sin = sinf(this_ang);
+			float pos_y = CYLINDER_RADIUS - (CYLINDER_RADIUS * this_cos);
+			float pos_z = (CYLINDER_RADIUS * this_sin);
 
-			float fBr;
-			if( i <= 1 )
+			float br;
+			if (i <= 1)
 			{
-				fBr = ( i + ( m_fAng / TRAIL_ANGS ) ) * 0.5f;
+				br = (i + (ang / TRAIL_ANGS)) * 0.5f;
 			}
-			else if( i > ( TRAIL_H * 0.5f ) )
+			else if (i > (TRAIL_H * 0.5f))
 			{
-				fBr = 1.0f - fabsf( fPosY / fPosYMax );
+				br = 1.0f - fabsf(pos_y / pos_y_max);
 			}
-			else 
+			else
 			{
-				fBr = 1.0f;
+				br = 1.0f;
 			}
 
-			fBr = params.brightness * std::min( fBr * 0.7f, 1.0f );
-			fBr = std::max( fBr, 0.0f );
-			m_pObj[ i ].ambient_light_color = ColorRgb::Grey( ( int )( fBr * 255.0f ) );
+			br = params.brightness * std::min(br * 0.7f, 1.0f);
+			br = std::max(br, 0.0f);
+			objects[i].ambient_light_color = ColorRgb::Grey((int)(br * 255.0f));
 
 			int n = 0;
-			float fMult = ((sinf((i + (m_fAng / TRAIL_ANGS)) * PI / TRAIL_H) * 0.9f) + 0.8f) * TRAIL_XS;
-			for(int j = 0; j < TRAIL_W; j++)
+			float mult = ((sinf((i + (ang / TRAIL_ANGS)) * PI / TRAIL_H) * 0.9f) + 0.8f) * TRAIL_XS;
+			for (int j = 0; j < TRAIL_W; j++)
 			{
-				float fX = ( j - ( TRAIL_W * 0.5f ) ) * fMult;
-				float fY = fPosY - ( fCos * m_pfHeight[ i ][ j ] );
-				float fZ = fPosZ - ( fSin * m_pfHeight[ i ][ j ] );
+				float x = (j - (TRAIL_W * 0.5f)) * mult;
+				float y = pos_y - (this_cos * heights[i][j]);
+				float z = pos_z - (this_sin * heights[i][j]);
 
-				m_pObj[ i ].vertices[ n + 0 ].position = Vector3( fX, fY - BAR_SIZE, fZ - BAR_SIZE );
-				m_pObj[ i ].vertices[ n + 1 ].position = Vector3( fX, fY + BAR_SIZE, fZ - BAR_SIZE );
-				m_pObj[ i ].vertices[ n + 2 ].position = Vector3( fX, fY + BAR_SIZE, fZ + BAR_SIZE );
-				m_pObj[ i ].vertices[ n + 3 ].position = Vector3( fX, fY - BAR_SIZE, fZ + BAR_SIZE );
+				objects[i].vertices[n + 0].position = Vector3(x, y - BAR_SIZE, z - BAR_SIZE);
+				objects[i].vertices[n + 1].position = Vector3(x, y + BAR_SIZE, z - BAR_SIZE);
+				objects[i].vertices[n + 2].position = Vector3(x, y + BAR_SIZE, z + BAR_SIZE);
+				objects[i].vertices[n + 3].position = Vector3(x, y - BAR_SIZE, z + BAR_SIZE);
 
 				n += 4;
 			}
 
-			m_pObj[ i ].Calculate(params.renderer, &m_cCamera, params.elapsed );
+			objects[i].Calculate(params.renderer, &camera, params.elapsed);
 		}
 
-		for( int i = 0; i < LIMITER_H; i++ )
+		for (int i = 0; i < LIMITER_H; i++)
 		{
-			float dCubeAng = ((CUBE_H + i - (TRAIL_H * 0.5f )) * TRAIL_ANGS) + ANG_OFFSET;
-			float dCubeCos = cosf(dCubeAng);
-			float dCubeSin = sinf(dCubeAng);
-			float dCubePosY = CYLINDER_RADIUS - (CYLINDER_RADIUS * dCubeCos);
-			float dCubePosZ = (CYLINDER_RADIUS * dCubeSin);//sin(dThisAng));
-			for(int j = 0; j < TRAIL_W; j++)
+			float cube_ang = ((CUBE_H + i - (TRAIL_H * 0.5f)) * TRAIL_ANGS) + ANG_OFFSET;
+			float cube_cos = cosf(cube_ang);
+			float cube_sin = sinf(cube_ang);
+			float cube_pos_y = CYLINDER_RADIUS - (CYLINDER_RADIUS * cube_cos);
+			float cube_pos_z = (CYLINDER_RADIUS * cube_sin);//sin(dThisAng));
+
+			for (int j = 0; j < TRAIL_W; j++)
 			{
-				m_pLimit[i].vertices[j].position.y = dCubePosY - (dCubeCos * m_pfCubeHeight[i][j]);
-				m_pLimit[i].vertices[j].position.z = dCubePosZ - (dCubeSin * m_pfCubeHeight[i][j]);
+				limiters[i].vertices[j].position.y = cube_pos_y - (cube_cos * cube_heights[i][j]);
+				limiters[i].vertices[j].position.z = cube_pos_z - (cube_sin * cube_heights[i][j]);
 			}
-			
-			float fBr = Clamp< float >( 0.9f - ( ( float )i ) / LIMITER_H, 0.0f, 1.0f );
-			m_pLimit[ i ].ambient_light_color = ColorRgb::Grey( ( int )( 255.0f * fBr * params.brightness ) );
-			m_pLimit[ i ].Calculate(params.renderer, &m_cCamera, params.elapsed);
+
+			float br = Clamp< float >(0.9f - ((float)i) / LIMITER_H, 0.0f, 1.0f);
+			limiters[i].ambient_light_color = ColorRgb::Grey((int)(255.0f * br * params.brightness));
+			limiters[i].Calculate(params.renderer, &camera, params.elapsed);
 		}
 
 		return nullptr;
 	}
-
-
-	/*---------------------------------------------
-	* Reconfigure( ):
-	---------------------------------------------*/
 
 	Error* Reconfigure(const ReconfigureParams& params) override
 	{
-		static Texture *pTexture;
-		pTexture = params.texture_library.Find(envmap_texture_class);
-		for(int i = 0; i < TRAIL_H; i++)
+		texture = params.texture_library.Find(envmap_texture_class);
+		for (int i = 0; i < TRAIL_H; i++)
 		{
-			m_pObj[i].textures[0].Set(Actor::TextureType::Envmap, pTexture);
+			objects[i].textures[0].Set(Actor::TextureType::Envmap, texture);
 		}
-		for(int i = 0; i < LIMITER_H; i++)
+		for (int i = 0; i < LIMITER_H; i++)
 		{
-			m_pLimit[i].textures[0].Set(Actor::TextureType::Sprite, pTexture);
+			limiters[i].textures[0].Set(Actor::TextureType::Sprite, texture);
 		}
 		return nullptr;
 	}
-
-	/*---------------------------------------------
-	* Render( ):
-	---------------------------------------------*/
 
 	Error* Render(const RenderParams& params) override
 	{
 		Error* error;
-		for( int i = 0; i < TRAIL_H; i++ )
+		for (int i = 0; i < TRAIL_H; i++)
 		{
-			error = m_pObj[ i ].Render(params.renderer);
-			if( error ) return TraceError( error );
+			error = objects[i].Render(params.renderer);
+			if (error) return TraceError(error);
 		}
-		for( int i = 0; i < LIMITER_H; i++ )
+		for (int i = 0; i < LIMITER_H; i++)
 		{
-			error = m_pLimit[ i ].Render(params.renderer);
-			if( error ) return TraceError( error );
+			error = limiters[i].Render(params.renderer);
+			if (error) return TraceError(error);
 		}
 		return nullptr;
 	}
