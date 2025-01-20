@@ -23,7 +23,6 @@ protected:
 
 	float beat_history[BEATHISTORY];
 
-	float elapsed;
 	float intensity;
 	float beat;
 	float intensity_beat_scale;
@@ -55,5 +54,5 @@ public:
 	float GetSample(int sample_idx) const;
 	float GetSample(int channel_idx, int sample_idx) const;
 
-	float GetBand(int band_idx) const;
+	float GetBand(int idx) const;
 };

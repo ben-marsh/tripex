@@ -40,7 +40,6 @@ AudioData::AudioData(int num_samples) : fourier(num_samples), num_samples(num_sa
 
 	memset(freq_history, 0, sizeof(freq_history));
 
-	elapsed = 0.0f;
 	intensity = 0.0f;
 	beat = 0.0f;
 	is_beat = FALSE;
@@ -309,8 +308,8 @@ float AudioData::GetSample(int channel_idx, int sample_idx) const
 	return ((float)stereo_samples[channel_idx][sample_idx]) / (1 << 15);
 }
 
-float AudioData::GetBand(int band_idx) const
+float AudioData::GetBand(int idx) const
 {
-	assert(band_idx >= 0 && band_idx < num_samples);
-	return bands[band_idx];
+	assert(idx >= 0 && idx < num_samples);
+	return bands[idx];
 }
