@@ -5,7 +5,7 @@
 #include "TextureData.h"
 #include "BezierCurve.h"
 
-template < bool bAltBlur > class EffectMotionBlur3T : public Effect
+template<bool ALT_BLUR> class EffectMotionBlur3T : public Effect
 {
 public:
 	const TextureClass envmap_texture_class =
@@ -15,21 +15,20 @@ public:
 	};
 
 	Camera camera;
-	Actor pObj[9];
+	Actor objects[9];
 	Actor obj;
 
-	float fChange;
-	float fShown;
-	int nEffect;
-	int nNewEffect;
+	float change = 0.0f;
+	float shown;
+	int current_effect;
+	int next_effect;
 
-	bool bFirstCalc;
-	float fPos;
-	float fAvTotal, fAvTime;
-	float fCamTarget;
-	float fSpeed;
-	bool bReset;
-	float fCamPos;
+	float pos;
+	float av_total, av_time;
+	float cam_target;
+	float speed = 0.0f;
+	bool reset;
+	float cam_pos;
 
 	ContainedBezierCurve<2> bz;
 	Camera cam;
@@ -38,91 +37,91 @@ public:
 		: Effect({ &envmap_texture_class })
 		, bz(Vector3(20, 20, 20), -Vector3(20, 20, 20))//, cam(0)
 	{
-		cam.flags.set( Camera::F_SCREEN_TRANSFORM, false );
+		cam.flags.set(Camera::F_SCREEN_TRANSFORM, false);
 
-		fCamPos = 0.0f;
-		fAvTotal = 0;
-		fAvTime = 16;
-		fCamTarget = 110;
-		bReset = false;
-		fShown = 0;
-		nNewEffect = -1;
-		bFirstCalc = false;
-		fPos = 0;
+		cam_pos = 0.0f;
+		av_total = 0;
+		av_time = 16;
+		cam_target = 110;
+		reset = false;
+		shown = 0;
+		next_effect = -1;
+		pos = 0;
 
 		obj.CreateTetrahedron(80.0f);
-		nEffect = rand() % 5;
-		// set lastframe to some constant thing
+		current_effect = rand() % 5;
 
 		camera.position.z = -80;//110;
 
-		for(int i = 0; i < 9; i++)
+		for (int i = 0; i < 9; i++)
 		{
-//		pObj[i].pVertex.SetFormat(D3DFVF_NORMAL | D3DFVF_TEX1);
-			pObj[i].CreateTorus(30, 5.0, 20, 5);
-			pObj[i].flags.set( Actor::F_DRAW_TRANSPARENT );
-			if(bAltBlur) pObj[i].flags.set( Actor::F_DO_MIX_EXPOSURE_FACES );
-			pObj[i].textures[0].type = Actor::TextureType::Lightmap;
-			pObj[i].exposure = 9;
-			pObj[i].frame_history = 4.0f;
-			if(!bAltBlur) pObj[i].exposure_light_delta = WideColorRgb(-3,-3,-0);
-			pObj[i].FindVertexNormals();
+			//		pObj[i].pVertex.SetFormat(D3DFVF_NORMAL | D3DFVF_TEX1);
+			objects[i].CreateTorus(30, 5.0, 20, 5);
+			objects[i].flags.set(Actor::F_DRAW_TRANSPARENT);
+			if (ALT_BLUR) objects[i].flags.set(Actor::F_DO_MIX_EXPOSURE_FACES);
+			objects[i].textures[0].type = Actor::TextureType::Lightmap;
+			objects[i].exposure = 9;
+			objects[i].frame_history = 4.0f;
+			if (!ALT_BLUR) objects[i].exposure_light_delta = WideColorRgb(-3, -3, -0);
+			objects[i].FindVertexNormals();
 		}
 	}
-	Vector3 GetPos(int nEffect, int i)
+
+	Vector3 GetPos(int effect_idx, int i)
 	{
-		if(nEffect == 0)
+		if (effect_idx == 0)
 		{
-			if(i < 8)
+			if (i < 8)
 			{
-				float fRadius = (1 + (i / 4)) * 40.0;
-				float fX = cos(i * 3.14159 / 2.0) * fRadius;//80.0;
-				float fY = sin(i * 3.14159 / 2.0) * fRadius;//80.0;
-				return Vector3(fX, fY, 0);
+				float radius = (1 + (i / 4)) * 40.0;
+				float x = cosf(i * 3.14159 / 2.0) * radius;//80.0;
+				float y = sinf(i * 3.14159 / 2.0) * radius;//80.0;
+				return Vector3(x, y, 0);
 			}
 			else return Vector3::Origin();
 		}
-		else if(nEffect == 1)
+		else if (effect_idx == 1)
 		{
-			if(i == 0) return Vector3(0, 40, 40);
-			else if(i == 1) return Vector3(0, -40, 40);
-			else if(i == 2) return Vector3(0, 0, 0);
-			else if(i == 3) return Vector3(0, 0, 80);
-			else if(i == 4) return Vector3(40, 0, 40);
-			else if(i == 5) return Vector3(-40, 0, 40);
-			else if(i == 6) return Vector3(80, 0, 40);
-			else if(i == 7) return Vector3(-80, 0, 40);
+			if (i == 0) return Vector3(0, 40, 40);
+			else if (i == 1) return Vector3(0, -40, 40);
+			else if (i == 2) return Vector3(0, 0, 0);
+			else if (i == 3) return Vector3(0, 0, 80);
+			else if (i == 4) return Vector3(40, 0, 40);
+			else if (i == 5) return Vector3(-40, 0, 40);
+			else if (i == 6) return Vector3(80, 0, 40);
+			else if (i == 7) return Vector3(-80, 0, 40);
 			else return Vector3(0, 0, 40);
 		}
-		else if(nEffect == 2)
+		else if (effect_idx == 2)
 		{
-			if(i < 8)
+			if (i < 8)
 			{
-				float fRadius = (1 + (i / 4)) * 40.0;
-				float fX = cos(i * 3.14159 / 2.0) * fRadius;//80.0;
-				float fY = sin(i * 3.14159 / 2.0) * fRadius;//80.0;
-				float fZ = sin((1 + (i / 4)) * 3.14159 / 6.0) * 40.0;
-				return Vector3(fX, fY, fZ);
+				float radius = (1 + (i / 4)) * 40.0;
+				float x = cosf(i * 3.14159 / 2.0) * radius;//80.0;
+				float y = sinf(i * 3.14159 / 2.0) * radius;//80.0;
+				float z = sinf((1 + (i / 4)) * 3.14159 / 6.0) * 40.0;
+				return Vector3(x, y, z);
 			}
 			else return Vector3::Origin();
 		}
-		else if(nEffect == 3)
+		else if (effect_idx == 3)
 		{
-			float fAng = (i % 3) * 2.0 * 3.14159 / 3.0f;
-			float fLength = 120.0f * ((i / 3) + 0.5f) / 4.0f;
-			return Vector3(cos(fAng) * fLength, sin(fAng) * fLength, 0);
+			float ang = (i % 3) * 2.0 * 3.14159 / 3.0f;
+			float len = 120.0f * ((i / 3) + 0.5f) / 4.0f;
+			return Vector3(cosf(ang) * len, sinf(ang) * len, 0);
 		}
 		else //if(nEffect == 2)
 		{
-			float fX = cos(i * 3.14159 * 2.0 / 9) * 80.0;
-			float fY = sin(i * 3.14159 * 2.0 / 9) * 80.0;
-			return Vector3(fX, fY, 0);
+			float x = cosf(i * 3.14159 * 2.0 / 9) * 80.0;
+			float y = sinf(i * 3.14159 * 2.0 / 9) * 80.0;
+			return Vector3(x, y, 0);
 		}
 	}
+
 	Error* Calculate(const CalculateParams& params) override
 	{
-		fAvTotal += params.elapsed * params.audio_data.GetIntensity( );
-		fAvTime += params.elapsed;
+		av_total += params.elapsed * params.audio_data.GetIntensity();
+		av_time += params.elapsed;
 
 		cam.position.z = -80;
 
@@ -131,92 +130,87 @@ public:
 		obj.yaw += params.elapsed * 3.0f * 3.14159 / 180.0f;
 		obj.Calculate(params.renderer, &cam, params.elapsed);
 
-		if(fAvTotal > 6 || bReset)
+		if (av_total > 6 || reset)
 		{
-			fCamTarget = -250 + (std::min(1.0f, fAvTotal / fAvTime) * 190);
-			if(bReset)
+			cam_target = -250 + (std::min(1.0f, av_total / av_time) * 190);
+			if (reset)
 			{
-				camera.position.z = fCamTarget;
-				bReset = false;
+				camera.position.z = cam_target;
+				reset = false;
 			}
-			fAvTotal = 0;
-			fAvTime = 0;
-			fSpeed = fabs(camera.position.z - fCamTarget) / 32.0;
+			av_total = 0;
+			av_time = 0;
+			speed = fabs(camera.position.z - cam_target) / 32.0;
 		}
 
-		camera.position.z = StepTo<float>(camera.position.z, fCamTarget, fSpeed * params.elapsed);// * 2.0 * (-camera.vPosition.k / 250.0));//2);
+		camera.position.z = StepTo<float>(camera.position.z, cam_target, speed * params.elapsed);// * 2.0 * (-camera.vPosition.k / 250.0));//2);
 
-		fCamPos += params.audio_data.GetIntensity( ) * params.elapsed * 0.02;
-		camera.SetTarget(bz.Calculate(fCamPos));
+		cam_pos += params.audio_data.GetIntensity() * params.elapsed * 0.02;
+		camera.SetTarget(bz.Calculate(cam_pos));
 
-		if(nNewEffect != -1)
+		if (next_effect != -1)
 		{
-			fChange += params.elapsed / 20.0;
-			if(fChange > 1)
+			change += params.elapsed / 20.0;
+			if (change > 1)
 			{
-				nEffect = nNewEffect;
-				nNewEffect = -1;
+				current_effect = next_effect;
+				next_effect = -1;
 			}
 		}
 		else
 		{
-			fShown += params.elapsed;
-			if(fShown > 50)
+			shown += params.elapsed;
+			if (shown > 50)
 			{
-				nNewEffect = rand() % 5;
-				fShown = 0;
-				fChange = 0;
+				next_effect = rand() % 5;
+				shown = 0;
+				change = 0;
 			}
 		}
 
-		camera.roll += params.audio_data.GetIntensity( ) * 3.14159 * 2.0 * params.elapsed / 180.0;
+		camera.roll += params.audio_data.GetIntensity() * 3.14159 * 2.0 * params.elapsed / 180.0;
 
-		for(int i = 0; i < 9; i++)
+		for (int i = 0; i < 9; i++)
 		{
-			if(nNewEffect != -1)
+			if (next_effect != -1)
 			{
-				pObj[i].position = (GetPos(nEffect, i) * (1 - fChange)) + (GetPos(nNewEffect, i) * fChange);
+				objects[i].position = (GetPos(current_effect, i) * (1 - change)) + (GetPos(next_effect, i) * change);
 			}
 			else
 			{
-				pObj[i].position = GetPos(nEffect, i);
-			}	
+				objects[i].position = GetPos(current_effect, i);
+			}
 
-			pObj[i].roll += params.elapsed * 4.0 * 3.14159 / 180.0;
-			pObj[i].pitch += params.audio_data.GetIntensity( ) * params.elapsed * 10.0 * 3.14159 / 180.0;
-			pObj[i].yaw += (params.audio_data.GetIntensity( ) + params.audio_data.GetBeat( ) ) * params.elapsed * 7 * 3.14159 / 180.0;
-			pObj[i].ambient_light_color = ColorRgb::Grey(params.brightness * 48.0f);// / pObj[i].nExposure);
-			pObj[i].Calculate(params.renderer, &camera, params.elapsed);
+			objects[i].roll += params.elapsed * 4.0 * 3.14159 / 180.0;
+			objects[i].pitch += params.audio_data.GetIntensity() * params.elapsed * 10.0 * 3.14159 / 180.0;
+			objects[i].yaw += (params.audio_data.GetIntensity() + params.audio_data.GetBeat()) * params.elapsed * 7 * 3.14159 / 180.0;
+			objects[i].ambient_light_color = ColorRgb::Grey(params.brightness * 48.0f);// / pObj[i].nExposure);
+			objects[i].Calculate(params.renderer, &camera, params.elapsed);
 		}
 
 		return nullptr;
 	}
+
 	Error* Render(const RenderParams& params) override
 	{
-		for(int i = 0; i < 9; i++)
+		for (int i = 0; i < 9; i++)
 		{
-			Error* error = pObj[i].Render(params.renderer);
-			if(error) return TraceError(error);
+			Error* error = objects[i].Render(params.renderer);
+			if (error) return TraceError(error);
 		}
 		return nullptr;
 	}
+
 	Error* Reconfigure(const ReconfigureParams& params) override
 	{
-		fAvTime = 16;
-		fAvTotal = params.audio_data.GetIntensity( ) * fAvTime;
-		bReset = true;
-		Texture *t = params.texture_library.Find(envmap_texture_class);
-		for(int i = 0; i < 9; i++) pObj[i].textures[0].texture = t;
-		bFirstCalc = true;
+		av_time = 16;
+		av_total = params.audio_data.GetIntensity() * av_time;
+		reset = true;
+		Texture* t = params.texture_library.Find(envmap_texture_class);
+		for (int i = 0; i < 9; i++) objects[i].textures[0].texture = t;
 		return nullptr;
 	}
 };
 
 EXPORT_EFFECT(MotionBlur3, EffectMotionBlur3T<false>)
 EXPORT_EFFECT(MotionBlur3Alt, EffectMotionBlur3T<true>)
-
-//typedef ZEffectMotionBlur3T<false> ZEffectMotionBlur3;
-//DECLARE_EFFECT_PTR(ZEffectMotionBlur3, pEffectMotionBlur3)
-
-//typedef ZEffectMotionBlur3T<true> ZEffectMotionBlur3Alt;
-//DECLARE_EFFECT_PTR(ZEffectMotionBlur3Alt, pEffectMotionBlur3Alt)
