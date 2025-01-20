@@ -9,6 +9,11 @@ extern const float PI2;
 extern const float DEG_TO_RAD;
 extern const float FLOAT_ZERO;
 
+#define IMPLEMENT_ENUM_FLAGS(FlagType) \
+	inline FlagType operator~(FlagType a){ return (FlagType)~(uint32)a; } \
+	inline FlagType operator|(FlagType a, FlagType b){ return (FlagType)((uint32)a | (uint32)b); } \
+	inline FlagType operator&(FlagType a, FlagType b){ return (FlagType)((uint32)a & (uint32)b); }
+
 uint32 GetSystemTimestampMs();
 float Wrap(float fValue, float fMin, float fMax);
 

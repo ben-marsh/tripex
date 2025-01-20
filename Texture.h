@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Error.h"
+#include "Misc.h"
 #include <vector>
 
 enum class TextureFlags
