@@ -10,7 +10,7 @@
 //static double linearity = 0;
 
 //static unsigned int buffersize = 0;
-//static D3DTLVERTEX *vb = NULL;
+//static D3DTLVERTEX *vb = nullptr;
 
 class EffectLightRing : public Effect
 {

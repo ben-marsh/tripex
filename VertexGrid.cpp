@@ -53,7 +53,7 @@ VertexGrid::VertexGrid(int width, int height)//, DWORD dwVertexFormat)//, GridCo
 /*ZGrid::ZGrid(int width, int height, GridCallbackFunction callback)
 {
 	this->callback = callback;
-	this->coordcallback = NULL;
+	this->coordcallback = nullptr;
 
 	Initialise(width, height);
 }
@@ -68,7 +68,7 @@ HRESULT ZGrid::Calculate()
 {
 	double fx, fy;
 	int i = 0;
-	if(coordcallback != NULL)
+	if(coordcallback != nullptr)
 	{
 		for(int x = 0; x <= width; x++)
 		{

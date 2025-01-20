@@ -69,7 +69,7 @@ std::string Effect::GetCfgItemName() const
 /******** ZEffectPtr **************************************/
 Error* EffectHandler::Calculate(float fElapsed, AudioData& audio_data, Renderer& renderer)
 {
-	assert(pEffect != NULL);
+	assert(pEffect != nullptr);
 
 	audio_data.SetIntensityBeatScale( fSensitivity * 3.0f );
 
@@ -81,14 +81,14 @@ Error* EffectHandler::Calculate(float fElapsed, AudioData& audio_data, Renderer&
 }
 Error* EffectHandler::Render(Renderer& renderer)
 {
-	assert(pEffect != NULL);
+	assert(pEffect != nullptr);
 
 	EffectBase::RenderParams params(renderer);
 	return pEffect->Render(params);
 }
 bool EffectHandler::CanRender(float fFrames)
 {
-	assert(pEffect != NULL);
+	assert(pEffect != nullptr);
 
 	if(fFrames > 3.8) return true;
 	else return pEffect->CanRender(GetElapsed(fFrames));

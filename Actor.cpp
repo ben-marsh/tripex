@@ -17,7 +17,7 @@ const float Actor::OBJECT_NORMAL_LENGTH = 0.5f;
 Actor::TextureEntry::TextureEntry()
 {
 	pitch = yaw = roll = 0.0f;
-	texture = NULL;
+	texture = nullptr;
 	type = TextureType::Unused;
 }
 
@@ -315,7 +315,7 @@ void Actor::Calculate(const Renderer& renderer, Camera* camera, float elapsed)
 	}
 
 	// set up the frame array
-	Frame* store_frame = NULL;
+	Frame* store_frame = nullptr;
 	for (int i = 0; i < unused_frames.size();)
 	{
 		if (unused_frames[i]->time_to_live > GetSystemTimestampMs())

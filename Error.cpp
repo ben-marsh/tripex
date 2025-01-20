@@ -37,7 +37,7 @@ std::string Error::GetDescription() const
 			}
 
 			const char* sPos = strrchr(trace[i].first, '\\');
-			if (sPos == NULL)
+			if (sPos == nullptr)
 			{
 				sPos = trace[i].first;
 			}

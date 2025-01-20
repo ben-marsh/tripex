@@ -92,7 +92,7 @@ const TextureFont::Glyph* TextureFont::FindGlyph(char character) const
 
 ColorRgb* TextureFont::GetBitmap()
 {
-	if (pixels == NULL)
+	if (pixels == nullptr)
 	{
 		pixels = std::make_unique<ColorRgb[]>(256 * 256);
 	}
@@ -142,7 +142,7 @@ ColorRgb* TextureFont::GetBitmap()
 
 Error* TextureFont::Create(Renderer& renderer)
 {
-	if (texture.get() == NULL)
+	if (texture.get() == nullptr)
 	{
 		Error* error = renderer.CreateTexture(256, 256, TextureFormat::X8R8G8B8, GetBitmap(), 256 * 256 * 4, 256 * 4, nullptr, TextureFlags::None, texture);
 		if (error) return TraceError(error);
@@ -177,7 +177,7 @@ void TextureFont::Draw(GeometryBuffer& geom, const char* text, Point<int> pos, C
 	for (int i = 0; text[i] != 0; i++)
 	{
 		const Glyph* glyph = FindGlyph(text[i]);
-		if (glyph != NULL)
+		if (glyph != nullptr)
 		{
 			if (faded)
 			{
@@ -216,7 +216,7 @@ int TextureFont::GetWidth(const char* text) const
 	for (int i = 0; text[i] != 0; i++)
 	{
 		const Glyph* glyph = FindGlyph(text[i]);
-		if (glyph != NULL)
+		if (glyph != nullptr)
 		{
 			width += glyph->end - glyph->start;
 		}

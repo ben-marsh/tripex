@@ -304,7 +304,7 @@ public:
 //			if(FAILED(hRes)) return TraceError(hRes);
 		}
 
-//	hRes = light->GetSurface()->Unlock(NULL);
+//	hRes = light->GetSurface()->Unlock(nullptr);
 //	if(FAILED(hRes)) return hRes;
 
 		/** TENTACLES **********/
@@ -449,7 +449,7 @@ public:
 
 /*				for(int i = 0;;i++)
 				{
-					if(pBump[i]->pTexture == NULL) return TraceError(E_BUMPMAPNOTFOUND);
+					if(pBump[i]->pTexture == nullptr) return TraceError(E_BUMPMAPNOTFOUND);
 					else if(pBump[i]->pTexture == texture)
 					{
 						pCurrentBumpmap = &pBump[i]->pBumpmap;

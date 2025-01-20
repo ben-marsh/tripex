@@ -9,12 +9,12 @@
 
 #define USE_RANDOM_AUDIO 1
 
-IDirect3D9* g_pd3d = NULL;
-IDirect3DDevice9* g_pd3dDevice = NULL;
+IDirect3D9* g_pd3d = nullptr;
+IDirect3DDevice9* g_pd3dDevice = nullptr;
 
-HWAVEIN g_hWaveIn = NULL;
+HWAVEIN g_hWaveIn = nullptr;
 WAVEHDR g_aWaveHdr[2];
-uint8* g_apnWaveBuf[2] = { NULL, };
+uint8* g_apnWaveBuf[2] = { nullptr, };
 WAVEFORMATEX g_wfex;
 
 Tripex* g_pTripex;
@@ -30,15 +30,15 @@ RendererDirect3d* g_direct3d;
 
 void DestroyD3D()
 {
-	if (g_pd3dDevice != NULL)
+	if (g_pd3dDevice != nullptr)
 	{
 		g_pd3dDevice->Release();
-		g_pd3dDevice = NULL;
+		g_pd3dDevice = nullptr;
 	}
-	if (g_pd3d != NULL)
+	if (g_pd3d != nullptr)
 	{
 		g_pd3d->Release();
-		g_pd3d = NULL;
+		g_pd3d = nullptr;
 	}
 }
 
@@ -59,7 +59,7 @@ void OutputWaveInError(MMRESULT mRes)
 
 MMRESULT AddWaveInBuffer(int nIdx)
 {
-	if (g_hWaveIn == NULL) return S_OK;
+	if (g_hWaveIn == nullptr) return S_OK;
 
 	MMRESULT mRes = waveInPrepareHeader(g_hWaveIn, &g_aWaveHdr[nIdx], sizeof(WAVEHDR));
 	if (FAILED(mRes)) return mRes;
@@ -76,7 +76,7 @@ MMRESULT AddWaveInBuffer(int nIdx)
 
 MMRESULT RemoveWaveInBuffer(int nIdx)
 {
-	if (g_hWaveIn == NULL) return S_OK;
+	if (g_hWaveIn == nullptr) return S_OK;
 
 	MMRESULT mRes = waveInUnprepareHeader(g_hWaveIn, &g_aWaveHdr[nIdx], sizeof(g_aWaveHdr[nIdx]));
 	if (FAILED(mRes)) return mRes;
@@ -124,7 +124,7 @@ MMRESULT DestroyWaveIn()
 {
 	for (int i = 0; i < 2; i++)
 	{
-		if (g_apnWaveBuf[i] != NULL)
+		if (g_apnWaveBuf[i] != nullptr)
 		{
 			while (!(((volatile WAVEHDR&)(g_aWaveHdr[i])).dwFlags & WHDR_DONE))
 			{
@@ -135,16 +135,16 @@ MMRESULT DestroyWaveIn()
 			if (FAILED(mRes)) OutputWaveInError(mRes);
 
 			delete g_apnWaveBuf[i];
-			g_apnWaveBuf[i] = NULL;
+			g_apnWaveBuf[i] = nullptr;
 		}
 	}
 
-	if (g_hWaveIn != NULL)
+	if (g_hWaveIn != nullptr)
 	{
 		MMRESULT mRes = waveInClose(g_hWaveIn);
 		if (FAILED(mRes)) return mRes;
 
-		g_hWaveIn = NULL;
+		g_hWaveIn = nullptr;
 	}
 
 	return S_OK;
@@ -159,7 +159,7 @@ static const int TICK_TIMER_ID = 0x1234;
 void HandleError(HWND hWnd, Error* error)
 {
 	KillTimer(hWnd, TICK_TIMER_ID);
-	MessageBoxA(hWnd, error->GetDescription().c_str(), NULL, MB_OK);
+	MessageBoxA(hWnd, error->GetDescription().c_str(), nullptr, MB_OK);
 	CloseWindow(hWnd);
 }
 
@@ -195,7 +195,7 @@ LRESULT CALLBACK TxWndProc(HWND hWnd, uint32 nMsg, WPARAM wParam, LPARAM lParam)
 					return FALSE;
 				}
 
-				SetTimer(hWnd, TICK_TIMER_ID, 10, NULL);
+				SetTimer(hWnd, TICK_TIMER_ID, 10, nullptr);
 			}
 		}
 		return FALSE;
@@ -303,14 +303,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR sCmdLine,
 	wc.lpfnWndProc = (WNDPROC)TxWndProc;
 	RegisterClass(&wc);
 
-	HWND hWnd = CreateWindow(wc.lpszClassName, L"Tripex", WS_OVERLAPPEDWINDOW, 50, 50, 700, 500, NULL, NULL, hInstance, NULL);
+	HWND hWnd = CreateWindow(wc.lpszClassName, L"Tripex", WS_OVERLAPPEDWINDOW, 50, 50, 700, 500, nullptr, nullptr, hInstance, nullptr);
 	ShowWindow(hWnd, SW_SHOW);
 	UpdateWindow(hWnd);
 
 	MSG msg;
 	while (IsWindow(hWnd))
 	{
-		DWORD dwRes = GetMessage(&msg, NULL, 0, 0);
+		DWORD dwRes = GetMessage(&msg, nullptr, 0, 0);
 		if (dwRes == 0 || dwRes == -1) break;
 
 		TranslateMessage(&msg);

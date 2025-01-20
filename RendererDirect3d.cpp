@@ -13,7 +13,7 @@ RendererDirect3d::TextureImpl::TextureImpl(int width, int height, TextureFormat 
 	, data_stride(data_stride)
 	, palette(palette)
 {
-	d3d_texture = NULL;
+	d3d_texture = nullptr;
 	dirty = false;
 }
 
@@ -40,7 +40,7 @@ Error* RendererDirect3d::TextureImpl::GetPixelData(std::vector<uint8>& buffer) c
 
 	D3DLOCKED_RECT d3dr;
 
-	hRes = pSurface->LockRect(&d3dr, NULL, 0);
+	hRes = pSurface->LockRect(&d3dr, nullptr, 0);
 	if (FAILED(hRes))
 	{
 		pSurface->Release();
@@ -115,7 +115,7 @@ void RendererDirect3d::Close()
 
 Error* RendererDirect3d::BeginFrame()
 {
-	HRESULT hRes = device->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x00000000, 1.0f, 0);
+	HRESULT hRes = device->Clear(0, nullptr, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x00000000, 1.0f, 0);
 	if (FAILED(hRes)) return TraceError(hRes);
 
 	hRes = device->BeginScene();
@@ -132,7 +132,7 @@ Error* RendererDirect3d::EndFrame()
 	HRESULT hRes = device->EndScene();
 	if (FAILED(hRes)) return TraceError(hRes);
 
-	hRes = device->Present(NULL, NULL, NULL, NULL);
+	hRes = device->Present(nullptr, nullptr, nullptr, nullptr);
 	if (FAILED(hRes)) return TraceError(hRes);
 
 	return nullptr;
@@ -424,7 +424,7 @@ Error* RendererDirect3d::UploadTexture(IDirect3DTexture9* d3d_texture, int width
 		D3DLOCKED_RECT locked_rect;
 		if (surface_desc.Width == (uint32)width && surface_desc.Height == (uint32)height && surface_desc.Format == D3DFMT_P8)
 		{
-			hRes = surface->LockRect(&locked_rect, NULL, 0);
+			hRes = surface->LockRect(&locked_rect, nullptr, 0);
 			if (FAILED(hRes)) return TraceError(hRes);
 
 			const uint8* input_data = (const uint8*)data;
@@ -444,7 +444,7 @@ Error* RendererDirect3d::UploadTexture(IDirect3DTexture9* d3d_texture, int width
 		{
 			RECT src_rect = { 0, 0, width, height };
 
-			hRes = D3DXLoadSurfaceFromMemory( surface, NULL, NULL, data, format, data_stride, palette, &src_rect, D3DX_FILTER_TRIANGLE | D3DX_FILTER_DITHER, 0 );
+			hRes = D3DXLoadSurfaceFromMemory( surface, nullptr, nullptr, data, format, data_stride, palette, &src_rect, D3DX_FILTER_TRIANGLE | D3DX_FILTER_DITHER, 0 );
 			if( FAILED( hRes ) ) return TraceError( hRes );
 		}
 	}
