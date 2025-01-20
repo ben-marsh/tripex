@@ -181,8 +181,8 @@ void TextureFont::Draw(GeometryBuffer& geom, const char* text, Point<int> pos, C
 		{
 			if (faded)
 			{
-				float brightness = Bound<float>(float(relative_in) / LETTER_APPEAR_FRAMES, 0, 1);
-				brightness *= 1 - Bound<float>(float(relative_out) / LETTER_APPEAR_FRAMES, 0, 1);
+				float brightness = Clamp<float>(float(relative_in) / LETTER_APPEAR_FRAMES, 0, 1);
+				brightness *= 1 - Clamp<float>(float(relative_out) / LETTER_APPEAR_FRAMES, 0, 1);
 				glyph_color = color * brightness;
 			}
 

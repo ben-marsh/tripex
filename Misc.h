@@ -17,7 +17,7 @@ extern const float FLOAT_ZERO;
 uint32 GetSystemTimestampMs();
 float Wrap(float fValue, float fMin, float fMax);
 
-template< class T > inline T Bound(T x, T a, T b)
+template< class T > inline T Clamp(T x, T a, T b)
 {
 	if (x < a)
 	{
@@ -52,14 +52,14 @@ template < class T > T ReverseBitOrder(const T src)
 	return dst;
 }
 
-template< class T > inline T StepTo(T value, T target, T nStep)
+template< class T > inline T StepTo(T value, T target, T step_size)
 {
 	if (value < target)
 	{
-		return std::min<T>(target, value + nStep);
+		return std::min<T>(target, value + step_size);
 	}
 	else
 	{
-		return std::max<T>(target, value - nStep);
+		return std::max<T>(target, value - step_size);
 	}
 }

@@ -162,8 +162,8 @@ public:
 		nOsc1 = rand() % 4;
 		nOsc2 = -1;
 
-		nFlowmapW = Bound<int>(nFlowmapW, 1, 4);
-		nFlowmapH = Bound<int>(nFlowmapH, 1, 4);
+		nFlowmapW = Clamp<int>(nFlowmapW, 1, 4);
+		nFlowmapH = Clamp<int>(nFlowmapH, 1, 4);
 
 		if (nFlowmapH > nFlowmapW) std::swap(nFlowmapW, nFlowmapH);
 
@@ -269,7 +269,7 @@ public:
 			double y = y1;
 			for (int x = ((int)x1) - 1; x < ((int)x2) + 2; x++)
 			{
-				double t = Bound<double>(std::min(x2, (double)x) - x1, 0, 1);
+				double t = Clamp<double>(std::min(x2, (double)x) - x1, 0, 1);
 				int yn = (int)y;
 				double p = y - yn;
 				if (x > 0 && yn > 0 && x < xw - 2 && yn < h - 2)
@@ -294,7 +294,7 @@ public:
 			double x = x1;
 			for (int y = ((int)y1) - 1; y < ((int)y2) + 2; y++)
 			{
-				double t = Bound<double>(std::min(y2, (double)y) - y1, 0, 1);
+				double t = Clamp<double>(std::min(y2, (double)y) - y1, 0, 1);
 				int xn = (int)x;
 				double p = x - xn;
 				if (xn > 0 && y > 0 && xn < xw - 2 && y < h - 2)
@@ -484,19 +484,19 @@ public:
 			pDst.x = (pDst.x * fMagnify) + (width - 1) / 2.0f;
 			pDst.y = (pDst.y * fMagnify) + (height - 1) / 2.0f;
 
-			pDst.x = Bound<float>(pDst.x, 0, width - 2);
-			pDst.y = Bound<float>(pDst.y, 0, height - 2);
+			pDst.x = Clamp<float>(pDst.x, 0, width - 2);
+			pDst.y = Clamp<float>(pDst.y, 0, height - 2);
 
-			xo = Bound<float>(pDst.x - int(pDst.x), 0, 1);
-			yo = Bound<float>(pDst.y - int(pDst.y), 0, 1);
+			xo = Clamp<float>(pDst.x - int(pDst.x), 0, 1);
+			yo = Clamp<float>(pDst.y - int(pDst.y), 0, 1);
 
 			int i = (int(yo * double(PRECISION)) + xo) * double(PRECISION);
 
 			if (nCalcY < height)
 			{
-				mo[nBuf][nCalcPixel] = Bound<int>(i, 0, 255) * 256 * 4;
+				mo[nBuf][nCalcPixel] = Clamp<int>(i, 0, 255) * 256 * 4;
 				sp[nBuf][nCalcPixel] = (int(pDst.y) * width) + int(pDst.x);
-				sp[nBuf][nCalcPixel] = Bound<int>(sp[nBuf][nCalcPixel], 0, (width * height) - 1);
+				sp[nBuf][nCalcPixel] = Clamp<int>(sp[nBuf][nCalcPixel], 0, (width * height) - 1);
 
 				pSrc.x += fPixelStep;
 				nCalcX++;

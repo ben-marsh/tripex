@@ -237,7 +237,7 @@ public:
 				m_pLimit[i].vertices[j].position.z = dCubePosZ - (dCubeSin * m_pfCubeHeight[i][j]);
 			}
 			
-			float fBr = Bound< float >( 0.9f - ( ( float )i ) / LIMITER_H, 0.0f, 1.0f );
+			float fBr = Clamp< float >( 0.9f - ( ( float )i ) / LIMITER_H, 0.0f, 1.0f );
 			m_pLimit[ i ].ambient_light_color = ColorRgb::Grey( ( int )( 255.0f * fBr * params.brightness ) );
 			m_pLimit[ i ].Calculate(params.renderer, &m_cCamera, params.elapsed);
 		}

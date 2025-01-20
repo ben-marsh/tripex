@@ -46,15 +46,15 @@ WideColorRgb ColorHsv::ToWideColorRgb() const
 	float spread = c.saturation * c.value * 255.0f;
 	float min = c.value * 255.0f - spread;
 
-	float r = min + Bound< float >(-1 + fabsf(pos - 3.0f), 0.0f, 1.0f) * spread;
-	float g = min + Bound< float >(+2 - fabsf(pos - 2.0f), 0.0f, 1.0f) * spread;
-	float b = min + Bound< float >(+2 - fabsf(pos - 4.0f), 0.0f, 1.0f) * spread;
+	float r = min + Clamp< float >(-1 + fabsf(pos - 3.0f), 0.0f, 1.0f) * spread;
+	float g = min + Clamp< float >(+2 - fabsf(pos - 2.0f), 0.0f, 1.0f) * spread;
+	float b = min + Clamp< float >(+2 - fabsf(pos - 4.0f), 0.0f, 1.0f) * spread;
 	return WideColorRgb((int32)r, (int32)g, (int32)b);
 }
 
 void ColorHsv::CorrectRange()
 {
 	hue = Wrap(hue, -PI, +PI);
-	saturation = Bound< float >(saturation, 0.0f, 1.0f);
-	value = Bound< float >(value, 0.0f, 1.0f);
+	saturation = Clamp< float >(saturation, 0.0f, 1.0f);
+	value = Clamp< float >(value, 0.0f, 1.0f);
 }

@@ -11,7 +11,7 @@ extern float fHUDTransparency;
 
 void DrawLineBar(GeometryBuffer& geom, int x, int y, int h, float p)
 {
-	int n = (int)(h * Bound<float>(p, 0.0f, 1.0f));
+	int n = (int)(h * Clamp<float>(p, 0.0f, 1.0f));
 	geom.AddSprite(Point<int>(x, y), Rect<int>(0, 0, 1, n), 0.1f);
 	geom.AddSprite(Point<int>(x, y + n), Rect<int>(0, 0, 1, h - n), 1.0f);
 }

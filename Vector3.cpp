@@ -13,7 +13,7 @@ float Vector3::GetRoll(float tightness) const
 {
 	float pos = fabsf(GetPitch() / (PI / 2.0f));
 	float roll_t = (pos - (1.0f - tightness)) / tightness;
-	float roll = Bound< float >(roll_t, 0.0f, 1.0f) * (PI / 2.0f);
+	float roll = Clamp< float >(roll_t, 0.0f, 1.0f) * (PI / 2.0f);
 	if (fabsf(GetYaw()) > (PI / 2.0f))
 	{
 		roll = -roll;

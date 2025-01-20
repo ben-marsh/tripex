@@ -145,8 +145,8 @@ public:
 					pObj[i].roll += 0.1f * as[i][0][0];
 					pObj[i].pitch += params.audio_data.GetDampenedBand( sensitivity, 3.0f/16.0f, 4.0f/16.0f) * as[i][1][0];
 					pObj[i].yaw += params.audio_data.GetDampenedBand( sensitivity, 4.0f/16.0f, 5.0f/16.0f) * as[i][2][0];
-					pObj[i].pitch = Bound<float>(pObj[i].pitch, -ANGSZ, ANGSZ);
-					pObj[i].yaw = Bound<float>(pObj[i].yaw, -ANGSZ, ANGSZ);
+					pObj[i].pitch = Clamp<float>(pObj[i].pitch, -ANGSZ, ANGSZ);
+					pObj[i].yaw = Clamp<float>(pObj[i].yaw, -ANGSZ, ANGSZ);
 				}
 				if((i % 3) == 1)
 				{

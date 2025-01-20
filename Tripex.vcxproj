@@ -277,10 +277,12 @@
     <ClInclude Include="Texture.h" />
     <ClInclude Include="TextureFont.h" />
     <ClInclude Include="Tripex.h" />
+    <ClInclude Include="WideColorRgb.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
     <None Include=".gitignore" />
+    <None Include="ColorRgb.inl" />
     <None Include="Edge.inl" />
     <None Include="Face.inl" />
     <None Include="packages.config" />
@@ -289,6 +291,7 @@
     <None Include="Vector3.inl" />
     <None Include="Fourier.inl" />
     <None Include="Matrix44.inl" />
+    <None Include="WideColorRgb.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -126,7 +126,7 @@ private:
 		{
 			for(int i = 0; i < vertices.size(); i++)
 			{
-				vertices[i].position = pvDir[i] * (1 + Bound<float>(pfPos[i], MINSZ, MAXSZ));
+				vertices[i].position = pvDir[i] * (1 + Clamp<float>(pfPos[i], MINSZ, MAXSZ));
 			}
 		}
 		void ResetPoint(int nPoint)
