@@ -1,4 +1,3 @@
-// average = (sensitivity * average)
 #include "Platform.h"
 #include "Actor.h"
 #include "BezierCurve.h"
@@ -33,31 +32,26 @@ public:
 
 	const float TWISTPLANERADIUS = 30.0f;
 
-	//#define bcTwistPlanes 4			// >= 2
-	//#define bcTwistPlaneCorners 4
-	static const int bcBezierPoints = 50;	//100
-	static const int bcCornerLinePoints = 10; //20
-	static const int bcCubeRadius = 30;	// radius of the container cylinder of the cube
-	static const int bcCubeHeight = 80;	// height of the cube
-
-	int nCornerIndex[BEZIERS];
+	int corner_index[BEZIERS];
 
 	Texture* sprite_texture;
 	Texture* tint_texture;
 	Actor obj;
-	Actor pObj[BEZIERS];
-	Actor pObjPlane[TWISTPLANES];
+	Actor edges[BEZIERS];
+	Actor planes[TWISTPLANES];
 	Camera camera;
-//static Object **bcBezierPoint, **bcTemplate, **bcCornerLinePoint;
 	BezierCurve bcEdge;
 	float fAng;
 
-	float pfRS[TWISTPLANES], pfPS[TWISTPLANES], pfYS[TWISTPLANES], pfPos[TWISTPLANES], pfSpeed[TWISTPLANES];
+	float plane_roll_speed[TWISTPLANES];
+	float plane_pitch_speed[TWISTPLANES];
+	float plane_yaw_speed[TWISTPLANES];
 	double brt;
 
-	Actor testobj;
-	double dAng, dAngX, dAngY, dAngZ;
-	double dMult;
+	double ang_x, ang_y, ang_z;
+	double mult;
+
+	float fel = 0.0f;
 
 	EffectBezierCube()
 		: Effect({ &sprite_texture_class, &tint_texture_class })
@@ -67,191 +61,166 @@ public:
 		sprite_texture = nullptr;
 		tint_texture = nullptr;
 
-		memset(pfRS, 0, sizeof(pfRS));
-		memset(pfPS, 0, sizeof(pfPS));
-		memset(pfYS, 0, sizeof(pfYS));
-		memset(pfPos, 0, sizeof(pfPos));
-		memset(pfSpeed, 0, sizeof(pfSpeed));
+		memset(plane_roll_speed, 0, sizeof(plane_roll_speed));
+		memset(plane_pitch_speed, 0, sizeof(plane_pitch_speed));
+		memset(plane_yaw_speed, 0, sizeof(plane_yaw_speed));
 
-		dAng = 0;
-		dAngX = 0;
-		dAngY = 0;
-		dAngZ = 0;
-		dMult = 0;
+		ang_x = 0;
+		ang_y = 0;
+		ang_z = 0;
+		mult = 0;
 
 		fAng = 0.0f;
 		obj.textures[0].type = Actor::TextureType::Sprite;
-		obj.flags.set( Actor::F_DRAW_VERTEX_SPRITES );
-		obj.flags.set( Actor::F_DRAW_TRANSPARENT);
+		obj.flags.set(Actor::F_DRAW_VERTEX_SPRITES);
+		obj.flags.set(Actor::F_DRAW_TRANSPARENT);
 		obj.frame_history = 8.0f;
 		obj.sprite_history_length = 0.3f;
-		//pObjPlane[i].pVertex.SetFormat(D3DFVF_TEX1);
 
-		for(int i = 0; i < TWISTPLANES; i++)
+		for (int i = 0; i < TWISTPLANES; i++)
 		{
-			pfPos[i] = 2;
-			pfSpeed[i] = 0;
+			plane_roll_speed[i] = (3 + (rand() * 10.0 / RAND_MAX)) * DEG_TO_RAD;
+			plane_pitch_speed[i] = (3 + (rand() / RAND_MAX)) * DEG_TO_RAD;
+			plane_yaw_speed[i] = (3 + (rand() / RAND_MAX)) * DEG_TO_RAD;
 
-			pObjPlane[i].flags.set( Actor::F_DRAW_TRANSPARENT );
-			pObjPlane[i].flags.set( Actor::F_DRAW_VERTEX_SPRITES );
-//		pObjPlane[i].Clear(ZObject::DoScreenTransform);
-			pObjPlane[i].sprite_size = 5.0f;//fRenderAsLights(10.0);
-			pObjPlane[i].flags.set( Actor::F_DO_FRAME_HISTORY );
+			planes[i].flags.set(Actor::F_DRAW_TRANSPARENT);
+			planes[i].flags.set(Actor::F_DRAW_VERTEX_SPRITES);
+			planes[i].sprite_size = 5.0f;
+			planes[i].flags.set(Actor::F_DO_FRAME_HISTORY);
 
-			pObjPlane[i].vertices.resize(TWISTPLANECORNERS);
-			Vector3 vCorner[BEZIERS];
-			for(int j = 0; j < BEZIERS; j++)
+			planes[i].vertices.resize(TWISTPLANECORNERS);
+			Vector3 corners[BEZIERS];
+			for (int j = 0; j < BEZIERS; j++)
 			{
-				float fRadius = TWISTPLANERADIUS;
-				float dAng = j * 2.0 * PI / BEZIERS;
-				if(i != 0 && i != TWISTPLANES - 1) fRadius *= 1.2f;
-				vCorner[j].x = 0;
-				vCorner[j].y = fRadius * cos(dAng);
-				vCorner[j].z = fRadius * sin(dAng);
+				float radius = TWISTPLANERADIUS;
+				if (i != 0 && i != TWISTPLANES - 1)
+				{
+					radius *= 1.2f;
+				}
+
+				float angle = j * 2.0 * PI / BEZIERS;
+				corners[j].x = 0;
+				corners[j].y = radius * cosf(angle);
+				corners[j].z = radius * sinf(angle);
 			}
-			for(int j = 0; j < TWISTPLANECORNERS; j++)
+			for (int j = 0; j < TWISTPLANECORNERS; j++)
 			{
-				float fPos = float(j % TWISTPLANEEDGE) / TWISTPLANEEDGE;
-				Vector3 &v1 = vCorner[j / TWISTPLANEEDGE];
-				Vector3 &v2 = vCorner[((j / TWISTPLANEEDGE) + 1) % BEZIERS];
+				float pos = float(j % TWISTPLANEEDGE) / TWISTPLANEEDGE;
+				Vector3& v1 = corners[j / TWISTPLANEEDGE];
+				Vector3& v2 = corners[((j / TWISTPLANEEDGE) + 1) % BEZIERS];
 
-				pObjPlane[i].vertices[j].position = (v1 * (1 - fPos)) + (v2 * fPos);
+				planes[i].vertices[j].position = (v1 * (1 - pos)) + (v2 * pos);
 			}
 
-			pObjPlane[i].textures[0].type = Actor::TextureType::Sprite;
-
-//		if(i == 0 || i == TWISTPLANES - 1)
-//		{
-//			pScene->vpObject.Add(pObjPlane[i]);
-//		}
+			planes[i].textures[0].type = Actor::TextureType::Sprite;
 		}
-		for(int i = 0; i < BEZIERS; i++)
+		for (int i = 0; i < BEZIERS; i++)
 		{
-			nCornerIndex[i] = i * TWISTPLANECORNERS / BEZIERS;
+			corner_index[i] = i * TWISTPLANECORNERS / BEZIERS;
 		}
-		for(int i = 0; i < BEZIERS; i++)
+		for (int i = 0; i < BEZIERS; i++)
 		{
-			pObj[i].vertices.resize(BEZIERPOINTS);
-			pObj[i].flags.set( Actor::F_DRAW_TRANSPARENT );
-			pObj[i].flags.set( Actor::F_DRAW_VERTEX_SPRITES );
-			for(int j = 0; j < BEZIERPOINTS; j++)
-			{
-//				pObj[i].pVertex[j].GetDiffuse() = ZColour::Grey(255.0 * (0.4 + (0.6 * fabs(cos(j * 3.14159 / BEZIERPOINTS)))));
-			}
-//			pObj[i]->Clear(ZObject::DoScreenTransform);
-			pObj[i].flags.set( Actor::F_NO_TRANSFORM );
-			pObj[i].sprite_size = 5.0;
-			pObj[i].frame_history = 1.0f;
-			pObj[i].sprite_history_length = 60.0f;
-//			pObj[i].Set(ZObject::DrawVertexSpriteHistory);
-			pObj[i].textures[0].type = Actor::TextureType::Sprite;
+			edges[i].vertices.resize(BEZIERPOINTS);
+			edges[i].flags.set(Actor::F_DRAW_TRANSPARENT);
+			edges[i].flags.set(Actor::F_DRAW_VERTEX_SPRITES);
+			edges[i].flags.set(Actor::F_NO_TRANSFORM);
+			edges[i].sprite_size = 5.0;
+			edges[i].frame_history = 1.0f;
+			edges[i].sprite_history_length = 60.0f;
+			edges[i].textures[0].type = Actor::TextureType::Sprite;
 		}
 	}
+
 	Error* Calculate(const CalculateParams& params) override
 	{
-		double dMultDest = 1 - params.audio_data.GetDampenedBand(sensitivity, 0.0f, 1.0f);//average;
-		camera.position.z = -110;//pScene->camera.z = -110;//60;
+		double mult_dest = 1 - params.audio_data.GetDampenedBand(sensitivity, 0.0f, 1.0f);
+		camera.position.z = -110;
 		double sm = 1.3 * params.elapsed;
 
 		brt = params.brightness;
-	
-		if(dMultDest < dMult) dMult = std::max(dMultDest, dMult - 0.01);
-		if(dMultDest > dMult) dMult = std::min(dMultDest, dMult + 0.01);
 
-		dAng += sm * params.audio_data.GetDampenedBand(sensitivity, 0, 0.5f) * 0.25 * 4 * DEG_TO_RAD;
-
-		double dCentre = (TWISTPLANES - 1.0) / 2.0;
-		for(int i = 0; i < TWISTPLANES; i++)
+		if (mult_dest < mult)
 		{
-			pfPos[i] += pfSpeed[i];
-			if(pfPos[i] > 1.0)
-			{
-				pfRS[i] = (3 + (rand() * 10.0 / RAND_MAX)) * DEG_TO_RAD;
-				pfPS[i] = (3 + (rand() / RAND_MAX)) * DEG_TO_RAD;
-				pfYS[i] = (3 + (rand() / RAND_MAX)) * DEG_TO_RAD;
-				pfPos[i] = pfPos[i] - (int)pfPos[i];
-			}
-
-			pObjPlane[i].roll += pfRS[i] * (params.audio_data.GetIntensity( ) + 0.1);
-			pObjPlane[i].yaw += pfYS[i] * (params.audio_data.GetIntensity( ) + 0.1);
-			pObjPlane[i].pitch += pfPS[i] * params.audio_data.GetIntensity( );
-
-			pObjPlane[i].position.x = -(BEZIERHEIGHT / 2) + (i * BEZIERHEIGHT / (TWISTPLANES - 1.0));
-			pObjPlane[i].position.z = -60;
-			double dBr = params.brightness * 0.2 * (0.1 + (0.9 * fabs((i / dCentre) - 1)));
-			pObjPlane[i].ambient_light_color = ColorRgb::Grey(255.0 * dBr);
-			pObjPlane[i].Calculate(params.renderer, &camera, params.elapsed);
+			mult = std::max(mult_dest, mult - 0.01);
+		}
+		if (mult_dest > mult)
+		{
+			mult = std::min(mult_dest, mult + 0.01);
 		}
 
-		for(int i = 0; i < BEZIERS; i++)
+		double center = (TWISTPLANES - 1.0) / 2.0;
+		for (int i = 0; i < TWISTPLANES; i++)
 		{
-			for(int j = 0; j < TWISTPLANES; j++)
-			{
-				bcEdge[j] = pObjPlane[j].frames[0]->positions[nCornerIndex[i]];
-				// - ZVector(d3d->GetWidth() / 2.0, d3d->GetHeight() / 2.0, 0);
-					//rvertex[nCornerIndex[i]].sx, pObjPlane[j]->rvertex[nCornerIndex[i]].sy, pObjPlane[j]->rvertex[nCornerIndex[i]].sz);
-			}
-			for(int j = 0; j < BEZIERPOINTS; j++)	
-			{
-				pObj[i].vertices[j].position = bcEdge.Calculate(double(j) / BEZIERPOINTS);
-			//	, &pObj[i]->vertex[j].x, &pObj[i]->vertex[j].y, &pObj[i]->vertex[j].z);
-			}
-			double dBr = params.brightness * 0.2;
-			pObj[i].ambient_light_color = ColorRgb::Grey(255.0 * dBr);//(255D3DRGB(dBr, dBr, dBr);
-			pObj[i].Calculate(params.renderer, &camera, params.elapsed);
+			planes[i].roll += plane_roll_speed[i] * (params.audio_data.GetIntensity() + 0.1);
+			planes[i].yaw += plane_yaw_speed[i] * (params.audio_data.GetIntensity() + 0.1);
+			planes[i].pitch += plane_pitch_speed[i] * params.audio_data.GetIntensity();
+
+			planes[i].position.x = -(BEZIERHEIGHT / 2) + (i * BEZIERHEIGHT / (TWISTPLANES - 1.0));
+			planes[i].position.z = -60;
+
+			double brightness = params.brightness * 0.2 * (0.1 + (0.9 * fabs((i / center) - 1)));
+			planes[i].ambient_light_color = ColorRgb::Grey(255.0 * brightness);
+			planes[i].Calculate(params.renderer, &camera, params.elapsed);
 		}
-		
-		static float fel = 0.0f;
+
+		for (int i = 0; i < BEZIERS; i++)
+		{
+			for (int j = 0; j < TWISTPLANES; j++)
+			{
+				bcEdge[j] = planes[j].frames[0]->positions[corner_index[i]];
+			}
+			for (int j = 0; j < BEZIERPOINTS; j++)
+			{
+				edges[i].vertices[j].position = bcEdge.Calculate(double(j) / BEZIERPOINTS);
+			}
+			double brightness = params.brightness * 0.2;
+			edges[i].ambient_light_color = ColorRgb::Grey(255.0 * brightness);
+			edges[i].Calculate(params.renderer, &camera, params.elapsed);
+		}
+
 		fel += params.elapsed;
-		for(; fel > 1.0; fel--)
+		for (; fel > 1.0; fel--)
 		{
 			fAng += 8.0f * DEG_TO_RAD;
 			obj.vertices.resize(1);
-			obj.vertices[0].position.x = 5 * cos(fAng);//pObj[0].pVertex[0].GetPosition();
-			obj.vertices[0].position.y = 5 * sin(fAng);//pObj[0].pVertex[0].GetPosition();
-			obj.vertices[0].position.z = -100;//pObj[0].pVertex[0].GetPosition();
+			obj.vertices[0].position.x = 5 * cos(fAng);
+			obj.vertices[0].position.y = 5 * sin(fAng);
+			obj.vertices[0].position.z = -100;
 		}
 		obj.Calculate(params.renderer, &camera, params.elapsed);
 
-		dMult = params.audio_data.GetDampenedBand(sensitivity, 0, 1.0f);//average;
-		dAngX += sm * dMult * 9 * DEG_TO_RAD;
+		mult = params.audio_data.GetDampenedBand(sensitivity, 0, 1.0f);
 
-		dAngY += sm * params.audio_data.GetDampenedBand(sensitivity, 0/16.0f, 3/16.0f) * 3.4 * DEG_TO_RAD;
-		dAngZ += sm * params.audio_data.GetDampenedBand(sensitivity, 3/16.0f, 9/16.0f) * 4.2 * DEG_TO_RAD;
-		while(dAngX > PI2) dAngX -= PI2;
-		while(dAngY > PI2) dAngY -= PI2;
-		while(dAngZ > PI2) dAngZ -= PI2;
+		ang_x += sm * mult * 9 * DEG_TO_RAD;
+		while (ang_x > PI2) ang_x -= PI2;
 
-		camera.roll += sm * params.audio_data.GetIntensity( ) * 4 * DEG_TO_RAD;
-	//	pScene->camera.turn(sm * average * 4 * 3.14159 / 180.0, 0, 0);
+		ang_y += sm * params.audio_data.GetDampenedBand(sensitivity, 0 / 16.0f, 3 / 16.0f) * 3.4 * DEG_TO_RAD;
+		while (ang_y > PI2) ang_y -= PI2;
+
+		ang_z += sm * params.audio_data.GetDampenedBand(sensitivity, 3 / 16.0f, 9 / 16.0f) * 4.2 * DEG_TO_RAD;
+		while (ang_z > PI2) ang_z -= PI2;
+
+		camera.roll += sm * params.audio_data.GetIntensity() * 4 * DEG_TO_RAD;
 		return nullptr;
 	}
+
 	Error* Render(const RenderParams& params) override
 	{
 		Error* error;
-	//	hRes = obj.Render(d3d);
-	//	if(FAILED(hRes)) return TraceError(hRes);
 
-		error = pObjPlane[0].Render(params.renderer);
-		if(error) return TraceError(error);
+		error = planes[0].Render(params.renderer);
+		if (error) return TraceError(error);
 
-		error = pObjPlane[TWISTPLANES-1].Render(params.renderer);
-		if(error) return TraceError(error);
-	//	for(int i = 0; i < TWISTPLANES; i++)
-	//	{
-	//		hRes = pObjPlane[i].Render(d3d);
-	//		if(FAILED(hRes)) return TraceError(hRes);
-	//	}
-		for(int i = 0; i < BEZIERS; i++)
+		error = planes[TWISTPLANES - 1].Render(params.renderer);
+		if (error) return TraceError(error);
+
+		for (int i = 0; i < BEZIERS; i++)
 		{
-			error = pObj[i].Render(params.renderer);
-			if(error) return TraceError(error);
+			error = edges[i].Render(params.renderer);
+			if (error) return TraceError(error);
 		}
 
-	//	hRes = pScene->render(d3d);
-	//	if(FAILED(hRes)) return hRes;
-
-		if(tint_texture != nullptr)
+		if (tint_texture != nullptr)
 		{
 			RenderState render_state;
 			render_state.blend_mode = BlendMode::Tint;
@@ -259,22 +228,23 @@ public:
 			render_state.texture_stages[0].texture = tint_texture;
 
 			error = params.renderer.DrawSprite(render_state, Point<int>(0, 0), Rect<int>(0, 0, params.renderer.GetWidth(), params.renderer.GetHeight()), ColorRgb::Grey(brt * 255.0));
-			if(error) return TraceError(error);
+			if (error) return TraceError(error);
 		}
+
 		return nullptr;
 	}
+
 	Error* Reconfigure(const ReconfigureParams& params) override
 	{
 		sprite_texture = params.texture_library.Find(sprite_texture_class);
-		testobj.textures[0].texture = sprite_texture;
 		obj.textures[0].texture = sprite_texture;
-		for(int i = 0; i < TWISTPLANES; i++)
+		for (int i = 0; i < TWISTPLANES; i++)
 		{
-			pObjPlane[i].textures[0].texture = sprite_texture;
+			planes[i].textures[0].texture = sprite_texture;
 		}
-		for(int i = 0; i < BEZIERS; i++)
+		for (int i = 0; i < BEZIERS; i++)
 		{
-			pObj[i].textures[0].texture = sprite_texture;
+			edges[i].textures[0].texture = sprite_texture;
 		}
 
 		tint_texture = params.texture_library.Find(tint_texture_class);
@@ -282,4 +252,4 @@ public:
 	}
 };
 
-EXPORT_EFFECT( BezierCube, EffectBezierCube )
+EXPORT_EFFECT(BezierCube, EffectBezierCube)
