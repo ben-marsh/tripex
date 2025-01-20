@@ -191,15 +191,15 @@ public:
 		multtab.resize(PRECISION * PRECISION * 4 * 256);
 
 
-		int x, y, c, i, j = 0;
+		int j = 0;
 		double m;
-		for (y = 0; y < PRECISION; y++)
+		for (int y = 0; y < PRECISION; y++)
 		{
-			for (x = 0; x < PRECISION; x++)
+			for (int x = 0; x < PRECISION; x++)
 			{
-				for (c = 0; c < 256; c++)
+				for (int c = 0; c < 256; c++)
 				{
-					for (i = 0; i < 4; i++)
+					for (int i = 0; i < 4; i++)
 					{
 						if (i == 0) m = (1 - (x / double(PRECISION))) * (1 - (y / double(PRECISION)));
 						else if (i == 1) m = (x / double(PRECISION)) * (1 - (y / double(PRECISION)));
@@ -224,7 +224,7 @@ public:
 		j = 0;
 		pSrc.x = -255.5f;//(width - 1) / 2.0f;
 		pSrc.y = fStartY;//(height - 1) / 2.0f;
-		for (y = 0; y < height; y++)
+		for (int y = 0; y < height; y++)
 		{
 			Calculate(0, width, width, 0);
 		}
@@ -235,7 +235,7 @@ public:
 		Calculate(y, 0);
 		prFlowmap.SetProgress(y);
 		}
-		*/	for (y = 0; y < height; y++)
+		*/	for (int y = 0; y < height; y++)
 		{
 			for (int x = 0; x < width; x++) bf1[j + x] = bf2[j + x] = 0;
 			j += width;
@@ -392,9 +392,9 @@ public:
 			{
 				double xd = pSrc.x - pdX[i];
 				double yd = pSrc.y - pdY[i];
-				double dAng = atan2(yd, xd);
+				dAng = atan2(yd, xd);
 				double dLen = sqrt(xd * xd + yd * yd);
-				double dMult = 50.0 / dLen;
+				dMult = 50.0 / dLen;
 				double dLenMult = std::max(1.0, 1.05 - (dLen / (50.0 * 60.0)));
 				pDst.x += (cos(dAng + (dMult * dMult * pdA[i])) * dLen * dLenMult) - xd;
 				pDst.y += (sin(dAng + (dMult * dMult * pdA[i])) * dLen * dLenMult) - yd;
@@ -608,7 +608,6 @@ public:
 	Error* Calculate(const CalculateParams& params) override
 	{
 		Error* error;
-		int i, j;
 
 		dFrames += params.elapsed;
 
@@ -663,7 +662,7 @@ public:
 				pcHSV[4].hue = pcHSV[3].hue;
 				pcHSV[4].CorrectRange();
 
-				for (i = 0; i < 5; i++)
+				for (int i = 0; i < 5; i++)
 				{
 					pcHSV[i].saturation = (i == 4) ? 0 : (0.25 + (rand() * 0.25 / RAND_MAX));
 					pcHSV[i].value = i / 4.0;// (i * i) / 16.0;
@@ -675,8 +674,8 @@ public:
 				pcHSV[4].saturation = 0.0f;//(i == 4)? 0 : 0.25;//(0.25 + (rand() * 0.25 / RAND_MAX));
 
 				ColorRgb pc[5];
-				for (i = 0; i < 5; i++) pc[i] = pcHSV[i].ToWideColorRgb();
-				for (i = 0; i < 256; i++)
+				for (int i = 0; i < 5; i++) pc[i] = pcHSV[i].ToWideColorRgb();
+				for (int i = 0; i < 256; i++)
 				{
 					int nSec = i / 64;
 					ColorRgb c = ColorRgb::Blend(pc[nSec], pc[nSec + 1], (i % 64) / 64.0);
@@ -710,7 +709,7 @@ public:
 		{
 			if (fadecolour >= 1)
 			{
-				for (int32 i = 0; i < 256; i++)
+				for (int i = 0; i < 256; i++)
 				{
 					pCanvas->palette[i] = dstcolour[i];
 				}
@@ -741,7 +740,6 @@ public:
 
 		r = (r / 20) + 10;
 
-		j = 0;
 		double mlt = std::min(0.85, (params.audio_data.GetIntensity() * 1.6)) / 4.0;
 		//(0.7 + (average * 0.5))) / 4.0;
 
@@ -788,7 +786,7 @@ public:
 		std::vector<unsigned int>& spt = sp[tflowmap];
 
 		unsigned char* mt;
-		for (i = 0; i < width * height; i++)
+		for (int i = 0; i < width * height; i++)
 		{
 			mt = &multtab[mot[i]];
 			// mot[i] = 0...PRECISION*PRECISION index

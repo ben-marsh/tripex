@@ -351,10 +351,10 @@ public:
 
 		if(pTint != nullptr)
 		{
-			RenderState render_state;
-			render_state.blend_mode = BlendMode::Tint;
-			render_state.depth_mode = DepthMode::Disable;
-			params.renderer.DrawSprite(render_state, Point<int>(0, 0), Rect<int>(0, 0, params.renderer.GetWidth(), params.renderer.GetHeight()), ColorRgb::Grey(brt * 255.0));
+			RenderState tint_render_state;
+			tint_render_state.blend_mode = BlendMode::Tint;
+			tint_render_state.depth_mode = DepthMode::Disable;
+			params.renderer.DrawSprite(tint_render_state, Point<int>(0, 0), Rect<int>(0, 0, params.renderer.GetWidth(), params.renderer.GetHeight()), ColorRgb::Grey(brt * 255.0));
 		}
 
 		return nullptr;

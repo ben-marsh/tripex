@@ -90,38 +90,38 @@ public:
 
 		i = 0;
 		float fChange = 1.0f / std::max(grid.width, grid.height);
-		float fPosX = xp;
+		float grid_pos_x = xp;
 		const float fMulX = 1.0f / GRW;
 		const float fMulY = 1.0f / GRH;
 		for(x = 0; x <= grid.width; x++)
 		{
-			fPosX += fChange;
+			grid_pos_x += fChange;
 
-			float fPosY = yp;
+			float grid_pos_y = yp;
 			for(y = 0; y <= grid.height; y++)
 			{
-				fPosY += fChange;
+				grid_pos_y += fChange;
 
 				float fBr = 0;
-				float fX = fPosX;
-				float fY = fPosY;
+				float fX = grid_pos_x;
+				float fY = grid_pos_y;
 
 				WideColorRgb cCol(0, 0, 0);
 				for(int j = 0; j < NCENTRES; j++)
 				{
-					float fPosX = x - pvPos[j].x;
-					float fPosY = y - pvPos[j].y;
-					float fNormX = fPosX * fMulX;//(1.0f / GRW);
-					float fNormY = fPosY * fMulY;//(1.0f / GRH);
+					float pos_x = x - pvPos[j].x;
+					float pos_y = y - pvPos[j].y;
+					float norm_x = pos_x * fMulX;//(1.0f / GRW);
+					float norm_y = pos_y * fMulY;//(1.0f / GRH);
 
-					float fRad = std::min(1.0, 100.0 / fabs(fPosX * fPosX + fPosY * fPosY));
+					float fRad = std::min(1.0, 100.0 / fabs(pos_x * pos_x + pos_y * pos_y));
 					fBr += fRad;
-					float fAng = atan2(fNormY, fNormX);
+					float fAng = atan2(norm_y, norm_x);
 					float fLen = fRad * (0.75 + (0.5 * cos((fAng * NSPIKES) + t + pdA[j])));
-					fX += fLen * fNormX;
-					fY += fLen * fNormY;
+					fX += fLen * norm_x;
+					fY += fLen * norm_y;
 
-					float fColMult = params.brightness * 0.5 * std::max(0.0f, 1.0f - (sqrtf(fPosX * fPosX + fPosY * fPosY) / 30.0f));
+					float fColMult = params.brightness * 0.5 * std::max(0.0f, 1.0f - (sqrtf(pos_x * pos_x + pos_y * pos_y) / 30.0f));
 					cCol.r += pc[j].r * fColMult;
 					cCol.g += pc[j].g * fColMult;
 					cCol.b += pc[j].b * fColMult;
