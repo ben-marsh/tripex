@@ -61,12 +61,12 @@ private:
 	TextureFont tef;
 	float effect_frames, fade_pos;
 	char status_msg[256];
-	DWORD status_time;
+	uint32 status_time;
 	unsigned int id;
 	int effect_idx;
 	int next_effect_idx;
 	std::shared_ptr<Texture> gui;
-	DWORD last_time;
+	uint32 last_time;
 	float frames = 0.0f;
 
 	std::vector<std::shared_ptr<Effect>> effects;

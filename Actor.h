@@ -36,7 +36,7 @@ public:
 
 	struct Frame
 	{
-		DWORD time_to_live = 0;
+		uint32 time_to_live = 0;
 		std::vector<Vector3> positions;
 		std::vector<float> distances;
 		float elapsed = 0.0f;

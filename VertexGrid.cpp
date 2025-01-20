@@ -3,7 +3,7 @@
 #include "error.h"
 #include <memory>
 
-VertexGrid::VertexGrid(int width, int height)//, DWORD dwVertexFormat)//, GridCoordCallbackFunction callback)
+VertexGrid::VertexGrid(int width, int height)
 {
 	pos_x = 0.0f;
 	pos_y = 0.0f;

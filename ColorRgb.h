@@ -18,7 +18,7 @@ public:
 		{
 			T b, g, r;
 		};
-		DWORD dw; // Need this to be at least 32 bits for ColorRgb
+		uint32 dw; // Need this to be at least 32 bits for ColorRgb
 	};
 
 	// Constructors:

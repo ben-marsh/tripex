@@ -129,7 +129,7 @@ public:
 	double efc;
 
 	int nSamples;
-	DWORD dwTimeTotal;//(75 * nSamples);
+	uint32 dwTimeTotal;//(75 * nSamples);
 	double dFrames;
 
 	double ang;
@@ -472,9 +472,9 @@ public:
 	inline void Calculate(int nBuf, int nMin, int nMax, int nMinTime)//int nLine, int n)
 	{
 		float fPixelStep = 1.0f / fMagnify;
-		DWORD nStart = GetSystemTimestampMs();
+		uint32 nStart = GetSystemTimestampMs();
 		float xo, yo;
-		for (int nThisPixels = 0; nThisPixels < nMax && (nThisPixels < nMin || (GetSystemTimestampMs() - nStart) < (DWORD)nMinTime); nThisPixels++)
+		for (int nThisPixels = 0; nThisPixels < nMax && (nThisPixels < nMin || (GetSystemTimestampMs() - nStart) < (uint32)nMinTime); nThisPixels++)
 		{
 			// calc x,y, nCalcPixel
 			Calculate();

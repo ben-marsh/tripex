@@ -167,14 +167,14 @@ Error* Tripex::Startup()
 
 Error* Tripex::Render()
 {
-	DWORD time = GetSystemTimestampMs();
+	uint32 time = GetSystemTimestampMs();
 	if (txs.test(TXS_RESET_TIMING))//bResetTiming)
 	{
 		last_time = time - 10000;
 		txs.reset(TXS_RESET_TIMING);
 	}
 
-	DWORD dwTimeChange = time - last_time;
+	uint32 dwTimeChange = time - last_time;
 
 	frames += std::min(4.0f, dwTimeChange / (1000.0f / 15.0f));
 	last_time = time;
@@ -365,7 +365,7 @@ Error* Tripex::Render()
 	std::string msg;
 	float msg_brightness = 0.0f;
 
-	DWORD dwTick = GetSystemTimestampMs();
+	uint32 dwTick = GetSystemTimestampMs();
 	if (dwTick >= status_time && dwTick <= status_time + (MSG_DISPLAY_TIME + MSG_FADEOUT_TIME) && status_msg[0] != 0)
 	{
 		msg = status_msg;
