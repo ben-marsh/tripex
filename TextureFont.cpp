@@ -212,14 +212,14 @@ int TextureFont::GetWidth(char c) const
 
 int TextureFont::GetWidth(const char* text) const
 {
-	int width = 0;
+	int result = 0;
 	for (int i = 0; text[i] != 0; i++)
 	{
 		const Glyph* glyph = FindGlyph(text[i]);
 		if (glyph != nullptr)
 		{
-			width += glyph->end - glyph->start;
+			result += glyph->end - glyph->start;
 		}
 	}
-	return width;
+	return result;
 }

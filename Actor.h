@@ -141,7 +141,6 @@ public:
 	float sprite_size;
 	float reflectivity;
 	float sprite_history_length;
-	int max_history_length;
 
 	float pitch, yaw, roll;
 	Vector3 position;

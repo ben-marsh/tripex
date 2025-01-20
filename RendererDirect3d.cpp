@@ -59,8 +59,8 @@ Error* RendererDirect3d::TextureImpl::GetPixelData(std::vector<uint8>& buffer) c
 
 RendererDirect3d::RendererDirect3d()
 {
-	width = 0;
-	height = 0;
+	screen_width = 0;
+	screen_height = 0;
 	memset(&caps, 0, sizeof(caps));
 }
 
@@ -98,8 +98,8 @@ Error* RendererDirect3d::Open(HWND hwnd)
 	hRes = back_buffer_surface->GetDesc(&back_buffer_surface_desc);
 	if (FAILED(hRes)) return TraceError(hRes);
 
-	width = back_buffer_surface_desc.Width;
-	height = back_buffer_surface_desc.Height;
+	screen_width = back_buffer_surface_desc.Width;
+	screen_height = back_buffer_surface_desc.Height;
 
 	hRes = device->GetDeviceCaps(&caps);
 	if (FAILED(hRes)) return TraceError(hRes);
@@ -140,16 +140,16 @@ Error* RendererDirect3d::EndFrame()
 
 Rect<int> RendererDirect3d::GetViewportRect() const
 {
-	return Rect<int>(0, 0, width, height);
+	return Rect<int>(0, 0, screen_width, screen_height);
 }
 
 Rect<float> RendererDirect3d::GetClipRect() const
 {
 	Rect<float> rect;
 	rect.left = std::min(-0.25f, caps.GuardBandLeft);
-	rect.right = std::max(width - 0.25f, caps.GuardBandRight);
+	rect.right = std::max(screen_width - 0.25f, caps.GuardBandRight);
 	rect.top = std::min(-0.25f, caps.GuardBandTop);
-	rect.bottom = std::max(height - 0.25f, caps.GuardBandBottom);
+	rect.bottom = std::max(screen_height - 0.25f, caps.GuardBandBottom);
 	return rect;
 }
 

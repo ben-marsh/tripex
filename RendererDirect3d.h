@@ -60,7 +60,7 @@ private:
 	ComPtr<IDirect3D9> d3d;
 	ComPtr<IDirect3DDevice9> device;
 	D3DCAPS9 caps;
-	unsigned int width, height;
+	unsigned int screen_width, screen_height;
 
 	static D3DTEXTUREADDRESS GetD3DTEXTUREADDRESS(TextureAddress address);
 

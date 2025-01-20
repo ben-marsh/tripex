@@ -73,7 +73,6 @@ public:
 		obj.frame_history = 10.0;
 		obj.sprite_size = 2.0f;
 		obj.sprite_history_length = 1.0f;
-		obj.max_history_length = 25;
 		obj.exposure_light_delta = WideColorRgb(-2, -2, -2);
 	}
 	Error* Calculate(const CalculateParams& params) override

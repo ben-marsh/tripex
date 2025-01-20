@@ -21,10 +21,10 @@ Actor::TextureEntry::TextureEntry()
 	type = TextureType::Unused;
 }
 
-void Actor::TextureEntry::Set(TextureType type, Texture* texture)
+void Actor::TextureEntry::Set(TextureType new_type, Texture* new_texture)
 {
-	this->type = type;
-	this->texture = texture;
+	type = new_type;
+	texture = new_texture;
 }
 
 ////// Actor::Light //////
@@ -55,7 +55,6 @@ Actor::Actor()
 	sprite_size = 7.5f;
 	sprite_history_length = 0.5;
 	exposure_light_delta = ColorRgb(0, 0, 0);
-	max_history_length = 15;
 	clip_min_x = 0.0f;
 	clip_max_x = 0.0f;
 	clip_min_y = 0.0f;
@@ -625,15 +624,15 @@ void Actor::Calculate(const Renderer& renderer, Camera* camera, float elapsed)
 			ColorRgb diffuse = init_diffuse;
 			ColorRgb specular = init_specular;
 
-			float position = 0;
+			float local_pos = 0;
 			int length = 0;
 			for (int j = 0; j < frames.size() - 1; j++)
 			{
 				if (frames[j]->distances[i] > 0)
 				{
-					for (; position < frames[j]->distances[i]; position += sprite_history_length)
+					for (; local_pos < frames[j]->distances[i]; local_pos += sprite_history_length)
 					{
-						float mult = position / frames[j]->distances[i];
+						float mult = local_pos / frames[j]->distances[i];
 
 						VertexTL& vertex = transformed_vertices.emplace_back();
 						vertex.position = (frames[j]->positions[i] * (1 - mult)) + (frames[j + 1]->positions[i] * mult);
@@ -647,7 +646,7 @@ void Actor::Calculate(const Renderer& renderer, Camera* camera, float elapsed)
 						length++;
 						if (length > max_history_length) break;
 					}
-					position -= frames[j]->distances[i];
+					local_pos -= frames[j]->distances[i];
 				}
 				if (length > max_history_length) break;
 			}
@@ -748,8 +747,8 @@ void Actor::Calculate(const Renderer& renderer, Camera* camera, float elapsed)
 				for (int i = 0; i < transformed_vertices.size(); i++)
 				{
 					uint16 vertex = i % (int)vertices.size();
-					uint16 exposure = i / (int)vertices.size();
-					size_t old_index = (vertex * exp_base.size()) + exposure;
+					uint16 exposure_ofs = i / (int)vertices.size();
+					size_t old_index = (vertex * exp_base.size()) + exposure_ofs;
 					lookup[old_index] = i;
 				}
 
@@ -879,7 +878,7 @@ template<typename T> void MakeExtraSpace(std::vector<T>& vec, size_t extra_space
 	}
 }
 
-void Actor::Clip(const Renderer& renderer, std::vector<Face>& faces, uint16 plane_mask)
+void Actor::Clip(const Renderer& renderer, std::vector<Face>& clip_faces, uint16 plane_mask)
 {
 	std::vector<Face> output_faces;
 	output_faces.clear();
@@ -926,18 +925,18 @@ void Actor::Clip(const Renderer& renderer, std::vector<Face>& faces, uint16 plan
 		required_clip_planes |= vertex_info[i].clip_planes;
 	}
 
-	for (int i = 0; i < faces.size(); i++)
+	for (int i = 0; i < clip_faces.size(); i++)
 	{
 		for (int j = 0;; j++)
 		{
 			if (j >= 3)
 			{
-				output_faces.push_back(faces[i]);
+				output_faces.push_back(clip_faces[i]);
 				break;
 			}
-			else if (vertex_info[faces[i][j]].clip_planes != 0)
+			else if (vertex_info[clip_faces[i][j]].clip_planes != 0)
 			{
-				temp_faces.push_back(faces[i]);
+				temp_faces.push_back(clip_faces[i]);
 				break;
 			}
 		}
@@ -1041,7 +1040,7 @@ void Actor::Clip(const Renderer& renderer, std::vector<Face>& faces, uint16 plan
 		}
 	}
 
-	std::swap(faces, output_faces);
+	std::swap(clip_faces, output_faces);
 }
 
 bool Actor::IsClipRequired(const Face& face, uint16 plane_mask, const std::vector<VertexInfo>& vertex_info) const
