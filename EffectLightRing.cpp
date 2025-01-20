@@ -36,11 +36,11 @@ public:
 	double accum, r, p, y;
 	double brt = 0;
 	double a2 = 0;
-	Texture *tint = nullptr;
+	Texture* tint = nullptr;
 	Actor obj;
 	Camera camera;
 
-	Texture * texture = nullptr;
+	Texture* texture = nullptr;
 	double br = 0;
 
 	EffectLightRing()
@@ -51,7 +51,7 @@ public:
 
 		camera.position.z = -50;
 		b.Create(4);
-		for(int i = 0; i < SOURCES; i++)
+		for (int i = 0; i < SOURCES; i++)
 		{
 			position[i] = rand() * 2.0 * 3.14159 / RAND_MAX;
 			speed[i] = rand() * 20.0 * (3.14159 / 180.0) / RAND_MAX;
@@ -61,15 +61,15 @@ public:
 			ehps[i] = rand() * 3.0 * (3.14159 / 180.0) / RAND_MAX;
 		}
 
-		obj.flags.set( Actor::F_DRAW_TRANSPARENT );
-		obj.flags.set( Actor::F_DRAW_VERTEX_SPRITES );
-		obj.flags.set( Actor::F_DRAW_VERTEX_SPRITE_HISTORY );
+		obj.flags.set(Actor::F_DRAW_TRANSPARENT);
+		obj.flags.set(Actor::F_DRAW_VERTEX_SPRITES);
+		obj.flags.set(Actor::F_DRAW_VERTEX_SPRITE_HISTORY);
 
 		obj.sprite_history_length = 4.0f;
 		obj.frame_history = 12.0f;
 		obj.sprite_size = 2.0f;//2.0f;
 		obj.exposure_light_delta = WideColorRgb(-2, -2, -2);//10, -10, -10);
-	
+
 		obj.vertices.resize(SOURCES);
 	}
 
@@ -78,24 +78,24 @@ public:
 		brt = params.brightness;
 		accum += params.elapsed * 3.0;
 		obj.ambient_light_color = ColorRgb::Grey(params.brightness * 255.0);
-		for(; accum > 1.0f; accum--)
+		for (; accum > 1.0f; accum--)
 		{
 			float elapsed = 1.0f;
-			for(int i = 0; i < SOURCES; i++)
+			for (int i = 0; i < SOURCES; i++)
 			{
-				position[i] += 0.25 * speed[i] * params.audio_data.GetIntensity( ) * elapsed;
-				ehp[i] += 0.25 * ehps[i] * (0.4 + 2 * (params.audio_data.GetIntensity( ) + params.audio_data.GetBeat( ))) * elapsed;
+				position[i] += 0.25 * speed[i] * params.audio_data.GetIntensity() * elapsed;
+				ehp[i] += 0.25 * ehps[i] * (0.4 + 2 * (params.audio_data.GetIntensity() + params.audio_data.GetBeat())) * elapsed;
 
 				double rad = 2.0 * er[i] * cos(ehp[i]);
 				obj.vertices[i].position.x = (46.0 + (rad * sin(ehp[i]))) * sin(position[i]);
 				obj.vertices[i].position.z = (46.0 + (rad * cos(ehp[i]))) * cos(position[i]);
-				obj.vertices[i].position.y = er[i] * sin(ehp[i]);	
+				obj.vertices[i].position.y = er[i] * sin(ehp[i]);
 			}
-	
-			a2 += elapsed * (params.audio_data.GetIntensity( ) + params.audio_data.GetBeat( )) * 3.14159 / 180.0;
 
-			obj.roll += elapsed * 0.25 * params.audio_data.GetIntensity( ) * 4.0 * 3.14159 / 180.0;
-			obj.pitch += elapsed * 0.25 * params.audio_data.GetIntensity( ) * 3.0 * 3.14159 / 180.0;
+			a2 += elapsed * (params.audio_data.GetIntensity() + params.audio_data.GetBeat()) * 3.14159 / 180.0;
+
+			obj.roll += elapsed * 0.25 * params.audio_data.GetIntensity() * 4.0 * 3.14159 / 180.0;
+			obj.pitch += elapsed * 0.25 * params.audio_data.GetIntensity() * 3.0 * 3.14159 / 180.0;
 			obj.yaw += elapsed * 0.25 * 2.0 * 3.14159 / 180.0;
 
 			obj.textures[0].Set(Actor::TextureType::Sprite, texture);
@@ -116,9 +116,9 @@ public:
 		Error* error;
 
 		error = obj.Render(params.renderer);
-		if(error) return TraceError(error);	
+		if (error) return TraceError(error);
 
-		if(tint != nullptr)
+		if (tint != nullptr)
 		{
 			RenderState render_state;
 			render_state.blend_mode = BlendMode::Tint;
@@ -136,4 +136,4 @@ public:
 	}
 };
 
-EXPORT_EFFECT( LightRing, EffectLightRing )
+EXPORT_EFFECT(LightRing, EffectLightRing)

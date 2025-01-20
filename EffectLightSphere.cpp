@@ -5,9 +5,6 @@
 #include "effect.h"
 #include "TextureData.h"
 
-//#define SOURCES 65//180//65//80
-//extern EFFECT lightsphere;
-
 class EffectLightSphere : public Effect
 {
 public:
@@ -30,26 +27,23 @@ public:
 	Actor obj;
 	Camera camera;
 
-	Texture *tex;
-	Texture *tx;
-
-	std::vector<Vector3> pvPosition[4];
+	std::vector<Vector3> source_positions[4];
 	std::vector<double> position;
 	std::vector<double> speed;
 	std::vector<double> length[FRAMES];
 
-	bool fNotRendered;
-	int nSources;
+	bool not_rendered;
+	int num_sources;
 
-	double br;
-	double brt;
+	double br = 0;
+	double brt = 0;
 
 	BezierCurve b;
 
 	double accum;
 	double r, p, y;
-	double dBrBack;
-	Texture *pTint;
+	double br_back = 0;
+	Texture* tint;
 
 	EffectLightSphere()
 		: Effect({ &sprite_texture_class, &tint_texture_class })
@@ -57,122 +51,126 @@ public:
 	{
 		accum = 1.1;
 		r = p = y = 0;
-		fNotRendered = true;
-		nSources = 100;
-		
-		for(int i = 0; i < 4; i++) pvPosition[i].resize(nSources);
-		for(int i = 0; i < FRAMES; i++) length[i].resize(nSources);
-		position.resize(nSources);
-		speed.resize(nSources);
+		not_rendered = true;
+		num_sources = 100;
+
+		for (int i = 0; i < 4; i++) source_positions[i].resize(num_sources);
+		for (int i = 0; i < FRAMES; i++) length[i].resize(num_sources);
+		position.resize(num_sources);
+		speed.resize(num_sources);
 
 		obj.position.z = 50;
-		obj.vertices.resize(nSources);
-		obj.flags.set( Actor::F_DRAW_TRANSPARENT );
-		obj.flags.set( Actor::F_DRAW_VERTEX_SPRITES );
-		obj.flags.set( Actor::F_DRAW_VERTEX_SPRITE_HISTORY );
+		obj.vertices.resize(num_sources);
+		obj.flags.set(Actor::F_DRAW_TRANSPARENT);
+		obj.flags.set(Actor::F_DRAW_VERTEX_SPRITES);
+		obj.flags.set(Actor::F_DRAW_VERTEX_SPRITE_HISTORY);
 		obj.frame_history = 10.0;
 		obj.sprite_size = 2.0f;
 		obj.sprite_history_length = 1.0f;
 		obj.exposure_light_delta = WideColorRgb(-2, -2, -2);
 	}
+
 	Error* Calculate(const CalculateParams& params) override
 	{
 		brt = params.brightness;
 		accum += params.elapsed * 2.0f;
-		for(; accum > 1.0f; accum--)
+		for (; accum > 1.0f; accum--)
 		{
 			float elapsed = 1.0f;
 
 			br = params.brightness;
-			for(int i = 0; i < nSources; i++)
+			for (int i = 0; i < num_sources; i++)
 			{
-				position[i] += speed[i] * params.audio_data.GetIntensity( ) * 0.3 * elapsed;
-				double linearity = std::max(0.0f, 1 - params.audio_data.GetBeat( ) );//);//(bigbeat / 2.0));
-			
-				while(position[i] > 1.0 || position[i] < 0.0)
+				position[i] += speed[i] * params.audio_data.GetIntensity() * 0.3 * elapsed;
+				double linearity = std::max(0.0f, 1 - params.audio_data.GetBeat());//);//(bigbeat / 2.0));
+
+				while (position[i] > 1.0 || position[i] < 0.0)
 				{
-					pvPosition[0][i] = pvPosition[3][i];
-					pvPosition[1][i] = pvPosition[3][i] + (pvPosition[3][i] - pvPosition[2][i]);
+					source_positions[0][i] = source_positions[3][i];
+					source_positions[1][i] = source_positions[3][i] + (source_positions[3][i] - source_positions[2][i]);
 
-					pvPosition[3][i].x = (rand() * 70.0 / RAND_MAX) - 35.0;
-					pvPosition[3][i].y = (rand() * 70.0 / RAND_MAX) - 35.0;
-					pvPosition[3][i].z = (rand() * 70.0 / RAND_MAX) - 35.0;
+					source_positions[3][i].x = (rand() * 70.0 / RAND_MAX) - 35.0;
+					source_positions[3][i].y = (rand() * 70.0 / RAND_MAX) - 35.0;
+					source_positions[3][i].z = (rand() * 70.0 / RAND_MAX) - 35.0;
 
-					float c = params.audio_data.GetRandomSample( );
-					pvPosition[2][i].x = (pvPosition[3][i].x * (1 - c)) + ((c * rand() * 70.0 / RAND_MAX) - 35.0);
-					pvPosition[2][i].y = (pvPosition[3][i].y * (1 - c)) + ((c * rand() * 70.0 / RAND_MAX) - 35.0);
-					pvPosition[2][i].z = (pvPosition[3][i].z * (1 - c)) + ((c * rand() * 70.0 / RAND_MAX) - 35.0);
+					float c = params.audio_data.GetRandomSample();
+					source_positions[2][i].x = (source_positions[3][i].x * (1 - c)) + ((c * rand() * 70.0 / RAND_MAX) - 35.0);
+					source_positions[2][i].y = (source_positions[3][i].y * (1 - c)) + ((c * rand() * 70.0 / RAND_MAX) - 35.0);
+					source_positions[2][i].z = (source_positions[3][i].z * (1 - c)) + ((c * rand() * 70.0 / RAND_MAX) - 35.0);
 
-					pvPosition[3][i].y = (pvPosition[0][i].y * (1 - linearity)) + (pvPosition[3][i].y * linearity);
-					pvPosition[2][i].y = (pvPosition[1][i].y * (1 - linearity)) + (pvPosition[2][i].y * linearity);
+					source_positions[3][i].y = (source_positions[0][i].y * (1 - linearity)) + (source_positions[3][i].y * linearity);
+					source_positions[2][i].y = (source_positions[1][i].y * (1 - linearity)) + (source_positions[2][i].y * linearity);
 
-					if(position[i] > 1.0) position[i] -= 1.0;
-					if(position[i] < 0.0) position[i] += 1.0;
-					speed[i] = (params.audio_data.GetRandomSample( ) * 0.15) + 0.01;
+					if (position[i] > 1.0) position[i] -= 1.0;
+					if (position[i] < 0.0) position[i] += 1.0;
+					speed[i] = (params.audio_data.GetRandomSample() * 0.15) + 0.01;
 				}
 
-				for(int j = 0; j < 4; j++)
+				for (int j = 0; j < 4; j++)
 				{
-					b[j] = pvPosition[j][i];
+					b[j] = source_positions[j][i];
 				}
 				obj.vertices[i].position = b.Calculate(position[i]);
 			}
 
-			obj.roll += elapsed * params.audio_data.GetIntensity( ) * 4.0 * 3.14159 / 180.0;
-			obj.pitch += elapsed * params.audio_data.GetIntensity( ) * 3.0 * 3.14159 / 180.0;
+			obj.roll += elapsed * params.audio_data.GetIntensity() * 4.0 * 3.14159 / 180.0;
+			obj.pitch += elapsed * params.audio_data.GetIntensity() * 3.0 * 3.14159 / 180.0;
 			obj.yaw += elapsed * 2.0 * 3.14159 / 180.0;
 			obj.Calculate(params.renderer, &camera, 1.0);
 			obj.ambient_light_color = ColorRgb::Grey(64.0 * params.brightness);
 		}
 		return nullptr;
 	}
+
 	virtual Error* Reconfigure(const ReconfigureParams& params) override
 	{
-		dBrBack = 1;
-		if(fNotRendered)// || (rand() <= (RAND_MAX * 0.3)))
+		br_back = 1;
+		if (not_rendered)// || (rand() <= (RAND_MAX * 0.3)))
 		{
-			for(int i = 0; i < nSources; i++)
+			for (int i = 0; i < num_sources; i++)
 			{
 				position[i] = 1;
-				speed[i] = rand() * 0.02 / RAND_MAX;	
+				speed[i] = rand() * 0.02 / RAND_MAX;
 
-				pvPosition[3][i].x = (rand() * 50.0 / RAND_MAX) - 25.0;
-				pvPosition[3][i].y = (rand() * 50.0 / RAND_MAX) - 25.0;
-				pvPosition[3][i].z = (rand() * 50.0 / RAND_MAX) - 25.0;
+				source_positions[3][i].x = (rand() * 50.0 / RAND_MAX) - 25.0;
+				source_positions[3][i].y = (rand() * 50.0 / RAND_MAX) - 25.0;
+				source_positions[3][i].z = (rand() * 50.0 / RAND_MAX) - 25.0;
 
-				pvPosition[2][i].x = (rand() * 50.0 / RAND_MAX) - 25.0;
-				pvPosition[2][i].y = pvPosition[3][i].y;//(rand() * 50.0 / RAND_MAX) - 25.0;
-				pvPosition[2][i].z = (rand() * 50.0 / RAND_MAX) - 25.0;
+				source_positions[2][i].x = (rand() * 50.0 / RAND_MAX) - 25.0;
+				source_positions[2][i].y = source_positions[3][i].y;//(rand() * 50.0 / RAND_MAX) - 25.0;
+				source_positions[2][i].z = (rand() * 50.0 / RAND_MAX) - 25.0;
 			}
-			fNotRendered = false;
+			not_rendered = false;
 		}
 
 		obj.textures[0].Set(Actor::TextureType::Sprite, params.texture_library.Find(sprite_texture_class));
 
-		pTint = params.texture_library.Find(tint_texture_class);
+		tint = params.texture_library.Find(tint_texture_class);
 		return nullptr;
 	}
+
 	Error* Render(const RenderParams& params) override
 	{
 		Error* error = obj.Render(params.renderer);
-		if(error) return TraceError(error);
+		if (error) return TraceError(error);
 
-		if(pTint != nullptr)
+		if (tint != nullptr)
 		{
 			RenderState render_state;
 			render_state.blend_mode = BlendMode::Tint;
 			render_state.depth_mode = DepthMode::Disable;
-			render_state.texture_stages[0].texture = pTint;
+			render_state.texture_stages[0].texture = tint;
 
 			params.renderer.DrawSprite(render_state, Point<int>(0, 0), Rect<int>(0, 0, params.renderer.GetWidth(), params.renderer.GetHeight()), ColorRgb::Grey(brt * 255.0));
 		}
 		return nullptr;
 	}
+
 	bool CanRender(double dElapsed)
 	{
 		return (dElapsed > 0.2);
 	}
 };
 
-EXPORT_EFFECT( LightSphere, EffectLightSphere )
+EXPORT_EFFECT(LightSphere, EffectLightSphere)
 
