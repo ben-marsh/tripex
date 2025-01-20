@@ -26,7 +26,7 @@ public:
 	bool is_bigbeat = false;
 	double bigbeat = 0.0;
 	double average = 0.0;
-	Texture *tx = nullptr;
+	Texture* tx = nullptr;
 
 	EffectDistortion1()
 		: Effect({ &background_texture_class })
@@ -38,9 +38,9 @@ public:
 		angle = 0;
 
 		int i = 0;
-		for(int x = 0; x <= GRW; x++)
+		for (int x = 0; x <= GRW; x++)
 		{
-			for(int y = 0; y <= GRH; y++)
+			for (int y = 0; y <= GRH; y++)
 			{
 				precalc_atan[i] = SPIKES * atan2((y - (GRH / 2.0)) / GRH, (x - (GRW / 2.0)) / GRW);
 				i++;
@@ -53,7 +53,7 @@ public:
 		br = params.brightness;
 		xp += 0.015/*08*/ * params.audio_data.GetDampenedBand(sensitivity, 0, 0.25f) * params.elapsed;
 		yp += 0.02/*08*/ * params.audio_data.GetDampenedBand(sensitivity, 0.25f, 0.5f) * params.elapsed;
-		t += params.elapsed * std::max(0.5, params.audio_data.GetDampenedBand(sensitivity, 2/16.0f, 5/16.0f) + (3.0 * params.audio_data.GetDampenedBand(sensitivity, 7/16.0f, 12/16.0f))) * 20 * 3.14159 / 180.0;
+		t += params.elapsed * std::max(0.5, params.audio_data.GetDampenedBand(sensitivity, 2 / 16.0f, 5 / 16.0f) + (3.0 * params.audio_data.GetDampenedBand(sensitivity, 7 / 16.0f, 12 / 16.0f))) * 20 * 3.14159 / 180.0;
 
 		angle += 1 * params.elapsed;
 		fac = 0.5 + (0.15 * cos(angle * 3.14159 / 256.0));
@@ -66,9 +66,9 @@ public:
 		ColorRgb color = ColorRgb::Grey(255.0 * params.brightness);
 
 		int i = 0;
-		for(int x = 0; x <= grid.width; x++)
+		for (int x = 0; x <= grid.width; x++)
 		{
-			for(int y = 0; y <= grid.height; y++)
+			for (int y = 0; y <= grid.height; y++)
 			{
 				fx = (x - w2) * rw;
 				fy = (y - h2) * rh;
@@ -94,7 +94,7 @@ public:
 		render_state.texture_stages[0].texture = tx;
 
 		Error* error = grid.Render(params.renderer, render_state);
-		if(error) return TraceError(error);
+		if (error) return TraceError(error);
 
 		return nullptr;
 	}
@@ -106,4 +106,4 @@ public:
 	}
 };
 
-EXPORT_EFFECT( Distortion1, EffectDistortion1 )
+EXPORT_EFFECT(Distortion1, EffectDistortion1)
