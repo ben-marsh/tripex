@@ -146,9 +146,7 @@ public:
 
 		static double accum = 1;
 		accum += params.elapsed;
-		double dChange = accum;
 
-		bool fChanged = false;
 		while(accum > 1.0)
 		{
 			for(i = 0; i < CLENGTH; i++)

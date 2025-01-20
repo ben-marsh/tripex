@@ -87,7 +87,6 @@ Error* Canvas::Render(Renderer& renderer, const RenderState& render_state)
 	v[0].diffuse = v[1].diffuse = v[2].diffuse = v[3].diffuse = color;
 
 	int width = num_textures_x * 256;
-	int height = num_textures_y * 256;
 
 	float s = float(renderer.GetWidth()) / width;
 	//	double ys = double(d3d->GetHeight()) / height;
@@ -96,7 +95,6 @@ Error* Canvas::Render(Renderer& renderer, const RenderState& render_state)
 	float xc = (renderer.GetWidth() - (num_textures_x * 254 * s)) / 2;
 	float yc = (renderer.GetHeight() - (num_textures_y * 254 * s)) / 2;
 
-	int i = 0;
 	for (int vi = 0; vi < num_textures_y; vi++)
 	{
 		for (int hi = 0; hi < num_textures_x; hi++)

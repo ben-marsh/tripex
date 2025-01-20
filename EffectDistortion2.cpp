@@ -86,10 +86,6 @@ public:
 			pvPos[i] = pb[i].Calculate(pdPos[i]);
 		}
 
-		double av = params.audio_data.GetIntensity( );//((average * average) + average) / 2;
-		double w2 = grid.width / 2.0, h2 = grid.height / 2.0;
-		double rw = 1.0 / grid.width, rh = 1.0 / grid.height;
-
 		float pdMax[] = { 0.3f, 0.4f, 0.5f };//min(average, 0.4) / 0.4, max(0, min(1.0, (average - 0.4) / 0.4)) }; 
 
 		i = 0;

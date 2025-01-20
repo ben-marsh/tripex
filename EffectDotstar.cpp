@@ -285,11 +285,9 @@ public:
 
 		int nIndex = 0;
 		double dY = (params.renderer.GetHeight() - 1 - (dSize * (64.0 /*- (2.0 * fPos)*/))) / 2;
-		double dCY = params.renderer.GetHeight() / 2.0;
 		for(int j = 0; j < 64; j++)
 		{
 			double dX = (params.renderer.GetWidth() - 1 - (dSize * 128.0)) / 2;
-			double dCX = params.renderer.GetWidth() / 2.0;
 			for(int i = 0; i < 128; i++)
 			{
 				if(pTarget[nIndex] != 0)

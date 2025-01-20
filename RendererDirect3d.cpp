@@ -422,7 +422,7 @@ Error* RendererDirect3d::UploadTexture(IDirect3DTexture9* d3d_texture, int width
 		if (FAILED(hRes)) return TraceError(hRes);
 
 		D3DLOCKED_RECT locked_rect;
-		if (surface_desc.Width == width && surface_desc.Height == height && surface_desc.Format == D3DFMT_P8)
+		if (surface_desc.Width == (uint32)width && surface_desc.Height == (uint32)height && surface_desc.Format == D3DFMT_P8)
 		{
 			hRes = surface->LockRect(&locked_rect, NULL, 0);
 			if (FAILED(hRes)) return TraceError(hRes);

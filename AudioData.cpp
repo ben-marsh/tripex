@@ -248,7 +248,6 @@ void AudioData::Render(GeometryBuffer& overlay_back, GeometryBuffer& overlay, fl
 
 float AudioData::GetRandomSample() const
 {
-	float rand_value = (((float)rand()) * num_samples) / RAND_MAX;
 	return mono_samples[(rand() * num_samples) / RAND_MAX] * (1.0f / (1 << 16));
 }
 

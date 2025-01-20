@@ -174,7 +174,6 @@ void TextureFont::Draw(GeometryBuffer& geom, const char* text, Point<int> pos, C
 	}
 
 	// just draw
-	int start_x = pos.x;
 	for (int i = 0; text[i] != 0; i++)
 	{
 		const Glyph* glyph = FindGlyph(text[i]);

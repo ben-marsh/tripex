@@ -19,6 +19,9 @@ static const float g_fRadToDeg = 57.295779513082320876798154814105f;//180.0f / P
 
 #pragma warning(disable:4201)
 #pragma warning(disable:4275)
+#pragma warning(disable:4100) // unreferenced formal parameter
+#pragma warning(disable:4458) // declaration of X hides class member
+#pragma warning(disable:4456) // declaration of X hides previous local declaration
 
 #define  _CRT_SECURE_NO_WARNINGS
 

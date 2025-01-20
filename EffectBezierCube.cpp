@@ -158,7 +158,6 @@ public:
 		if(dMultDest < dMult) dMult = std::max(dMultDest, dMult - 0.01);
 		if(dMultDest > dMult) dMult = std::min(dMultDest, dMult + 0.01);
 
-		double dTwistAng = PI * sin(dAng) / 2.0;
 		dAng += sm * params.audio_data.GetDampenedBand(sensitivity, 0, 0.5f) * 0.25 * 4 * g_fDegToRad;
 
 		double dCentre = (TWISTPLANES - 1.0) / 2.0;

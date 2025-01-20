@@ -204,7 +204,7 @@ public:
 						if (i == 0) m = (1 - (x / double(PRECISION))) * (1 - (y / double(PRECISION)));
 						else if (i == 1) m = (x / double(PRECISION)) * (1 - (y / double(PRECISION)));
 						else if (i == 2) m = (1 - (x / double(PRECISION))) * (y / double(PRECISION));
-						else if (i == 3) m = (x / double(PRECISION)) * (y / double(PRECISION));
+						else m = (x / double(PRECISION)) * (y / double(PRECISION));
 
 						double v = c * m;
 						double dm = 0.999999999 - std::max(0.0, (c - 192.0) * /*0.05*/0.02 / 64.0);
@@ -321,7 +321,6 @@ public:
 	}
 	void ChangeEffect()
 	{
-		int ofm = fm;
 		int nTotal = 0;
 		for (int i = 0; i < FLOWMAPS; i++)
 		{
@@ -514,7 +513,7 @@ public:
 	}
 	void DrawOscilloscope(double dElapsed, int nOsc, double dBr, const AudioData& audio_data, std::vector<unsigned char>& dst)
 	{
-		double xsprev, ysprev;
+		double xsprev = 0, ysprev = 0;
 		dOscSpin += dElapsed * 1 * 3.14159 / 180.0;
 		double xc = width / 2.0;
 		double yc = height / 2.0;
@@ -575,7 +574,7 @@ public:
 			//		for(j = 0; j < 2; j++)
 			//		{
 		{
-			double na, nr, nx, ny;
+			double na, nr, nx = 0, ny = 0;
 			for (i = 0; i <= 128; i++)
 			{
 				int n = i % 128;
@@ -740,8 +739,6 @@ public:
 		double r = params.audio_data.GetIntensity();
 		ang += params.elapsed * std::min(r / 200.0, 2.0) * 4.0 * 3.14159 / 180.0;
 
-		int brt = params.audio_data.GetIntensity() * 30.0; //min(max(average * 10.0, 8), 50);
-
 		r = (r / 20) + 10;
 
 		j = 0;
@@ -791,7 +788,6 @@ public:
 		std::vector<unsigned int>& spt = sp[tflowmap];
 
 		unsigned char* mt;
-		int nIterations = width * height * 4;
 		for (i = 0; i < width * height; i++)
 		{
 			mt = &multtab[mot[i]];

@@ -391,7 +391,6 @@ void Actor::Calculate(const Renderer& renderer, Camera* camera, float elapsed)
 //	pClippedFace.SetLength(0);
 	transformed_vertices.resize(0);
 	//	pClippedVertex.SetLength(0);
-	bool clipped = false;
 
 	//	ZTexturePosition pTex[8];
 	Vector3 trans_normal;
@@ -626,7 +625,6 @@ void Actor::Calculate(const Renderer& renderer, Camera* camera, float elapsed)
 			ColorRgb diffuse = init_diffuse;
 			ColorRgb specular = init_specular;
 
-			int num_frames = 0;
 			float position = 0;
 			int length = 0;
 			for (int j = 0; j < frames.size() - 1; j++)
@@ -1337,7 +1335,7 @@ void Actor::CreateGeosphere(float radius, int num_vertices)
 
 			faces[face2] = faces[face1];
 
-			int vertex;
+			int vertex = 0;
 			for (int k = 0; k < 3; k++)
 			{
 				if (faces[face1][k] != te[0] && faces[face1][k] != te[1])
@@ -1513,7 +1511,7 @@ void Actor::CreateTentacles(int segs, float l, float r)
 	vertices.resize(TARMS * (((segs - 1) * TTEMP) + 1));
 	faces.clear();
 
-	int vn = 0, fn = 0;
+	int vn = 0;
 	for (int i = 0; i < 6; i++) // each arm
 	{
 		Vector3 center, direction;

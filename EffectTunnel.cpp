@@ -89,7 +89,6 @@ public:
 
 			pObj[no].flags.set(Actor::F_DRAW_TRANSPARENT);
 
-			int f = 0;
 			for(int j = 0; j < nTunnelL - 1; j++)
 			{
 				int nIndex = j * nCrossSection;
@@ -129,7 +128,6 @@ public:
 			fTBr += std::max(params.audio_data.GetIntensity() - fTBr, -0.05f) * params.elapsed;
 		}
 
-		int nOldStart = (int)(fPos * nTunnelL);
 		bool fReset = false;
 		if(bFirstRender)
 		{

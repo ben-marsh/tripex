@@ -118,7 +118,6 @@ public:
 			float fY = sin(i * 3.14159 * 2.0 / 9) * 80.0;
 			return Vector3(fX, fY, 0);
 		}
-		return Vector3(0, 0, 0);
 	}
 	Error* Calculate(const CalculateParams& params) override
 	{
@@ -183,7 +182,6 @@ public:
 				pObj[i].position = GetPos(nEffect, i);
 			}	
 
-			float fSpeed = params.audio_data.GetDampenedBand( sensitivity, i / 10.0, (i + 1) / 10.0);
 			pObj[i].roll += params.elapsed * 4.0 * 3.14159 / 180.0;
 			pObj[i].pitch += params.audio_data.GetIntensity( ) * params.elapsed * 10.0 * 3.14159 / 180.0;
 			pObj[i].yaw += (params.audio_data.GetIntensity( ) + params.audio_data.GetBeat( ) ) * params.elapsed * 7 * 3.14159 / 180.0;

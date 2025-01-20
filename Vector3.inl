@@ -21,11 +21,11 @@ inline Vector3 Vector3::Polar(float length, float pitch, float yaw)
 	return Vector3(0, 0, length) * Matrix44::Rotate(pitch, yaw);
 }
 
-inline void Vector3::Set(float x, float y, float z)
+inline void Vector3::Set(float new_x, float new_y, float new_z)
 {
-	this->x = x;
-	this->y = y;
-	this->z = z;
+	x = new_x;
+	y = new_y;
+	z = new_z;
 }
 
 inline Vector3 Vector3::operator+() const
