@@ -24,10 +24,9 @@ float Vector3::GetRoll(float tightness) const
 Vector3 Vector3::operator*(const Matrix44& m) const
 {
 	Vector3 result;
-	for (int i = 0; i < 3; i++)
-	{
-		result[i] = (x * m[i][0]) + (y * m[i][1]) + (z * m[i][2]) + m[i][3];
-	}
+	result.x = (x * m[0][0]) + (y * m[0][1]) + (z * m[0][2]) + m[0][3];
+	result.y = (x * m[1][0]) + (y * m[1][1]) + (z * m[1][2]) + m[1][3];
+	result.z = (x * m[2][0]) + (y * m[2][1]) + (z * m[2][2]) + m[2][3];
 	return result;
 }
 

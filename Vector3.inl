@@ -92,18 +92,6 @@ inline Vector3& Vector3::operator/=(float value)
 	return operator*=(1.0f / value);
 }
 
-inline float& Vector3::operator[ ](int index)
-{
-	assert(index >= 0 && index < 3);
-	return elements[index];
-}
-
-inline const float& Vector3::operator[ ](int index) const
-{
-	assert(index >= 0 && index < 3);
-	return elements[index];
-}
-
 inline float Vector3::Dot(const Vector3& v) const
 {
 	return (x * v.x) + (y * v.y) + (z * v.z);

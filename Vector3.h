@@ -7,14 +7,7 @@ class Matrix44;
 class Vector3
 {
 public:
-	union
-	{
-		struct
-		{
-			float x, y, z;
-		};
-		float elements[3];
-	};
+	float x, y, z;
 
 	// Constructors
 	Vector3();
@@ -48,10 +41,6 @@ public:
 	// operator/( ):
 	Vector3 operator/(float value) const;
 	Vector3& operator/=(float value);
-
-	// operator[ ]:
-	float& operator[ ](int pos);
-	const float& operator[ ](int pos) const;
 
 	// Dot( ):
 	float Dot(const Vector3& v) const;

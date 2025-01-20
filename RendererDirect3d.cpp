@@ -430,7 +430,7 @@ Error* RendererDirect3d::UploadTexture(IDirect3DTexture9* d3d_texture, int width
 			const uint8* input_data = (const uint8*)data;
 			uint8* output_data = (uint8*)locked_rect.pBits;
 
-			for (int32 i = 0; i < 256; i++)
+			for (int row = 0; row < 256; row++)
 			{
 				memcpy(output_data, input_data, 256);
 				output_data += locked_rect.Pitch;

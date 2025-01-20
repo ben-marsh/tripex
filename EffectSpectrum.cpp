@@ -125,7 +125,6 @@ public:
 
 	Error* Calculate( const CalculateParams& params ) override
 	{
-		int i, j;
 		m_fRotAng += params.elapsed * ( 2.0f * g_fDegToRad );
 		m_fBrAng += params.elapsed * ( 2.0f * g_fDegToRad );
 
@@ -140,32 +139,32 @@ public:
 
 		while( m_fAng >= TRAIL_ANGS )
 		{
-			for( i = TRAIL_H - 1; i >= 1; i-- )
+			for( int i = TRAIL_H - 1; i >= 1; i-- )
 			{
 				for( int j = 0; j < TRAIL_W; j++ )
 				{
 					m_pfHeight[ i ][ j ] = m_pfHeight[ i - 1 ][ j ];
 				}
 			}
-			for( i = 0; i < TRAIL_W; i++ )
+			for( int i = 0; i < TRAIL_W; i++ )
 			{
 				m_pfHeight[ 0 ][ i ] = 0.0f;
 			}
-			for( i = 0; i < 256; i++ )
+			for( int i = 0; i < 256; i++ )
 			{
 				int nTarget = i * TRAIL_W / 256;
 				m_pfHeight[ 0 ][ nTarget ] = std::max( m_pfHeight[ 0 ][ nTarget ], params.audio_data.GetBand( i ) );
 			}
-			for( i = 0; i < TRAIL_W; i++ )
+			for( int i = 0; i < TRAIL_W; i++ )
 			{
 				m_pfHeight[ 0 ][ i ] = 300.0f * sinf( ( PI * 0.5f ) * m_pfHeight[ 0 ][ i ] );
 			}
 			m_fAng -= TRAIL_ANGS;
 		}
 
-		for( j = 0; j < LIMITER_H; j++ )
+		for( int j = 0; j < LIMITER_H; j++ )
 		{
-			for( i = 0; i < TRAIL_W; i++ )
+			for( int i = 0; i < TRAIL_W; i++ )
 			{
 				m_pfCubeTime[ j ][ i ] += params.elapsed;
 				m_pfCubeHeight[ j ][ i ] = m_pfCubeTop[ j ][ i ] - ( ACCELER * ( m_pfCubeTime[ j ][ i ] * m_pfCubeTime[ j ][ i ] ) / 2.0f );
@@ -180,7 +179,7 @@ public:
 		}
 
 		float fPosYMax = -CYLINDER_RADIUS + ( CYLINDER_RADIUS * cosf( TRAIL_ANGS * ( TRAIL_H * 0.5f ) + ANG_OFFSET ) );
-		for(i = 0; i < TRAIL_H; i++)
+		for(int i = 0; i < TRAIL_H; i++)
 		{
 			float fThisAng = ( ( i - ( TRAIL_H * 0.5f ) ) * TRAIL_ANGS ) + m_fAng + ANG_OFFSET;
 			float fCos = cosf( fThisAng );
@@ -225,7 +224,7 @@ public:
 			m_pObj[ i ].Calculate(params.renderer, &m_cCamera, params.elapsed );
 		}
 
-		for( i = 0; i < LIMITER_H; i++ )
+		for( int i = 0; i < LIMITER_H; i++ )
 		{
 			float dCubeAng = ((CUBE_H + i - (TRAIL_H * 0.5f )) * TRAIL_ANGS) + ANG_OFFSET;
 			float dCubeCos = cosf(dCubeAng);

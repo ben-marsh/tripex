@@ -145,8 +145,8 @@ Error* Tripex::Startup()
 
 					if (internal_texture != tex_blank)
 					{
-						Error* error = renderer.CreateTextureFromImage(internal_texture + 1, *internal_texture, texture);
-						assert(error == nullptr);
+						error = renderer.CreateTextureFromImage(internal_texture + 1, *internal_texture, texture);
+						if (error != nullptr) return error;
 					}
 
 					it = data_to_texture.insert(std::make_pair(internal_texture, std::move(texture))).first;
