@@ -19,18 +19,18 @@ protected:
 
 	int band_idx[FREQ_BANDS];
 	float band_mul[FREQ_BANDS];
-	float bands[FREQ_BANDS];
+	float bands[FREQ_BANDS] = {};
 
-	float beat_history[BEATHISTORY];
+	float beat_history[BEATHISTORY] = {};
 
 	float intensity;
 	float beat;
 	float intensity_beat_scale;
 	bool is_beat;
 
-	int num_data_channels;
-	int data_sample_size;
-	int data_freq_shift;
+	int num_data_channels = 0;
+	int data_sample_size = 0;
+	int data_freq_shift = 0;
 
 public:
 	const int num_samples;

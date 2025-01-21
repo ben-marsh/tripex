@@ -21,7 +21,7 @@ public:
 	T* operator->() const;
 
 	ComPtr& operator=(const ComPtr& other) = delete;
-	ComPtr& operator=(ComPtr&& other);
+	ComPtr& operator=(ComPtr&& other) noexcept;
 
 private:
 	T* ptr;
@@ -87,7 +87,7 @@ template<class T> inline T* ComPtr<T>::operator->() const
 	return ptr;
 }
 
-template<class T> inline ComPtr<T>& ComPtr<T>::operator=(ComPtr&& other)
+template<class T> inline ComPtr<T>& ComPtr<T>::operator=(ComPtr&& other) noexcept
 {
 	Release();
 

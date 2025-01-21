@@ -15,6 +15,7 @@ typedef unsigned int uint32;
 	#define NOMINMAX
 	#define  _CRT_SECURE_NO_WARNINGS
 
+#pragma warning(error: 4305)
 	#pragma warning(disable:4100) // unreferenced formal parameter
 //	#pragma warning(disable:4458) // declaration of X hides class member
 	#pragma warning(disable:4244)

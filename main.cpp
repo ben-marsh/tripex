@@ -291,7 +291,7 @@ LRESULT CALLBACK TxWndProc(HWND hWnd, uint32 nMsg, WPARAM wParam, LPARAM lParam)
 * WinMain( )
 -----------------------------------*/
 
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR sCmdLine, int nCmd)
+int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR sCmdLine, _In_ int nCmd)
 {
 	WNDCLASS wc;
 	ZeroMemory(&wc, sizeof(wc));

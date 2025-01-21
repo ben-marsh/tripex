@@ -600,9 +600,6 @@ public:
 				ny = ty;
 			}
 		}
-		//		}
-		default:
-			break;
 		}
 	}
 	Error* Calculate(const CalculateParams& params) override

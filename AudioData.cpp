@@ -23,15 +23,6 @@ void DrawHorizontalBar(GeometryBuffer& geom, int x, int y, int w, int h, float p
 	geom.AddSprite(Point<int>(x, y), Rect<int>(0, 0, (int)(w * p), h), ColorRgb::White());
 }
 
-
-/*---------------------------------------------
-* ZAudio:
----------------------------------------------*/
-
-/*---------------------------------------------
-* Constructor:
----------------------------------------------*/
-
 AudioData::AudioData(int num_samples) : fourier(num_samples), num_samples(num_samples)
 {
 	mono_samples.resize(num_samples);

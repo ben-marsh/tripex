@@ -20,9 +20,11 @@ public:
 
 	struct Glyph
 	{
-		char character;
-		int start, end;
-		int bitmap_x, bitmap_y;
+		char character = 0;
+		int start = 0;
+		int end = 0;
+		int bitmap_x = 0;
+		int bitmap_y = 0;
 		std::unique_ptr<uint8[]> data;
 	};
 
