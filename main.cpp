@@ -7,26 +7,36 @@
 #include "RendererDirect3d.h"
 #include "effect.h"
 
-#define USE_RANDOM_AUDIO 1
+#define AUDIO_SOURCE_RANDOM 0
+#define AUDIO_SOURCE_WAVEIN 1
+#define AUDIO_SOURCE_WAVFILE 2
+
+#define AUDIO_SOURCE AUDIO_SOURCE_WAVFILE // 0 = random, 1 = wave in, 2 = wav file
 
 IDirect3D9* g_pd3d = nullptr;
 IDirect3DDevice9* g_pd3dDevice = nullptr;
+Tripex* g_pTripex;
+RendererDirect3d* g_direct3d;
+
+#if AUDIO_SOURCE == AUDIO_SOURCE_WAVEIN
 
 HWAVEIN g_hWaveIn = nullptr;
 WAVEHDR g_aWaveHdr[2];
 uint8* g_apnWaveBuf[2] = { nullptr, };
 WAVEFORMATEX g_wfex;
 
-Tripex* g_pTripex;
-RendererDirect3d* g_direct3d;
+#endif
+#if AUDIO_SOURCE == AUDIO_SOURCE_WAVFILE
 
-/*---------------------------------
-* CreateD3D( )
------------------------------------*/
+std::unique_ptr<uint8[]> wav_file_data;
 
-/*---------------------------------
-* DestroyD3D( )
------------------------------------*/
+const WAVEFORMATEX* wav_file_format = nullptr;
+
+const uint8* wav_data = nullptr;
+uint32 wav_data_pos = 0;
+uint32 wav_data_len = 0;
+
+#endif
 
 void DestroyD3D()
 {
@@ -42,9 +52,13 @@ void DestroyD3D()
 	}
 }
 
-/*---------------------------------------------
-* OutputWaveInError( ):
----------------------------------------------*/
+#if AUDIO_SOURCE == AUDIO_SOURCE_RANDOM
+
+uint16 random_audio_data[4096];
+
+#endif
+
+#if AUDIO_SOURCE == AUDIO_SOURCE_WAVEIN
 
 void OutputWaveInError(MMRESULT mRes)
 {
@@ -52,10 +66,6 @@ void OutputWaveInError(MMRESULT mRes)
 	waveInGetErrorTextA(mRes, sBuf, sizeof(sBuf));
 	printf("%s", sBuf);
 }
-
-/*---------------------------------------------
-* AddWaveInBuffer( ):
----------------------------------------------*/
 
 MMRESULT AddWaveInBuffer(int nIdx)
 {
@@ -70,10 +80,6 @@ MMRESULT AddWaveInBuffer(int nIdx)
 	return mRes;
 }
 
-/*---------------------------------------------
-* RemoveWaveInBuffer( ):
----------------------------------------------*/
-
 MMRESULT RemoveWaveInBuffer(int nIdx)
 {
 	if (g_hWaveIn == nullptr) return S_OK;
@@ -84,19 +90,16 @@ MMRESULT RemoveWaveInBuffer(int nIdx)
 	return S_OK;
 }
 
-/*---------------------------------------------
-* CreateWaveIn( ):
----------------------------------------------*/
-
 MMRESULT CreateWaveIn(HWND hWnd)
 {
 	ZeroMemory(&g_wfex, sizeof(g_wfex));
 	g_wfex.wFormatTag = WAVE_FORMAT_PCM;
-	g_wfex.nChannels = 1;//2;
+	g_wfex.nChannels = 1;
 	g_wfex.wBitsPerSample = 16;
 	g_wfex.nSamplesPerSec = 44100;
 	g_wfex.nBlockAlign = (g_wfex.nChannels * g_wfex.wBitsPerSample) / 8;
 	g_wfex.nAvgBytesPerSec = g_wfex.nSamplesPerSec * g_wfex.nChannels * g_wfex.wBitsPerSample / 8;
+
 	MMRESULT mRes = waveInOpen(&g_hWaveIn, WAVE_MAPPER, &g_wfex, (DWORD_PTR)hWnd, 0, CALLBACK_WINDOW);
 	if (mRes != S_OK) return mRes;
 
@@ -115,10 +118,6 @@ MMRESULT CreateWaveIn(HWND hWnd)
 
 	return waveInStart(g_hWaveIn);
 }
-
-/*---------------------------------------------
-* DestroyWaveIn( ):
----------------------------------------------*/
 
 MMRESULT DestroyWaveIn()
 {
@@ -150,9 +149,94 @@ MMRESULT DestroyWaveIn()
 	return S_OK;
 }
 
-/*---------------------------------
-* TxWndProc( )
------------------------------------*/
+#endif
+
+#if AUDIO_SOURCE == AUDIO_SOURCE_WAVFILE
+
+HWAVEOUT g_hWaveOut;
+
+Error* WaveOutWriteNext();
+
+Error* CreateWaveOutError(MMRESULT res)
+{
+	char buffer[256];
+	waveOutGetErrorTextA(res, buffer, sizeof(buffer));
+	return new Error(std::string("Wave out error: ") + std::string(buffer));
+}
+
+Error* CreateWaveOut(HWND hWnd)
+{
+	WAVEFORMATEX format = {};
+	format.wFormatTag = WAVE_FORMAT_PCM;
+	format.nChannels = wav_file_format->nChannels;
+	format.wBitsPerSample = wav_file_format->wBitsPerSample;
+	format.nSamplesPerSec = wav_file_format->nSamplesPerSec;
+	format.nBlockAlign = (format.nChannels * format.wBitsPerSample) / 8;
+	format.nAvgBytesPerSec = format.nSamplesPerSec * format.nChannels * format.wBitsPerSample / 8;
+
+	MMRESULT res = waveOutOpen(&g_hWaveOut, WAVE_MAPPER, &format, (DWORD_PTR)hWnd, 0, CALLBACK_WINDOW);
+	if (res != S_OK) return CreateWaveOutError(res);
+
+	for (int idx = 0; idx < 4; idx++)
+	{
+		Error* error = WaveOutWriteNext();
+		if (error) return error;
+	}
+
+	return nullptr;
+}
+
+Error* DestroyWaveOut()
+{
+	MMRESULT res = waveOutReset(g_hWaveOut);
+	if (res != S_OK) return CreateWaveOutError(res);
+
+	res = waveOutClose(g_hWaveOut);
+	if (res != S_OK) return CreateWaveOutError(res);
+
+	return nullptr;
+}
+
+Error* WaveOutFreeBuffer(WAVEHDR* hdr)
+{
+	MMRESULT res = waveOutUnprepareHeader(g_hWaveOut, hdr, sizeof(WAVEHDR));
+	if (res != S_OK)
+	{
+		return CreateWaveOutError(res);
+	}
+
+	delete hdr;
+	return nullptr;
+}
+
+Error* WaveOutWriteNext()
+{
+	uint32 buffer_size = wav_file_format->nChannels * 1024 * (wav_file_format->wBitsPerSample / 8);
+	buffer_size = std::min(buffer_size, wav_data_len - wav_data_pos);
+
+	WAVEHDR* header = new WAVEHDR();
+	memset(header, 0, sizeof(*header));
+	header->lpData = (LPSTR)(wav_data + wav_data_pos);
+	header->dwBufferLength = buffer_size;
+
+	MMRESULT res = waveOutPrepareHeader(g_hWaveOut, header, sizeof(*header));
+	if (res != S_OK) return CreateWaveOutError(res);
+
+	res = waveOutWrite(g_hWaveOut, header, sizeof(*header));
+	if (res != S_OK) return CreateWaveOutError(res);
+
+	g_pTripex->WriteAudioData(wav_file_format->nChannels, wav_file_format->nSamplesPerSec, wav_file_format->wBitsPerSample, header->lpData, header->dwBufferLength);
+
+	wav_data_pos += buffer_size;
+	if (wav_data_pos == wav_data_len)
+	{
+		wav_data_pos = 0;
+	}
+
+	return nullptr;
+}
+
+#endif
 
 static const int TICK_TIMER_ID = 0x1234;
 
@@ -169,36 +253,49 @@ LRESULT CALLBACK TxWndProc(HWND hWnd, uint32 nMsg, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_CREATE:
 		{
+			Error* error;
+#if AUDIO_SOURCE == AUDIO_SOURCE_WAVEIN
 			MMRESULT mRes = CreateWaveIn(hWnd);
 			if (FAILED(mRes))
 			{
 				OutputWaveInError(mRes);
 				DestroyWaveIn();
+				return FALSE;
 			}
-			else
+#endif
+			g_direct3d = new RendererDirect3d();
+
+			error = g_direct3d->Open(hWnd);
+			if (error)
 			{
-				g_direct3d = new RendererDirect3d();
-
-				Error* error = g_direct3d->Open(hWnd);
-				if (error)
-				{
-					HandleError(hWnd, error);
-					return FALSE;
-				}
-
-				g_pTripex = new Tripex(*g_direct3d);
-
-				error = g_pTripex->Startup();
-				if (error)
-				{
-					HandleError(hWnd, error);
-					return FALSE;
-				}
-
-				SetTimer(hWnd, TICK_TIMER_ID, 10, nullptr);
+				HandleError(hWnd, error);
+				return FALSE;
 			}
+
+			g_pTripex = new Tripex(*g_direct3d);
+
+			error = g_pTripex->Startup();
+			if (error)
+			{
+				HandleError(hWnd, error);
+				return FALSE;
+			}
+
+#if AUDIO_SOURCE == AUDIO_SOURCE_WAVFILE
+			error = CreateWaveOut(hWnd);
+			if (error)
+			{
+				HandleError(hWnd, error);
+				//				OutputWaveInError(mRes);
+				//				DestroyWaveIn();
+				return FALSE;
+			}
+#endif
+
+			SetTimer(hWnd, TICK_TIMER_ID, 10, nullptr);
 		}
 		return FALSE;
+#if AUDIO_SOURCE == AUDIO_SOURCE_WAVEIN
 	case MM_WIM_OPEN:
 		return FALSE;
 	case MM_WIM_CLOSE:
@@ -208,21 +305,47 @@ LRESULT CALLBACK TxWndProc(HWND hWnd, uint32 nMsg, WPARAM wParam, LPARAM lParam)
 			int nIdx = (int)((WAVEHDR*)lParam - g_aWaveHdr);
 			RemoveWaveInBuffer(nIdx);
 
-#if USE_RANDOM_AUDIO
-			for (int idx = 0; idx < (int)g_aWaveHdr[nIdx].dwBytesRecorded; idx++)
-			{
-				g_aWaveHdr[nIdx].lpData[idx] = rand();
-			}
-#endif
-
-			g_pTripex->SetAudioData(2, 44100, 16, g_aWaveHdr[nIdx].lpData, g_aWaveHdr[nIdx].dwBytesRecorded);
+			g_pTripex->SetAudioData(g_wfex.nChannels, g_wfex.nSamplesPerSec, g_wfex.wBitsPerSample, g_aWaveHdr[nIdx].lpData, g_aWaveHdr[nIdx].dwBytesRecorded);
 
 			AddWaveInBuffer(nIdx);
 		}
 		return FALSE;
+#endif
+#if AUDIO_SOURCE == AUDIO_SOURCE_WAVFILE
+	case MM_WOM_OPEN:
+		return FALSE;
+	case MM_WOM_CLOSE:
+		return FALSE;
+	case MM_WOM_DONE:
+		{
+			WAVEHDR* hdr = (WAVEHDR*)lParam;
+
+			Error* error = WaveOutFreeBuffer(hdr);
+			if (error)
+			{
+				HandleError(hWnd, error);
+				return FALSE;
+			}
+
+			error = WaveOutWriteNext();
+			if (error)
+			{
+				HandleError(hWnd, error);
+				return FALSE;
+			}
+		}
+		return FALSE;
+#endif
 	case WM_TIMER:
 		if (wParam == TICK_TIMER_ID)
 		{
+#if AUDIO_SOURCE == AUDIO_SOURCE_RANDOM
+			for (int idx = 0; idx < sizeof(random_audio_data) / sizeof(random_audio_data[0]); idx++)
+			{
+				random_audio_data[idx] = rand();
+			}
+			g_pTripex->SetAudioData(2, 44100, 16, random_audio_data, sizeof(random_audio_data));
+#endif
 			Error* error = g_pTripex->Render();
 			if (error)
 			{
@@ -231,10 +354,18 @@ LRESULT CALLBACK TxWndProc(HWND hWnd, uint32 nMsg, WPARAM wParam, LPARAM lParam)
 		}
 		break;
 	case WM_DESTROY:
+#if AUDIO_SOURCE == AUDIO_SOURCE_WAVEIN
 		{
 			MMRESULT mRes = DestroyWaveIn();
 			if (FAILED(mRes)) OutputWaveInError(mRes);
 		}
+#endif
+#if AUDIO_SOURCE == AUDIO_SOURCE_WAVFILE
+		{
+			Error* error = DestroyWaveOut();
+			if (error) HandleError(hWnd, error);
+		}
+#endif
 
 		KillTimer(hWnd, TICK_TIMER_ID);
 
@@ -287,12 +418,49 @@ LRESULT CALLBACK TxWndProc(HWND hWnd, uint32 nMsg, WPARAM wParam, LPARAM lParam)
 	return DefWindowProc(hWnd, nMsg, wParam, lParam);
 }
 
-/*---------------------------------
-* WinMain( )
------------------------------------*/
-
 int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR sCmdLine, _In_ int nCmd)
 {
+#if AUDIO_SOURCE == AUDIO_SOURCE_WAVFILE
+
+	FILE* file = fopen("C:\\dump\\yardact.wav", "rb");
+	fseek(file, 0, SEEK_END);
+	long length = ftell(file);
+	fseek(file, 0, SEEK_SET);
+	wav_file_data = std::make_unique<uint8[]>(length);
+	fread(wav_file_data.get(), 1, length, file);
+	fclose(file);
+
+	const uint8* wav_header = wav_file_data.get();
+	assert(memcmp(wav_header, "RIFF", 4) == 0);
+	assert(memcmp(wav_header + 8, "WAVE", 4) == 0);
+
+	for (long pos = 12; pos < length; )
+	{
+		const uint8* chunk_header = wav_header + pos;
+		uint32 chunk_len = *((const uint32*)(chunk_header + 4));
+
+		const uint8* chunk_data = chunk_header + 8;
+		if (memcmp(chunk_header, "fmt ", 4) == 0)
+		{
+			const WAVEFORMAT* wav_format = (const WAVEFORMAT*)chunk_data;
+			assert(wav_format->wFormatTag == WAVE_FORMAT_PCM);
+
+			wav_file_format = (const WAVEFORMATEX*)wav_format;
+		}
+		else if (memcmp(chunk_header, "data", 4) == 0)
+		{
+			wav_data  = chunk_data;
+			wav_data_len = chunk_len;
+		}
+
+		pos += 8 + chunk_len;
+	}
+
+	assert(wav_file_format != nullptr);
+	assert(wav_data != nullptr);
+
+#endif
+
 	WNDCLASS wc;
 	ZeroMemory(&wc, sizeof(wc));
 	wc.hCursor = LoadCursor(0, IDC_ARROW);
@@ -303,7 +471,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	wc.lpfnWndProc = (WNDPROC)TxWndProc;
 	RegisterClass(&wc);
 
-	HWND hWnd = CreateWindow(wc.lpszClassName, L"Tripex", WS_OVERLAPPEDWINDOW, 50, 50, 700, 500, nullptr, nullptr, hInstance, nullptr);
+	HWND hWnd = CreateWindow(wc.lpszClassName, L"Tripex", WS_OVERLAPPEDWINDOW, 50, 50, 800, 600, nullptr, nullptr, hInstance, nullptr);
 	ShowWindow(hWnd, SW_SHOW);
 	UpdateWindow(hWnd);
 

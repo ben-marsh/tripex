@@ -17,7 +17,7 @@ public:
 	Error* Render();
 	void Shutdown();
 
-	void SetAudioData(int num_channels, int sample_rate, int sample_bits, const void* data, size_t data_len);
+	void WriteAudioData(int num_channels, int sample_rate, int sample_bits, const void* data, size_t data_len);
 
 	void ChangeEffect();
 	void MoveToPrevEffect();

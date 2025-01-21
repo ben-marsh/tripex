@@ -90,6 +90,7 @@
     <ClInclude Include="ComPtr.h" />
     <ClInclude Include="RendererDirect3d.h" />
     <ClInclude Include="VertexGrid.h" />
+    <ClInclude Include="WideColorRgb.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Fourier.inl" />
@@ -102,6 +103,8 @@
     <None Include="Face.inl" />
     <None Include="Point.inl" />
     <None Include="Rect.inl" />
+    <None Include="ColorRgb.inl" />
+    <None Include="WideColorRgb.inl" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Data">

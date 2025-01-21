@@ -6,6 +6,8 @@
 class AudioData
 {
 protected:
+	static const int INTERNAL_SAMPLE_RATE = 44100;
+
 	static const int FREQ_HISTORY_SIZE = 20;
 	static const int FREQ_BANDS = 256;
 	static const int BEATHISTORY = 5;
@@ -28,18 +30,13 @@ protected:
 	float intensity_beat_scale;
 	bool is_beat;
 
-	int num_data_channels = 0;
-	int data_sample_size = 0;
-	int data_freq_shift = 0;
-
 public:
 	const int num_samples;
 
 	AudioData(int num_samples);
 	~AudioData();
 
-	void SetDataFormat(int num_channels, int frequency, int num_sample_bits);
-	void AddData(const void* data, size_t data_size);
+	void WriteData(int num_channels, int samples_per_sec, int bits_per_sample, const void* data, size_t data_size);
 
 	void Update(float elapsed, float sensitivity);
 	void Render(GeometryBuffer& overlay_back, GeometryBuffer& overlay, float overlay_back_mult) const;
@@ -55,4 +52,7 @@ public:
 	float GetSample(int channel_idx, int sample_idx) const;
 
 	float GetBand(int idx) const;
+
+private:
+	template<typename T> void WriteData(int num_channels, int samples_per_sec, const T* input_samples, size_t num_input_samples);
 };

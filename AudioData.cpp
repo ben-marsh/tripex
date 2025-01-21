@@ -7,8 +7,6 @@
 
 const float AudioData::FREQ_BAND_POWER = 2.0f;
 
-extern float fHUDTransparency;
-
 void DrawLineBar(GeometryBuffer& geom, int x, int y, int h, float p)
 {
 	int n = (int)(h * Clamp<float>(p, 0.0f, 1.0f));
@@ -56,74 +54,68 @@ AudioData::~AudioData()
 {
 }
 
-/*---------------------------------------------
-* SetDataFormat( ):
----------------------------------------------*/
-
-void AudioData::SetDataFormat(int nChannels, int nFrequency, int nSampleBits)
+template<typename T> void AudioData::WriteData(int num_channels, int samples_per_sec, const T* input_samples, size_t num_input_samples)
 {
-	num_data_channels = nChannels;
-	data_freq_shift = IntegerLog2(44100 / nFrequency);
-	data_sample_size = nSampleBits / 8;
+	struct SampleConverter
+	{
+		static inline int16 GetInternalSample(const int8* value)
+		{
+			return *value << 8;
+		}
+
+		static inline int16 GetInternalSample(const int16* sample)
+		{
+			return *sample;
+		}
+	};
+
+	float sample_t = 0.0f;
+	float sample_delta = (float)INTERNAL_SAMPLE_RATE / samples_per_sec;
+
+	for (int channel_idx = 0; channel_idx < 2; channel_idx++)
+	{
+		const T* input_sample = input_samples + (channel_idx % num_channels);
+		std::vector<int16>& output_samples = stereo_samples[channel_idx];
+
+		int16 last_sample = (output_samples.size() > 0) ? output_samples.back() : 0;
+		for(size_t idx = 0; idx < num_input_samples; idx++)
+		{
+			int16 next_sample = SampleConverter::GetInternalSample(input_sample);
+			sample_t += sample_delta;
+
+			while (sample_t > 1.0f)
+			{
+				int16 sample = last_sample + (next_sample - last_sample) * (1.0f / sample_t);
+				output_samples.push_back(sample);
+
+				sample_t -= 1.0f;
+				last_sample = sample;
+			}
+
+			input_sample += num_channels;
+		}
+
+		if (output_samples.size() > num_samples)
+		{
+			output_samples.erase(output_samples.begin(), output_samples.begin() + (output_samples.size() - num_samples));
+		}
+	}
 }
 
-/*---------------------------------------------
-* AddData( ):
----------------------------------------------*/
-
-void AudioData::AddData(const void* data, size_t data_size)
+void AudioData::WriteData(int num_channels, int samples_per_sec, int bits_per_sample, const void* data, size_t data_size)
 {
-	uint8* data_pos = (uint8*)data;
-
-	size_t nDstIdx = 0;
-	int nMaxSize = (num_samples * data_sample_size * num_data_channels) >> data_freq_shift;
-	if (data_size > nMaxSize)
+	if (bits_per_sample == 8)
 	{
-		data_pos += data_size - nMaxSize;
+		WriteData<int8>(num_channels, samples_per_sec, (const int8*)data, (size_t)(data_size / num_channels));
 	}
-	else if (data_size < nMaxSize)
+	else if (bits_per_sample == 16)
 	{
-		nDstIdx = num_samples - (data_size << data_freq_shift) / (num_data_channels * data_sample_size);
-		memmove(stereo_samples[0].data(), stereo_samples[0].data() + (num_samples - nDstIdx), nDstIdx * sizeof(short int));
-		memmove(stereo_samples[1].data(), stereo_samples[1].data() + (num_samples - nDstIdx), nDstIdx * sizeof(short int));
+		WriteData<int16>(num_channels, samples_per_sec, (const int16*)data, (size_t)(data_size / (num_channels * sizeof(int16))));
 	}
-
-	size_t nIdx = nDstIdx;
-	int nStep = 1 << data_freq_shift;
-
-	//	int nDstIdx = 0;
-	//	int nDstSize = &m_anStereo[ m_nSamples * 2 ] - pnDst;
-	//	int nDstStep = ( 2 * ( 1 << m_nDataFreqShift ) );
-	switch (data_sample_size)
+	else
 	{
-	case 1:
-		for (; nIdx < num_samples; nIdx += nStep)
-		{
-			stereo_samples[0][nIdx] = ((int)*data_pos) << 8;
-			data_pos += num_data_channels - 1;
-			stereo_samples[1][nIdx] = ((int)*data_pos) << 8;
-			data_pos++;
-		}
-		break;
-	case 2:
-		for (; nIdx < num_samples; nIdx += nStep)
-		{
-			stereo_samples[0][nIdx] = *((short int*)data_pos);
-			data_pos += (num_data_channels - 1) * 2;
-			stereo_samples[1][nIdx] = *((short int*)data_pos);
-			data_pos += 2;
-		}
-		break;
-	default:
 		assert(false);
-		break;
 	}
-
-	//	short int *pnMonoDst = &m_anMono[ nDstIdx / 2 ];
-	//	for( int i = nDstIdx; i < m_nSamples * 2; i += 2 )
-	//	{
-	//		*( pnMonoDst++ ) = ( ( int )( m_anStereo[ i + 0 ] ) + ( int )( m_anStereo[ i + 1 ] ) ) >> 1;
-	//	}
 }
 
 /*---------------------------------------------

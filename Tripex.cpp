@@ -435,10 +435,9 @@ void Tripex::Shutdown()
 	effects.clear();
 }
 
-void Tripex::SetAudioData(int num_channels, int sample_rate, int sample_bits, const void* data, size_t data_len)
+void Tripex::WriteAudioData(int num_channels, int sample_rate, int sample_bits, const void* data, size_t data_len)
 {
-	audio->SetDataFormat(num_channels, sample_rate, sample_bits);
-	audio->AddData(data, data_len);
+	audio->WriteData(num_channels, sample_rate, sample_bits, data, data_len);
 }
 
 void Tripex::ChangeEffect()
