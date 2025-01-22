@@ -7,25 +7,10 @@
 
 const float AudioData::FREQ_BAND_POWER = 2.0f;
 
-void DrawLineBar(GeometryBuffer& geom, int x, int y, int h, float p)
-{
-	int n = (int)(h * Clamp<float>(p, 0.0f, 1.0f));
-	geom.AddSprite(Point<int>(x, y), Rect<int>(0, 0, 1, n), 0.1f);
-	geom.AddSprite(Point<int>(x, y + n), Rect<int>(0, 0, 1, h - n), 1.0f);
-}
-
-void DrawHorizontalBar(GeometryBuffer& geom, int x, int y, int w, int h, float p)
-{
-	p = std::min(1.0f, std::max(0.0f, p));
-	geom.AddSprite(Point<int>(x, y), Rect<int>(0, 0, w, h), ColorRgb::Grey(20));
-	geom.AddSprite(Point<int>(x, y), Rect<int>(0, 0, (int)(w * p), h), ColorRgb::White());
-}
-
 AudioData::AudioData(int num_samples) : fourier(num_samples), num_samples(num_samples)
 {
 	mono_samples.resize(num_samples);
-	stereo_samples[0].resize(num_samples);
-	stereo_samples[1].resize(num_samples);
+	stereo_samples.resize(num_samples * 2);
 
 	memset(freq_history, 0, sizeof(freq_history));
 
@@ -54,79 +39,47 @@ AudioData::~AudioData()
 {
 }
 
-template<typename T> void AudioData::WriteData(int num_channels, int samples_per_sec, const T* input_samples, size_t num_input_samples)
+void AudioData::Update(float elapsed, float sensitivity, AudioSource& audio_source)
 {
-	struct SampleConverter
+	sample_pos += elapsed * INTERNAL_SAMPLE_RATE;
+
+	int remove_sample_count = (int)sample_pos;
+
+	int required_sample_count = remove_sample_count + num_samples;
+	if (stereo_samples.size() < required_sample_count * 2)
 	{
-		static inline int16 GetInternalSample(const int8* value)
-		{
-			return *value << 8;
-		}
-
-		static inline int16 GetInternalSample(const int16* sample)
-		{
-			return *sample;
-		}
-	};
-
-	float sample_t = 0.0f;
-	float sample_delta = (float)INTERNAL_SAMPLE_RATE / samples_per_sec;
-
-	for (int channel_idx = 0; channel_idx < 2; channel_idx++)
-	{
-		const T* input_sample = input_samples + (channel_idx % num_channels);
-		std::vector<int16>& output_samples = stereo_samples[channel_idx];
-
-		int16 last_sample = (output_samples.size() > 0) ? output_samples.back() : 0;
-		for(size_t idx = 0; idx < num_input_samples; idx++)
-		{
-			int16 next_sample = SampleConverter::GetInternalSample(input_sample);
-			sample_t += sample_delta;
-
-			while (sample_t > 1.0f)
-			{
-				int16 sample = last_sample + (next_sample - last_sample) * (1.0f / sample_t);
-				output_samples.push_back(sample);
-
-				sample_t -= 1.0f;
-				last_sample = sample;
-			}
-
-			input_sample += num_channels;
-		}
-
-		if (output_samples.size() > num_samples)
-		{
-			output_samples.erase(output_samples.begin(), output_samples.begin() + (output_samples.size() - num_samples));
-		}
+		size_t current_sample_count = stereo_samples.size();
+		stereo_samples.resize(required_sample_count * 2);
+		audio_source.Read(stereo_samples.data() + current_sample_count, required_sample_count - (current_sample_count / 2));
 	}
-}
 
-void AudioData::WriteData(int num_channels, int samples_per_sec, int bits_per_sample, const void* data, size_t data_size)
-{
-	if (bits_per_sample == 8)
-	{
-		WriteData<int8>(num_channels, samples_per_sec, (const int8*)data, (size_t)(data_size / num_channels));
-	}
-	else if (bits_per_sample == 16)
-	{
-		WriteData<int16>(num_channels, samples_per_sec, (const int16*)data, (size_t)(data_size / (num_channels * sizeof(int16))));
-	}
-	else
-	{
-		assert(false);
-	}
-}
+	stereo_samples.erase(stereo_samples.begin(), stereo_samples.begin() + remove_sample_count * 2);
+	sample_pos -= remove_sample_count;
 
-/*---------------------------------------------
-* Update( ):
----------------------------------------------*/
+/*
 
-void AudioData::Update(float elapsed, float sensitivity)
-{
+	int read_num_samples = num_samples * 10;
+
+	sample_pos += elapsed * INTERNAL_SAMPLE_RATE;
+
+
+	int remove_samples = (int)sample_pos;
+	sample_pos -= remove_samples;
+
+	int remove_stereo_sample_count = std::min(remove_samples * 2, (int)stereo_samples.size());
+	stereo_samples.erase(stereo_samples.begin(), stereo_samples.begin() + remove_stereo_sample_count);
+
+	size_t required_sample_count = read_num_samples * 2;
+	if (stereo_samples.size() < required_sample_count)
+	{
+		size_t current_sample_count = stereo_samples.size();
+		stereo_samples.resize(required_sample_count);
+		audio_source.Read(stereo_samples.data() + current_sample_count, read_num_samples - (current_sample_count / 2));
+	}
+	*/
 	for (int i = 0; i < num_samples; i++)
 	{
-		mono_samples[i] = ((int)stereo_samples[0][i] + (int)stereo_samples[1][i]) / 2;
+		mono_samples[i] = ((int)stereo_samples[(i * 2) + 0] + (int)stereo_samples[(i * 2) + 1]) / 2;
 	}
 
 	fourier.Update(mono_samples.data());
@@ -136,8 +89,8 @@ void AudioData::Update(float elapsed, float sensitivity)
 		bands[i] = band_mul[i] * fourier.GetAmplitude(band_idx[i]);
 	}
 
-	elapsed = std::min(elapsed + elapsed, 1.0f);
-	for (; elapsed > 0.5f; elapsed -= 0.5f)
+	float frames = std::min(elapsed * 30.0f, 1.0f);
+	for (; frames > 0.5f; frames -= 0.5f)
 	{
 		for (size_t idx = FREQ_HISTORY_SIZE - 1; idx > 0; idx--)
 		{
@@ -202,10 +155,6 @@ void AudioData::Update(float elapsed, float sensitivity)
 	}
 }
 
-/*---------------------------------------------
-* Render( ):
----------------------------------------------*/
-
 void AudioData::Render(GeometryBuffer& overlay_back, GeometryBuffer& overlay, float overlay_back_mult) const
 {
 	overlay_back.AddSprite(Point<int>(10, 30), Rect<int>(0, 0, 600, 400), overlay_back_mult);
@@ -224,18 +173,27 @@ void AudioData::Render(GeometryBuffer& overlay_back, GeometryBuffer& overlay, fl
 	}
 }
 
-/*---------------------------------------------
-* GetRandomSample( ):
----------------------------------------------*/
-
+/*
+void AudioData::WriteData(int num_channels, int samples_per_sec, int bits_per_sample, const void* data, size_t data_size)
+{
+	if (bits_per_sample == 8)
+	{
+		WriteData<int8>(num_channels, samples_per_sec, (const int8*)data, (size_t)(data_size / num_channels));
+	}
+	else if (bits_per_sample == 16)
+	{
+		WriteData<int16>(num_channels, samples_per_sec, (const int16*)data, (size_t)(data_size / (num_channels * sizeof(int16))));
+	}
+	else
+	{
+		assert(false);
+	}
+}
+*/
 float AudioData::GetRandomSample() const
 {
 	return mono_samples[(rand() * num_samples) / RAND_MAX] * (1.0f / (1 << 16));
 }
-
-/*---------------------------------------------
-* GetDampenedBand( ):
----------------------------------------------*/
 
 float AudioData::GetDampenedBand(float dampen, float min, float max) const
 {
@@ -288,11 +246,25 @@ float AudioData::GetSample(int channel_idx, int sample_idx) const
 {
 	assert(sample_idx >= 0 && sample_idx < num_samples);
 	assert(channel_idx >= 0 && channel_idx < 2);
-	return ((float)stereo_samples[channel_idx][sample_idx]) / (1 << 15);
+	return ((float)stereo_samples[(sample_idx * 2) + channel_idx]) / (1 << 15);
 }
 
 float AudioData::GetBand(int idx) const
 {
 	assert(idx >= 0 && idx < num_samples);
 	return bands[idx];
+}
+
+void AudioData::DrawLineBar(GeometryBuffer& geom, int x, int y, int h, float p)
+{
+	int n = (int)(h * Clamp<float>(p, 0.0f, 1.0f));
+	geom.AddSprite(Point<int>(x, y), Rect<int>(0, 0, 1, n), 0.1f);
+	geom.AddSprite(Point<int>(x, y + n), Rect<int>(0, 0, 1, h - n), 1.0f);
+}
+
+void AudioData::DrawHorizontalBar(GeometryBuffer& geom, int x, int y, int w, int h, float p)
+{
+	p = std::min(1.0f, std::max(0.0f, p));
+	geom.AddSprite(Point<int>(x, y), Rect<int>(0, 0, w, h), ColorRgb::Grey(20));
+	geom.AddSprite(Point<int>(x, y), Rect<int>(0, 0, (int)(w * p), h), ColorRgb::White());
 }

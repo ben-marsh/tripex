@@ -10,14 +10,12 @@
 class Tripex
 {
 public:
-	Tripex(Renderer& renderer);
+	Tripex(std::shared_ptr<Renderer> renderer);
 	~Tripex();
 
 	Error* Startup();
-	Error* Render();
+	Error* Render(AudioSource& audio_source);
 	void Shutdown();
-
-	void WriteAudioData(int num_channels, int sample_rate, int sample_bits, const void* data, size_t data_len);
 
 	void ChangeEffect();
 	void MoveToPrevEffect();
@@ -57,7 +55,7 @@ private:
 	GeometryBuffer overlay_text;
 	GeometryBuffer overlay_foreground;
 
-	Renderer& renderer;
+	std::shared_ptr<Renderer> renderer;
 	TextureFont tef;
 	float effect_frames, fade_pos;
 	char status_msg[256];

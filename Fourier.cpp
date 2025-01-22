@@ -88,7 +88,6 @@ void Fourier::Update(const short int* anSample)
 	}
 }
 
-
 float Fourier::GetAmplitude(int index) const
 {
 	assert(index >= 0 && index < num_samples);

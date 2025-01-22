@@ -1,12 +1,13 @@
 #pragma once
 
+#include "AudioSource.h"
 #include "Fourier.h"
 #include "GeometryBuffer.h"
 
 class AudioData
 {
 protected:
-	static const int INTERNAL_SAMPLE_RATE = 44100;
+	static const int INTERNAL_SAMPLE_RATE = AudioSource::SAMPLE_RATE;
 
 	static const int FREQ_HISTORY_SIZE = 20;
 	static const int FREQ_BANDS = 256;
@@ -15,7 +16,7 @@ protected:
 	static const float FREQ_BAND_POWER;
 
 	std::vector<int16> mono_samples;
-	std::vector<int16> stereo_samples[2];
+	std::vector<int16> stereo_samples;
 	float freq_history[FREQ_HISTORY_SIZE][16];
 	Fourier fourier;
 
@@ -36,9 +37,7 @@ public:
 	AudioData(int num_samples);
 	~AudioData();
 
-	void WriteData(int num_channels, int samples_per_sec, int bits_per_sample, const void* data, size_t data_size);
-
-	void Update(float elapsed, float sensitivity);
+	void Update(float elapsed, float sensitivity, AudioSource& audio_source);
 	void Render(GeometryBuffer& overlay_back, GeometryBuffer& overlay, float overlay_back_mult) const;
 
 	float GetIntensity() const;
@@ -54,5 +53,8 @@ public:
 	float GetBand(int idx) const;
 
 private:
-	template<typename T> void WriteData(int num_channels, int samples_per_sec, const T* input_samples, size_t num_input_samples);
+	float sample_pos = 0;
+
+	static void DrawLineBar(GeometryBuffer& geom, int x, int y, int h, float p);
+	static void DrawHorizontalBar(GeometryBuffer& geom, int x, int y, int w, int h, float p);
 };

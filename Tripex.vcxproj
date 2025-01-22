@@ -193,6 +193,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AudioDevice.cpp" />
+    <ClCompile Include="AudioSource.cpp" />
     <ClCompile Include="ColorHsv.cpp" />
     <ClCompile Include="GeometryBuffer.cpp" />
     <ClCompile Include="Renderer.cpp" />
@@ -246,6 +248,8 @@
     <ClCompile Include="Tripex.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AudioDevice.h" />
+    <ClInclude Include="AudioSource.h" />
     <ClInclude Include="ComPtr.h" />
     <ClInclude Include="GeometryBuffer.h" />
     <ClInclude Include="Renderer.h" />

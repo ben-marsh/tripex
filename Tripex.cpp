@@ -37,8 +37,8 @@ IMPORT_EFFECT(LightRing);
 
 /****** constants *****/
 
-Tripex::Tripex(Renderer& renderer)
-	: renderer(renderer)
+Tripex::Tripex(std::shared_ptr<Renderer> renderer)
+	: renderer(std::move(renderer))
 {
 	CreateEffects();
 }
@@ -90,7 +90,7 @@ Error* Tripex::Startup()
 	//	}
 	//	}
 
-	Error* error = renderer.CreateTexture(256, 256, TextureFormat::P8, &tex_raw_gui[1], 256 * 256, 256, pe.data(), TextureFlags::None, gui);
+	Error* error = renderer->CreateTexture(256, 256, TextureFormat::P8, &tex_raw_gui[1], 256 * 256, 256, pe.data(), TextureFlags::None, gui);
 	if (error) return TraceError(error);
 
 	//	gui = auto_ptr< ZTexture >(new ZTexture(pc));//(ZColour*)g_anTexRawGUI ));//cGUI.GetPtr()));
@@ -103,7 +103,7 @@ Error* Tripex::Startup()
 	tef.Add((uint8*)&tex_raw_font[1]);
 	tef.FindGlyph(' ')->end = 2;
 
-	error = tef.Create(renderer);
+	error = tef.Create(*renderer);
 	if (error) return TraceError(error);
 
 	//	renderer.AddTexture( tef.GetTexture( ) );
@@ -145,7 +145,7 @@ Error* Tripex::Startup()
 
 					if (internal_texture != tex_blank)
 					{
-						error = renderer.CreateTextureFromImage(internal_texture + 1, *internal_texture, texture);
+						error = renderer->CreateTextureFromImage(internal_texture + 1, *internal_texture, texture);
 						if (error != nullptr) return error;
 					}
 
@@ -165,7 +165,7 @@ Error* Tripex::Startup()
 	return nullptr;
 }
 
-Error* Tripex::Render()
+Error* Tripex::Render(AudioSource& audio_source)
 {
 	uint32 time = GetSystemTimestampMs();
 	if (txs.test(TXS_RESET_TIMING))//bResetTiming)
@@ -175,6 +175,7 @@ Error* Tripex::Render()
 	}
 
 	uint32 dwTimeChange = time - last_time;
+	float elapsed = dwTimeChange / 1000.0f;
 
 	frames += std::min(4.0f, dwTimeChange / (1000.0f / 15.0f));
 	last_time = time;
@@ -335,13 +336,13 @@ Error* Tripex::Render()
 		return nullptr;
 	}
 
-	audio->Update(frames, enabled_effects[effect_idx]->sensitivity);
+	audio->Update(elapsed, enabled_effects[effect_idx]->sensitivity, audio_source);
 
 	for (int i = 0; i < 2; i++)
 	{
 		audio->SetIntensityBeatScale(draw_effects[i]->sensitivity * 3.0f);
 
-		Effect::CalculateParams params(draw_effects[i]->fBr, draw_effects[i]->GetElapsed(frames), *audio.get(), renderer);
+		Effect::CalculateParams params(draw_effects[i]->fBr, draw_effects[i]->GetElapsed(frames), *audio.get(), *renderer);
 
 		Error* error = draw_effects[i]->Calculate(params);
 		if (error) return TraceError(error);
@@ -349,12 +350,12 @@ Error* Tripex::Render()
 		audio->SetIntensityBeatScale(0.0f);
 	}
 
-	Error* error = renderer.BeginFrame();
+	Error* error = renderer->BeginFrame();
 	if (error) return TraceError(error);
 
 	for (int i = 0; i < 2; i++)
 	{
-		error = draw_effects[i]->Render(renderer);
+		error = draw_effects[i]->Render(*renderer);
 		if (error) return TraceError(error);
 	}
 
@@ -396,7 +397,7 @@ Error* Tripex::Render()
 		render_state.blend_mode = BlendMode::OverlayBackground;
 		render_state.depth_mode = DepthMode::Disable;
 
-		error = renderer.DrawIndexedPrimitive(render_state, overlay_background);
+		error = renderer->DrawIndexedPrimitive(render_state, overlay_background);
 		if (error) return TraceError(error);
 	}
 
@@ -407,7 +408,7 @@ Error* Tripex::Render()
 		render_state.depth_mode = DepthMode::Disable;
 		render_state.texture_stages[0].texture = tef.texture.get();
 
-		error = renderer.DrawIndexedPrimitive(render_state, overlay_text);
+		error = renderer->DrawIndexedPrimitive(render_state, overlay_text);
 		if (error) return TraceError(error);
 	}
 
@@ -417,11 +418,11 @@ Error* Tripex::Render()
 		render_state.blend_mode = BlendMode::OverlayForeground;
 		render_state.depth_mode = DepthMode::Disable;
 
-		error = renderer.DrawIndexedPrimitive(render_state, overlay_foreground);
+		error = renderer->DrawIndexedPrimitive(render_state, overlay_foreground);
 		if (error) return TraceError(error);
 	}
 
-	error = renderer.EndFrame();
+	error = renderer->EndFrame();
 	if (error) return TraceError(error);
 
 	frames = 0;
@@ -433,11 +434,6 @@ void Tripex::Shutdown()
 
 	enabled_effects.clear();
 	effects.clear();
-}
-
-void Tripex::WriteAudioData(int num_channels, int sample_rate, int sample_bits, const void* data, size_t data_len)
-{
-	audio->WriteData(num_channels, sample_rate, sample_bits, data, data_len);
 }
 
 void Tripex::ChangeEffect()
@@ -506,7 +502,7 @@ int Tripex::GetClippedLineLength(const TextureFont& font, const char* text, int 
 
 void Tripex::DrawMessage(const TextureFont& font, int y, const char* text, float brightness, float back_brightness)
 {
-	const int clip_width = renderer.GetWidth() - 40;
+	const int clip_width = renderer->GetWidth() - 40;
 	const int line_height = 20;
 
 	std::vector<std::string> lines;
@@ -532,7 +528,7 @@ void Tripex::DrawMessage(const TextureFont& font, int y, const char* text, float
 		}
 	}
 
-	int centre_x = renderer.GetWidth() / 2;
+	int centre_x = renderer->GetWidth() / 2;
 
 	if (back_brightness > FLOAT_ZERO)
 	{

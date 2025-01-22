@@ -53,6 +53,8 @@
     <ClCompile Include="RendererDirect3d.cpp" />
     <ClCompile Include="Vertex.cpp" />
     <ClCompile Include="VertexGrid.cpp" />
+    <ClCompile Include="AudioSource.cpp" />
+    <ClCompile Include="AudioDevice.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Effect.h" />
@@ -91,6 +93,8 @@
     <ClInclude Include="RendererDirect3d.h" />
     <ClInclude Include="VertexGrid.h" />
     <ClInclude Include="WideColorRgb.h" />
+    <ClInclude Include="AudioSource.h" />
+    <ClInclude Include="AudioDevice.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Fourier.inl" />
