@@ -162,6 +162,8 @@ Error* Tripex::Startup()
 
 	txs.set(TXS_RESET_TIMING);
 
+	txs.set(TXS_SHOW_HELP);
+
 	return nullptr;
 }
 
@@ -391,6 +393,45 @@ Error* Tripex::Render(AudioSource& audio_source)
 		audio->Render(overlay_background, overlay_foreground, overlay_back_mult);
 	}
 
+	if (txs.test(TXS_SHOW_HELP))
+	{
+		static const char* help_text[][2] =
+		{
+			{ "F1", "Toggle this help window" },
+			{ "F2", "Show audio info" },
+			{ "<-", "Previous effect" },
+			{ "->", "Next effect" },
+			{ "R", "Reconfigure current effect" },
+			{ "E", "Choose random effect" },
+			{ "H", "Hold current effect" },
+			{ "O", "Open a WAV file for playback" },
+			{ "T", "Play a test tone" },
+			{ "M", "Mute audio (use random data)" }
+		};
+
+		int num_lines = sizeof(help_text) / sizeof(help_text[0]);
+
+		int margin_x = 40;
+		int margin_y = 10;
+		int col1_w = 100;
+		int col2_w = 250;
+		int line_height = 20;
+
+		int w = (margin_x * 2) + col1_w + col2_w;
+		int h = (margin_y * 2) + (line_height * num_lines);
+		int x = (renderer->GetWidth() - w) / 2;
+		int y = (renderer->GetHeight() - h) / 2;
+
+		overlay_background.AddSprite(Point<int>(x, y), Rect<int>(0, 0, w, h), overlay_back_mult);
+
+		for (int line_idx = 0; line_idx < num_lines; line_idx++)
+		{
+			int line_y = y + margin_y + (line_height * line_idx);
+			tef.Draw(overlay_text, help_text[line_idx][0], Point<int>(x + margin_x + 10 - tef.GetWidth(help_text[line_idx][0]) / 2, line_y), ColorRgb::Grey(192.0f));
+			tef.Draw(overlay_text, help_text[line_idx][1], Point<int>(x + margin_x + col1_w, line_y), ColorRgb::Grey(192.0f));
+		}
+	}
+
 	// Draw the overlay background
 	{
 		RenderState render_state;
@@ -465,6 +506,11 @@ void Tripex::ToggleHoldingEffect()
 void Tripex::ToggleAudioInfo()
 {
 	txs.flip(TXS_VISIBLE_BEATS);
+}
+
+void Tripex::ToggleHelp()
+{
+	txs.flip(TXS_SHOW_HELP);
 }
 
 int Tripex::GetClippedLineLength(const TextureFont& font, const char* text, int clip_width)

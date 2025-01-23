@@ -24,6 +24,7 @@ public:
 	void ToggleHoldingEffect();
 
 	void ToggleAudioInfo();
+	void ToggleHelp();
 
 private:
 	static const int MSG_DISPLAY_TIME = 4000;
@@ -40,6 +41,7 @@ private:
 		TXS_RECONFIGURE,
 		TXS_HOLD,
 		TXS_RESET_TARGET,
+		TXS_SHOW_HELP,
 
 		TXS_LAST,
 	};

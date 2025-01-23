@@ -130,6 +130,9 @@ LRESULT WndProc(HWND hWnd, uint32 nMsg, WPARAM wParam, LPARAM lParam)
 			case VK_ESCAPE:
 				DestroyWindow(hWnd);
 				break;
+			case VK_F1:
+				app->tripex->ToggleHelp();
+				break;
 			case VK_F2:
 				app->tripex->ToggleAudioInfo();
 				break;
