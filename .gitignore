@@ -1,6 +1,6 @@
 .vs/
 packages/
-Tripex/
+/Tripex/
 x64/
 *.dsp
 *.plg
