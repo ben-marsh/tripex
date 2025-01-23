@@ -16,7 +16,7 @@ AudioData::AudioData(int num_samples) : fourier(num_samples), num_samples(num_sa
 
 	intensity = 0.0f;
 	beat = 0.0f;
-	is_beat = FALSE;
+	is_beat = false;
 	intensity_beat_scale = 0.0f;
 
 	static const float power = 2.0f;
@@ -117,12 +117,12 @@ void AudioData::Update(float elapsed, float sensitivity, AudioSource& audio_sour
 			float limit = 500.0f - 4.8f * sensitivity;
 			if (size > limit)
 			{
-				is_beat = TRUE;
+				is_beat = true;
 				beat += 0.5f * size / limit;
 			}
 			else
 			{
-				is_beat = FALSE;
+				is_beat = false;
 			}
 
 			memmove(&beat_history[1], &beat_history[0], sizeof(beat_history[0]) * (BEATHISTORY - 1));

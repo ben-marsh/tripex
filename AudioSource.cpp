@@ -53,7 +53,12 @@ void MemoryAudioSource::Read(void* read_data, size_t read_size)
 Error* MemoryAudioSource::CreateFromWavFile(const char* path, std::unique_ptr<MemoryAudioSource>& out_source)
 {
 	// Read the raw data into memory
-	FILE* file = fopen(path, "rb");
+	FILE* file;
+	if (fopen_s(&file, path, "rb") != 0)
+	{
+		return new Error(std::string("Unable to open file: ") + std::string(path));
+	}
+
 	fseek(file, 0, SEEK_END);
 	long length = ftell(file);
 	fseek(file, 0, SEEK_SET);

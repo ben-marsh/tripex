@@ -2,7 +2,6 @@
 #include "AudioData.h"
 #include <deque>
 #include <commdlg.h>
-#include "stdafx.h"
 #include "Tripex.h"
 #include "RendererDirect3d.h"
 #include "effect.h"

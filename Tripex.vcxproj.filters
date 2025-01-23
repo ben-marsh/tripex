@@ -4,7 +4,6 @@
     <ClCompile Include="error.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Misc.cpp" />
-    <ClCompile Include="StdAfx.cpp" />
     <ClCompile Include="AudioData.cpp" />
     <ClCompile Include="Effect.cpp" />
     <ClCompile Include="Fourier.cpp" />
@@ -60,7 +59,6 @@
     <ClInclude Include="Effect.h" />
     <ClInclude Include="Error.h" />
     <ClInclude Include="Misc.h" />
-    <ClInclude Include="StdAfx.h" />
     <ClInclude Include="AudioData.h" />
     <ClInclude Include="Fourier.h" />
     <ClInclude Include="Platform.h" />
