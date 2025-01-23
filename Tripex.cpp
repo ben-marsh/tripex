@@ -399,8 +399,8 @@ Error* Tripex::Render(AudioSource& audio_source)
 		{
 			{ "F1", "Toggle this help window" },
 			{ "F2", "Show audio info" },
-			{ "<-", "Previous effect" },
-			{ "->", "Next effect" },
+			{ "<", "Previous effect" },
+			{ ">", "Next effect" },
 			{ "R", "Reconfigure current effect" },
 			{ "E", "Choose random effect" },
 			{ "H", "Hold current effect" },
@@ -412,7 +412,7 @@ Error* Tripex::Render(AudioSource& audio_source)
 		int num_lines = sizeof(help_text) / sizeof(help_text[0]);
 
 		int margin_x = 40;
-		int margin_y = 10;
+		int margin_y = 15;
 		int col1_w = 100;
 		int col2_w = 250;
 		int line_height = 20;
