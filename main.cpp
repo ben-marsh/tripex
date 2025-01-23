@@ -1,6 +1,7 @@
 #include "Platform.h"
 #include "AudioData.h"
 #include <deque>
+#include <commdlg.h>
 #include "stdafx.h"
 #include "Tripex.h"
 #include "RendererDirect3d.h"
@@ -20,6 +21,25 @@ struct AppState
 	std::shared_ptr<AudioSource> audio_source;
 };
 
+Error* CreateWaveOutDevice(AppState& app, std::unique_ptr<AudioSource> new_audio_source)
+{
+	app.audio_device.reset();
+	app.audio_source.reset();
+
+	std::shared_ptr<WaveOutAudioDevice> device = std::make_shared<WaveOutAudioDevice>(std::move(new_audio_source));
+
+	Error* error = device->Create();
+	if (error != nullptr)
+	{
+		return error;
+	}
+
+	app.audio_device = device;
+	app.audio_source = device;
+
+	return nullptr;
+}
+
 LRESULT WndProc(HWND hWnd, uint32 nMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (nMsg)
@@ -29,37 +49,11 @@ LRESULT WndProc(HWND hWnd, uint32 nMsg, WPARAM wParam, LPARAM lParam)
 			AppState* app = new AppState();
 			SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)app);
 
-			Error* error = nullptr;
-			if (1)
-			{
-				std::shared_ptr<WaveOutAudioDevice> device = std::make_shared<WaveOutAudioDevice>();
-				error = device->CreateDefault();
-				//				error = source->Open(hWnd, "C:\\dump\\yardact.wav");
-
-				app->audio_device = device;
-				app->audio_source = device;
-			}
-			else if (1)
-			{
-				app->audio_device.reset();
-				app->audio_source = std::make_shared<RandomAudioSource>();
-			}
-			else
-			{
-				assert(false);
-				//				g_pAudioSource = new WaveInAudioSource();
-				//				g_pAudioSource->
-			}
-
-			if (error)
-			{
-				HandleError(hWnd, error);
-				return FALSE;
-			}
-
 			app->renderer = std::make_shared<RendererDirect3d>();
+			app->audio_device.reset();
+			app->audio_source = std::make_shared<RandomAudioSource>();
 
-			error = app->renderer->Open(hWnd);
+			Error* error = app->renderer->Open(hWnd);
 			if (error)
 			{
 				HandleError(hWnd, error);
@@ -153,6 +147,80 @@ LRESULT WndProc(HWND hWnd, uint32 nMsg, WPARAM wParam, LPARAM lParam)
 				break;
 			case 'H':
 				app->tripex->ToggleHoldingEffect();
+				break;
+			case 'M':
+				app->audio_device.reset();
+				app->audio_source = std::make_shared<RandomAudioSource>();
+				break;
+			case 'O':
+				{
+					char filename[MAX_PATH] = {};
+
+					OPENFILENAMEA ofn = {};
+					ofn.lStructSize = sizeof(ofn);
+					ofn.hwndOwner = hWnd;
+					ofn.lpstrFilter = "Wav files (*.wav)\0*.wav\0All files (*.*)\0*.*\0";
+					ofn.lpstrFile = filename;
+					ofn.nMaxFile = sizeof(filename);
+					ofn.nFilterIndex = 1;
+					ofn.lpstrFileTitle = NULL;
+					ofn.nMaxFileTitle = 0;
+					ofn.lpstrInitialDir = NULL;
+					ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+
+					if (GetOpenFileNameA(&ofn))
+					{
+						std::unique_ptr<MemoryAudioSource> source;
+
+						Error* error = MemoryAudioSource::CreateFromWavFile(filename, source);
+						if (error != nullptr)
+						{
+							HandleError(hWnd, error);
+							return FALSE;
+						}
+
+						error = CreateWaveOutDevice(*app, std::move(source));
+						if (error != nullptr)
+						{
+							HandleError(hWnd, error);
+							return FALSE;
+						}
+					}
+				}
+				break;
+			case 'T':
+				{
+					int length = 20; // length in seconds
+					int num_channels = 2;
+					int sample_rate = 44100;
+
+					size_t block_size = num_channels * sizeof(int16);
+					size_t num_blocks = length * sample_rate;
+
+					size_t buffer_size = num_blocks * block_size;
+					std::unique_ptr<uint8[]> buffer = std::make_unique<uint8[]>(buffer_size);
+
+					int16* next_sample = (int16*)buffer.get();
+					for (int idx = 0; idx < num_blocks; idx++)
+					{
+						float time = (float)idx / sample_rate;
+						float frequency = ((((int)time) % 2) == 0) ? 256.0f : 512.0f;
+						float angle = time * frequency * PI2;
+
+						int16 sample = (int16)(32760.0f * sinf(angle));
+						*(next_sample++) = sample;
+						*(next_sample++) = sample;
+					}
+
+					std::unique_ptr<MemoryAudioSource> source = std::make_unique<MemoryAudioSource>(std::move(buffer), buffer_size);
+
+					Error* error = CreateWaveOutDevice(*app, std::move(source));
+					if (error != nullptr)
+					{
+						HandleError(hWnd, error);
+						return FALSE;
+					}
+				}
 				break;
 			}
 		}

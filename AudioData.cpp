@@ -41,42 +41,21 @@ AudioData::~AudioData()
 
 void AudioData::Update(float elapsed, float sensitivity, AudioSource& audio_source)
 {
-	sample_pos += elapsed * INTERNAL_SAMPLE_RATE;
+	// Add new audio data to the stereo buffer
+	block_pos += elapsed * INTERNAL_SAMPLE_RATE;
 
-	int remove_sample_count = (int)sample_pos;
+	size_t block_count = stereo_samples.size() / 2;
+	size_t remove_block_count = std::min((size_t)block_pos, block_count);
 
-	int required_sample_count = remove_sample_count + num_samples;
-	if (stereo_samples.size() < required_sample_count * 2)
-	{
-		size_t current_sample_count = stereo_samples.size();
-		stereo_samples.resize(required_sample_count * 2);
-		audio_source.Read(stereo_samples.data() + current_sample_count, required_sample_count - (current_sample_count / 2));
-	}
+	stereo_samples.erase(stereo_samples.begin(), stereo_samples.begin() + remove_block_count * 2);
+	block_pos -= remove_block_count;
 
-	stereo_samples.erase(stereo_samples.begin(), stereo_samples.begin() + remove_sample_count * 2);
-	sample_pos -= remove_sample_count;
+	size_t current_sample_count = stereo_samples.size();
+	stereo_samples.resize(num_samples * 2);
 
-/*
+	audio_source.Read(stereo_samples.data() + current_sample_count, (stereo_samples.size() - current_sample_count) * sizeof(int16));
 
-	int read_num_samples = num_samples * 10;
-
-	sample_pos += elapsed * INTERNAL_SAMPLE_RATE;
-
-
-	int remove_samples = (int)sample_pos;
-	sample_pos -= remove_samples;
-
-	int remove_stereo_sample_count = std::min(remove_samples * 2, (int)stereo_samples.size());
-	stereo_samples.erase(stereo_samples.begin(), stereo_samples.begin() + remove_stereo_sample_count);
-
-	size_t required_sample_count = read_num_samples * 2;
-	if (stereo_samples.size() < required_sample_count)
-	{
-		size_t current_sample_count = stereo_samples.size();
-		stereo_samples.resize(required_sample_count);
-		audio_source.Read(stereo_samples.data() + current_sample_count, read_num_samples - (current_sample_count / 2));
-	}
-	*/
+	// Downsample it to mono
 	for (int i = 0; i < num_samples; i++)
 	{
 		mono_samples[i] = ((int)stereo_samples[(i * 2) + 0] + (int)stereo_samples[(i * 2) + 1]) / 2;

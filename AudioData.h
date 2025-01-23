@@ -53,7 +53,7 @@ public:
 	float GetBand(int idx) const;
 
 private:
-	float sample_pos = 0;
+	float block_pos = 0;
 
 	static void DrawLineBar(GeometryBuffer& geom, int x, int y, int h, float p);
 	static void DrawHorizontalBar(GeometryBuffer& geom, int x, int y, int w, int h, float p);

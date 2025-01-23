@@ -4,48 +4,52 @@
 #include "AudioSource.h"
 #include "Error.h"
 #include <deque>
+#include <memory>
 #include <mmeapi.h>
 
-class AudioDevice : public AudioSource
+class AudioDevice
 {
 public:
-	virtual Error* Tick(float elapsed) = 0;
+	virtual ~AudioDevice();
+	virtual Error* Create() = 0;
 	virtual Error* Destroy() = 0;
+	virtual Error* Tick(float elapsed) = 0;
 };
 
-class WaveOutAudioDevice : public AudioDevice
+class WaveOutAudioDevice : public AudioDevice, public AudioSource
 {
 public:
-	Error* CreateDefault();
-	Error* Open(const char* filename);
+	WaveOutAudioDevice(std::unique_ptr<AudioSource> in_source);
+	~WaveOutAudioDevice();
 
-	virtual Error* Tick(float elapsed) override;
+	virtual Error* Create() override;
 	virtual Error* Destroy() override;
+	virtual Error* Tick(float elapsed) override;
 
-	virtual void Read(int16* data, size_t num_samples) override;
+	virtual void Read(void* read_data, size_t read_size) override;
 
 private:
-	static const int BUFFERED_PACKETS = 4;
+	static const int NUM_PACKETS = 4;
+
+	struct Packet
+	{
+		size_t stream_pos;
+		WAVEHDR header = {};
+		std::unique_ptr<uint8[]> buffer;
+		size_t buffer_size = 0;
+	};
+
+	size_t stream_pos;
+	size_t read_pos;
 
 	HWAVEOUT waveout_handle = nullptr;
-	bool closing = false;
+	std::unique_ptr<AudioSource> audio_source;
 
-	std::unique_ptr<uint8[]> wav_file_data;
-	std::deque<std::unique_ptr<WAVEHDR>> waveout_packets;
-
-	WAVEFORMATEX wav_format = {};
-
-	const uint8* wav_data = nullptr;
-	uint32 wav_data_pos = 0;
-	uint32 wav_data_len = 0;
-
-	float sample_pos = 0.0;
-
-	Error* CreateWaveOutError(MMRESULT res);
+	Packet packets[NUM_PACKETS];
+	int next_packet = 0;
 
 	static void CALLBACK WaveOutStaticCallback(HWAVEOUT hwo, UINT uMsg, DWORD_PTR dwInstance, DWORD_PTR dwParam1, DWORD_PTR dwParam2);
 
-	Error* CreateWaveOut();
-	Error* DestroyWaveOut();
-	Error* WriteNextPacket();
+	Error* WriteNextPackets();
+	Error* CreateWaveOutError(MMRESULT res);
 };
